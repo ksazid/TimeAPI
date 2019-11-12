@@ -17,10 +17,10 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
+  <!--<ItemGroup>
     <Reference Include="TimeAPI.API">
       <HintPath>..\TimeAPI.API\bin\Debug\netcoreapp3.0\TimeAPI.API.dll</HintPath>
     </Reference>
-  </ItemGroup>
+  </ItemGroup>-->
 
 </Project>

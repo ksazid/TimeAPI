@@ -2,9 +2,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TimeAPI.API.Controllers;
-using TimeAPI.API.Models;
-using TimeAPI.API.Services;
 
 namespace TimeAPI.Test
 {
