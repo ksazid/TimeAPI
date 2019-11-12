@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace AspNetCoreIdentityExample.Web.Models.AccountViewModels
+namespace TimeAPI.API.Models.AccountViewModels
 {
     public class LoginWith2faViewModel
     {

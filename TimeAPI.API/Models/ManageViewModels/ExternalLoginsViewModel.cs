@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 
-namespace AspNetCoreIdentityExample.Web.Models.ManageViewModels
+namespace TimeAPI.API.Models.ManageViewModels
 {
     public class ExternalLoginsViewModel
     {

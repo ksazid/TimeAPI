@@ -1,4 +1,4 @@
-﻿using AspNetCoreIdentityExample.Web.Models.AccountViewModels;
+﻿using TimeAPI.API.Models.AccountViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -60,7 +60,7 @@ namespace TimeAPI.API.Controllers
 
             try
             {
-                UserModel.Role = "Admin";
+                UserModel.Role = "admin";
                 var result = await _userManager.CreateAsync(appUser, UserModel.Password);
                 var xRest = await _userManager.AddToRoleAsync(appUser, UserModel.Role);
                 return Ok(result);
@@ -72,10 +72,8 @@ namespace TimeAPI.API.Controllers
         }
 
         [HttpPost]
-        [AllowAnonymous]
         [Route("Login")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginViewModel model)
+        public async Task<IActionResult> Login([FromBody]LoginViewModel model)
         {
             //ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)

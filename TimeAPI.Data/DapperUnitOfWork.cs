@@ -27,14 +27,12 @@ namespace TimeAPI.Data
 
         public DapperUnitOfWork(string connectionString)
         {
-            using (var sqlConnection = new Microsoft.Data.SqlClient.SqlConnection(connectionString))
-            {
-                sqlConnection.OpenAsync();
-            };
-            //Microsoft.SqlServer.Server.SqlConnection sqlConnectionMicrosoft = new Microsoft.Data.SqlClient.SqlConnection(connectionString);
-            //_connection = new Microsoft.Data.SqlClient.SqlConnection(connectionString);
+            _connection = new Microsoft.Data.SqlClient.SqlConnection(connectionString);
             _connection.Open();
             _transaction = _connection.BeginTransaction();
+            //Microsoft.SqlServer.Server.SqlConnection sqlConnectionMicrosoft = new Microsoft.Data.SqlClient.SqlConnection(connectionString);
+            //_connection = new Microsoft.Data.SqlClient.SqlConnection(connectionString);
+
         }
 
         #region IUnitOfWork Members
