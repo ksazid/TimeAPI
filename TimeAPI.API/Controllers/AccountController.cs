@@ -13,12 +13,15 @@ using System.Text;
 using System.Threading.Tasks;
 using TimeAPI.API.Models;
 using TimeAPI.API.Services;
+using Microsoft.AspNetCore.Cors;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace TimeAPI.API.Controllers
 {
+
     //[Authorize]
+    [EnableCors("AllowOrigin")]
     [Route("api/[controller]")]
     public class AccountController : Controller
     {

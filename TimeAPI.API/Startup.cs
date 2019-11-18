@@ -1,6 +1,7 @@
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Cors;
 //using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -48,6 +49,13 @@ namespace TimeAPI.API
                         .AllowAnyMethod()
                         .AllowAnyHeader()
                         .AllowCredentials();
+                    });
+
+                options.AddPolicy("AllowSubdomain",
+                    builder =>
+                    {
+                        builder.WithOrigins("https://*.azurewebsites.net")
+                            .SetIsOriginAllowedToAllowWildcardSubdomains();
                     });
             });
 
@@ -118,6 +126,18 @@ namespace TimeAPI.API
             {
                 app.UseExceptionHandler("/Home/Error");
             }
+
+            //WebAPI Hosted URL
+            app.UseCors("AllowAll");
+            app.UseCors(builder =>
+                builder.WithOrigins(Configuration["ApplicationSettings:Client_URL"].ToString(),
+                                    "http://localhost:4200",
+                                    "https://enforce.azurewebsites.net/")
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+            );
+
+
             app.UseStaticFiles();
 
             app.UseRouting();
@@ -129,17 +149,6 @@ namespace TimeAPI.API
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
-
-
-            //WebAPI Hosted URL
-            //app.UseCors("AllowAll");
-            app.UseCors(builder =>
-                builder.WithOrigins(Configuration["ApplicationSettings:Client_URL"].ToString(), 
-                                    "http://localhost:4200",
-                                    "https://enforce.azurewebsites.net/")
-                .AllowAnyHeader()
-                .AllowAnyMethod()
-            );
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>
