@@ -137,6 +137,13 @@ namespace TimeAPI.API
             }
 
             //WebAPI Hosted URL
+            app.Use(async (ctx, next) =>
+            {
+                ctx.Response.Headers.Add("Set-Cookie", "HttpOnly;Secure;SameSite=Strict");
+
+            });
+
+            app.UseOptions();
             app.UseCors("AllowOrigin");
             app.UseCors(builder =>
                 builder.WithOrigins(Configuration["ApplicationSettings:Client_URL"].ToString(),
@@ -153,6 +160,8 @@ namespace TimeAPI.API
             app.UseStaticFiles();
             app.UseRouting();
             app.UseAuthorization();
+            app.UseCookiePolicy();
+            //app.UseMvc();
 
             app.UseEndpoints(endpoints =>
             {
