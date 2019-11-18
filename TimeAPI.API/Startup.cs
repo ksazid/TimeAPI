@@ -1,4 +1,3 @@
-
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 //using Microsoft.EntityFrameworkCore;
@@ -30,24 +29,6 @@ namespace TimeAPI.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddCors(options =>
-            //{
-            //    options.AddPolicy("AllowOrigin",
-            //        builder =>
-            //        {
-            //            builder.WithOrigins(Configuration["ApplicationSettings:Client_URL"].ToString(),
-            //                        "http://localhost:4200",
-            //                        "https://enforce.azurewebsites.net",
-            //                        "https://*.azurewebsites.net")
-            //                .SetIsOriginAllowedToAllowWildcardSubdomains()
-            //                .AllowAnyOrigin()
-            //                .SetIsOriginAllowed((host) => true)
-            //                .AllowAnyMethod().WithOrigins("GET, POST, PUT, DELETE, OPTIONS")
-            //                .AllowAnyHeader().WithOrigins("origin, accept, content-Type")
-            //                .AllowCredentials();
-            //        });
-
-            //});
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy",
@@ -120,22 +101,6 @@ namespace TimeAPI.API
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseCors("CorsPolicy");
-
-            //app.UseCors();
-            ////app.UseOptions();
-            //app.UseCors("AllowOrigin");
-            //app.UseCors(builder =>
-            //    builder.WithOrigins(Configuration["ApplicationSettings:Client_URL"].ToString(),
-            //                        "http://localhost:4200",
-            //                        "https://enforce.azurewebsites.net/",
-            //                        "https://*.azurewebsites.net")
-            //                        .SetIsOriginAllowed((host) => true)
-            //                        .AllowAnyHeader().WithOrigins("origin, accept, content-Type")
-            //                        .AllowAnyMethod().WithOrigins("GET, POST, PUT, DELETE, OPTIONS")
-            //                        .SetIsOriginAllowedToAllowWildcardSubdomains()
-            //                        .AllowCredentials()
-            //            );
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -157,24 +122,11 @@ namespace TimeAPI.API
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
 
-
-            //WebAPI Hosted URL
-            //app.UseCors(builder =>
-            //    builder.WithOrigins(Configuration["ApplicationSettings:Client_URL"].ToString())
-            //    .AllowAnyHeader()
-            //    .AllowAnyMethod()
-            //);
-          
-
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Time API");
             });
         }
-
-
-
-
     }
 }

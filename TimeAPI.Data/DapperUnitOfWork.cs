@@ -22,6 +22,9 @@ namespace TimeAPI.Data
         private IUserLoginRepository _userLoginRepository;
         private IRepository<UserToken, UserTokenKey> _userTokenRepository;
         private IUserRoleRepository _userRoleRepository;
+
+        private IEmployeeRepository _employeeRepository;
+
         private bool _disposed;
         #endregion
 
@@ -30,9 +33,6 @@ namespace TimeAPI.Data
             _connection = new Microsoft.Data.SqlClient.SqlConnection(connectionString);
             _connection.Open();
             _transaction = _connection.BeginTransaction();
-            //Microsoft.SqlServer.Server.SqlConnection sqlConnectionMicrosoft = new Microsoft.Data.SqlClient.SqlConnection(connectionString);
-            //_connection = new Microsoft.Data.SqlClient.SqlConnection(connectionString);
-
         }
 
         #region IUnitOfWork Members
@@ -99,6 +99,16 @@ namespace TimeAPI.Data
             }
         }
 
+
+        public IEmployeeRepository EmployeeRepository
+        {
+            get
+            {
+                return _employeeRepository
+                    ?? (_employeeRepository = new EmployeeRepository(_transaction));
+            }
+        }
+
         public void Commit()
         {
             try
@@ -134,6 +144,7 @@ namespace TimeAPI.Data
             _userLoginRepository = null;
             _userTokenRepository = null;
             _userRoleRepository = null;
+            _employeeRepository = null;
         }
 
         private void dispose(bool disposing)

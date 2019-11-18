@@ -63,7 +63,7 @@ namespace TimeAPI.API.Controllers
 
             try
             {
-                UserModel.Role = "admin";
+                UserModel.Role = "superadmin";
                 var result = await _userManager.CreateAsync(appUser, UserModel.Password);
                 var xRest = await _userManager.AddToRoleAsync(appUser, UserModel.Role);
                 return Ok(result);
@@ -343,7 +343,6 @@ namespace TimeAPI.API.Controllers
         //}
 
         #region Helpers
-
         private void AddErrors(IdentityResult result)
         {
             foreach (var error in result.Errors)
@@ -363,7 +362,6 @@ namespace TimeAPI.API.Controllers
                 return RedirectToAction(nameof(HomeController.Index), "Home");
             }
         }
-
         #endregion
     }
 }

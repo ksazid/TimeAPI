@@ -6,6 +6,4 @@
         public string Client_URL { get; set; }
     }
 
-
-
 }

@@ -13,6 +13,7 @@ namespace TimeAPI.Domain
         IUserLoginRepository UserLoginRepository { get; }
         IRepository<UserToken, UserTokenKey> UserTokenRepository { get; }
         IUserRoleRepository UserRoleRepository { get; }
+        IEmployeeRepository EmployeeRepository { get; }
 
         //commit all after all completes
         void Commit();
