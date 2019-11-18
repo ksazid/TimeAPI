@@ -37,6 +37,10 @@ namespace TimeAPI.API
             //Cross Platform Enabled
             //services.AddCors();
 
+
+
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+
             services.AddCors(options =>
             {
                 options.AddPolicy(AllowOrigin,
@@ -47,6 +51,7 @@ namespace TimeAPI.API
                                     "https://enforce.azurewebsites.net/",
                                     "https://timeapi.azurewebsites.net/")
                         .AllowAnyOrigin()
+                        .SetIsOriginAllowed((host) => true)
                         .AllowAnyMethod().WithOrigins("GET, POST, PUT, DELETE, OPTIONS")
                         .AllowAnyHeader().WithOrigins("origin, accept, content-Type")
                         .AllowCredentials();
@@ -58,13 +63,12 @@ namespace TimeAPI.API
                         builder.WithOrigins("https://*.azurewebsites.net")
                         .SetIsOriginAllowedToAllowWildcardSubdomains()
                         .AllowAnyOrigin()
+                        .SetIsOriginAllowed((host) => true)
                         .AllowAnyMethod().WithOrigins("GET, POST, PUT, DELETE, OPTIONS")
                         .AllowAnyHeader().WithOrigins("origin, accept, content-Type")
                         .AllowCredentials();
                     });
             });
-
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
             services.AddMvcCore().AddApiExplorer();
 
             //Inject appsetting.json for controllers.
@@ -139,6 +143,7 @@ namespace TimeAPI.API
                                     "http://localhost:4200",
                                     "https://enforce.azurewebsites.net/",
                                     "https://timeapi.azurewebsites.net/")
+                .SetIsOriginAllowed((host) => true)
                 .AllowAnyHeader().WithOrigins("origin, accept, content-Type")
                 .AllowAnyMethod().WithOrigins("GET, POST, PUT, DELETE, OPTIONS")
                 .AllowAnyOrigin()
