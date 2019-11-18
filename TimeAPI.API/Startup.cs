@@ -142,9 +142,5 @@ namespace TimeAPI.API
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Time API");
             });
         }
-
-
-
-
     }
 }
