@@ -1,7 +1,6 @@
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Cors;
 //using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -26,21 +25,12 @@ namespace TimeAPI.API
         {
             Configuration = configuration;
         }
-
         readonly string AllowOrigin = "AllowOrigin";
-
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //Cross Platform Enabled
-            //services.AddCors();
-
-
-
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
-
             services.AddCors(options =>
             {
                 options.AddPolicy(AllowOrigin,
@@ -49,26 +39,17 @@ namespace TimeAPI.API
                         builder.WithOrigins(Configuration["ApplicationSettings:Client_URL"].ToString(),
                                     "http://localhost:4200",
                                     "https://enforce.azurewebsites.net/",
-                                    "https://timeapi.azurewebsites.net/")
-                        .AllowAnyOrigin()
-                        .SetIsOriginAllowed((host) => true)
-                        .AllowAnyMethod().WithOrigins("GET, POST, PUT, DELETE, OPTIONS")
-                        .AllowAnyHeader().WithOrigins("origin, accept, content-Type")
-                        .AllowCredentials();
+                                    "https://*.azurewebsites.net")
+                            .SetIsOriginAllowedToAllowWildcardSubdomains()
+                            .AllowAnyOrigin()
+                            .SetIsOriginAllowed((host) => true)
+                            .AllowAnyMethod().WithOrigins("GET, POST, PUT, DELETE, OPTIONS")
+                            .AllowAnyHeader().WithOrigins("origin, accept, content-Type")
+                            .AllowCredentials();
                     });
 
-                options.AddPolicy("AllowSubdomain",
-                    builder =>
-                    {
-                        builder.WithOrigins("https://*.azurewebsites.net")
-                        .SetIsOriginAllowedToAllowWildcardSubdomains()
-                        .AllowAnyOrigin()
-                        .SetIsOriginAllowed((host) => true)
-                        .AllowAnyMethod().WithOrigins("GET, POST, PUT, DELETE, OPTIONS")
-                        .AllowAnyHeader().WithOrigins("origin, accept, content-Type")
-                        .AllowCredentials();
-                    });
             });
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
             services.AddMvcCore().AddApiExplorer();
 
             //Inject appsetting.json for controllers.
@@ -93,6 +74,7 @@ namespace TimeAPI.API
                 c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Time API", Version = "v1" });
             });
 
+
             //Asp.net Identity Password Config
             services.Configure<IdentityOptions>(options =>
             {
@@ -102,31 +84,37 @@ namespace TimeAPI.API
                 options.Password.RequireUppercase = false;
             });
 
+            //Cross Platform Enabled
+            services.AddCors();
+
             //JWT Auth for Token Based Authentication
             var key = Encoding.UTF8.GetBytes(Configuration["ApplicationSettings:JWT_Secret"].ToString());
             services.AddAuthentication(x =>
-            {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(x =>
-            {
-                x.RequireHttpsMetadata = false;
-                x.SaveToken = false;
-                x.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    ClockSkew = TimeSpan.Zero
-                };
-            });
+                        {
+                            x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                            x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                            x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                        }).AddJwtBearer(x =>
+                        {
+                            x.RequireHttpsMetadata = false;
+                            x.SaveToken = false;
+                            x.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                            {
+                                ValidateIssuerSigningKey = true,
+                                IssuerSigningKey = new SymmetricSecurityKey(key),
+                                ValidateIssuer = false,
+                                ValidateAudience = false,
+                                ClockSkew = TimeSpan.Zero
+                            };
+                        });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+
+            app.UseCors();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -136,32 +124,11 @@ namespace TimeAPI.API
                 app.UseExceptionHandler("/Home/Error");
             }
 
-            //WebAPI Hosted URL
-            app.Use(async (ctx, next) =>
-            {
-                ctx.Response.Headers.Add("Set-Cookie", "HttpOnly;Secure;SameSite=Strict");
-
-            });
-
-            app.UseOptions();
-            app.UseCors("AllowOrigin");
-            app.UseCors(builder =>
-                builder.WithOrigins(Configuration["ApplicationSettings:Client_URL"].ToString(),
-                                    "http://localhost:4200",
-                                    "https://enforce.azurewebsites.net/",
-                                    "https://timeapi.azurewebsites.net/")
-                .SetIsOriginAllowed((host) => true)
-                .AllowAnyHeader().WithOrigins("origin, accept, content-Type")
-                .AllowAnyMethod().WithOrigins("GET, POST, PUT, DELETE, OPTIONS")
-                .AllowAnyOrigin()
-            );
-
-
             app.UseStaticFiles();
+
             app.UseRouting();
             app.UseAuthorization();
             app.UseCookiePolicy();
-            //app.UseMvc();
 
             app.UseEndpoints(endpoints =>
             {
@@ -170,11 +137,36 @@ namespace TimeAPI.API
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
 
+
+            //WebAPI Hosted URL
+            //app.UseCors(builder =>
+            //    builder.WithOrigins(Configuration["ApplicationSettings:Client_URL"].ToString())
+            //    .AllowAnyHeader()
+            //    .AllowAnyMethod()
+            //);
+            app.UseOptions();
+            app.UseCors("AllowOrigin");
+            app.UseCors(builder =>
+                builder.WithOrigins(Configuration["ApplicationSettings:Client_URL"].ToString(),
+                                    "http://localhost:4200",
+                                    "https://enforce.azurewebsites.net/",
+                                    "https://*.azurewebsites.net")
+                                    .SetIsOriginAllowed((host) => true)
+                                    .AllowAnyHeader().WithOrigins("origin, accept, content-Type")
+                                    .AllowAnyMethod().WithOrigins("GET, POST, PUT, DELETE, OPTIONS")
+                                    .SetIsOriginAllowedToAllowWildcardSubdomains()
+                                    .AllowCredentials()
+                        );
+
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Time API");
             });
         }
+
+
+
+
     }
 }

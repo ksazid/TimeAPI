@@ -3,7 +3,7 @@
     "windowsAuthentication": true,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "https://timeapi.azurewebsites.net/",
+      "applicationUrl": "http://localhost:5000",
       "sslPort": 0
     }
   },
