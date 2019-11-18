@@ -26,11 +26,29 @@ namespace TimeAPI.API
             Configuration = configuration;
         }
 
+        readonly string AllowOrigin = "AllowOrigin";
+
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //Cross Platform Enabled
+            services.AddCors();
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(AllowOrigin,
+                    builder =>
+                    {
+                        builder
+                        .AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials();
+                    });
+            });
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
             services.AddMvcCore().AddApiExplorer();
 
@@ -51,24 +69,10 @@ namespace TimeAPI.API
             //    c.EnableAnnotations();
             //});
 
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAll",
-                    builder =>
-                    {
-                        builder
-                        .AllowAnyOrigin()
-                        .AllowAnyMethod()
-                        .AllowAnyHeader()
-                        .AllowCredentials();
-                    });
-            });
-
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Time API", Version = "v1" });
             });
-
 
             //Asp.net Identity Password Config
             services.Configure<IdentityOptions>(options =>
@@ -78,9 +82,6 @@ namespace TimeAPI.API
                 options.Password.RequireLowercase = false;
                 options.Password.RequireUppercase = false;
             });
-
-            //Cross Platform Enabled
-            services.AddCors();
 
             //JWT Auth for Token Based Authentication
             var key = Encoding.UTF8.GetBytes(Configuration["ApplicationSettings:JWT_Secret"].ToString());
@@ -131,7 +132,9 @@ namespace TimeAPI.API
             //WebAPI Hosted URL
             app.UseCors("AllowAll");
             app.UseCors(builder =>
-                builder.WithOrigins(Configuration["ApplicationSettings:Client_URL"].ToString())
+                builder.WithOrigins(Configuration["ApplicationSettings:Client_URL"].ToString(), 
+                                    "http://localhost:4200",
+                                    "https://enforce.azurewebsites.net/")
                 .AllowAnyHeader()
                 .AllowAnyMethod()
             );
