@@ -34,14 +34,16 @@ namespace TimeAPI.API
         public void ConfigureServices(IServiceCollection services)
         {
             //Cross Platform Enabled
-            services.AddCors();
+            //services.AddCors();
 
             services.AddCors(options =>
             {
                 options.AddPolicy(AllowOrigin,
                     builder =>
                     {
-                        builder
+                        builder.WithOrigins(Configuration["ApplicationSettings:Client_URL"].ToString(),
+                                    "http://localhost:4200",
+                                    "https://enforce.azurewebsites.net/")
                         .AllowAnyOrigin()
                         .AllowAnyMethod()
                         .AllowAnyHeader()
@@ -130,7 +132,7 @@ namespace TimeAPI.API
 
 
             //WebAPI Hosted URL
-            app.UseCors("AllowAll");
+            //app.UseCors("AllowAll");
             app.UseCors(builder =>
                 builder.WithOrigins(Configuration["ApplicationSettings:Client_URL"].ToString(), 
                                     "http://localhost:4200",
