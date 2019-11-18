@@ -51,6 +51,19 @@ namespace TimeAPI.API
             //    c.EnableAnnotations();
             //});
 
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll",
+                    builder =>
+                    {
+                        builder
+                        .AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials();
+                    });
+            });
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Time API", Version = "v1" });
@@ -116,6 +129,7 @@ namespace TimeAPI.API
 
 
             //WebAPI Hosted URL
+            app.UseCors("AllowAll");
             app.UseCors(builder =>
                 builder.WithOrigins(Configuration["ApplicationSettings:Client_URL"].ToString())
                 .AllowAnyHeader()
