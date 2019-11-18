@@ -44,10 +44,11 @@ namespace TimeAPI.API
                     {
                         builder.WithOrigins(Configuration["ApplicationSettings:Client_URL"].ToString(),
                                     "http://localhost:4200",
-                                    "https://enforce.azurewebsites.net/")
+                                    "https://enforce.azurewebsites.net/",
+                                    "https://timeapi.azurewebsites.net/")
                         .AllowAnyOrigin()
-                        .AllowAnyMethod()
-                        .AllowAnyHeader()
+                        .AllowAnyMethod().WithOrigins("GET, POST, PUT, DELETE, OPTIONS")
+                        .AllowAnyHeader().WithOrigins("origin, accept, content-Type")
                         .AllowCredentials();
                     });
 
@@ -55,7 +56,11 @@ namespace TimeAPI.API
                     builder =>
                     {
                         builder.WithOrigins("https://*.azurewebsites.net")
-                            .SetIsOriginAllowedToAllowWildcardSubdomains();
+                        .SetIsOriginAllowedToAllowWildcardSubdomains()
+                        .AllowAnyOrigin()
+                        .AllowAnyMethod().WithOrigins("GET, POST, PUT, DELETE, OPTIONS")
+                        .AllowAnyHeader().WithOrigins("origin, accept, content-Type")
+                        .AllowCredentials();
                     });
             });
 
@@ -128,18 +133,19 @@ namespace TimeAPI.API
             }
 
             //WebAPI Hosted URL
-            app.UseCors("AllowAll");
+            app.UseCors("AllowOrigin");
             app.UseCors(builder =>
                 builder.WithOrigins(Configuration["ApplicationSettings:Client_URL"].ToString(),
                                     "http://localhost:4200",
-                                    "https://enforce.azurewebsites.net/")
-                .AllowAnyHeader()
-                .AllowAnyMethod()
+                                    "https://enforce.azurewebsites.net/",
+                                    "https://timeapi.azurewebsites.net/")
+                .AllowAnyHeader().WithOrigins("origin, accept, content-Type")
+                .AllowAnyMethod().WithOrigins("GET, POST, PUT, DELETE, OPTIONS")
+                .AllowAnyOrigin()
             );
 
 
             app.UseStaticFiles();
-
             app.UseRouting();
             app.UseAuthorization();
 
