@@ -21,7 +21,7 @@ namespace TimeAPI.API.Controllers
 {
 
     //[Authorize]
-    [EnableCors("AllowOrigin")]
+    [EnableCors("CorsPolicy")]
     [Route("api/[controller]")]
     public class AccountController : Controller
     {
