@@ -24,6 +24,7 @@ namespace TimeAPI.API.Identity
         IUserPhoneNumberStore<ApplicationUser>,
         IUserLockoutStore<ApplicationUser>,
         IQueryableUserStore<ApplicationUser>
+
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -56,8 +57,22 @@ namespace TimeAPI.API.Identity
                     throw new ArgumentNullException(nameof(user));
 
                 var userEntity = getUserEntity(user);
+                var employee = new Employee()
+                {
+                    id = Guid.NewGuid().ToString(),
+                    user_id = userEntity.Id,
+                    full_name = user.FullName,
+                    first_name = user.FirstName,
+                    last_name = user.FirstName,
+                    phone = user.Phone,
+                    email = userEntity.Email,
+                    createdby = user.FullName,
+                    is_admin = true
+                };
 
                 _unitOfWork.UserRepository.Add(userEntity);
+                _unitOfWork.EmployeeRepository.Add(employee);
+
                 _unitOfWork.Commit();
 
                 return Task.FromResult(IdentityResult.Success);

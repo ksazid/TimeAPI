@@ -13,12 +13,13 @@ namespace TimeAPI.Data.Repositories
 
         public void Add(Employee entity)
         {
-            entity.id = ExecuteScalar<string>(
+
+        entity.id = ExecuteScalar<string>(
                 sql: @"
                     INSERT INTO [dbo].[employee] (id, user_id, deptid, full_name, first_name,last_name, alias, emp_code, role, designation, dob, 
-		                          joined_date, phone, mobile, summary, created_date, createdby, modified_date, modifiedby, is_deleted, is_admin)
+		                          joined_date, phone, mobile, email, summary, created_date, createdby, modified_date, modifiedby, is_deleted, is_admin)
                     VALUES (@id, @user_id, @deptid, @full_name, @first_name, @last_name, @alias, @emp_code, @role, @designation, @dob, 
-		                          @joined_date, @phone, @mobile, @summary, @created_date, @createdby, @modified_date, @modifiedby, @is_deleted, @is_admin);
+		                          @joined_date, @phone, @mobile, @email, @summary, @created_date, @createdby, @modified_date, @modifiedby, @is_deleted, @is_admin);
                     SELECT SCOPE_IDENTITY()",
                 param: entity
             );

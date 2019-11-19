@@ -58,12 +58,15 @@ namespace TimeAPI.API.Controllers
             {
                 UserName = UserModel.Email,
                 Email = UserModel.Email,
-                FullName = UserModel.FullName
+                FirstName = UserModel.FirstName,
+                LastName = UserModel.LastName,
+                FullName = UserModel.FullName,
+                Role = "superadmin",
+                Phone = UserModel.Phone
             };
 
             try
             {
-                UserModel.Role = "superadmin";
                 var result = await _userManager.CreateAsync(appUser, UserModel.Password);
                 var xRest = await _userManager.AddToRoleAsync(appUser, UserModel.Role);
                 return Ok(result);

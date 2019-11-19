@@ -15,6 +15,8 @@ using TimeAPI.API.Models;
 using TimeAPI.API.Services;
 using TimeAPI.Data;
 using TimeAPI.Domain;
+using TimeAPI.Domain.Repositories;
+using TimeAPI.Data.Repositories;
 
 namespace TimeAPI.API
 {
@@ -46,6 +48,7 @@ namespace TimeAPI.API
             services.AddIdentity<ApplicationUser, IdentityRole>()
               .AddCustomStores()
               .AddDefaultTokenProviders();
+
 
             // Add application services.
             services.AddScoped<IUnitOfWork, DapperUnitOfWork>(provider => new DapperUnitOfWork(Configuration.GetConnectionString("DefaultConnection").ToString()));
