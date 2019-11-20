@@ -31,7 +31,6 @@ namespace TimeAPI.API.Controllers
         private readonly ILogger _logger;
         private readonly ApplicationSettings _appSettings;
 
-
         public AccountController(UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IEmailSender emailSender,
@@ -44,38 +43,8 @@ namespace TimeAPI.API.Controllers
             _appSettings = AppSettings.Value;
         }
 
-        //[TempData]
-        //public string ErrorMessage { get; set; }
-
-
-        [EnableCors("CorsPolicy")]
-        [HttpPost]
-        [Route("Register")]
-        //post : api/ApplicationUser/Register
-        public async Task<object> PostApplicatinUser([FromBody]RegisterViewModel UserModel)
-        {
-            var appUser = new ApplicationUser()
-            {
-                UserName = UserModel.Email,
-                Email = UserModel.Email,
-                FirstName = UserModel.FirstName,
-                LastName = UserModel.LastName,
-                FullName = UserModel.FullName,
-                Role = "superadmin",
-                Phone = UserModel.Phone
-            };
-
-            try
-            {
-                var result = await _userManager.CreateAsync(appUser, UserModel.Password);
-                var xRest = await _userManager.AddToRoleAsync(appUser, UserModel.Role);
-                return Ok(result);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
+        [TempData]
+        public string ErrorMessage { get; set; }
 
         [EnableCors("CorsPolicy")]
         [HttpPost]
@@ -112,35 +81,6 @@ namespace TimeAPI.API.Controllers
             return BadRequest(new { message = "OOP! Please enter a valid user and password." });
         }
 
-        //[EnableCors("CorsPolicy")]
-        //[HttpPost]
-        //[Route("Register")]
-        //post : api/ApplicationUser/Register
-        //public async Task<object> PostApplicatinUser([FromBody]RegisterViewModel UserModel)
-        //{
-        //    var appUser = new ApplicationUser()
-        //    {
-        //        UserName = UserModel.Email,
-        //        Email = UserModel.Email,
-        //        FirstName = UserModel.FirstName,
-        //        LastName = UserModel.LastName,
-        //        FullName = UserModel.FullName,
-        //        Role = "superadmin",
-        //        Phone = UserModel.Phone
-        //    };
-
-        //    try
-        //    {
-        //        var result = await _userManager.CreateAsync(appUser, UserModel.Password);
-        //        var xRest = await _userManager.AddToRoleAsync(appUser, UserModel.Role);
-        //        return Ok(result);
-        //    }
-        //    catch (Exception)
-        //    {
-        //        throw;
-        //    }
-        //}
-
         [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("SignUp")]
@@ -173,22 +113,141 @@ namespace TimeAPI.API.Controllers
 
                 await _signInManager.SignInAsync(user, isPersistent: false);
                 _logger.LogInformation("User created a new account with password.");
-            }
-            AddErrors(result);
+                return Ok(new SuccessViewModel { Code = "200", Status = "Success" });
 
-            return Ok(result);
+            }
+            else
+            {
+                AddErrors(result);
+                return Ok(result);
+            }
             //}
             //return BadRequest(new { message = "OOP! Please enter a valid user details." });
         }
 
+        [EnableCors("CorsPolicy")]
+        [HttpPost]
+        [Route("Logout")]
+        public async Task<object> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            _logger.LogInformation("User logged out.");
+            return Ok(new SuccessViewModel { Code = "200", Status = "Success" });
+        }
+
+        [EnableCors("CorsPolicy")]
+        [HttpGet]
+        [Route("ConfirmEmail")]
+        public async Task<object> ConfirmEmail(string userId, string code)
+        {
+            if (userId == null || code == null)
+            {
+                return Ok(new SuccessViewModel { Code = "201", Status = "Error" });
+            }
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                throw new ApplicationException($"Unable to load user with ID '{userId}'.");
+            }
+            var result = await _userManager.ConfirmEmailAsync(user, code);
+            return Ok(result.Succeeded ? "ConfirmEmail" : "Error");
+        }
+
+        [EnableCors("CorsPolicy")]
+        [HttpPost]
+        [Route("ForgotPassword")]
+        public async Task<object> ForgotPassword([FromBody]ForgotPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
+                {
+                    // Don't reveal that the user does not exist or is not confirmed
+                    return Ok(new SuccessViewModel { Code = "201", Status = "User not exists." });
+                }
+
+                // For more information on how to enable account confirmation and password reset please
+                // visit https://go.microsoft.com/fwlink/?LinkID=532713
+                var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var callbackUrl = Url.ResetPasswordCallbackLink(user.Id, code, Request.Scheme);
+                await _emailSender.SendEmailAsync(model.Email, "Reset Password",
+                   $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>");
+                return Ok(new SuccessViewModel { Code = "200", Status = "Success", Message="Reset password email sent to registerd email." });
+            }
+            // If we got this far, something failed, redisplay form
+            return Ok(model);
+        }
+
+        [EnableCors("CorsPolicy")]
+        [HttpPost]
+        [Route("ResetPassword")]
+        public async Task<IActionResult> ResetPassword([FromBody]ResetPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Ok(model);
+            }
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                return Ok(new SuccessViewModel { Code = "201", Status = "Error", Message = "Please enter a valid email" });
+            }
+            var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
+            if (result.Succeeded)
+            {
+                return Ok(new SuccessViewModel { Code = "200", Status = "Success", Message = "Password reset successful." });
+            }
+            AddErrors(result);
+            return Ok(new SuccessViewModel
+            {
+                Code = "200",
+                Status = "Success",
+                Message = ""
+            });
+        }
+
+        //[HttpGet]
+        //[AllowAnonymous]
+        //public IActionResult ResetPasswordConfirmation()
+        //{
+        //    return View();
+        //}
 
 
+        //[HttpGet]
+        //[AllowAnonymous]
+        //public IActionResult ForgotPassword()
+        //{
+        //    return View();
+        //}
 
+        //[HttpPost]
+        //[AllowAnonymous]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        var user = await _userManager.FindByEmailAsync(model.Email);
+        //        if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
+        //        {
+        //            // Don't reveal that the user does not exist or is not confirmed
+        //            return RedirectToAction(nameof(ForgotPasswordConfirmation));
+        //        }
 
+        //        // For more information on how to enable account confirmation and password reset please
+        //        // visit https://go.microsoft.com/fwlink/?LinkID=532713
+        //        var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+        //        var callbackUrl = Url.ResetPasswordCallbackLink(user.Id, code, Request.Scheme);
+        //        await _emailSender.SendEmailAsync(model.Email, "Reset Password",
+        //           $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>");
+        //        return RedirectToAction(nameof(ForgotPasswordConfirmation));
+        //    }
 
-
-
-
+        //    // If we got this far, something failed, redisplay form
+        //    return View(model);
+        //}
 
         //[HttpPost]
         //[AllowAnonymous]
@@ -308,59 +367,7 @@ namespace TimeAPI.API.Controllers
         //}
 
         //[HttpGet]
-        //[AllowAnonymous]
-        //public async Task<IActionResult> ConfirmEmail(string userId, string code)
-        //{
-        //    if (userId == null || code == null)
-        //    {
-        //        return RedirectToAction(nameof(HomeController.Index), "Home");
-        //    }
-        //    var user = await _userManager.FindByIdAsync(userId);
-        //    if (user == null)
-        //    {
-        //        throw new ApplicationException($"Unable to load user with ID '{userId}'.");
-        //    }
-        //    var result = await _userManager.ConfirmEmailAsync(user, code);
-        //    return View(result.Succeeded ? "ConfirmEmail" : "Error");
-        //}
-
-        //[HttpGet]
-        //[AllowAnonymous]
-        //public IActionResult ForgotPassword()
-        //{
-        //    return View();
-        //}
-
-        //[HttpPost]
-        //[AllowAnonymous]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        var user = await _userManager.FindByEmailAsync(model.Email);
-        //        if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
-        //        {
-        //            // Don't reveal that the user does not exist or is not confirmed
-        //            return RedirectToAction(nameof(ForgotPasswordConfirmation));
-        //        }
-
-        //        // For more information on how to enable account confirmation and password reset please
-        //        // visit https://go.microsoft.com/fwlink/?LinkID=532713
-        //        var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-        //        var callbackUrl = Url.ResetPasswordCallbackLink(user.Id, code, Request.Scheme);
-        //        await _emailSender.SendEmailAsync(model.Email, "Reset Password",
-        //           $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>");
-        //        return RedirectToAction(nameof(ForgotPasswordConfirmation));
-        //    }
-
-        //    // If we got this far, something failed, redisplay form
-        //    return View(model);
-        //}
-
-        //[HttpGet]
-        //[AllowAnonymous]
-        //public IActionResult ForgotPasswordConfirmation()
+        //public IActionResult AccessDenied()
         //{
         //    return View();
         //}
@@ -374,46 +381,9 @@ namespace TimeAPI.API.Controllers
         //        throw new ApplicationException("A code must be supplied for password reset.");
         //    }
         //    var model = new ResetPasswordViewModel { Code = code };
-        //    return View(model);
+        //    return Ok(model);
         //}
 
-        //[HttpPost]
-        //[AllowAnonymous]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return View(model);
-        //    }
-        //    var user = await _userManager.FindByEmailAsync(model.Email);
-        //    if (user == null)
-        //    {
-        //        // Don't reveal that the user does not exist
-        //        return RedirectToAction(nameof(ResetPasswordConfirmation));
-        //    }
-        //    var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
-        //    if (result.Succeeded)
-        //    {
-        //        return RedirectToAction(nameof(ResetPasswordConfirmation));
-        //    }
-        //    AddErrors(result);
-        //    return View();
-        //}
-
-        //[HttpGet]
-        //[AllowAnonymous]
-        //public IActionResult ResetPasswordConfirmation()
-        //{
-        //    return View();
-        //}
-
-
-        //[HttpGet]
-        //public IActionResult AccessDenied()
-        //{
-        //    return View();
-        //}
 
         #region Helpers
         private void AddErrors(IdentityResult result)
