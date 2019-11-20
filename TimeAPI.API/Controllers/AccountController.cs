@@ -22,7 +22,7 @@ namespace TimeAPI.API.Controllers
 
     //[Authorize]
     [EnableCors("CorsPolicy")]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class AccountController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -107,9 +107,77 @@ namespace TimeAPI.API.Controllers
                     return Ok(new { token });
                 }
                 else
-                    return BadRequest(new { message = "OOP! ITS LOOK LIKE USER OR PASSWORD IS INVALID" });
+                    return BadRequest(new { message = "OOP! Its look like user or password is invalid" });
             }
-            return BadRequest(new { message = "OOP! PLEASE ENTER A VALID USER AND PASSWORD." });
+            return BadRequest(new { message = "OOP! Please enter a valid user and password." });
+        }
+
+        //[EnableCors("CorsPolicy")]
+        //[HttpPost]
+        //[Route("Register")]
+        //post : api/ApplicationUser/Register
+        //public async Task<object> PostApplicatinUser([FromBody]RegisterViewModel UserModel)
+        //{
+        //    var appUser = new ApplicationUser()
+        //    {
+        //        UserName = UserModel.Email,
+        //        Email = UserModel.Email,
+        //        FirstName = UserModel.FirstName,
+        //        LastName = UserModel.LastName,
+        //        FullName = UserModel.FullName,
+        //        Role = "superadmin",
+        //        Phone = UserModel.Phone
+        //    };
+
+        //    try
+        //    {
+        //        var result = await _userManager.CreateAsync(appUser, UserModel.Password);
+        //        var xRest = await _userManager.AddToRoleAsync(appUser, UserModel.Role);
+        //        return Ok(result);
+        //    }
+        //    catch (Exception)
+        //    {
+        //        throw;
+        //    }
+        //}
+
+        [EnableCors("CorsPolicy")]
+        [HttpPost]
+        [Route("Signup")]
+        public async Task<object> SignUp([FromBody]RegisterViewModel UserModel)
+        {
+            //if (ModelState.IsValid)
+            //{
+            var user = new ApplicationUser()
+            {
+                UserName = UserModel.Email,
+                Email = UserModel.Email,
+                FirstName = UserModel.FirstName,
+                LastName = UserModel.LastName,
+                FullName = UserModel.FullName,
+                Role = "superadmin",
+                Phone = UserModel.Phone
+            };
+            var result = await _userManager.CreateAsync(user, UserModel.Password);
+            if (result.Succeeded)
+            {
+                _logger.LogInformation("User created a new account with password.");
+
+                if (user.Email != null)
+                {
+                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
+                    await _emailSender.SendEmailConfirmationAsync(UserModel.Email, callbackUrl);
+                }
+
+                await _signInManager.SignInAsync(user, isPersistent: false);
+                _logger.LogInformation("User created a new account with password.");
+            }
+            AddErrors(result);
+
+            return Ok(result);
+            //}
+            //return BadRequest(new { message = "OOP! Please enter a valid user details." });
         }
 
 
