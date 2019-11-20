@@ -114,6 +114,7 @@ namespace TimeAPI.API
             app.UseRouting();
             app.UseAuthorization();
             app.UseCookiePolicy();
+            app.UseMvc();
 
             app.UseEndpoints(endpoints =>
             {
