@@ -40,7 +40,7 @@ namespace TimeAPI.API
                     .AllowAnyHeader()
                     .AllowCredentials());
             });
-            services.AddMvc();
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
             services.AddMvcCore().AddApiExplorer();
 
             //Inject appsetting.json for controllers.

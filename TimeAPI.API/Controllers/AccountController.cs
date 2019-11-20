@@ -48,7 +48,7 @@ namespace TimeAPI.API.Controllers
         //public string ErrorMessage { get; set; }
 
 
-
+        [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("Register")]
         //post : api/ApplicationUser/Register
@@ -77,6 +77,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
+        [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("Login")]
         public async Task<IActionResult> Login([FromBody]LoginViewModel model)
