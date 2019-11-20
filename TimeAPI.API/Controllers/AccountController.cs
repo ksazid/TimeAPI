@@ -143,7 +143,7 @@ namespace TimeAPI.API.Controllers
 
         [EnableCors("CorsPolicy")]
         [HttpPost]
-        [Route("Signup")]
+        [Route("SignUp")]
         public async Task<object> SignUp([FromBody]RegisterViewModel UserModel)
         {
             //if (ModelState.IsValid)
@@ -158,6 +158,7 @@ namespace TimeAPI.API.Controllers
                 Role = "superadmin",
                 Phone = UserModel.Phone
             };
+
             var result = await _userManager.CreateAsync(user, UserModel.Password);
             if (result.Succeeded)
             {
