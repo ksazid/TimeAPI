@@ -101,6 +101,7 @@ namespace TimeAPI.API
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseCors("CorsPolicy");
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -114,7 +115,6 @@ namespace TimeAPI.API
             app.UseRouting();
             app.UseAuthorization();
             app.UseCookiePolicy();
-            app.UseMvc();
 
             app.UseEndpoints(endpoints =>
             {
