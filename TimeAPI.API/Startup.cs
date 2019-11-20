@@ -31,6 +31,7 @@ namespace TimeAPI.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            ////Cross Platform Enabled
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy",
@@ -48,7 +49,6 @@ namespace TimeAPI.API
             services.AddIdentity<ApplicationUser, IdentityRole>()
               .AddCustomStores()
               .AddDefaultTokenProviders();
-
 
             // Add application services.
             services.AddScoped<IUnitOfWork, DapperUnitOfWork>(provider => new DapperUnitOfWork(Configuration.GetConnectionString("DefaultConnection").ToString()));
@@ -74,9 +74,6 @@ namespace TimeAPI.API
                 options.Password.RequireLowercase = false;
                 options.Password.RequireUppercase = false;
             });
-
-            //Cross Platform Enabled
-            services.AddCors();
 
             //JWT Auth for Token Based Authentication
             var key = Encoding.UTF8.GetBytes(Configuration["ApplicationSettings:JWT_Secret"].ToString());
