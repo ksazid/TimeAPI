@@ -71,7 +71,7 @@ namespace TimeAPI.API.Identity
                 };
 
                 _unitOfWork.UserRepository.Add(userEntity);
-                _unitOfWork.EmployeeRepository  .Add(employee);
+                _unitOfWork.EmployeeRepository.Add(employee);
 
                 _unitOfWork.Commit();
 

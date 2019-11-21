@@ -54,7 +54,7 @@ namespace TimeAPI.API
             services.AddScoped<IUnitOfWork, DapperUnitOfWork>(provider => new DapperUnitOfWork(Configuration.GetConnectionString("DefaultConnection").ToString()));
             services.AddTransient<IEmailSender, EmailSender>();
 
-            //services.AddControllersWithViews();
+            //services.AddControllersWithViewsEmployeeRepository
             //services.AddSwaggerGen(c =>
             //{
             //    c.EnableAnnotations();
