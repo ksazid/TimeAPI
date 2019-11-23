@@ -35,7 +35,7 @@ namespace TimeAPI.API
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy",
-                    builder => builder.WithOrigins("https://enforce.azurewebsites.net")
+                    builder => builder.WithOrigins("https://enforce.azurewebsites.net", "http://localhost:4200/")
                     .AllowAnyMethod()
                     .AllowAnyHeader()
                     .AllowCredentials());
@@ -50,9 +50,16 @@ namespace TimeAPI.API
               .AddCustomStores()
               .AddDefaultTokenProviders();
 
+
+
             // Add application services.
-            services.AddScoped<IUnitOfWork, DapperUnitOfWork>(provider => new DapperUnitOfWork(Configuration.GetConnectionString("DefaultConnection").ToString()));
+            services.AddScoped<IUnitOfWork, DapperUnitOfWork>(provider => new DapperUnitOfWork(Configuration.GetConnectionString("DefaultConnection")));
             services.AddTransient<IEmailSender, EmailSender>();
+
+            //services.AddSingleton<IEmployeeRepository, EmployeeRepository>();
+            //services.AddSingleton<IOrganizationRepository, OrganizationRepository>();
+
+
 
             //services.AddControllersWithViewsEmployeeRepository
             //services.AddSwaggerGen(c =>
@@ -76,7 +83,7 @@ namespace TimeAPI.API
             });
 
             //JWT Auth for Token Based Authentication
-            var key = Encoding.UTF8.GetBytes(Configuration["ApplicationSettings:JWT_Secret"].ToString());
+            var key = Encoding.UTF8.GetBytes(Configuration["ApplicationSettings:JWT_Secret"]);
             services.AddAuthentication(x =>
                         {
                             x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

@@ -4,7 +4,7 @@ using System.Data;
 
 namespace TimeAPI.Data.Repositories
 {
-    internal abstract class RepositoryBase
+    public abstract class RepositoryBase
     {
         private IDbTransaction _transaction;
         private IDbConnection Connection { get { return _transaction.Connection; } }

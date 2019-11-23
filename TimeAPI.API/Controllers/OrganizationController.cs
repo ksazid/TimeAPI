@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using TimeAPI.API.Models;
 using TimeAPI.API.Models.EmployeeViewModels;
 using TimeAPI.API.Services;
@@ -25,11 +26,11 @@ namespace TimeAPI.API.Controllers
         private readonly IUnitOfWork _unitOfWork;
         public OrganizationController(IUnitOfWork unitOfWork, ILogger<EmployeeController> logger,
             IEmailSender emailSender,
-            ApplicationSettings appSettings)
+            IOptions<ApplicationSettings> AppSettings)
         {
             _emailSender = emailSender;
             _logger = logger;
-            _appSettings = appSettings;
+            _appSettings = AppSettings.Value;
             _unitOfWork = unitOfWork;
         }
 
@@ -57,6 +58,130 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Organization Added succefully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+
+        [EnableCors("CorsPolicy")]
+        [HttpPost]
+        [Route("UpdateOrganization")]
+        public async Task<object> UpdateOrganization([FromBody] OrganizationViewModel organizationViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (organizationViewModel == null)
+                    throw new ArgumentNullException(nameof(organizationViewModel));
+
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationViewModel, Organization>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<Organization>(organizationViewModel);
+
+
+                _unitOfWork.OrganizationRepository.Update(modal);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Organization Updated succefully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+
+        [EnableCors("CorsPolicy")]
+        [HttpPost]
+        [Route("RemoveOrganization")]
+        public async Task<object> RemoveOrganization([FromBody] string org_id, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (org_id == null)
+                    throw new ArgumentNullException(nameof(org_id));
+
+                _unitOfWork.OrganizationRepository.Remove(org_id);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Organization remvoed succefully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [EnableCors("CorsPolicy")]
+        [HttpPost]
+        [Route("FindByUsersIdName")]
+        public async Task<object> FindByUsersIdName([FromBody] string user_id, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (user_id == null)
+                    throw new ArgumentNullException(nameof(user_id));
+
+                var result = _unitOfWork.OrganizationRepository.FindByUsersID(user_id);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [EnableCors("CorsPolicy")]
+        [HttpPost]
+        [Route("FindByOrgName")]
+        public async Task<object> FindOrganizationByName([FromBody] string org_name, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (org_name == null)
+                    throw new ArgumentNullException(nameof(org_name));
+
+                var result = _unitOfWork.OrganizationRepository.FindByOrgName(org_name);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [EnableCors("CorsPolicy")]
+        [HttpPost]
+        [Route("GetAllOrg")]
+        public async Task<object> GetAllOrg(CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                var result = _unitOfWork.OrganizationRepository.All();
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

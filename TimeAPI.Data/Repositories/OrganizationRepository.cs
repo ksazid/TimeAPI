@@ -5,7 +5,7 @@ using TimeAPI.Domain.Repositories;
 
 namespace TimeAPI.Data.Repositories
 {
-    internal class OrganizationRepository : RepositoryBase, IOrganizationRepository
+    public class OrganizationRepository : RepositoryBase, IOrganizationRepository
     {
         public OrganizationRepository(IDbTransaction transaction)
            : base(transaction)
@@ -14,16 +14,16 @@ namespace TimeAPI.Data.Repositories
         public void Add(Organization entity)
         {
 
-        entity.org_id = ExecuteScalar<string>(
-                sql: @"
+            entity.org_id = ExecuteScalar<string>(
+                    sql: @"
                     INSERT INTO dbo.organization 
                             (org_id, user_id, org_name, type, country, adr1, adr2, city, primary_cont_name,
                                 primary_cont_type, time_zone, created_date, createdby, modified_date, modifiedby, is_deleted)
                     VALUES (@org_id, @user_id, @org_name, @type, @country, @adr1, @adr2, @city, @primary_cont_name,
                                @primary_cont_type, @time_zone, @created_date, @createdby, @modified_date, @modifiedby, @is_deleted);
                     SELECT SCOPE_IDENTITY()",
-                param: entity
-            );
+                    param: entity
+                );
         }
 
         public Organization Find(string key)
@@ -39,6 +39,13 @@ namespace TimeAPI.Data.Repositories
             return QuerySingleOrDefault<Organization>(
                 sql: "SELECT * FROM [dbo].[organization] WHERE org_name = @org_name",
                 param: new { org_name }
+            );
+        }
+        public IEnumerable<Organization> FindByUsersID(string user_id)
+        {
+            return Query<Organization>(
+                sql: "SELECT * FROM [dbo].[organization] WHERE user_id = @user_id",
+                param: new { user_id }
             );
         }
 

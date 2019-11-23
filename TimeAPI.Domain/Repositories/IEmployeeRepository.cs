@@ -9,5 +9,9 @@ namespace TimeAPI.Domain.Repositories
     {
         Employee FindByEmpName(string full_name);
         Employee FindByEmpCode(string emp_code);
+        IEnumerable<Employee> FindByOrgIDCode(string org_id);
+        IEnumerable<Employee> FindByRoleName(string role);
+        
+            
     }
 }

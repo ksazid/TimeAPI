@@ -109,6 +109,7 @@ namespace TimeAPI.Data
                     ?? (_employeeRepository = new EmployeeRepository(_transaction));
             }
         }
+
         public IOrganizationRepository OrganizationRepository
         {
             get
@@ -118,7 +119,6 @@ namespace TimeAPI.Data
             }
         }
 
-        
 
         public void Commit()
         {

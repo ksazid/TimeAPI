@@ -5,7 +5,7 @@ using TimeAPI.Domain.Repositories;
 
 namespace TimeAPI.Data.Repositories
 {
-    internal class EmployeeRepository : RepositoryBase, IEmployeeRepository
+    public class EmployeeRepository : RepositoryBase, IEmployeeRepository
     {
         public EmployeeRepository(IDbTransaction transaction)
            : base(transaction)
@@ -14,15 +14,15 @@ namespace TimeAPI.Data.Repositories
         public void Add(Employee entity)
         {
 
-        entity.id = ExecuteScalar<string>(
-                sql: @"
+            entity.id = ExecuteScalar<string>(
+                    sql: @"
                     INSERT INTO [dbo].[employee] (id, user_id, deptid, full_name, first_name,last_name, alias, emp_code, role, designation, dob, 
 		                          joined_date, phone, mobile, email, summary, created_date, createdby, modified_date, modifiedby, is_deleted, is_admin)
                     VALUES (@id, @user_id, @deptid, @full_name, @first_name, @last_name, @alias, @emp_code, @role, @designation, @dob, 
 		                          @joined_date, @phone, @mobile, @email, @summary, @created_date, @createdby, @modified_date, @modifiedby, @is_deleted, @is_admin);
                     SELECT SCOPE_IDENTITY()",
-                param: entity
-            );
+                    param: entity
+                );
         }
 
         public Employee Find(string key)
@@ -41,6 +41,13 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
+        public IEnumerable<Employee> FindByOrgIDCode(string OrgID)
+        {
+            return Query<Employee>(
+                sql: "SELECT * FROM [dbo].[employee] WHERE org_id = @OrgID",
+                param: new { OrgID }
+            );
+        }
         public Employee FindByEmpCode(string emp_code)
         {
             return QuerySingleOrDefault<Employee>(
