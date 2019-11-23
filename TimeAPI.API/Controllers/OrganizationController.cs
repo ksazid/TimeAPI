@@ -36,27 +36,27 @@ namespace TimeAPI.API.Controllers
 
         [EnableCors("CorsPolicy")]
         [HttpPost]
-        [Route("AddEmployee")]
-        public async Task<object> AddOrganization([FromBody] EmployeeViewModel employeeViewModel, CancellationToken cancellationToken)
+        [Route("AddOrganization")]
+        public async Task<object> AddOrganization([FromBody] OrganizationViewModel organizationViewModel, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (employeeViewModel == null)
-                    throw new ArgumentNullException(nameof(employeeViewModel));
+                if (organizationViewModel == null)
+                    throw new ArgumentNullException(nameof(organizationViewModel));
 
-                employeeViewModel.id = Guid.NewGuid().ToString();
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeViewModel, Employee>());
+                organizationViewModel.org_id = Guid.NewGuid().ToString();
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationViewModel, Organization>());
                 var mapper = config.CreateMapper();
-                var modal = mapper.Map<Employee>(employeeViewModel);
+                var modal = mapper.Map<Organization>(organizationViewModel);
 
 
-                _unitOfWork.EmployeeRepository.Add(modal);
+                _unitOfWork.OrganizationRepository.Add(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee registered succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Organization Added succefully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
