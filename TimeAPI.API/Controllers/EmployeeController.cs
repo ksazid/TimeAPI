@@ -99,17 +99,17 @@ namespace TimeAPI.API.Controllers
         [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("RemoveEmployee")]
-        public async Task<object> RemoveEmployee([FromBody] string id, CancellationToken cancellationToken)
+        public async Task<object> RemoveEmployee([FromBody] Utils _Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (id == null)
-                    throw new ArgumentNullException(nameof(id));
+                if (_Utils == null)
+                    throw new ArgumentNullException(nameof(_Utils.ID));
 
-                _unitOfWork.EmployeeRepository.Remove(id);
+                _unitOfWork.EmployeeRepository.Remove(_Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee removed succefully." }).ConfigureAwait(false);
@@ -125,22 +125,18 @@ namespace TimeAPI.API.Controllers
         [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("FindByEmpName")]
-        public async Task<object> FindByEmpName([FromBody] string full_name, CancellationToken cancellationToken)
+        public async Task<object> FindByEmpName([FromBody] UtilsName _UtilsName, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrEmpty(full_name))
-            {
-                throw new ArgumentException("Text cannot be empty.", nameof(full_name));
-            }
-
+         
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (full_name == null)
-                    throw new ArgumentNullException(nameof(full_name));
+                if (_UtilsName == null)
+                    throw new ArgumentNullException(nameof(_UtilsName));
 
-                var result = _unitOfWork.EmployeeRepository.FindByEmpName(full_name);
+                var result = _unitOfWork.EmployeeRepository.FindByEmpName(_UtilsName.FullName);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
@@ -152,23 +148,20 @@ namespace TimeAPI.API.Controllers
         }
 
 
-
-
         [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("FindByOrgID")]
-        public async Task<object> FindByOrgID([FromBody] string OrgID, CancellationToken cancellationToken)
+        public async Task<object> FindByOrgID([FromBody] Utils _Utils, CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (OrgID == null)
-                    throw new ArgumentNullException(nameof(OrgID));
+                if (_Utils == null)
+                    throw new ArgumentNullException(nameof(_Utils.ID));
 
-                var result = _unitOfWork.EmployeeRepository.FindByOrgIDCode(OrgID);
+                var result = _unitOfWork.EmployeeRepository.FindByOrgIDCode(_Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
@@ -183,7 +176,7 @@ namespace TimeAPI.API.Controllers
         [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("FindByEmpCode")]
-        public async Task<object> FindByEmpCode([FromBody] string EmpCode, CancellationToken cancellationToken)
+        public async Task<object> FindByEmpCode([FromBody] UtilsCode _EmpCode, CancellationToken cancellationToken)
         {
 
             try
@@ -191,10 +184,10 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (EmpCode == null)
-                    throw new ArgumentNullException(nameof(EmpCode));
+                if (_EmpCode == null)
+                    throw new ArgumentNullException(nameof(_EmpCode.Code));
 
-                var result = _unitOfWork.EmployeeRepository.FindByEmpCode(EmpCode);
+                var result = _unitOfWork.EmployeeRepository.FindByEmpCode(_EmpCode.Code);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
@@ -209,18 +202,18 @@ namespace TimeAPI.API.Controllers
         [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("FindByRoleName")]
-        public async Task<object> FindByRoleName([FromBody] string role, CancellationToken cancellationToken)
+        public async Task<object> FindByRoleName([FromBody] UtilsRole _UtilsRole, CancellationToken cancellationToken)
         {
-
+          
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (role == null)
-                    throw new ArgumentNullException(nameof(role));
+                if (_UtilsRole == null)
+                    throw new ArgumentNullException(nameof(_UtilsRole.Role));
 
-                var result = _unitOfWork.EmployeeRepository.FindByRoleName(role);
+                var result = _unitOfWork.EmployeeRepository.FindByRoleName(_UtilsRole.Role);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);

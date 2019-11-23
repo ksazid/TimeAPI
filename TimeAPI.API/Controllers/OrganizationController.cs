@@ -99,17 +99,17 @@ namespace TimeAPI.API.Controllers
         [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("RemoveOrganization")]
-        public async Task<object> RemoveOrganization([FromBody] string org_id, CancellationToken cancellationToken)
+        public async Task<object> RemoveOrganization([FromBody] Utils _Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (org_id == null)
-                    throw new ArgumentNullException(nameof(org_id));
+                if (_Utils == null)
+                    throw new ArgumentNullException(nameof(_Utils.ID));
 
-                _unitOfWork.OrganizationRepository.Remove(org_id);
+                _unitOfWork.OrganizationRepository.Remove(_Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Organization remvoed succefully." }).ConfigureAwait(false);
@@ -123,17 +123,17 @@ namespace TimeAPI.API.Controllers
         [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("FindByUsersIdName")]
-        public async Task<object> FindByUsersIdName([FromBody] string user_id, CancellationToken cancellationToken)
+        public async Task<object> FindByUsersIdName([FromBody] Utils _Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (user_id == null)
-                    throw new ArgumentNullException(nameof(user_id));
+                if (_Utils == null)
+                    throw new ArgumentNullException(nameof(_Utils.ID));
 
-                var result = _unitOfWork.OrganizationRepository.FindByUsersID(user_id);
+                var result = _unitOfWork.OrganizationRepository.FindByUsersID(_Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
@@ -147,17 +147,17 @@ namespace TimeAPI.API.Controllers
         [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("FindByOrgName")]
-        public async Task<object> FindOrganizationByName([FromBody] string org_name, CancellationToken cancellationToken)
+        public async Task<object> FindOrganizationByName([FromBody] UtilsName _UtilsName, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (org_name == null)
-                    throw new ArgumentNullException(nameof(org_name));
+                if (_UtilsName == null)
+                    throw new ArgumentNullException(nameof(_UtilsName.FullName));
 
-                var result = _unitOfWork.OrganizationRepository.FindByOrgName(org_name);
+                var result = _unitOfWork.OrganizationRepository.FindByOrgName(_UtilsName.FullName);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
@@ -190,3 +190,4 @@ namespace TimeAPI.API.Controllers
         }
     }
 }
+
