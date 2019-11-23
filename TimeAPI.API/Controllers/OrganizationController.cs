@@ -17,13 +17,13 @@ namespace TimeAPI.API.Controllers
 {
     [EnableCors("CorsPolicy")]
     [Route("[controller]")]
-    public class EmployeeController : Controller
+    public class OrganizationController : Controller
     {
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
-        public EmployeeController(IUnitOfWork unitOfWork, ILogger<EmployeeController> logger,
+        public OrganizationController(IUnitOfWork unitOfWork, ILogger<EmployeeController> logger,
             IEmailSender emailSender,
             ApplicationSettings appSettings)
         {
@@ -37,7 +37,7 @@ namespace TimeAPI.API.Controllers
         [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("AddEmployee")]
-        public async Task<object> AddEmployee([FromBody] EmployeeViewModel employeeViewModel, CancellationToken cancellationToken)
+        public async Task<object> AddOrganization([FromBody] EmployeeViewModel employeeViewModel, CancellationToken cancellationToken)
         {
             try
             {

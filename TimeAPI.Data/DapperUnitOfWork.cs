@@ -24,6 +24,7 @@ namespace TimeAPI.Data
         private IUserRoleRepository _userRoleRepository;
 
         private IEmployeeRepository _employeeRepository;
+        private IOrganizationRepository _organizationRepository;
 
         private bool _disposed;
         #endregion
@@ -108,6 +109,16 @@ namespace TimeAPI.Data
                     ?? (_employeeRepository = new EmployeeRepository(_transaction));
             }
         }
+        public IOrganizationRepository OrganizationRepository
+        {
+            get
+            {
+                return _organizationRepository
+                    ?? (_organizationRepository = new OrganizationRepository(_transaction));
+            }
+        }
+
+        
 
         public void Commit()
         {

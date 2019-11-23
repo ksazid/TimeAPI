@@ -173,7 +173,7 @@ namespace TimeAPI.API.Controllers
                 var callbackUrl = Url.ResetPasswordCallbackLink(user.Id, code, Request.Scheme);
                 await _emailSender.SendEmailAsync(model.Email, "Reset Password",
                    $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>");
-                return Ok(new SuccessViewModel { Code = "200", Status = "Success", Message="Reset password email sent to registerd email." });
+                return Ok(new SuccessViewModel { Code = "200", Status = "Success", Desc="Reset password email sent to registerd email." });
             }
             // If we got this far, something failed, redisplay form
             return Ok(model);
@@ -191,19 +191,19 @@ namespace TimeAPI.API.Controllers
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
             {
-                return Ok(new SuccessViewModel { Code = "201", Status = "Error", Message = "Please enter a valid email" });
+                return Ok(new SuccessViewModel { Code = "201", Status = "Error", Desc = "Please enter a valid email" });
             }
             var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
             if (result.Succeeded)
             {
-                return Ok(new SuccessViewModel { Code = "200", Status = "Success", Message = "Password reset successful." });
+                return Ok(new SuccessViewModel { Code = "200", Status = "Success", Desc = "Password reset successful." });
             }
             AddErrors(result);
             return Ok(new SuccessViewModel
             {
-                Code = "200",
-                Status = "Success",
-                Message = ""
+                Code = "201",
+                Status = "Error",
+                Desc = ""
             });
         }
 
