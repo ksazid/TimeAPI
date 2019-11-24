@@ -102,6 +102,8 @@ namespace TimeAPI.API.Controllers
             var result = await _userManager.CreateAsync(user, UserModel.Password);
             if (result.Succeeded)
             {
+                var xRest = await _userManager.AddToRoleAsync(user, UserModel.Role);
+
                 _logger.LogInformation("User created a new account with password.");
 
                 if (user.Email != null)
@@ -110,8 +112,12 @@ namespace TimeAPI.API.Controllers
                     var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
                     await _emailSender.SendEmailConfirmationAsync(UserModel.Email, callbackUrl);
                 }
+                else
+                { 
+                    // check if its a phone 
+                }
 
-                await _signInManager.SignInAsync(user, isPersistent: false);
+                //await _signInManager.SignInAsync(user, isPersistent: false);
                 _logger.LogInformation("User created a new account with password.");
                 return Ok(new SuccessViewModel { Code = "200", Status = "Success" });
 
