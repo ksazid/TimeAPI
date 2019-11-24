@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace TimeAPI.API.Models.EmployeeViewModels
+namespace TimeAPI.API.Models.OrganizationViewModels
 {
     public class OrganizationViewModel
     {
-        public string org_id { get; set; }
+        //public string org_id { get; set; }
         public string user_id { get; set; }
         public string org_name { get; set; }
         public string type { get; set; }
@@ -18,10 +18,11 @@ namespace TimeAPI.API.Models.EmployeeViewModels
         public string primary_cont_name { get; set; }
         public string primary_cont_type { get; set; }
         public string time_zone { get; set; }
-        public string created_date { get; set; }
         public string createdby { get; set; }
-        public string modified_date { get; set; }
-        public string modifiedby { get; set; }
-        public bool is_deleted { get; set; }
+
+        //public string created_date { get; set; }
+        //public string modified_date { get; set; }
+        //public string modifiedby { get; set; }
+        //public bool is_deleted { get; set; }
     }
 }

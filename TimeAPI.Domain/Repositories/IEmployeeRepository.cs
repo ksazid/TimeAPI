@@ -12,6 +12,5 @@ namespace TimeAPI.Domain.Repositories
         IEnumerable<Employee> FindByOrgIDCode(string org_id);
         IEnumerable<Employee> FindByRoleName(string role);
         
-            
     }
 }

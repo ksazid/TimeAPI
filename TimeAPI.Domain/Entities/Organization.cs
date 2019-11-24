@@ -10,6 +10,8 @@ namespace TimeAPI.Domain.Entities
         public string user_id { get; set; }
         public string org_name { get; set; }
         public string type { get; set; }
+        public string summary { get; set; }
+        public string img_url { get; set; }
         public string country { get; set; }
         public string adr1 { get; set; }
         public string adr2 { get; set; }
@@ -21,7 +23,7 @@ namespace TimeAPI.Domain.Entities
         public string createdby { get; set; }
         public string modified_date { get; set; }
         public string modifiedby { get; set; }
-        public string is_deleted { get; set; }
+        public bool is_deleted { get; set; }
 
     }
 }

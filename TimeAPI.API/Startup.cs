@@ -17,6 +17,8 @@ using TimeAPI.Data;
 using TimeAPI.Domain;
 using TimeAPI.Domain.Repositories;
 using TimeAPI.Data.Repositories;
+using System.Collections.Generic;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace TimeAPI.API
 {
@@ -40,6 +42,7 @@ namespace TimeAPI.API
                     .AllowAnyHeader()
                     .AllowCredentials());
             });
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
             services.AddMvcCore().AddApiExplorer();
 
@@ -56,10 +59,7 @@ namespace TimeAPI.API
             services.AddScoped<IUnitOfWork, DapperUnitOfWork>(provider => new DapperUnitOfWork(Configuration.GetConnectionString("DefaultConnection")));
             services.AddTransient<IEmailSender, EmailSender>();
 
-            //services.AddSingleton<IEmployeeRepository, EmployeeRepository>();
-            //services.AddSingleton<IOrganizationRepository, OrganizationRepository>();
-
-
+            //services.AddAuthorization(options => options.AddPolicy("Trusted", policy => policy.RequireClaim("Employee", "Mosalla")));
 
             //services.AddControllersWithViewsEmployeeRepository
             //services.AddSwaggerGen(c =>
@@ -117,7 +117,7 @@ namespace TimeAPI.API
             {
                 app.UseExceptionHandler("/Home/Error");
             }
-
+            app.UseAuthentication();
             app.UseStaticFiles();
             app.UseRouting();
             app.UseAuthorization();
@@ -134,7 +134,22 @@ namespace TimeAPI.API
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Time API");
+                //c.AddSecurityDefinition("Bearer", new ApiKeyScheme
+                //{
+                //    In = "header",
+                //    Description = "Please insert JWT with Bearer into field",
+                //    Name = "Authorization",
+                //    Type = "apiKey"
+                //});
+
+                //c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
+                //  {
+                //    { "Bearer", new string[] { } }
+                //  });
+
             });
         }
+
+
     }
 }

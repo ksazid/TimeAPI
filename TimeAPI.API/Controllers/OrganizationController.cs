@@ -1,23 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using TimeAPI.API.Filters;
 using TimeAPI.API.Models;
-using TimeAPI.API.Models.EmployeeViewModels;
+using TimeAPI.API.Models.OrganizationViewModels;
 using TimeAPI.API.Services;
 using TimeAPI.Domain;
 using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.API.Controllers
 {
+    [ApiKeyAuth]
     [EnableCors("CorsPolicy")]
     [Route("[controller]")]
+    //[Authorize(Roles = "superadmin")]
+
     public class OrganizationController : Controller
     {
         private readonly IEmailSender _emailSender;
@@ -48,11 +50,14 @@ namespace TimeAPI.API.Controllers
                 if (organizationViewModel == null)
                     throw new ArgumentNullException(nameof(organizationViewModel));
 
-                organizationViewModel.org_id = Guid.NewGuid().ToString();
+                //organizationViewModel.org_id = Guid.NewGuid().ToString();
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationViewModel, Organization>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Organization>(organizationViewModel);
 
+                modal.org_id = Guid.NewGuid().ToString();
+                modal.created_date = DateTime.Now.ToString();
+                modal.is_deleted = false;
 
                 _unitOfWork.OrganizationRepository.Add(modal);
                 _unitOfWork.Commit();
@@ -122,8 +127,8 @@ namespace TimeAPI.API.Controllers
 
         [EnableCors("CorsPolicy")]
         [HttpPost]
-        [Route("FindByUsersIdName")]
-        public async Task<object> FindByUsersIdName([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        [Route("FindByUsersId")]
+        public async Task<object> FindByUsersId([FromBody] Utils _Utils, CancellationToken cancellationToken)
         {
             try
             {
@@ -168,9 +173,9 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
-        [HttpPost]
+
         [Route("GetAllOrg")]
+        [HttpPost]
         public async Task<object> GetAllOrg(CancellationToken cancellationToken)
         {
             try

@@ -16,10 +16,12 @@ namespace TimeAPI.Data.Repositories
 
             entity.id = ExecuteScalar<string>(
                     sql: @"
-                    INSERT INTO [dbo].[employee] (id, user_id, deptid, full_name, first_name,last_name, alias, emp_code, role, designation, dob, 
-		                          joined_date, phone, mobile, email, summary, created_date, createdby, modified_date, modifiedby, is_deleted, is_admin)
-                    VALUES (@id, @user_id, @deptid, @full_name, @first_name, @last_name, @alias, @emp_code, @role, @designation, @dob, 
-		                          @joined_date, @phone, @mobile, @email, @summary, @created_date, @createdby, @modified_date, @modifiedby, @is_deleted, @is_admin);
+                    INSERT INTO [dbo].[employee] (id, user_id, deptid, full_name, first_name,last_name, alias, gender, emp_status, emp_type, imgurl, workemail, 
+                                   emp_code, role, designation, dob, joined_date, phone, mobile, email, summary, created_date, createdby, modified_date, modifiedby,
+                                   is_deleted, is_admin)
+                    VALUES (@id, @user_id, @deptid, @full_name, @first_name, @last_name, @alias,  @gender, @emp_status, @emp_type, @imgurl, @workemail,  @emp_code,
+                                  @role, @designation, @dob, @joined_date, @phone, @mobile, @email, @summary, @created_date, @createdby, @modified_date, @modifiedby,
+                                  @is_deleted, @is_admin);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -88,6 +90,7 @@ namespace TimeAPI.Data.Repositories
                 sql: @"UPDATE dbo.employee
                    SET 
                        deptid = @deptid, full_name = @full_name, first_name = @first_name, last_name = @last_name, alias = @alias, 
+                       gender = @gender, emp_status = @emp_status, emp_type = @emp_type, imgurl = @imgurl, workemail = @workemail, 
                        emp_code = @emp_code, role = @role, designation = @designationdob = @dob, joined_date = @joined_date, 
                        phone = @phone, mobile = @mobile, summary = @summary, created_date = @created_date, createdby = @createdby, 
                        modified_date = @modified_date, modifiedby = @modifiedby, is_deleted = @is_deleted, is_admin = @is_admin
