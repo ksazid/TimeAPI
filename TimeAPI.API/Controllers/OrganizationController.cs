@@ -15,7 +15,7 @@ using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.API.Controllers
 {
-    [ApiKeyAuth]
+    //[ApiKeyAuth]
     [EnableCors("CorsPolicy")]
     [Route("[controller]")]
     //[Authorize(Roles = "superadmin")]
@@ -37,7 +37,6 @@ namespace TimeAPI.API.Controllers
         }
 
 
-        [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("AddOrganization")]
         public async Task<object> AddOrganization([FromBody] OrganizationViewModel organizationViewModel, CancellationToken cancellationToken)
@@ -71,7 +70,6 @@ namespace TimeAPI.API.Controllers
         }
 
 
-        [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("UpdateOrganization")]
         public async Task<object> UpdateOrganization([FromBody] OrganizationViewModel organizationViewModel, CancellationToken cancellationToken)
@@ -101,7 +99,6 @@ namespace TimeAPI.API.Controllers
         }
 
 
-        [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("RemoveOrganization")]
         public async Task<object> RemoveOrganization([FromBody] Utils _Utils, CancellationToken cancellationToken)
@@ -125,7 +122,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("FindByUsersId")]
         public async Task<object> FindByUsersId([FromBody] Utils _Utils, CancellationToken cancellationToken)
@@ -149,7 +145,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("FindByOrgName")]
         public async Task<object> FindOrganizationByName([FromBody] UtilsName _UtilsName, CancellationToken cancellationToken)
