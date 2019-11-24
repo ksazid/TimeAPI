@@ -98,9 +98,10 @@ namespace TimeAPI.API.Controllers
             };
 
             var result = await _userManager.CreateAsync(user, UserModel.Password);
+            var xRest = await _userManager.AddToRoleAsync(user, user.Role);
             if (result.Succeeded)
             {
-                var xRest = await _userManager.AddToRoleAsync(user, UserModel.Role);
+      
 
                 _logger.LogInformation("User created a new account with password.");
 
