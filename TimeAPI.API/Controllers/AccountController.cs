@@ -46,7 +46,6 @@ namespace TimeAPI.API.Controllers
         [TempData]
         public string ErrorMessage { get; set; }
 
-        [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("Login")]
         public async Task<IActionResult> Login([FromBody]LoginViewModel model)
@@ -81,7 +80,6 @@ namespace TimeAPI.API.Controllers
             return BadRequest(new { message = "OOP! Please enter a valid user and password." });
         }
 
-        [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("SignUp")]
         public async Task<object> SignUp([FromBody]RegisterViewModel UserModel)
@@ -131,7 +129,6 @@ namespace TimeAPI.API.Controllers
             //return BadRequest(new { message = "OOP! Please enter a valid user details." });
         }
 
-        [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("Logout")]
         public async Task<object> Logout()
@@ -141,7 +138,6 @@ namespace TimeAPI.API.Controllers
             return Ok(new SuccessViewModel { Code = "200", Status = "Success" });
         }
 
-        [EnableCors("CorsPolicy")]
         [HttpGet]
         [Route("ConfirmEmail")]
         public async Task<object> ConfirmEmail(string userId, string code)
@@ -159,7 +155,6 @@ namespace TimeAPI.API.Controllers
             return Ok(result.Succeeded ? "ConfirmEmail" : "Error");
         }
 
-        [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("ForgotPassword")]
         public async Task<object> ForgotPassword([FromBody]ForgotPasswordViewModel model)
@@ -185,7 +180,6 @@ namespace TimeAPI.API.Controllers
             return Ok(model);
         }
 
-        [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("ResetPassword")]
         public async Task<IActionResult> ResetPassword([FromBody]ResetPasswordViewModel model)
