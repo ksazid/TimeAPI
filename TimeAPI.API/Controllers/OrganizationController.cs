@@ -18,7 +18,7 @@ namespace TimeAPI.API.Controllers
     //[ApiKeyAuth]
     [EnableCors("CorsPolicy")]
     [Route("[controller]")]
-    [Authorize(Roles = "superadmin")]
+    //[Authorize(Roles = "superadmin")]
 
     public class OrganizationController : Controller
     {
