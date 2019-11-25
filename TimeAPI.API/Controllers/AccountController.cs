@@ -49,15 +49,16 @@ namespace TimeAPI.API.Controllers
         [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("Login")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login([FromBody]LoginViewModel model)
         {
             //ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                var user = await _userManager.FindByNameAsync(model.Email);
-                if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
+                var user = await _userManager.FindByNameAsync(model.Email).ConfigureAwait(true);
+                if (user != null && await _userManager.CheckPasswordAsync(user, model.Password).ConfigureAwait(true))
                 {
-                    var role = await _userManager.GetRolesAsync(user);
+                    var role = await _userManager.GetRolesAsync(user).ConfigureAwait(true);
                     IdentityOptions options = new IdentityOptions();
                     var tokenDescriptor = new SecurityTokenDescriptor()
                     {
@@ -84,6 +85,7 @@ namespace TimeAPI.API.Controllers
         [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("SignUp")]
+        [ValidateAntiForgeryToken]
         public async Task<object> SignUp([FromBody]RegisterViewModel UserModel)
         {
             if (ModelState.IsValid)
