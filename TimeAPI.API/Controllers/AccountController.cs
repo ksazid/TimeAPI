@@ -46,6 +46,7 @@ namespace TimeAPI.API.Controllers
         [TempData]
         public string ErrorMessage { get; set; }
 
+        [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("Login")]
         public async Task<IActionResult> Login([FromBody]LoginViewModel model)
@@ -80,56 +81,58 @@ namespace TimeAPI.API.Controllers
             return BadRequest(new { message = "OOP! Please enter a valid user and password." });
         }
 
+        [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("SignUp")]
         public async Task<object> SignUp([FromBody]RegisterViewModel UserModel)
         {
-            //if (ModelState.IsValid)
-            //{
-            var user = new ApplicationUser()
+            if (ModelState.IsValid)
             {
-                UserName = UserModel.Email,
-                Email = UserModel.Email,
-                FirstName = UserModel.FirstName,
-                LastName = UserModel.LastName,
-                FullName = UserModel.FullName,
-                Role = "superadmin",
-                Phone = UserModel.Phone
-            };
-
-            var result = await _userManager.CreateAsync(user, UserModel.Password);
-            var xRest = await _userManager.AddToRoleAsync(user, user.Role);
-            if (result.Succeeded)
-            {
-      
-
-                _logger.LogInformation("User created a new account with password.");
-
-                if (user.Email != null)
+                var user = new ApplicationUser()
                 {
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
-                    await _emailSender.SendEmailConfirmationAsync(UserModel.Email, callbackUrl);
+                    UserName = UserModel.Email,
+                    Email = UserModel.Email,
+                    FirstName = UserModel.FirstName,
+                    LastName = UserModel.LastName,
+                    FullName = UserModel.FullName,
+                    Role = "superadmin",
+                    Phone = UserModel.Phone
+                };
+
+                var result = await _userManager.CreateAsync(user, UserModel.Password).ConfigureAwait(true); 
+                var xRest = await _userManager.AddToRoleAsync(user, user.Role).ConfigureAwait(true); 
+                if (result.Succeeded)
+                {
+
+
+                    _logger.LogInformation("User created a new account with password.");
+
+                    if (user.Email != null)
+                    {
+                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true); 
+                        var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
+                        await _emailSender.SendEmailConfirmationAsync(UserModel.Email, callbackUrl).ConfigureAwait(true);
+                    }
+                    else
+                    {
+                        // check if its a phone 
+                    }
+
+                    //await _signInManager.SignInAsync(user, isPersistent: false);
+                    _logger.LogInformation("User created a new account with password.");
+                    return Ok(new SuccessViewModel { Code = "200", Status = "Success", Desc= "User created a new account with password." });
+
                 }
                 else
-                { 
-                    // check if its a phone 
+                {
+                    AddErrors(result);
+                    return Ok(result);
                 }
-
-                //await _signInManager.SignInAsync(user, isPersistent: false);
-                _logger.LogInformation("User created a new account with password.");
-                return Ok(new SuccessViewModel { Code = "200", Status = "Success" });
-
             }
-            else
-            {
-                AddErrors(result);
-                return Ok(result);
-            }
-            //}
-            //return BadRequest(new { message = "OOP! Please enter a valid user details." });
+            return BadRequest(new { message = "OOP! Please enter a valid user details." });
         }
 
+        [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("Logout")]
         public async Task<object> Logout()
@@ -139,6 +142,7 @@ namespace TimeAPI.API.Controllers
             return Ok(new SuccessViewModel { Code = "200", Status = "Success" });
         }
 
+        [EnableCors("CorsPolicy")]
         [HttpGet]
         [Route("ConfirmEmail")]
         public async Task<object> ConfirmEmail(string userId, string code)
@@ -156,6 +160,7 @@ namespace TimeAPI.API.Controllers
             return Ok(result.Succeeded ? "ConfirmEmail" : "Error");
         }
 
+        [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("ForgotPassword")]
         public async Task<object> ForgotPassword([FromBody]ForgotPasswordViewModel model)
@@ -175,12 +180,13 @@ namespace TimeAPI.API.Controllers
                 var callbackUrl = Url.ResetPasswordCallbackLink(user.Id, code, Request.Scheme);
                 await _emailSender.SendEmailAsync(model.Email, "Reset Password",
                    $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>");
-                return Ok(new SuccessViewModel { Code = "200", Status = "Success", Desc="Reset password email sent to registerd email." });
+                return Ok(new SuccessViewModel { Code = "200", Status = "Success", Desc = "Reset password email sent to registerd email." });
             }
             // If we got this far, something failed, redisplay form
             return Ok(model);
         }
 
+        [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("ResetPassword")]
         public async Task<IActionResult> ResetPassword([FromBody]ResetPasswordViewModel model)
