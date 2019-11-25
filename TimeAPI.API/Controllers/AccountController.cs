@@ -76,7 +76,7 @@ namespace TimeAPI.API.Controllers
                 return Ok(new { token });
             }
             else
-                return Ok(new  SuccessViewModel{ Code = "201", Status = "Error", Desc = "Please enter a valid user and password." });
+                return Ok(new SuccessViewModel { Code = "201", Status = "Error", Desc = "Please enter a valid user and password." });
             //}
             //return BadRequest(new { message = "OOP! Please enter a valid user and password." });
         }
@@ -88,9 +88,21 @@ namespace TimeAPI.API.Controllers
         {
             //if (ModelState.IsValid)
             //{
+
+            string _userName = "";
+            if (UserModel.Email != null)
+            {
+                _userName = UserModel.Email;
+            }
+            if (UserModel.Phone != null)
+            {
+                _userName = UserModel.Phone;
+            }
+
             var user = new ApplicationUser()
             {
-                UserName = UserModel.Email,
+
+                UserName = _userName,
                 Email = UserModel.Email,
                 FirstName = UserModel.FirstName,
                 LastName = UserModel.LastName,

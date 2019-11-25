@@ -64,7 +64,7 @@ namespace TimeAPI.API.Identity
                     full_name = user.FullName,
                     first_name = user.FirstName,
                     last_name = user.LastName,
-                    phone = user.Phone,
+                    mobile = user.Phone,
                     email = userEntity.Email,
                     createdby = user.FullName,
                     is_admin = true
