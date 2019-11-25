@@ -49,89 +49,82 @@ namespace TimeAPI.API.Controllers
         [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("Login")]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public async Task<IActionResult> Login([FromBody]LoginViewModel model)
         {
             //ViewData["ReturnUrl"] = returnUrl;
-            if (ModelState.IsValid)
+            //if (ModelState.IsValid)
+            //{
+            var user = await _userManager.FindByNameAsync(model.Email).ConfigureAwait(true);
+            if (user != null && await _userManager.CheckPasswordAsync(user, model.Password).ConfigureAwait(true))
             {
-                var user = await _userManager.FindByNameAsync(model.Email).ConfigureAwait(true);
-                if (user != null && await _userManager.CheckPasswordAsync(user, model.Password).ConfigureAwait(true))
+                var role = await _userManager.GetRolesAsync(user).ConfigureAwait(true);
+                IdentityOptions options = new IdentityOptions();
+                var tokenDescriptor = new SecurityTokenDescriptor()
                 {
-                    var role = await _userManager.GetRolesAsync(user).ConfigureAwait(true);
-                    IdentityOptions options = new IdentityOptions();
-                    var tokenDescriptor = new SecurityTokenDescriptor()
-                    {
-                        Subject = new ClaimsIdentity(new Claim[] {
+                    Subject = new ClaimsIdentity(new Claim[] {
 
                         new Claim("UserID", user.Id.ToString()),
                         new Claim(options.ClaimsIdentity.RoleClaimType, role.FirstOrDefault())
                     }),
-                        Expires = DateTime.Now.AddDays(1),
-                        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettings.JWT_Secret)), SecurityAlgorithms.HmacSha256Signature)
-                    };
+                    Expires = DateTime.Now.AddDays(1),
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettings.JWT_Secret)), SecurityAlgorithms.HmacSha256Signature)
+                };
 
-                    var tokenHandler = new JwtSecurityTokenHandler();
-                    var securityToken = tokenHandler.CreateToken(tokenDescriptor);
-                    var token = tokenHandler.WriteToken(securityToken);
-                    return Ok(new { token });
-                }
-                else
-                    return BadRequest(new { message = "OOP! Its look like user or password is invalid" });
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var securityToken = tokenHandler.CreateToken(tokenDescriptor);
+                var token = tokenHandler.WriteToken(securityToken);
+                return Ok(new { token });
             }
-            return BadRequest(new { message = "OOP! Please enter a valid user and password." });
+            else
+                return BadRequest(new { message = "OOP! Its look like user or password is invalid" });
+            //}
+            //return BadRequest(new { message = "OOP! Please enter a valid user and password." });
         }
 
         [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("SignUp")]
-        [ValidateAntiForgeryToken]
         public async Task<object> SignUp([FromBody]RegisterViewModel UserModel)
         {
-            if (ModelState.IsValid)
+            //if (ModelState.IsValid)
+            //{
+            var user = new ApplicationUser()
             {
-                var user = new ApplicationUser()
+                UserName = UserModel.Email,
+                Email = UserModel.Email,
+                FirstName = UserModel.FirstName,
+                LastName = UserModel.LastName,
+                FullName = UserModel.FullName,
+                Role = "superadmin",
+                Phone = UserModel.Phone
+            };
+
+            var result = await _userManager.CreateAsync(user, UserModel.Password).ConfigureAwait(true);
+            var xRest = await _userManager.AddToRoleAsync(user, user.Role).ConfigureAwait(true);
+            if (result.Succeeded)
+            {
+                _logger.LogInformation("User created a new account with password.");
+
+                if (user.Email != null)
                 {
-                    UserName = UserModel.Email,
-                    Email = UserModel.Email,
-                    FirstName = UserModel.FirstName,
-                    LastName = UserModel.LastName,
-                    FullName = UserModel.FullName,
-                    Role = "superadmin",
-                    Phone = UserModel.Phone
-                };
-
-                var result = await _userManager.CreateAsync(user, UserModel.Password).ConfigureAwait(true); 
-                var xRest = await _userManager.AddToRoleAsync(user, user.Role).ConfigureAwait(true); 
-                if (result.Succeeded)
-                {
-
-
-                    _logger.LogInformation("User created a new account with password.");
-
-                    if (user.Email != null)
-                    {
-                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true); 
-                        var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
-                        await _emailSender.SendEmailConfirmationAsync(UserModel.Email, callbackUrl).ConfigureAwait(true);
-                    }
-                    else
-                    {
-                        // check if its a phone 
-                    }
-
-                    //await _signInManager.SignInAsync(user, isPersistent: false);
-                    _logger.LogInformation("User created a new account with password.");
-                    return Ok(new SuccessViewModel { Code = "200", Status = "Success", Desc= "User created a new account with password." });
-
+                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true);
+                    var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
+                    await _emailSender.SendEmailConfirmationAsync(UserModel.Email, callbackUrl).ConfigureAwait(true);
                 }
                 else
                 {
-                    AddErrors(result);
-                    return Ok(result);
+                    // check if its a phone 
                 }
+                return Ok(new SuccessViewModel { Code = "200", Status = "Success", Desc = "User created a new account with password." });
             }
-            return BadRequest(new { message = "OOP! Please enter a valid user details." });
+            else
+            {
+                AddErrors(result);
+                return Ok(result);
+            }
+            //}
+            //return BadRequest(new { message = "OOP! Please enter a valid user details." });
         }
 
         [EnableCors("CorsPolicy")]
@@ -139,7 +132,7 @@ namespace TimeAPI.API.Controllers
         [Route("Logout")]
         public async Task<object> Logout()
         {
-            await _signInManager.SignOutAsync();
+            await _signInManager.SignOutAsync().ConfigureAwait(true);
             _logger.LogInformation("User logged out.");
             return Ok(new SuccessViewModel { Code = "200", Status = "Success" });
         }
@@ -153,12 +146,12 @@ namespace TimeAPI.API.Controllers
             {
                 return Ok(new SuccessViewModel { Code = "201", Status = "Error" });
             }
-            var user = await _userManager.FindByIdAsync(userId);
+            var user = await _userManager.FindByIdAsync(userId).ConfigureAwait(true);
             if (user == null)
             {
                 throw new ApplicationException($"Unable to load user with ID '{userId}'.");
             }
-            var result = await _userManager.ConfirmEmailAsync(user, code);
+            var result = await _userManager.ConfirmEmailAsync(user, code).ConfigureAwait(true);
             return Ok(result.Succeeded ? "ConfirmEmail" : "Error");
         }
 
@@ -167,25 +160,25 @@ namespace TimeAPI.API.Controllers
         [Route("ForgotPassword")]
         public async Task<object> ForgotPassword([FromBody]ForgotPasswordViewModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var user = await _userManager.FindByEmailAsync(model.Email);
-                if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
-                {
-                    // Don't reveal that the user does not exist or is not confirmed
-                    return Ok(new SuccessViewModel { Code = "201", Status = "User not exists." });
-                }
-
-                // For more information on how to enable account confirmation and password reset please
-                // visit https://go.microsoft.com/fwlink/?LinkID=532713
-                var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-                var callbackUrl = Url.ResetPasswordCallbackLink(user.Id, code, Request.Scheme);
-                await _emailSender.SendEmailAsync(model.Email, "Reset Password",
-                   $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>");
-                return Ok(new SuccessViewModel { Code = "200", Status = "Success", Desc = "Reset password email sent to registerd email." });
+                return Ok(model);
             }
-            // If we got this far, something failed, redisplay form
-            return Ok(model);
+            var user = await _userManager.FindByEmailAsync(model.Email).ConfigureAwait(true);
+            if (user == null || !(await _userManager.IsEmailConfirmedAsync(user).ConfigureAwait(true)))
+            {
+                // Don't reveal that the user does not exist or is not confirmed
+                return Ok(new SuccessViewModel { Code = "201", Status = "User not exists." });
+            }
+
+            // For more information on how to enable account confirmation and password reset please
+            // visit https://go.microsoft.com/fwlink/?LinkID=532713
+            var code = await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(true);
+            var callbackUrl = Url.ResetPasswordCallbackLink(user.Id, code, Request.Scheme);
+            await _emailSender.SendEmailAsync(model.Email, "Reset Password", $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>").ConfigureAwait(true);
+            return Ok(new SuccessViewModel { Code = "200", Status = "Success", Desc = "Reset password email sent to registerd email." });
+            //// If we got this far, something failed, redisplay form
+            //return Ok(model);
         }
 
         [EnableCors("CorsPolicy")]
@@ -197,12 +190,12 @@ namespace TimeAPI.API.Controllers
             {
                 return Ok(model);
             }
-            var user = await _userManager.FindByEmailAsync(model.Email);
+            var user = await _userManager.FindByEmailAsync(model.Email).ConfigureAwait(true);
             if (user == null)
             {
                 return Ok(new SuccessViewModel { Code = "201", Status = "Error", Desc = "Please enter a valid email" });
             }
-            var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
+            var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password).ConfigureAwait(true);
             if (result.Succeeded)
             {
                 return Ok(new SuccessViewModel { Code = "200", Status = "Success", Desc = "Password reset successful." });
@@ -212,7 +205,7 @@ namespace TimeAPI.API.Controllers
             {
                 Code = "201",
                 Status = "Error",
-                Desc = ""
+                Desc = result.Errors.ToString()
             });
         }
 

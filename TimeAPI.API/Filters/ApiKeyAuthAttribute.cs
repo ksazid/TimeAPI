@@ -29,7 +29,7 @@ namespace TimeAPI.API.Filters
                 return;
             }
 
-            await next();
+            await next().ConfigureAwait(true);
            
         }
     }
