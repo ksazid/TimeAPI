@@ -49,7 +49,6 @@ namespace TimeAPI.API.Controllers
         [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("Login")]
-        //[ValidateAntiForgeryToken]
         public async Task<IActionResult> Login([FromBody]LoginViewModel model)
         {
             //ViewData["ReturnUrl"] = returnUrl;
@@ -77,7 +76,7 @@ namespace TimeAPI.API.Controllers
                 return Ok(new { token });
             }
             else
-                return BadRequest(new { message = "OOP! Its look like user or password is invalid" });
+                return Ok(new  SuccessViewModel{ Code = "201", Status = "Error", Desc = "Please enter a valid user and password." });
             //}
             //return BadRequest(new { message = "OOP! Please enter a valid user and password." });
         }
