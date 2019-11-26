@@ -14,13 +14,13 @@ using System.Threading.Tasks;
 using TimeAPI.API.Models;
 using TimeAPI.API.Services;
 using Microsoft.AspNetCore.Cors;
+using TimeAPI.API.Filters;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace TimeAPI.API.Controllers
 {
-
-    //[Authorize]
+    //[ApiKeyAuth]
     [EnableCors("CorsPolicy")]
     [Route("[controller]")]
     public class AccountController : Controller
@@ -32,8 +32,7 @@ namespace TimeAPI.API.Controllers
         private readonly ApplicationSettings _appSettings;
 
         public AccountController(UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager,
-            IEmailSender emailSender,
+            SignInManager<ApplicationUser> signInManager, IEmailSender emailSender,
             ILogger<AccountController> logger, IOptions<ApplicationSettings> AppSettings)
         {
             _userManager = userManager;

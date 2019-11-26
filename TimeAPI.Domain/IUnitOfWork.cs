@@ -15,6 +15,11 @@ namespace TimeAPI.Domain
         IUserRoleRepository UserRoleRepository { get; }
         IEmployeeRepository EmployeeRepository { get; }
         IOrganizationRepository OrganizationRepository { get; }
+        IDepartmentRepository DepartmentRepository { get; }
+        IProfileImageRepository ProfileImageRepository { get; }
+        IReportingRepository ReportingRepository { get; }
+        ISocialRepository SocialRepository { get; }
+        ISubscriptionRepository SubscriptionRepository { get; }
 
         //commit all after all completes
         void Commit();

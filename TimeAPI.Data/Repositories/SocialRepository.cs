@@ -5,13 +5,15 @@ using TimeAPI.Domain.Repositories;
 
 namespace TimeAPI.Data.Repositories
 {
-    public class EmployeeRepository : RepositoryBase, IEmployeeRepository
+    public class SocialRepository : RepositoryBase, ISocialRepository
     {
-        public EmployeeRepository(IDbTransaction transaction)
-           : base(transaction)
-        { }
 
-        public void Add(Employee entity)
+        public SocialRepository(IDbTransaction transaction) : base(transaction)
+        {
+
+        }
+
+        public void Add(Social entity)
         {
 
             entity.id = ExecuteScalar<string>(
@@ -27,49 +29,26 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public Employee Find(string key)
+        public Social Find(string key)
         {
-            return QuerySingleOrDefault<Employee>(
+            return QuerySingleOrDefault<Social>(
                 sql: "SELECT * FROM [dbo].[employee] WHERE id = @key",
                 param: new { key }
             );
         }
 
-        public Employee FindByEmpName(string full_name)
-        {
-            return QuerySingleOrDefault<Employee>(
-                sql: "SELECT * FROM [dbo].[employee] WHERE full_name = @full_name",
-                param: new { full_name }
-            );
-        }
 
-        public IEnumerable<Employee> FindByOrgIDCode(string OrgID)
+        public IEnumerable<Social> FindByEmpID(string role)
         {
-            return Query<Employee>(
-                sql: "SELECT * FROM [dbo].[employee] WHERE org_id = @OrgID",
-                param: new { OrgID }
-            );
-        }
-
-        public Employee FindByEmpCode(string emp_code)
-        {
-            return QuerySingleOrDefault<Employee>(
-                sql: "SELECT * FROM [dbo].[employee] WHERE emp_code = @emp_code",
-                param: new { emp_code }
-            );
-        }
-
-        public IEnumerable<Employee> FindByRoleName(string role)
-        {
-            return Query<Employee>(
+            return Query<Social>(
                 sql: "SELECT * FROM [dbo].[employee] WHERE role = @role",
                 param: new { role }
             );
         }
 
-        public IEnumerable<Employee> All()
+        public IEnumerable<Social> All()
         {
-            return Query<Employee>(
+            return Query<Social>(
                 sql: "SELECT * FROM [dbo].[employee]"
             );
         }
@@ -79,26 +58,25 @@ namespace TimeAPI.Data.Repositories
             Execute(
                 sql: @"UPDATE dbo.employee
                    SET
-                       modified_date = @modified_date, modifiedby = @modifiedby, is_deleted = 1
+                       modified_date = @modified_date, modifiedby = @modifiedby, is_deleted = 1, is_admin = @is_admin
                     WHERE id = @key",
                 param: new { key }
             );
         }
 
-        public void Update(Employee entity)
+        public void Update(Social entity)
         {
             Execute(
                 sql: @"UPDATE dbo.employee
                    SET 
                        deptid = @deptid, full_name = @full_name, first_name = @first_name, last_name = @last_name, alias = @alias, 
                        gender = @gender, emp_status = @emp_status, emp_type = @emp_type, imgurl = @imgurl, workemail = @workemail, 
-                       emp_code = @emp_code, role = @role, designation = @designation, dob = @dob, joined_date = @joined_date, 
+                       emp_code = @emp_code, role = @role, designation = @designationdob = @dob, joined_date = @joined_date, 
                        phone = @phone, mobile = @mobile, summary = @summary, created_date = @created_date, createdby = @createdby, 
                        modified_date = @modified_date, modifiedby = @modifiedby, is_deleted = @is_deleted, is_admin = @is_admin
                     WHERE id = @id",
                 param: entity
             );
         }
-
     }
 }

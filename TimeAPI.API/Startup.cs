@@ -19,6 +19,11 @@ using TimeAPI.Domain.Repositories;
 using TimeAPI.Data.Repositories;
 using System.Collections.Generic;
 using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
+using System.IO;
+using TimeAPI.API.Filters;
+using System.Linq;
 
 namespace TimeAPI.API
 {
@@ -53,25 +58,34 @@ namespace TimeAPI.API
               .AddCustomStores()
               .AddDefaultTokenProviders();
 
-
-
             // Add application services.
             services.AddScoped<IUnitOfWork, DapperUnitOfWork>(provider => new DapperUnitOfWork(Configuration.GetConnectionString("DefaultConnection")));
             services.AddTransient<IEmailSender, EmailSender>();
 
-            //services.AddAuthorization(options => options.AddPolicy("Trusted", policy => policy.RequireClaim("Employee", "Mosalla")));
-
-            //services.AddControllersWithViewsEmployeeRepository
-            //services.AddSwaggerGen(c =>
-            //{
-            //    c.EnableAnnotations();
-            //});
-
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Time API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Time API", Version = "v1" });
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "Please insert JWT with Bearer into field",
+                    Name = "Bearer Token",
+                    Type = SecuritySchemeType.ApiKey
+                });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement {
+                   {
+                     new OpenApiSecurityScheme
+                     {
+                       Reference = new OpenApiReference
+                       {
+                         Type = ReferenceType.SecurityScheme,
+                         Id = "Bearer"
+                       }
+                      },
+                      new string[] { }
+                    }
+                  });
             });
-
 
             //Asp.net Identity Password Config
             services.Configure<IdentityOptions>(options =>
@@ -85,23 +99,24 @@ namespace TimeAPI.API
             //JWT Auth for Token Based Authentication
             var key = Encoding.UTF8.GetBytes(Configuration["ApplicationSettings:JWT_Secret"]);
             services.AddAuthentication(x =>
-                        {
-                            x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                            x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                            x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                        }).AddJwtBearer(x =>
-                        {
-                            x.RequireHttpsMetadata = false;
-                            x.SaveToken = false;
-                            x.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-                            {
-                                ValidateIssuerSigningKey = true,
-                                IssuerSigningKey = new SymmetricSecurityKey(key),
-                                ValidateIssuer = false,
-                                ValidateAudience = false,
-                                ClockSkew = TimeSpan.Zero
-                            };
-                        });
+                                {
+                                    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                                    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                                    x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                                }).AddJwtBearer(x =>
+                                {
+                                    x.RequireHttpsMetadata = false;
+                                    x.SaveToken = false;
+                                    x.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                                    {
+                                        ValidateIssuerSigningKey = true,
+                                        IssuerSigningKey = new SymmetricSecurityKey(key),
+                                        ValidateIssuer = true,
+                                        ValidateAudience = true,
+                                        ValidateLifetime = true, 
+                                        ClockSkew = TimeSpan.Zero
+                                    };
+                                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -135,22 +150,8 @@ namespace TimeAPI.API
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Time API");
-                //c.AddSecurityDefinition("Bearer", new ApiKeyScheme
-                //{
-                //    In = "header",
-                //    Description = "Please insert JWT with Bearer into field",
-                //    Name = "Authorization",
-                //    Type = "apiKey"
-                //});
-
-                //c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
-                //  {
-                //    { "Bearer", new string[] { } }
-                //  });
 
             });
         }
-
-
     }
 }

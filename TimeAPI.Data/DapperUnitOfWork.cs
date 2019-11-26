@@ -25,6 +25,11 @@ namespace TimeAPI.Data
 
         private IEmployeeRepository _employeeRepository;
         private IOrganizationRepository _organizationRepository;
+        private IDepartmentRepository _departmentRepository;
+        private IProfileImageRepository _profileImageRepository;
+        private ISocialRepository _socialRepository;
+        private ISubscriptionRepository _subscriptionRepository;
+        private IReportingRepository _reportingRepository;
 
         private bool _disposed;
         #endregion
@@ -119,6 +124,50 @@ namespace TimeAPI.Data
             }
         }
 
+        public IDepartmentRepository DepartmentRepository
+        {
+            get
+            {
+                return _departmentRepository
+                    ?? (_departmentRepository = new DepartmentRepository(_transaction));
+            }
+        }
+
+        public IProfileImageRepository ProfileImageRepository
+        {
+            get
+            {
+                return _profileImageRepository
+                    ?? (_profileImageRepository = new ProfileImageRepository(_transaction));
+            }
+        }
+
+        public ISocialRepository SocialRepository
+        {
+            get
+            {
+                return _socialRepository
+                    ?? (_socialRepository = new SocialRepository(_transaction));
+            }
+        }
+
+        public ISubscriptionRepository SubscriptionRepository
+        {
+            get
+            {
+                return _subscriptionRepository
+                    ?? (_subscriptionRepository = new SubscriptionRepository(_transaction));
+            }
+        }
+
+        public IReportingRepository ReportingRepository
+        {
+            get
+            {
+                return _reportingRepository
+                    ?? (_reportingRepository = new ReportingRepository(_transaction));
+            }
+        }
 
         public void Commit()
         {

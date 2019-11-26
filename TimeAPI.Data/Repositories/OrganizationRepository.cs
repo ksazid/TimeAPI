@@ -34,22 +34,6 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public Organization FindByOrgName(string org_name)
-        {
-            return QuerySingleOrDefault<Organization>(
-                sql: "SELECT * FROM [dbo].[organization] WHERE org_name = @org_name",
-                param: new { org_name }
-            );
-        }
-        public IEnumerable<Organization> FindByUsersID(string user_id)
-        {
-            return Query<Organization>(
-                sql: "SELECT * FROM [dbo].[organization] WHERE user_id = @user_id",
-                param: new { user_id }
-            );
-        }
-
-
         public IEnumerable<Organization> All()
         {
             return Query<Organization>(
@@ -81,5 +65,20 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
+        public Organization FindByOrgName(string org_name)
+        {
+            return QuerySingleOrDefault<Organization>(
+                sql: "SELECT * FROM [dbo].[organization] WHERE org_name = @org_name",
+                param: new { org_name }
+            );
+        }
+
+        public IEnumerable<Organization> FindByUsersID(string user_id)
+        {
+            return Query<Organization>(
+                sql: "SELECT * FROM [dbo].[organization] WHERE user_id = @user_id",
+                param: new { user_id }
+            );
+        }
     }
 }

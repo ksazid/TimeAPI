@@ -20,6 +20,7 @@ namespace TimeAPI.API.Filters
                 context.Result = new UnauthorizedResult();
                 return;
             }
+
             var configuration = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
             var apikey = configuration.GetValue<string>(key: "ApiKey");
 
