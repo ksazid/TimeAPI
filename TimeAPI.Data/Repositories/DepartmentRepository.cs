@@ -25,7 +25,7 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public Department Find(string key)
+        public Department Find(string key)  
         {
             return QuerySingleOrDefault<Department>(
                 sql: "SELECT * FROM dbo.department WHERE is_deleted = 0 and id = @key",
