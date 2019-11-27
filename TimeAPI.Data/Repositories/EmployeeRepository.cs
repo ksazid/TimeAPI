@@ -17,11 +17,9 @@ namespace TimeAPI.Data.Repositories
             entity.id = ExecuteScalar<string>(
                     sql: @"
                     INSERT INTO [dbo].[employee] (id, user_id, deptid, full_name, first_name,last_name, alias, gender, emp_status, emp_type, imgurl, workemail, 
-                                   emp_code, role, designation, dob, joined_date, phone, mobile, email, summary, created_date, createdby, modified_date, modifiedby,
-                                   is_deleted, is_admin)
-                    VALUES (@id, @user_id, @deptid, @full_name, @first_name, @last_name, @alias,  @gender, @emp_status, @emp_type, @imgurl, @workemail,  @emp_code,
-                                  @role, @designation, @dob, @joined_date, @phone, @mobile, @email, @summary, @created_date, @createdby, @modified_date, @modifiedby,
-                                  @is_deleted, @is_admin);
+                                   emp_code, role, designation, dob, joined_date, phone, mobile, email, summary, created_date, createdby, is_admin)
+                    VALUES (@id, @user_id, @deptid, @full_name, @first_name, @last_name, @alias,  @gender, @emp_status, @emp_type, @imgurl, @workemail, @emp_code,
+                                  @role, @designation, @dob, @joined_date, @phone, @mobile, @email, @summary, @created_date, @createdby, @is_admin);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -30,7 +28,7 @@ namespace TimeAPI.Data.Repositories
         public Employee Find(string key)
         {
             return QuerySingleOrDefault<Employee>(
-                sql: "SELECT * FROM [dbo].[employee] WHERE id = @key",
+                sql: "SELECT * FROM [dbo].[employee] WHERE id = @key and is_deleted = 0",
                 param: new { key }
             );
         }
@@ -38,7 +36,7 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<Employee> All()
         {
             return Query<Employee>(
-                sql: "SELECT * FROM [dbo].[employee]"
+                sql: "SELECT * FROM [dbo].[employee] where is_deleted = 0"
             );
         }
 
@@ -61,8 +59,8 @@ namespace TimeAPI.Data.Repositories
                        deptid = @deptid, full_name = @full_name, first_name = @first_name, last_name = @last_name, alias = @alias, 
                        gender = @gender, emp_status = @emp_status, emp_type = @emp_type, imgurl = @imgurl, workemail = @workemail, 
                        emp_code = @emp_code, role = @role, designation = @designation, dob = @dob, joined_date = @joined_date, 
-                       phone = @phone, mobile = @mobile, summary = @summary, created_date = @created_date, createdby = @createdby, 
-                       modified_date = @modified_date, modifiedby = @modifiedby, is_deleted = @is_deleted, is_admin = @is_admin
+                       phone = @phone, mobile = @mobile, summary = @summary, modified_date = @modified_date, modifiedby = @modifiedby, 
+                       is_admin = @is_admin
                     WHERE id = @id",
                 param: entity
             );
@@ -71,7 +69,7 @@ namespace TimeAPI.Data.Repositories
         public Employee FindByEmpName(string full_name)
         {
             return QuerySingleOrDefault<Employee>(
-                sql: "SELECT * FROM [dbo].[employee] WHERE full_name = @full_name",
+                sql: "SELECT * FROM [dbo].[employee] WHERE full_name = @full_name and is_deleted = 0",
                 param: new { full_name }
             );
         }
@@ -79,7 +77,7 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<Employee> FindByOrgIDCode(string OrgID)
         {
             return Query<Employee>(
-                sql: "SELECT * FROM [dbo].[employee] WHERE org_id = @OrgID",
+                sql: "SELECT * FROM [dbo].[employee] WHERE org_id = @OrgID and is_deleted = 0",
                 param: new { OrgID }
             );
         }
@@ -87,7 +85,7 @@ namespace TimeAPI.Data.Repositories
         public Employee FindByEmpCode(string emp_code)
         {
             return QuerySingleOrDefault<Employee>(
-                sql: "SELECT * FROM [dbo].[employee] WHERE emp_code = @emp_code",
+                sql: "SELECT * FROM [dbo].[employee] WHERE emp_code = @emp_code and is_deleted = 0",
                 param: new { emp_code }
             );
         }
@@ -95,7 +93,7 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<Employee> FindByRoleName(string role)
         {
             return Query<Employee>(
-                sql: "SELECT * FROM [dbo].[employee] WHERE role = @role",
+                sql: "SELECT * FROM [dbo].[employee] WHERE role = @role and is_deleted = 0",
                 param: new { role }
             );
         }

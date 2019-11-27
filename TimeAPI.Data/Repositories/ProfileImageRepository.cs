@@ -17,8 +17,8 @@ namespace TimeAPI.Data.Repositories
 
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.image
-                                   (id, user_id, img_name, img_url, created_date, createdby, modified_date, modifiedby, is_deleted)
-                           VALUES (@id, @user_id, @img_name, @img_url, @created_date, @createdby, @modified_date, @modifiedby, @is_deleted);
+                                   (id, user_id, img_name, img_url, created_date, createdby)
+                           VALUES (@id, @user_id, @img_name, @img_url, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -27,7 +27,7 @@ namespace TimeAPI.Data.Repositories
         public Image Find(string key)
         {
             return QuerySingleOrDefault<Image>(
-                sql: "SELECT * FROM dbo.image WHERE id = @key",
+                sql: "SELECT * FROM dbo.image WHERE id = @key and  is_deleted = 0",
                 param: new { key }
             );
         }
@@ -52,11 +52,8 @@ namespace TimeAPI.Data.Repositories
                         user_id = @user_id, 
                         img_name = @img_name, 
                         img_url = @img_url, 
-                        created_date = @created_date, 
-                        createdby = @createdby, 
                         modified_date = @modified_date, 
-                        modifiedby = @modifiedby, 
-                        is_deleted = @is_deleted
+                        modifiedby = @modifiedby
                     WHERE id = @id",
                 param: entity
             );
@@ -65,7 +62,7 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<Image> All()
         {
             return Query<Image>(
-                sql: "SELECT * FROM [dbo].[image]"
+                sql: "SELECT * FROM [dbo].[image] where is_deleted = 0"
             );
         }
 

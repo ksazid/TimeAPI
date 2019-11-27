@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -30,6 +31,8 @@ namespace TimeAPI.API.Models.EmployeeViewModels
         public string email { get; set; }
         public string summary { get; set; }
         public string created_date { get; set; }
+
+        [Required (ErrorMessage = "Please enter current user full name")]
         public string createdby { get; set; }
         public string modified_date { get; set; }
         public string modifiedby { get; set; }

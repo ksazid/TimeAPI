@@ -45,7 +45,6 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-
         public void Remove(string key)
         {
             Execute(

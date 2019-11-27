@@ -15,11 +15,10 @@ namespace TimeAPI.Data.Repositories
 
         public void Add(Reporting entity)
         {
-
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.reporting
-                                  (id, empid, report_emp_id, created_date, createdby, modified_date, modifiedby, is_deleted)
-                           VALUES (@id, @empid, @report_emp_id, @created_date, @createdby, @modified_date, @modifiedby, @is_deleted);
+                                  (id, empid, report_emp_id, created_date, createdby)
+                           VALUES (@id, @empid, @report_emp_id, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -28,7 +27,7 @@ namespace TimeAPI.Data.Repositories
         public Reporting Find(string key)
         {
             return QuerySingleOrDefault<Reporting>(
-                sql: "SELECT * FROM dbo.reporting WHERE id = @key",
+                sql: "SELECT * FROM dbo.reporting WHERE id = @key and  is_deleted = 0",
                 param: new { key }
             );
         }
@@ -36,7 +35,7 @@ namespace TimeAPI.Data.Repositories
         public void Remove(string key)
         {
             Execute(
-                sql: @"UPDATE dbo.image
+                sql: @"UPDATE dbo.reporting
                    SET
                        modified_date = @modified_date, modifiedby = @modifiedby, is_deleted = 1
                     WHERE id = @key",
@@ -53,11 +52,8 @@ namespace TimeAPI.Data.Repositories
                         user_id = @user_id, 
                         img_name = @img_name, 
                         img_url = @img_url, 
-                        created_date = @created_date, 
-                        createdby = @createdby, 
                         modified_date = @modified_date, 
-                        modifiedby = @modifiedby, 
-                        is_deleted = @is_deleted
+                        modifiedby = @modifiedby
                     WHERE id = @id",
                 param: entity
             );
@@ -66,14 +62,14 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<Reporting> All()
         {
             return Query<Reporting>(
-                sql: "SELECT * FROM [dbo].[image]"
+                sql: "SELECT * FROM [dbo].[reporting] WHERE  is_deleted = 0"
             );
         }
 
         public Reporting FindReportingHeadByEmpID(string key)
         {
             return QuerySingleOrDefault<Reporting>(
-                sql: "SELECT * FROM dbo.reporting WHERE id = @key",
+                sql: "SELECT * FROM dbo.reporting WHERE report_emp_id = @key and  is_deleted = 0",
                 param: new { key }
             );
         }
@@ -81,7 +77,7 @@ namespace TimeAPI.Data.Repositories
         public Reporting FindByReportEmpID(string key)
         {
             return QuerySingleOrDefault<Reporting>(
-                sql: "SELECT * FROM dbo.reporting WHERE id = @key",
+                sql: "SELECT * FROM dbo.reporting WHERE empid = @key and  is_deleted = 0",
                 param: new { key }
             );
         }

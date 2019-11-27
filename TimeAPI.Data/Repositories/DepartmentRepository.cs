@@ -28,7 +28,7 @@ namespace TimeAPI.Data.Repositories
         public Department Find(string key)
         {
             return QuerySingleOrDefault<Department>(
-                sql: "SELECT * FROM dbo.department WHERE id = @key",
+                sql: "SELECT * FROM dbo.department WHERE is_deleted = 0 and id = @key",
                 param: new { key }
             );
         }
@@ -64,14 +64,14 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<Department> All()
         {
             return Query<Department>(
-                sql: "SELECT * FROM [dbo].[department]"
+                sql: "SELECT * FROM [dbo].[department] where is_deleted = 0"
             );
         }
 
         public Department FindByDepartmentName(string dep_name)
         {
             return QuerySingleOrDefault<Department>(
-                sql: "SELECT * FROM [dbo].[department] WHERE dep_name = @dep_name",
+                sql: "SELECT * FROM [dbo].[department] WHERE dep_name = @dep_name and is_deleted = 0",
                 param: new { dep_name }
             );
         }
@@ -79,7 +79,7 @@ namespace TimeAPI.Data.Repositories
         public Department FindByDepartmentAlias(string alias)
         {
             return QuerySingleOrDefault<Department>(
-                sql: "SELECT * FROM [dbo].[department] WHERE alias = @alias",
+                sql: "SELECT * FROM [dbo].[department] WHERE alias = @alias and is_deleted = 0",
                 param: new { alias }
             );
         }
@@ -87,7 +87,7 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<Department> FindDepartmentByOrgID(string org_id)
         {
             return Query<Department>(
-                sql: "SELECT * FROM [dbo].[department] WHERE alias = @org_id",
+                sql: "SELECT * FROM [dbo].[department] WHERE org_id = @org_id and is_deleted = 0",
                 param: new { org_id }
             );
         }
@@ -97,7 +97,7 @@ namespace TimeAPI.Data.Repositories
             return Query<DepartmentResultSet>(
                 sql: @"select e.full_name, e.email, e.designation, d.dep_name from employee e
                         join department d on e.id = d.depart_lead_empid
-                        where d.org_id = @org_id",
+                        where d.org_id = @org_id and d.is_deleted = 0",
                 param: new { org_id }
             );
         }
@@ -107,7 +107,7 @@ namespace TimeAPI.Data.Repositories
             return QuerySingleOrDefault<DepartmentResultSet>(
                 sql: @"select e.full_name, e.email, e.designation, d.dep_name from employee e
                         join department d on e.id = d.depart_lead_empid
-                        where d.id = @DepID",
+                        where d.id = @DepID  and d.is_deleted = 0",
                 param: new { DepID }
             );
         }
