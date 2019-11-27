@@ -42,7 +42,6 @@ namespace TimeAPI.API.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("AddDesignation")]
         public async Task<object> AddDesignation([FromBody] DesignationViewModel designationViewModel, CancellationToken cancellationToken)
