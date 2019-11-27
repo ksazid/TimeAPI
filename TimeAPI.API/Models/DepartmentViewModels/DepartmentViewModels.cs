@@ -10,8 +10,7 @@ namespace TimeAPI.API.Models.DepartmentViewModels
     {
         public DepartmentViewModels()
         {
-            id = Guid.NewGuid().ToString();
-            created_date = DateTime.Now.ToString();
+
         }
 
         public string id { get; set; }

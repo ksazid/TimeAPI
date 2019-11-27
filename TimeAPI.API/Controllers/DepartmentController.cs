@@ -50,6 +50,9 @@ namespace TimeAPI.API.Controllers
                 if (departmentViewModels == null)
                     throw new ArgumentNullException(nameof(departmentViewModels));
 
+                departmentViewModels.id = Guid.NewGuid().ToString();
+                departmentViewModels.created_date = DateTime.Now.ToString();
+
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<DepartmentViewModels, Department>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Department>(departmentViewModels);
