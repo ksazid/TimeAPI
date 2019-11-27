@@ -6,13 +6,9 @@ using System.Threading.Tasks;
 
 namespace TimeAPI.API.Models.DepartmentViewModels
 {
-    public class DepartmentViewModels
+    public class DepartmentViewModel
     {
-        public DepartmentViewModels()
-        {
-
-        }
-
+       
         public string id { get; set; }
 
         [Required(ErrorMessage = "enter department lead")]

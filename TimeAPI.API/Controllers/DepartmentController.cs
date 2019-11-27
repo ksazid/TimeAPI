@@ -40,7 +40,7 @@ namespace TimeAPI.API.Controllers
         [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("AddDepartment")]
-        public async Task<object> AddDepartment([FromBody] DepartmentViewModels departmentViewModels, CancellationToken cancellationToken)
+        public async Task<object> AddDepartment([FromBody] DepartmentViewModel departmentViewModels, CancellationToken cancellationToken)
         {
             try
             {
@@ -53,7 +53,7 @@ namespace TimeAPI.API.Controllers
                 departmentViewModels.id = Guid.NewGuid().ToString();
                 departmentViewModels.created_date = DateTime.Now.ToString();
 
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<DepartmentViewModels, Department>());
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<DepartmentViewModel, Department>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Department>(departmentViewModels);
 
@@ -71,7 +71,7 @@ namespace TimeAPI.API.Controllers
         [EnableCors("CorsPolicy")]
         [HttpPut]
         [Route("UpdateDepartment")]
-        public async Task<object> UpdateDepartment([FromBody] DepartmentViewModels departmentViewModels, CancellationToken cancellationToken)
+        public async Task<object> UpdateDepartment([FromBody] DepartmentViewModel departmentViewModels, CancellationToken cancellationToken)
         {
             try
             {
@@ -83,7 +83,7 @@ namespace TimeAPI.API.Controllers
 
                 departmentViewModels.modifiedby = departmentViewModels.createdby;
                 departmentViewModels.created_date = DateTime.Now.ToString();
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<DepartmentViewModels, Department>());
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<DepartmentViewModel, Department>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Department>(departmentViewModels);
 
