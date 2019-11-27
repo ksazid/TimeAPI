@@ -37,7 +37,7 @@ namespace TimeAPI.API.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpPost]
         [Route("AddDepartment")]
         public async Task<object> AddDepartment([FromBody] DepartmentViewModel departmentViewModels, CancellationToken cancellationToken)
@@ -68,7 +68,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpPut]
         [Route("UpdateDepartment")]
         public async Task<object> UpdateDepartment([FromBody] DepartmentViewModel departmentViewModels, CancellationToken cancellationToken)
@@ -99,7 +99,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpPost]
         [Route("RemoveDepartment")]
         public async Task<object> RemoveDepartment([FromBody] Utils _Utils, CancellationToken cancellationToken)
@@ -123,7 +123,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpGet]
         [Route("GetAllDepartments")]
         public async Task<object> GetAllDepartments(CancellationToken cancellationToken)
@@ -144,7 +144,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpPost]
         [Route("FindByDepartmentName")]
         public async Task<object> FindByDepartmentName([FromBody] UtilsName _UtilsName, CancellationToken cancellationToken)
@@ -169,7 +169,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpPost]
         [Route("FindByDepartmentAlias")]
         public async Task<object> FindByDepartmentAlias([FromBody] UtilsAlias _UtilsAlias, CancellationToken cancellationToken)
@@ -194,7 +194,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpPost]
         [Route("FindDepartmentByOrgID")]
         public async Task<object> FindDepartmentByOrgID([FromBody] Utils _Utils, CancellationToken cancellationToken)
@@ -219,7 +219,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpPost]
         [Route("FindByDepartmentID")]
         public async Task<object> FindByDepartmentID([FromBody] Utils _Utils, CancellationToken cancellationToken)
@@ -244,7 +244,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpPost]
         [Route("FindDepLeadByDepID")]
         public async Task<object> FindDepLeadByDepID([FromBody] Utils _Utils, CancellationToken cancellationToken)

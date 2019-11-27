@@ -36,7 +36,7 @@ namespace TimeAPI.API.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpPost]
         [Route("AddEmployee")]
         public async Task<object> AddEmployee([FromBody] EmployeeViewModel employeeViewModel, CancellationToken cancellationToken)
@@ -66,7 +66,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpPut]
         [Route("UpdateEmployee")]
         public async Task<object> UpdateEmployee([FromBody] EmployeeViewModel employeeViewModel, CancellationToken cancellationToken)
@@ -95,7 +95,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpPost]
         [Route("RemoveEmployee")]
         public async Task<object> RemoveEmployee([FromBody] Utils _Utils, CancellationToken cancellationToken)
@@ -119,7 +119,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpGet]
         [Route("GetAllEmployees")]
         public async Task<object> GetAllEmployees(CancellationToken cancellationToken)
@@ -141,7 +141,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpPost]
         [Route("FindByEmpID")]
         public async Task<object> FindByEmpID([FromBody] Utils _Utils, CancellationToken cancellationToken)
@@ -165,7 +165,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpPost]
         [Route("FindByEmpName")]
         public async Task<object> FindByEmpName([FromBody] UtilsName _UtilsName, CancellationToken cancellationToken)
@@ -190,7 +190,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpPost]
         [Route("FindByOrgID")]
         public async Task<object> FindByOrgID([FromBody] Utils _Utils, CancellationToken cancellationToken)
@@ -214,7 +214,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpPost]
         [Route("FindByEmpCode")]
         public async Task<object> FindByEmpCode([FromBody] UtilsCode _EmpCode, CancellationToken cancellationToken)
@@ -239,7 +239,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpPost]
         [Route("FindByRoleName")]
         public async Task<object> FindByRoleName([FromBody] UtilsRole _UtilsRole, CancellationToken cancellationToken)

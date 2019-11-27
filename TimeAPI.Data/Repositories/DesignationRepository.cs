@@ -15,9 +15,9 @@ namespace TimeAPI.Data.Repositories
         {
 
             entity.id = ExecuteScalar<string>(
-                    sql: @"INSERT INTO dbo.department
-                                  (id, org_id, depart_lead_empid, dep_name, alias, created_date, createdby)
-                           VALUES (@id, @org_id, @depart_lead_empid, @dep_name, @alias, @created_date, @createdby);
+                    sql: @"INSERT INTO dbo.designation
+                                  (id, dep_id, designation_name, alias, created_date, createdby)
+                           VALUES (@id, @dep_id, @designation_name, @alias, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -26,7 +26,7 @@ namespace TimeAPI.Data.Repositories
         public Designation Find(string key)
         {
             return QuerySingleOrDefault<Designation>(
-                sql: "SELECT * FROM dbo.department WHERE is_deleted = 0 and id = @key",
+                sql: "SELECT * FROM dbo.designation WHERE is_deleted = 0 and id = @key",
                 param: new { key }
             );
         }
@@ -34,7 +34,7 @@ namespace TimeAPI.Data.Repositories
         public void Remove(string key)
         {
             Execute(
-                sql: @"UPDATE dbo.department
+                sql: @"UPDATE dbo.designation
                    SET
                        modified_date = @modified_date, modifiedby = @modifiedby, is_deleted = 1
                     WHERE id = @key",
@@ -45,12 +45,11 @@ namespace TimeAPI.Data.Repositories
         public void Update(Designation entity)
         {
             Execute(
-                sql: @"UPDATE dbo.department
+                sql: @"UPDATE dbo.designation
                    SET 
                     id = @id, 
-                    org_id = @org_id,
-                    depart_lead_empid = @depart_lead_empid, 
-                    dep_name = @dep_name, 
+                    dep_id = @dep_id,
+                    designation_name = @designation_name, 
                     alias = @alias, 
                     modified_date = @modified_date, 
                     modifiedby = @modifiedby
@@ -62,14 +61,14 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<Designation> All()
         {
             return Query<Designation>(
-                sql: "SELECT * FROM [dbo].[department] where is_deleted = 0"
+                sql: "SELECT * FROM [dbo].[designation] where is_deleted = 0"
             );
         }
 
         public Designation FindByDesignationName(string dep_name)
         {
             return QuerySingleOrDefault<Designation>(
-                sql: "SELECT * FROM [dbo].[department] WHERE dep_name = @dep_name and is_deleted = 0",
+                sql: "SELECT * FROM [dbo].[designation] WHERE dep_name = @designation_name and is_deleted = 0",
                 param: new { dep_name }
             );
         }
@@ -77,16 +76,16 @@ namespace TimeAPI.Data.Repositories
         public Designation FindByDesignationAlias(string alias)
         {
             return QuerySingleOrDefault<Designation>(
-                sql: "SELECT * FROM [dbo].[department] WHERE alias = @alias and is_deleted = 0",
+                sql: "SELECT * FROM [dbo].[designation] WHERE alias = @alias and is_deleted = 0",
                 param: new { alias }
             );
         }
 
-        public IEnumerable<Designation> FindDesignationByDeptID(string org_id)
+        public IEnumerable<Designation> FindDesignationByDeptID(string dep_id)
         {
             return Query<Designation>(
-                sql: "SELECT * FROM [dbo].[department] WHERE org_id = @org_id and is_deleted = 0",
-                param: new { org_id }
+                sql: "SELECT * FROM [dbo].[designation] WHERE dep_id = @dep_id and is_deleted = 0",
+                param: new { dep_id }
             );
         }
 

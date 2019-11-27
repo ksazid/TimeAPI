@@ -71,7 +71,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
         [HttpPut]
         [Route("UpdateDesignation")]
         public async Task<object> UpdateDesignation([FromBody]  DesignationViewModel designationViewModel, CancellationToken cancellationToken)
@@ -99,7 +98,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpPost]
         [Route("RemoveDesignation")]
         public async Task<object> RemoveDesignation([FromBody] Utils _Utils, CancellationToken cancellationToken)
@@ -123,7 +122,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpGet]
         [Route("GetAllDesignation")]
         public async Task<object> GetAllDesignation(CancellationToken cancellationToken)
@@ -145,7 +144,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpPost]
         [Route("FindByDesignationName")]
         public async Task<object> FindByDesignationName([FromBody] UtilsName _Utils, CancellationToken cancellationToken)
@@ -169,7 +168,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpPost]
         [Route("FindByDesignationAlias")]
         public async Task<object> FindByDesignationAlias([FromBody] UtilsAlias _UtilsAlias, CancellationToken cancellationToken)
@@ -193,7 +192,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpPost]
         [Route("FindDesignationByDeptID")]
         public async Task<object> FindDesignationByDeptID([FromBody] Utils _Utils, CancellationToken cancellationToken)

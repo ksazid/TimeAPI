@@ -22,6 +22,10 @@ using TimeAPI.API.Models.SocialViewModels;
 
 namespace TimeAPI.API.Controllroers
 {
+    //[ApiKeyAuth]
+    [EnableCors("CorsPolicy")]
+    [Route("[controller]")]
+    //[Authorize(Roles = "superadmin")]
     public class SocialController : Controller
     {
         private readonly IEmailSender _emailSender;
@@ -39,7 +43,7 @@ namespace TimeAPI.API.Controllroers
         }
 
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpPost]
         [Route("AddSocial")]
         public async Task<object> AddSocial([FromBody] SocialViewModel socialViewModel, CancellationToken cancellationToken)
@@ -69,7 +73,7 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpPut]
         [Route("UpdateSocial")]
         public async Task<object> UpdateSocial([FromBody] SocialViewModel socialViewModel, CancellationToken cancellationToken)
@@ -97,7 +101,7 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpPost]
         [Route("RemoveSocial")]
         public async Task<object> RemoveSocial([FromBody] Utils _Utils, CancellationToken cancellationToken)
@@ -121,7 +125,7 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpGet]
         [Route("GetAllSocial")]
         public async Task<object> GetAllSocial(CancellationToken cancellationToken)
@@ -143,7 +147,7 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpPost]
         [Route("FindBySocailID")]
         public async Task<object> FindBySocailID([FromBody] Utils _Utils, CancellationToken cancellationToken)
@@ -167,7 +171,7 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpPost]
         [Route("FindSocialIdsByEmpID")]
         public async Task<object> FindSocialIdsByEmpID([FromBody] Utils _Utils, CancellationToken cancellationToken)

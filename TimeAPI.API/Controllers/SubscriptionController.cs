@@ -43,7 +43,7 @@ namespace TimeAPI.API.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpPost]
         [Route("AddSubscription")]
         public async Task<object> AddSubscription([FromBody] SubscriptionViewModel subscriptionViewModel, CancellationToken cancellationToken)
@@ -73,7 +73,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpPut]
         [Route("UpdateSubscription")]
         public async Task<object> UpdateSubscription([FromBody] SubscriptionViewModel subscriptionViewModel, CancellationToken cancellationToken)
@@ -101,7 +101,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpPost]
         [Route("RemoveSubscription")]
         public async Task<object> RemoveSubscription([FromBody] Utils _Utils, CancellationToken cancellationToken)
@@ -125,7 +125,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpGet]
         [Route("GetAllSubscription")]
         public async Task<object> GetAllSubscription(CancellationToken cancellationToken)
@@ -147,7 +147,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpPost]
         [Route("FindBySubscriptionID")]
         public async Task<object> FindBySubscriptionID([FromBody] Utils _Utils, CancellationToken cancellationToken)
@@ -171,7 +171,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpPost]
         [Route("FindByApiKeyByUserID")]
         public async Task<object> FindByApiKeyByUserID([FromBody] Utils _Utils, CancellationToken cancellationToken)
@@ -195,7 +195,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpPost]
         [Route("FindByApiKeyOrgID")]
         public async Task<object> FindByApiKeyOrgID([FromBody] Utils _Utils, CancellationToken cancellationToken)

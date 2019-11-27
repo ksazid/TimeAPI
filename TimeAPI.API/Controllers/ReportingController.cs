@@ -41,7 +41,7 @@ namespace TimeAPI.API.Controllers
             _appSettings = AppSettings.Value;
             _unitOfWork = unitOfWork;
         }
-        [EnableCors("CorsPolicy")]
+        
         [HttpPost]
         [Route("AddReporting")]
         public async Task<object> AddReporting([FromBody] ReportingViewModel reportingViewModel, CancellationToken cancellationToken)
@@ -71,7 +71,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpPut]
         [Route("UpdateReporting")]
         public async Task<object> UpdateReporting([FromBody] ReportingViewModel reportingViewModel, CancellationToken cancellationToken)
@@ -102,7 +102,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpPost]
         [Route("RemoveReporting")]
         public async Task<object> RemoveReporting([FromBody] Utils _Utils, CancellationToken cancellationToken)
@@ -126,7 +126,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpGet]
         [Route("GetAllReporting")]
         public async Task<object> GetAllReporting(CancellationToken cancellationToken)
@@ -147,7 +147,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpPost]
         [Route("FindByReportEmpID")]
         public async Task<object> FindByReportEmpID([FromBody] Utils _Utils, CancellationToken cancellationToken)
@@ -172,7 +172,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [EnableCors("CorsPolicy")]
+        
         [HttpPost]
         [Route("FindReportingHeadByEmpID")]
         public async Task<object> FindReportingHeadByEmpID([FromBody] Utils _Utils, CancellationToken cancellationToken)
