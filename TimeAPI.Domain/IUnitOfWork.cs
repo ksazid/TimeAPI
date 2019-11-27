@@ -20,6 +20,7 @@ namespace TimeAPI.Domain
         IReportingRepository ReportingRepository { get; }
         ISocialRepository SocialRepository { get; }
         ISubscriptionRepository SubscriptionRepository { get; }
+        IDesignationRepositiory DesignationRepositiory { get; }
 
         //commit all after all completes
         void Commit();

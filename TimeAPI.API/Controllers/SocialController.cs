@@ -98,7 +98,7 @@ namespace TimeAPI.API.Controllroers
         }
 
         [EnableCors("CorsPolicy")]
-        [HttpDelete]
+        [HttpPost]
         [Route("RemoveSocial")]
         public async Task<object> RemoveSocial([FromBody] Utils _Utils, CancellationToken cancellationToken)
         {

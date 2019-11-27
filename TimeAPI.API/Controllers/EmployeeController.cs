@@ -96,7 +96,7 @@ namespace TimeAPI.API.Controllers
         }
 
         [EnableCors("CorsPolicy")]
-        [HttpDelete]
+        [HttpPost]
         [Route("RemoveEmployee")]
         public async Task<object> RemoveEmployee([FromBody] Utils _Utils, CancellationToken cancellationToken)
         {

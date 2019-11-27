@@ -102,7 +102,7 @@ namespace TimeAPI.API.Controllers
         }
 
         [EnableCors("CorsPolicy")]
-        [HttpDelete]
+        [HttpPost]
         [Route("RemoveSubscription")]
         public async Task<object> RemoveSubscription([FromBody] Utils _Utils, CancellationToken cancellationToken)
         {

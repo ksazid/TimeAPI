@@ -30,6 +30,7 @@ namespace TimeAPI.Data
         private ISocialRepository _socialRepository;
         private ISubscriptionRepository _subscriptionRepository;
         private IReportingRepository _reportingRepository;
+        private IDesignationRepositiory _designationRepositiory;
 
         private bool _disposed;
         #endregion
@@ -166,6 +167,15 @@ namespace TimeAPI.Data
             {
                 return _reportingRepository
                     ?? (_reportingRepository = new ReportingRepository(_transaction));
+            }
+        }
+
+        public IDesignationRepositiory DesignationRepositiory
+        {
+            get
+            {
+                return _designationRepositiory
+                    ?? (_designationRepositiory = new DesignationRepository(_transaction));
             }
         }
 
