@@ -205,7 +205,7 @@ namespace TimeAPI.API.Controllers
                 if (_Utils == null)
                     throw new ArgumentNullException(nameof(_Utils.ID));
 
-                var result = _unitOfWork.DepartmentRepository.FindByDepartmentAlias(_Utils.ID);
+                var result = _unitOfWork.DepartmentRepository.FindDepartmentByOrgID(_Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);

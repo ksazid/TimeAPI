@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using TimeAPI.Domain.Entities;
+using TimeAPI.Domain.Model;
 using TimeAPI.Domain.Repositories;
 
 
@@ -91,9 +92,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<object> FindAllDepLeadByOrgID(string org_id)
+        public IEnumerable<DepartmentResultSet> FindAllDepLeadByOrgID(string org_id)
         {
-            return Query<object>(
+            return Query<DepartmentResultSet>(
                 sql: @"select e.full_name, e.email, e.designation, d.dep_name from employee e
                         join department d on e.id = d.depart_lead_empid
                         where d.org_id = @org_id",
@@ -101,16 +102,15 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public object FindDepLeadByDepID(string DepID)
+        public DepartmentResultSet FindDepLeadByDepID(string DepID)
         {
-            return QuerySingleOrDefault<object>(
+            return QuerySingleOrDefault<DepartmentResultSet>(
                 sql: @"select e.full_name, e.email, e.designation, d.dep_name from employee e
                         join department d on e.id = d.depart_lead_empid
                         where d.id = @DepID",
                 param: new { DepID }
             );
         }
-
 
     }
 }
