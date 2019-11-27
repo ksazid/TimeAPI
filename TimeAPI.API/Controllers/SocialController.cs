@@ -22,13 +22,13 @@ using TimeAPI.API.Models.SocialViewModels;
 
 namespace TimeAPI.API.Controllroers
 {
-    public class SocialContller : Controller
+    public class SocialController : Controller
     {
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
-        public SocialContller(IUnitOfWork unitOfWork, ILogger<SocialContller> logger,
+        public SocialController(IUnitOfWork unitOfWork, ILogger<SocialController> logger,
             IEmailSender emailSender,
             IOptions<ApplicationSettings> AppSettings)
         {
