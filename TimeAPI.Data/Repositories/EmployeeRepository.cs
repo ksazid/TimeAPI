@@ -35,38 +35,6 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public Employee FindByEmpName(string full_name)
-        {
-            return QuerySingleOrDefault<Employee>(
-                sql: "SELECT * FROM [dbo].[employee] WHERE full_name = @full_name",
-                param: new { full_name }
-            );
-        }
-
-        public IEnumerable<Employee> FindByOrgIDCode(string OrgID)
-        {
-            return Query<Employee>(
-                sql: "SELECT * FROM [dbo].[employee] WHERE org_id = @OrgID",
-                param: new { OrgID }
-            );
-        }
-
-        public Employee FindByEmpCode(string emp_code)
-        {
-            return QuerySingleOrDefault<Employee>(
-                sql: "SELECT * FROM [dbo].[employee] WHERE emp_code = @emp_code",
-                param: new { emp_code }
-            );
-        }
-
-        public IEnumerable<Employee> FindByRoleName(string role)
-        {
-            return Query<Employee>(
-                sql: "SELECT * FROM [dbo].[employee] WHERE role = @role",
-                param: new { role }
-            );
-        }
-
         public IEnumerable<Employee> All()
         {
             return Query<Employee>(
@@ -97,6 +65,38 @@ namespace TimeAPI.Data.Repositories
                        modified_date = @modified_date, modifiedby = @modifiedby, is_deleted = @is_deleted, is_admin = @is_admin
                     WHERE id = @id",
                 param: entity
+            );
+        }
+
+        public Employee FindByEmpName(string full_name)
+        {
+            return QuerySingleOrDefault<Employee>(
+                sql: "SELECT * FROM [dbo].[employee] WHERE full_name = @full_name",
+                param: new { full_name }
+            );
+        }
+
+        public IEnumerable<Employee> FindByOrgIDCode(string OrgID)
+        {
+            return Query<Employee>(
+                sql: "SELECT * FROM [dbo].[employee] WHERE org_id = @OrgID",
+                param: new { OrgID }
+            );
+        }
+
+        public Employee FindByEmpCode(string emp_code)
+        {
+            return QuerySingleOrDefault<Employee>(
+                sql: "SELECT * FROM [dbo].[employee] WHERE emp_code = @emp_code",
+                param: new { emp_code }
+            );
+        }
+
+        public IEnumerable<Employee> FindByRoleName(string role)
+        {
+            return Query<Employee>(
+                sql: "SELECT * FROM [dbo].[employee] WHERE role = @role",
+                param: new { role }
             );
         }
 

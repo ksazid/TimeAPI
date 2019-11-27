@@ -10,5 +10,7 @@ namespace TimeAPI.Domain.Repositories
         Department FindByDepartmentName(string dep_name);
         Department FindByDepartmentAlias(string alias);
         IEnumerable<Department> FindDepartmentByOrgID(string OrgID);
+        IEnumerable<object> FindAllDepLeadByOrgID(string OrgID);
+        object FindDepLeadByDepID(string OrgID);
     }
 }

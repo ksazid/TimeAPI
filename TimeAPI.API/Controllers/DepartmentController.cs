@@ -37,7 +37,6 @@ namespace TimeAPI.API.Controllers
             _unitOfWork = unitOfWork;
         }
 
-
         [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("AddDepartment")]
@@ -51,11 +50,9 @@ namespace TimeAPI.API.Controllers
                 if (departmentViewModels == null)
                     throw new ArgumentNullException(nameof(departmentViewModels));
 
-                departmentViewModels.id = Guid.NewGuid().ToString();
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<DepartmentViewModels, Department>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Department>(departmentViewModels);
-
 
                 _unitOfWork.DepartmentRepository.Add(modal);
                 _unitOfWork.Commit();
@@ -81,6 +78,8 @@ namespace TimeAPI.API.Controllers
                 if (departmentViewModels == null)
                     throw new ArgumentNullException(nameof(departmentViewModels));
 
+                departmentViewModels.modifiedby = departmentViewModels.createdby;
+                departmentViewModels.created_date = DateTime.Now.ToString();
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<DepartmentViewModels, Department>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Department>(departmentViewModels);
@@ -96,7 +95,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
 
         [EnableCors("CorsPolicy")]
         [HttpDelete]
@@ -115,6 +113,102 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Department removed succefully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [EnableCors("CorsPolicy")]
+        [HttpGet]
+        [Route("GetAllDepartments")]
+        public async Task<object> GetAllDepartments(CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                var result = _unitOfWork.DepartmentRepository.All();
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [EnableCors("CorsPolicy")]
+        [HttpPost]
+        [Route("FindByDepartmentName")]
+        public async Task<object> FindByDepartmentName([FromBody] UtilsName _UtilsName, CancellationToken cancellationToken)
+        {
+
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (_UtilsName == null)
+                    throw new ArgumentNullException(nameof(_UtilsName.FullName));
+
+                var result = _unitOfWork.DepartmentRepository.FindByDepartmentName(_UtilsName.FullName);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [EnableCors("CorsPolicy")]
+        [HttpPost]
+        [Route("FindByDepartmentAlias")]
+        public async Task<object> FindByDepartmentAlias([FromBody] UtilsAlias _UtilsAlias, CancellationToken cancellationToken)
+        {
+
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (_UtilsAlias == null)
+                    throw new ArgumentNullException(nameof(_UtilsAlias.Alias));
+
+                var result = _unitOfWork.DepartmentRepository.FindByDepartmentAlias(_UtilsAlias.Alias);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [EnableCors("CorsPolicy")]
+        [HttpPost]
+        [Route("FindDepartmentByOrgID")]
+        public async Task<object> FindDepartmentByOrgID([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        {
+
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (_Utils == null)
+                    throw new ArgumentNullException(nameof(_Utils.ID));
+
+                var result = _unitOfWork.DepartmentRepository.FindByDepartmentAlias(_Utils.ID);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -147,44 +241,20 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
-        [EnableCors("CorsPolicy")]
-        [HttpGet]
-        [Route("GetAllDepartments")]
-        public async Task<object> GetAllDepartments([FromBody]  CancellationToken cancellationToken)
-        {
-            try
-            {
-                if (cancellationToken != null)
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                var result = _unitOfWork.DepartmentRepository.All();
-                _unitOfWork.Commit();
-
-                return await Task.FromResult<object>(result).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-            }
-        }
-
-
         [EnableCors("CorsPolicy")]
         [HttpPost]
-        [Route("FindByDepartmentName")]
-        public async Task<object> FindByDepartmentName([FromBody] UtilsName _UtilsName, CancellationToken cancellationToken)
+        [Route("FindDepLeadByDepID")]
+        public async Task<object> FindDepLeadByDepID([FromBody] Utils _Utils, CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_UtilsName == null)
-                    throw new ArgumentNullException(nameof(_UtilsName.FullName));
+                if (_Utils == null)
+                    throw new ArgumentNullException(nameof(_Utils.ID));
 
-                var result = _unitOfWork.DepartmentRepository.FindByDepartmentName(_UtilsName.FullName);
+                var result = _unitOfWork.DepartmentRepository.FindDepLeadByDepID(_Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
@@ -195,56 +265,5 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
-        [EnableCors("CorsPolicy")]
-        [HttpPost]
-        [Route("FindByDepartmentAlias")]
-        public async Task<object> FindByDepartmentAlias([FromBody] UtilsAlias _UtilsAlias, CancellationToken cancellationToken)
-        {
-
-            try
-            {
-                if (cancellationToken != null)
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                if (_UtilsAlias == null)
-                    throw new ArgumentNullException(nameof(_UtilsAlias.Alias));
-
-                var result = _unitOfWork.DepartmentRepository.FindByDepartmentAlias(_UtilsAlias.Alias);
-                _unitOfWork.Commit();
-
-                return await Task.FromResult<object>(result).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-            }
-        }
-
-
-        [EnableCors("CorsPolicy")]
-        [HttpGet]
-        [Route("GetAllEmployees")]
-        public async Task<object> GetAllEmployees([FromBody] Utils _UtilsOrgID, CancellationToken cancellationToken)
-        {
-
-            try
-            {
-                if (cancellationToken != null)
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                if (_UtilsOrgID == null)
-                    throw new ArgumentNullException(nameof(_UtilsOrgID.ID));
-
-                var result = _unitOfWork.DepartmentRepository.FindDepartmentByOrgID(_UtilsOrgID.ID);
-                _unitOfWork.Commit();
-
-                return await Task.FromResult<object>(result).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-            }
-        }
     }
 }

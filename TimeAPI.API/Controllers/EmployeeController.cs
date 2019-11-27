@@ -36,7 +36,6 @@ namespace TimeAPI.API.Controllers
             _unitOfWork = unitOfWork;
         }
 
-
         [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("AddEmployee")]
@@ -67,7 +66,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [EnableCors("CorsPolicy")]
         [HttpPut]
         [Route("UpdateEmployee")]
@@ -97,7 +95,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [EnableCors("CorsPolicy")]
         [HttpDelete]
         [Route("RemoveEmployee")]
@@ -122,7 +119,51 @@ namespace TimeAPI.API.Controllers
             }
         }
 
+        [EnableCors("CorsPolicy")]
+        [HttpGet]
+        [Route("GetAllEmployees")]
+        public async Task<object> GetAllEmployees(CancellationToken cancellationToken)
+        {
 
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                var result = _unitOfWork.EmployeeRepository.All();
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [EnableCors("CorsPolicy")]
+        [HttpPost]
+        [Route("FindByEmpID")]
+        public async Task<object> FindByEmpID([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (_Utils == null)
+                    throw new ArgumentNullException(nameof(_Utils.ID));
+
+                var result = _unitOfWork.EmployeeRepository.Find(_Utils.ID);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
 
         [EnableCors("CorsPolicy")]
         [HttpPost]
@@ -149,7 +190,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("FindByOrgID")]
@@ -173,7 +213,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
 
         [EnableCors("CorsPolicy")]
         [HttpPost]
@@ -200,7 +239,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [EnableCors("CorsPolicy")]
         [HttpPost]
         [Route("FindByRoleName")]
@@ -216,29 +254,6 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(_UtilsRole.Role));
 
                 var result = _unitOfWork.EmployeeRepository.FindByRoleName(_UtilsRole.Role);
-                _unitOfWork.Commit();
-
-                return await Task.FromResult<object>(result).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-            }
-        }
-
-
-        [EnableCors("CorsPolicy")]
-        [HttpGet]
-        [Route("GetAllEmployees")]
-        public async Task<object> GetAllEmployees(CancellationToken cancellationToken)
-        {
-
-            try
-            {
-                if (cancellationToken != null)
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                var result = _unitOfWork.EmployeeRepository.All();
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
