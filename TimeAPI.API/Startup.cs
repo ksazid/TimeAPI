@@ -109,7 +109,7 @@ namespace TimeAPI.API
                                     x.SaveToken = false;
                                     x.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
                                     {
-                                        ValidateIssuerSigningKey = true,
+                                        ValidateIssuerSigningKey = false,
                                         IssuerSigningKey = new SymmetricSecurityKey(key),
                                         ValidateIssuer = false,
                                         ValidateAudience = false,
