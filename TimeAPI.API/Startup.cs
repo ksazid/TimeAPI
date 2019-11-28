@@ -69,7 +69,7 @@ namespace TimeAPI.API
                 {
                     In = ParameterLocation.Header,
                     Description = "Please insert JWT with Bearer into field",
-                    Name = "Bearer Token",
+                    Name = "token",
                     Type = SecuritySchemeType.ApiKey
                 });
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement {
@@ -111,8 +111,8 @@ namespace TimeAPI.API
                                     {
                                         ValidateIssuerSigningKey = true,
                                         IssuerSigningKey = new SymmetricSecurityKey(key),
-                                        ValidateIssuer = true,
-                                        ValidateAudience = true,
+                                        ValidateIssuer = false,
+                                        ValidateAudience = false,
                                         ValidateLifetime = true, 
                                         ClockSkew = TimeSpan.Zero
                                     };

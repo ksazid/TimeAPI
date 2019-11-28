@@ -1,4 +1,5 @@
 ﻿using TimeAPI.Domain.Entities;
+using TimeAPI.Domain.Model;
 
 namespace TimeAPI.Domain.Repositories
 {
@@ -7,5 +8,7 @@ namespace TimeAPI.Domain.Repositories
         User FindByNormalizedUserName(string normalizedUserName);
 
         User FindByNormalizedEmail(string normalizedEmail);
+
+        UserDataGroupDataSet GetUserDataGroupByUserID(string EmpID);
     }
 }

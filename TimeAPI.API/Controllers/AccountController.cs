@@ -15,6 +15,8 @@ using TimeAPI.API.Models;
 using TimeAPI.API.Services;
 using Microsoft.AspNetCore.Cors;
 using TimeAPI.API.Filters;
+using TimeAPI.Domain;
+using System.Threading;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -30,11 +32,13 @@ namespace TimeAPI.API.Controllers
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
         private readonly ApplicationSettings _appSettings;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public AccountController(UserManager<ApplicationUser> userManager,
+        public AccountController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager, IEmailSender emailSender,
             ILogger<AccountController> logger, IOptions<ApplicationSettings> AppSettings)
         {
+            unitOfWork = _unitOfWork;
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
@@ -45,7 +49,6 @@ namespace TimeAPI.API.Controllers
         [TempData]
         public string ErrorMessage { get; set; }
 
-        
         [HttpPost]
         [Route("Login")]
         public async Task<IActionResult> Login([FromBody]LoginViewModel model)
@@ -72,7 +75,7 @@ namespace TimeAPI.API.Controllers
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var securityToken = tokenHandler.CreateToken(tokenDescriptor);
                 var token = tokenHandler.WriteToken(securityToken);
-                return Ok(new { token });
+                return Ok(new { token , user.Id });
             }
             else
                 return Ok(new SuccessViewModel { Code = "201", Status = "Error", Desc = "Please enter a valid user and password." });
@@ -80,7 +83,6 @@ namespace TimeAPI.API.Controllers
             //return BadRequest(new { message = "OOP! Please enter a valid user and password." });
         }
 
-        
         [HttpPost]
         [Route("SignUp")]
         public async Task<object> SignUp([FromBody]RegisterViewModel UserModel)
@@ -137,7 +139,7 @@ namespace TimeAPI.API.Controllers
             //return BadRequest(new { message = "OOP! Please enter a valid user details." });
         }
 
-        
+
         [HttpPost]
         [Route("Logout")]
         public async Task<object> Logout()
@@ -147,7 +149,7 @@ namespace TimeAPI.API.Controllers
             return Ok(new SuccessViewModel { Code = "200", Status = "Success" });
         }
 
-        
+
         [HttpGet]
         [Route("ConfirmEmail")]
         public async Task<object> ConfirmEmail(string userId, string code)
@@ -165,7 +167,7 @@ namespace TimeAPI.API.Controllers
             return Ok(result.Succeeded ? "ConfirmEmail" : "Error");
         }
 
-        
+
         [HttpPost]
         [Route("ForgotPassword")]
         public async Task<object> ForgotPassword([FromBody]ForgotPasswordViewModel model)
@@ -191,7 +193,7 @@ namespace TimeAPI.API.Controllers
             //return Ok(model);
         }
 
-        
+
         [HttpPost]
         [Route("ResetPassword")]
         public async Task<IActionResult> ResetPassword([FromBody]ResetPasswordViewModel model)
@@ -218,7 +220,7 @@ namespace TimeAPI.API.Controllers
                 Desc = result.Errors.ToString()
             });
         }
-
+       
 
         #region Helpers
         private void AddErrors(IdentityResult result)

@@ -212,6 +212,8 @@ namespace TimeAPI.API.Identity
             }
         }
 
+    
+
         public void Dispose()
         {
             // Lifetimes of dependencies are managed by the IoC container, so disposal here is unnecessary.
@@ -877,6 +879,8 @@ namespace TimeAPI.API.Identity
             return Task.CompletedTask;
         }
         #endregion
+
+
 
         #region Private Methods
         private User getUserEntity(ApplicationUser ApplicationUser)

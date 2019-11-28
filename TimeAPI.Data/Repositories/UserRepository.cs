@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using TimeAPI.Domain.Entities;
+using TimeAPI.Domain.Model;
 using TimeAPI.Domain.Repositories;
 
 namespace TimeAPI.Data.Repositories
@@ -81,5 +82,31 @@ namespace TimeAPI.Data.Repositories
                     WHERE Id = @Id",
                 param: entity);
         }
+
+        public UserDataGroupDataSet GetUserDataGroupByUserID(string UserID)
+        {
+            var resultsAspNetUsers = QuerySingleOrDefault<User>(
+                sql: @"select * from AspNetUsers WHERE id = @UserID;",
+                param: new { UserID }
+            );
+
+            var resultsOrganization = Query<Organization>(
+                sql: @"select * from Organization WHERE user_id = @UserID and is_deleted = 0;",
+                param: new { UserID }
+            );
+            var resultsEmployee = QuerySingleOrDefault<Employee>(
+                sql: @"select * from Employee WHERE user_id = @UserID and is_deleted = 0;",
+                param: new { UserID }
+            );
+
+            UserDataGroupDataSet _UserDataGroupDataSet = new UserDataGroupDataSet();
+
+            _UserDataGroupDataSet._User = resultsAspNetUsers;
+            _UserDataGroupDataSet._Organization = resultsOrganization;
+            _UserDataGroupDataSet._Employee = resultsEmployee;
+
+            return _UserDataGroupDataSet;
+        }
+
     }
 }
