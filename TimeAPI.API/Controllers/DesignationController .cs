@@ -87,6 +87,7 @@ namespace TimeAPI.API.Controllers
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Designation>(designationViewModel);
 
+                designationViewModel.modified_date = DateTime.Now.ToString();
                 _unitOfWork.DesignationRepositiory.Update(modal);
                 _unitOfWork.Commit();
 
@@ -144,7 +145,32 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        
+
+
+        [HttpPost]
+        [Route("FindByDesignationID")]
+        public async Task<object> FindByDesignationID([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (_Utils == null)
+                    throw new ArgumentNullException(nameof(_Utils.ID));
+
+                var result = _unitOfWork.DesignationRepositiory.Find(_Utils.ID);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+
         [HttpPost]
         [Route("FindByDesignationName")]
         public async Task<object> FindByDesignationName([FromBody] UtilsName _Utils, CancellationToken cancellationToken)
@@ -215,6 +241,8 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
+
+        
 
     }
 }

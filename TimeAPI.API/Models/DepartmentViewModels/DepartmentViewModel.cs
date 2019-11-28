@@ -14,9 +14,8 @@ namespace TimeAPI.API.Models.DepartmentViewModels
         [Required(ErrorMessage = "enter department lead")]
         public string depart_lead_empid { get; set; }
 
-        [Required(ErrorMessage = "enter department lead")]
+        [Required(ErrorMessage = "enter org name")]
         public string org_id { get; set; }
-
 
         [Required(ErrorMessage = "enter department name")]
         public string dep_name { get; set; }
