@@ -39,7 +39,6 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("GetUserDataGroupByUserID")]
-        [Authorize]
         public Task<object> GetUserDataGroupByUserID([FromBody] Utils UserID, CancellationToken cancellationToken)
         {
             if (cancellationToken != null)
