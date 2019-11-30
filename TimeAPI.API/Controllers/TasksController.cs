@@ -147,7 +147,7 @@ namespace TimeAPI.API.Controllers
         }
 
         [HttpGet]
-        [Route("GetAllTasks")]
+        [Route("FindByTasksId")]
         public async Task<object> FindByTasksId([FromBody] Utils _Utils, CancellationToken cancellationToken)
         {
 

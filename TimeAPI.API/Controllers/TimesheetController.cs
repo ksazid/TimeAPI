@@ -169,29 +169,5 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        //[HttpPost]
-        //[Route("FindByEmpName")]
-        //public async Task<object> FindByEmpName([FromBody] UtilsName _UtilsName, CancellationToken cancellationToken)
-        //{
-
-        //    try
-        //    {
-        //        if (cancellationToken != null)
-        //            cancellationToken.ThrowIfCancellationRequested();
-
-        //        if (_UtilsName == null)
-        //            throw new ArgumentNullException(nameof(_UtilsName));
-
-        //        var result = _unitOfWork.TimesheetRepository.FindByEmpName(_UtilsName.FullName);
-        //        _unitOfWork.Commit();
-
-        //        return await Task.FromResult<object>(result).ConfigureAwait(false);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-        //    }
-        //}
-
     }
 }
