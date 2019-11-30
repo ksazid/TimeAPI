@@ -82,10 +82,10 @@ namespace TimeAPI.API.Controllers
                 if (organizationViewModel == null)
                     throw new ArgumentNullException(nameof(organizationViewModel));
 
+                organizationViewModel.modified_date = DateTime.Now.ToString();
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationViewModel, Organization>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Organization>(organizationViewModel);
-
 
                 _unitOfWork.OrganizationRepository.Update(modal);
                 _unitOfWork.Commit();
@@ -115,6 +115,29 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Organization remvoed succefully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("FindByOrgId")]
+        public async Task<object> FindByOrgId([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (_Utils == null)
+                    throw new ArgumentNullException(nameof(_Utils.ID));
+
+                var result = _unitOfWork.OrganizationRepository.Find(_Utils.ID);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

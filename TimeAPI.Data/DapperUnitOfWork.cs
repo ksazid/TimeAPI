@@ -22,7 +22,6 @@ namespace TimeAPI.Data
         private IUserLoginRepository _userLoginRepository;
         private IRepository<UserToken, UserTokenKey> _userTokenRepository;
         private IUserRoleRepository _userRoleRepository;
-
         private IEmployeeRepository _employeeRepository;
         private IOrganizationRepository _organizationRepository;
         private IDepartmentRepository _departmentRepository;
@@ -31,6 +30,7 @@ namespace TimeAPI.Data
         private ISubscriptionRepository _subscriptionRepository;
         private IReportingRepository _reportingRepository;
         private IDesignationRepositiory _designationRepositiory;
+        private ITimesheetRepository _timesheetRepository;
 
         private bool _disposed;
         #endregion
@@ -106,7 +106,6 @@ namespace TimeAPI.Data
             }
         }
 
-
         public IEmployeeRepository EmployeeRepository
         {
             get
@@ -179,6 +178,15 @@ namespace TimeAPI.Data
             }
         }
 
+        public ITimesheetRepository TimesheetRepository
+        {
+            get
+            {
+                return _timesheetRepository
+                    ?? (_timesheetRepository = new TimesheetRepository(_transaction));
+            }
+        }
+
         public void Commit()
         {
             try
@@ -215,6 +223,14 @@ namespace TimeAPI.Data
             _userTokenRepository = null;
             _userRoleRepository = null;
             _employeeRepository = null;
+            _organizationRepository = null;
+            _departmentRepository = null;
+            _profileImageRepository = null;
+            _socialRepository = null;
+            _subscriptionRepository = null;
+            _reportingRepository = null;
+            _designationRepositiory = null;
+            _timesheetRepository = null;
         }
 
         private void dispose(bool disposing)

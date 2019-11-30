@@ -21,6 +21,7 @@ namespace TimeAPI.Domain
         ISocialRepository SocialRepository { get; }
         ISubscriptionRepository SubscriptionRepository { get; }
         IDesignationRepositiory DesignationRepositiory { get; }
+        ITimesheetRepository TimesheetRepository { get; }
 
         //commit all after all completes
         void Commit();

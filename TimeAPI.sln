@@ -12,7 +12,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeAPI.API", "TimeAPI.API\
 		{FD1637AB-AC80-4781-9FEC-BDD3417B04CD} = {FD1637AB-AC80-4781-9FEC-BDD3417B04CD}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeAPI.Test", "TimeAPI.Test\TimeAPI.Test.csproj", "{250AACB9-5766-4D2E-B255-749CB1E943AD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeAPI.Test", "TimeAPI.Test\TimeAPI.Test.csproj", "{250AACB9-5766-4D2E-B255-749CB1E943AD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

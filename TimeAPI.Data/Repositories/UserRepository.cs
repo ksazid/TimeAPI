@@ -101,9 +101,9 @@ namespace TimeAPI.Data.Repositories
 
             UserDataGroupDataSet _UserDataGroupDataSet = new UserDataGroupDataSet();
 
-            _UserDataGroupDataSet._User = resultsAspNetUsers;
-            _UserDataGroupDataSet._Organization = resultsOrganization;
-            _UserDataGroupDataSet._Employee = resultsEmployee;
+            _UserDataGroupDataSet.User = resultsAspNetUsers;
+            _UserDataGroupDataSet.Organization = resultsOrganization;
+            _UserDataGroupDataSet.Employee = resultsEmployee;
 
             return _UserDataGroupDataSet;
         }
