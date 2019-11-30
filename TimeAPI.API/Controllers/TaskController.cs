@@ -19,7 +19,7 @@ using TimeAPI.Domain;
 using System.Threading;
 using TimeAPI.Domain.Entities;
 using TimeAPI.API.Models.DesignationViewModels;
-using TimeAPI.API.Models.TimesheetViewModels;
+using TimeAPI.API.Models.TaskViewModels;
 using System.Collections.Generic;
 
 namespace TimeAPI.API.Controllers
@@ -28,13 +28,13 @@ namespace TimeAPI.API.Controllers
     [EnableCors("CorsPolicy")]
     [Route("[controller]")]
     //[Authorize(Roles = "superadmin")]
-    public class TimesheetController : Controller
+    public class TaskController : Controller
     {
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
-        public TimesheetController(IUnitOfWork unitOfWork, ILogger<TimesheetController> logger,
+        public TaskController(IUnitOfWork unitOfWork, ILogger<TaskController> logger,
             IEmailSender emailSender,
             IOptions<ApplicationSettings> AppSettings)
         {
@@ -45,66 +45,66 @@ namespace TimeAPI.API.Controllers
         }
 
         [HttpPost]
-        [Route("AddTimesheet")]
-        public async Task<object> AddTimesheet([FromBody]  TimesheetViewModel timesheetViewModel, CancellationToken cancellationToken)
+        [Route("AddTask")]
+        public async Task<object> AddTask([FromBody]  TaskViewModel TaskViewModel, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (timesheetViewModel == null)
-                    throw new ArgumentNullException(nameof(timesheetViewModel));
+                if (TaskViewModel == null)
+                    throw new ArgumentNullException(nameof(TaskViewModel));
 
-                timesheetViewModel.id = Guid.NewGuid().ToString();
-                timesheetViewModel.created_date = DateTime.Now.ToString();
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetViewModel, Timesheet>());
+                TaskViewModel.id = Guid.NewGuid().ToString();
+                TaskViewModel.created_date = DateTime.Now.ToString();
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TaskViewModel, Domain.Entities.Task>());
                 var mapper = config.CreateMapper();
-                var modal = mapper.Map<Timesheet>(timesheetViewModel);
+                var modal = mapper.Map<Domain.Entities.Task>(TaskViewModel);
 
-                _unitOfWork.TimesheetRepository.Add(modal);
+                _unitOfWork.TaskRepository.Add(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Timesheet registered succefully." }).ConfigureAwait(false);
+                return await System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Task registered succefully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+                return System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
 
         [HttpPut]
-        [Route("UpdateTimesheet")]
-        public async Task<object> UpdateAddTimesheet([FromBody] TimesheetViewModel timesheetViewModel, CancellationToken cancellationToken)
+        [Route("UpdateTask")]
+        public async Task<object> UpdateAddTask([FromBody] TaskViewModel TaskViewModel, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (timesheetViewModel == null)
-                    throw new ArgumentNullException(nameof(timesheetViewModel));
+                if (TaskViewModel == null)
+                    throw new ArgumentNullException(nameof(TaskViewModel));
 
-                timesheetViewModel.modified_date = DateTime.Now.ToString();
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetViewModel, Timesheet>());
+                TaskViewModel.modified_date = DateTime.Now.ToString();
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TaskViewModel, Domain.Entities.Task>());
                 var mapper = config.CreateMapper();
-                var modal = mapper.Map<Timesheet>(timesheetViewModel);
+                var modal = mapper.Map<Domain.Entities.Task>(TaskViewModel);
 
 
-                _unitOfWork.TimesheetRepository.Update(modal);
+                _unitOfWork.TaskRepository.Update(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Timesheet updated succefully." }).ConfigureAwait(false);
+                return await System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Task updated succefully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+                return System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
 
         [HttpPost]
-        [Route("RemoveTimesheet")]
-        public async Task<object> RemoveTimesheet([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        [Route("RemoveTask")]
+        public async Task<object> RemoveTask([FromBody] Utils _Utils, CancellationToken cancellationToken)
         {
             try
             {
@@ -114,20 +114,20 @@ namespace TimeAPI.API.Controllers
                 if (_Utils == null)
                     throw new ArgumentNullException(nameof(_Utils.ID));
 
-                _unitOfWork.TimesheetRepository.Remove(_Utils.ID);
+                _unitOfWork.TaskRepository.Remove(_Utils.ID);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Timesheet removed succefully." }).ConfigureAwait(false);
+                return await System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Task removed succefully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+                return System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
 
         [HttpGet]
-        [Route("GetAllTimesheets")]
-        public async Task<object> GetAllTimesheets(CancellationToken cancellationToken)
+        [Route("GetAllTasks")]
+        public async Task<object> GetAllTasks(CancellationToken cancellationToken)
         {
 
             try
@@ -135,14 +135,14 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.TimesheetRepository.All();
+                var result = _unitOfWork.TaskRepository.All();
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(result).ConfigureAwait(false);
+                return await System.Threading.Tasks.Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+                return System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
 
@@ -158,14 +158,14 @@ namespace TimeAPI.API.Controllers
                 if (_Utils == null)
                     throw new ArgumentNullException(nameof(_Utils.ID));
 
-                var result = _unitOfWork.TimesheetRepository.Find(_Utils.ID);
+                var result = _unitOfWork.TaskRepository.Find(_Utils.ID);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(result).ConfigureAwait(false);
+                return await System.Threading.Tasks.Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+                return System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
 
@@ -182,7 +182,7 @@ namespace TimeAPI.API.Controllers
         //        if (_UtilsName == null)
         //            throw new ArgumentNullException(nameof(_UtilsName));
 
-        //        var result = _unitOfWork.TimesheetRepository.FindByEmpName(_UtilsName.FullName);
+        //        var result = _unitOfWork.TaskRepository.FindByEmpName(_UtilsName.FullName);
         //        _unitOfWork.Commit();
 
         //        return await Task.FromResult<object>(result).ConfigureAwait(false);

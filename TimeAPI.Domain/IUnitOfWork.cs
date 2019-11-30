@@ -22,6 +22,7 @@ namespace TimeAPI.Domain
         ISubscriptionRepository SubscriptionRepository { get; }
         IDesignationRepositiory DesignationRepositiory { get; }
         ITimesheetRepository TimesheetRepository { get; }
+        ITaskRepository TaskRepository { get; }
 
         //commit all after all completes
         void Commit();

@@ -31,6 +31,7 @@ namespace TimeAPI.Data
         private IReportingRepository _reportingRepository;
         private IDesignationRepositiory _designationRepositiory;
         private ITimesheetRepository _timesheetRepository;
+        private ITaskRepository _taskRepository;
 
         private bool _disposed;
         #endregion
