@@ -24,6 +24,11 @@ namespace TimeAPI.Domain
         ITimesheetRepository TimesheetRepository { get; }
         ITaskRepository TaskRepository { get; }
         ISetupRepository SetupRepository { get; }
+        IPriorityRepository PriorityRepository { get; }
+        IStatusRepository StatusRepository { get; }
+        IEmployeeTypeRepository EmployeeTypeRepository { get; }
+        IEmployeeStatusRepository EmployeeStatusRepository { get; }
+        IIndustryTypeRepository IndustryTypeRepository { get; }
 
         //commit all after all completes
         void Commit();

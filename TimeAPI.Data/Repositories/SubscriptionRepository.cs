@@ -76,7 +76,7 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<Subscription> FindByApiKeyByUserID(string user_id)
         {
             return Query<Subscription>(
-                sql: "SELECT * FROM dbo.subscription WHERE id = @key and is_deleted = 0",
+                sql: "SELECT * FROM dbo.subscription WHERE user_id = @user_id and is_deleted = 0",
                 param: new { user_id }
             );
         }
@@ -84,7 +84,7 @@ namespace TimeAPI.Data.Repositories
         public Subscription FindByApiKeyOrgID(string org_id)
         {
             return QuerySingleOrDefault<Subscription>(
-                sql: "SELECT * FROM dbo.subscription WHERE id = @key and is_deleted = 0",
+                sql: "SELECT * FROM dbo.subscription WHERE org_id = @org_id and is_deleted = 0",
                 param: new { org_id }
             );
         }

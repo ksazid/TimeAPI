@@ -60,7 +60,7 @@ namespace TimeAPI.Data.Repositories
                               adr1 = @adr1, adr2 = @adr2, city = @city, primary_cont_name = @primary_cont_name,  
                               primary_cont_type = @primary_cont_type, time_zone = @time_zone,  
                               modified_date = @modified_date, modifiedby = @modifiedby
-                         WHERE org_id = org_id",
+                         WHERE org_id = @org_id",
                 param: entity
             );
         }

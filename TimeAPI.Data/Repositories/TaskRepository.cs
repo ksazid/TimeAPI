@@ -55,8 +55,8 @@ namespace TimeAPI.Data.Repositories
                     assigned_empid = @assigned_empid, 
                     due_date = @due_date,
                     modified_date = @modified_date, 
-                    modifiedby = @modifiedby, 
-                    is_deleted = @is_deleted",
+                    modifiedby = @modifiedby
+                    WHERE id =  @id",
                 param: entity
             );
         }

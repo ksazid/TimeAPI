@@ -55,8 +55,8 @@ namespace TimeAPI.Data.Repositories
                     is_checkout = @is_checkout,
                     groupid = @groupid,
                     modified_date = @modified_date, 
-                    modifiedby = @modifiedby, 
-                    is_deleted = @is_deleted",
+                    modifiedby = @modifiedby
+                    WHERE id = @id",
                 param: entity
             );
         }

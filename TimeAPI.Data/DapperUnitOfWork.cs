@@ -33,6 +33,13 @@ namespace TimeAPI.Data
         private ITimesheetRepository _timesheetRepository;
         private ITaskRepository _taskRepository;
         private ISetupRepository _setupRepository;
+        private IPriorityRepository _priorityRepository;
+        private IStatusRepository _statusRepository;
+        private IEmployeeTypeRepository _employeeTypeRepository;
+        private IEmployeeStatusRepository _employeeStatusRepository;
+        private IIndustryTypeRepository _industryTypeRepository;
+
+
 
         private bool _disposed;
         #endregion
@@ -204,6 +211,50 @@ namespace TimeAPI.Data
             {
                 return _setupRepository
                     ?? (_setupRepository = new SetupRepository(_transaction));
+            }
+        }
+        public IPriorityRepository PriorityRepository
+        {
+            get
+            {
+                return _priorityRepository
+                    ?? (_priorityRepository = new PriorityRepository(_transaction));
+            }
+        }
+
+        public IStatusRepository StatusRepository
+        {
+            get
+            {
+                return _statusRepository
+                    ?? (_statusRepository = new StatusRepository(_transaction));
+            }
+        }
+
+        public IEmployeeTypeRepository EmployeeTypeRepository
+        {
+            get
+            {
+                return _employeeTypeRepository
+                    ?? (_employeeTypeRepository = new EmployeeTypeRepository(_transaction));
+            }
+        }
+
+        public IEmployeeStatusRepository EmployeeStatusRepository
+        {
+            get
+            {
+                return _employeeStatusRepository
+                    ?? (_employeeStatusRepository = new EmployeeStatusRepository(_transaction));
+            }
+        }
+
+        public IIndustryTypeRepository IndustryTypeRepository
+        {
+            get
+            {
+                return _industryTypeRepository
+                    ?? (_industryTypeRepository = new IndustryTypeRepository(_transaction));
             }
         }
 
