@@ -146,6 +146,30 @@ namespace TimeAPI.API.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("GetAllTasks")]
+        public async Task<object> FindByTasksId([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        {
+
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (_Utils == null)
+                    throw new ArgumentNullException(nameof(_Utils.ID));
+
+                var result = _unitOfWork.TaskRepository.Find(_Utils.ID);
+                _unitOfWork.Commit();
+
+                return await System.Threading.Tasks.Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
         //[HttpPost]
         //[Route("CheckOutByEmpID")]
         //public async Task<object> CheckOutByEmpID([FromBody] Utils _Utils, CancellationToken cancellationToken)
