@@ -28,13 +28,13 @@ namespace TimeAPI.API.Controllers
     [EnableCors("CorsPolicy")]
     [Route("[controller]")]
     //[Authorize(Roles = "superadmin")]
-    public class TasksController : Controller
+    public class EmployeeTasksController : Controller
     {
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
-        public TasksController(IUnitOfWork unitOfWork, ILogger<TasksController> logger,
+        public EmployeeTasksController(IUnitOfWork unitOfWork, ILogger<EmployeeTasksController> logger,
             IEmailSender emailSender,
             IOptions<ApplicationSettings> AppSettings)
         {
