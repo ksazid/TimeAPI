@@ -32,6 +32,7 @@ namespace TimeAPI.Data
         private IDesignationRepositiory _designationRepositiory;
         private ITimesheetRepository _timesheetRepository;
         private ITaskRepository _taskRepository;
+        private ISetupRepository _setupRepository;
 
         private bool _disposed;
         #endregion
@@ -194,6 +195,15 @@ namespace TimeAPI.Data
             {
                 return _taskRepository
                     ?? (_taskRepository = new TaskRepository(_transaction));
+            }
+        }
+
+        public ISetupRepository SetupRepository
+        {
+            get
+            {
+                return _setupRepository
+                    ?? (_setupRepository = new SetupRepository(_transaction));
             }
         }
 
