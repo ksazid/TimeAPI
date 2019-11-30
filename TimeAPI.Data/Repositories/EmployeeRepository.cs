@@ -18,7 +18,7 @@ namespace TimeAPI.Data.Repositories
                     sql: @"
                     INSERT INTO [dbo].[employee] (id, org_id, user_id, deptid, full_name, first_name,last_name, alias, gender, emp_status, emp_type, imgurl, workemail, 
                                    emp_code, role, designation, dob, joined_date, phone, mobile, email, summary, created_date, createdby, is_admin)
-                    VALUES (@id, org_id, @user_id, @deptid, @full_name, @first_name, @last_name, @alias,  @gender, @emp_status, @emp_type, @imgurl, @workemail, @emp_code,
+                    VALUES (@id, @org_id, @user_id, @deptid, @full_name, @first_name, @last_name, @alias,  @gender, @emp_status, @emp_type, @imgurl, @workemail, @emp_code,
                                   @role, @designation, @dob, @joined_date, @phone, @mobile, @email, @summary, @created_date, @createdby, @is_admin);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
