@@ -188,6 +188,15 @@ namespace TimeAPI.Data
             }
         }
 
+        public ITaskRepository TaskRepository
+        {
+            get
+            {
+                return _taskRepository
+                    ?? (_taskRepository = new TaskRepository(_transaction));
+            }
+        }
+
         public void Commit()
         {
             try

@@ -58,9 +58,9 @@ namespace TimeAPI.API.Controllers
 
                 TaskViewModel.id = Guid.NewGuid().ToString();
                 TaskViewModel.created_date = DateTime.Now.ToString();
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TaskViewModel, Domain.Entities.Task>());
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TaskViewModel, Domain.Entities.Tasks>());
                 var mapper = config.CreateMapper();
-                var modal = mapper.Map<Domain.Entities.Task>(TaskViewModel);
+                var modal = mapper.Map<Domain.Entities.Tasks>(TaskViewModel);
 
                 _unitOfWork.TaskRepository.Add(modal);
                 _unitOfWork.Commit();
@@ -86,9 +86,9 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(TaskViewModel));
 
                 TaskViewModel.modified_date = DateTime.Now.ToString();
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TaskViewModel, Domain.Entities.Task>());
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TaskViewModel, Domain.Entities.Tasks>());
                 var mapper = config.CreateMapper();
-                var modal = mapper.Map<Domain.Entities.Task>(TaskViewModel);
+                var modal = mapper.Map<Domain.Entities.Tasks>(TaskViewModel);
 
 
                 _unitOfWork.TaskRepository.Update(modal);

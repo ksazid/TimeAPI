@@ -6,7 +6,7 @@ using TimeAPI.Domain.Model;
 
 namespace TimeAPI.Domain.Repositories
 {
-    public interface ITaskRepository : IRepository<Task, string>
+    public interface ITaskRepository : IRepository<Tasks, string>
     {
         //Department FindByDepartmentName(string dep_name);
         //Department FindByDepartmentAlias(string alias);

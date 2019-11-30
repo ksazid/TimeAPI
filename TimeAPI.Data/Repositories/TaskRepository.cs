@@ -12,7 +12,7 @@ namespace TimeAPI.Data.Repositories
         public TaskRepository(IDbTransaction transaction) : base(transaction)
         { }
 
-        public void Add(Task entity)
+        public void Add(Tasks entity)
         {
 
             entity.id = ExecuteScalar<string>(
@@ -24,9 +24,9 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public Task Find(string key)
+        public Tasks Find(string key)
         {
-            return QuerySingleOrDefault<Task>(
+            return QuerySingleOrDefault<Tasks>(
                 sql: "SELECT * FROM dbo.task WHERE is_deleted = 0 and id = @key",
                 param: new { key }
             );
@@ -43,7 +43,7 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public void Update(Task entity)
+        public void Update(Tasks entity)
         {
             Execute(
                 sql: @"UPDATE dbo.task
@@ -61,9 +61,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<Task> All()
+        public IEnumerable<Tasks> All()
         {
-            return Query<Task>(
+            return Query<Tasks>(
                 sql: "SELECT * FROM [dbo].[task] where is_deleted = 0"
             );
         }

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TimeAPI.Domain.Entities
 {
-    public class Task
+    public class Tasks
     {
         public string id { get; set; } 
         public string task_name { get; set; }
