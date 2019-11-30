@@ -28,13 +28,13 @@ namespace TimeAPI.API.Controllers
     [EnableCors("CorsPolicy")]
     [Route("[controller]")]
     //[Authorize(Roles = "superadmin")]
-    public class TaskController : Controller
+    public class TasksController : Controller
     {
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
-        public TaskController(IUnitOfWork unitOfWork, ILogger<TaskController> logger,
+        public TasksController(IUnitOfWork unitOfWork, ILogger<TasksController> logger,
             IEmailSender emailSender,
             IOptions<ApplicationSettings> AppSettings)
         {
@@ -146,28 +146,28 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [HttpPost]
-        [Route("CheckOutByEmpID")]
-        public async Task<object> CheckOutByEmpID([FromBody] Utils _Utils, CancellationToken cancellationToken)
-        {
-            try
-            {
-                if (cancellationToken != null)
-                    cancellationToken.ThrowIfCancellationRequested();
+        //[HttpPost]
+        //[Route("CheckOutByEmpID")]
+        //public async Task<object> CheckOutByEmpID([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        //{
+        //    try
+        //    {
+        //        if (cancellationToken != null)
+        //            cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.ID));
+        //        if (_Utils == null)
+        //            throw new ArgumentNullException(nameof(_Utils.ID));
 
-                var result = _unitOfWork.TaskRepository.Find(_Utils.ID);
-                _unitOfWork.Commit();
+        //        var result = _unitOfWork.TaskRepository.Find(_Utils.ID);
+        //        _unitOfWork.Commit();
 
-                return await System.Threading.Tasks.Task.FromResult<object>(result).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                return System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-            }
-        }
+        //        return await System.Threading.Tasks.Task.FromResult<object>(result).ConfigureAwait(false);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+        //    }
+        //}
 
         //[HttpPost]
         //[Route("FindByEmpName")]
