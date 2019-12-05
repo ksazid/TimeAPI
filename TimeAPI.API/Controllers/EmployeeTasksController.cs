@@ -162,6 +162,29 @@ namespace TimeAPI.API.Controllers
                 if (_Utils == null)
                     throw new ArgumentNullException(nameof(_Utils.ID));
 
+                var results = _unitOfWork.TaskRepository.Find(_Utils.ID);
+                _unitOfWork.Commit();
+
+                return await System.Threading.Tasks.Task.FromResult<object>(results).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("FetchGridDataByTaskID")]
+        public async Task<object> FetchGridDataByTaskID([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (_Utils == null)
+                    throw new ArgumentNullException(nameof(_Utils.ID));
+
                 oDataTable _oDataTable = new oDataTable();
                 IEnumerable<dynamic> results = _unitOfWork.TaskRepository.FindByTaskDetailsByID(_Utils.ID);
                 var xResult = _oDataTable.ToDataTable(results);
@@ -174,6 +197,9 @@ namespace TimeAPI.API.Controllers
                 return System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
+
+
+        
 
 
     }

@@ -74,6 +74,7 @@ namespace TimeAPI.Data.Repositories
         {
             return Query<dynamic>(
                    sql: @"	SELECT 
+                            task.id,
 		                    task.task_name,
 		                    task.task_desc,
 		                    priority.priority_name,
