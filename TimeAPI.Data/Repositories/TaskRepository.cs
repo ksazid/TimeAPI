@@ -82,9 +82,9 @@ namespace TimeAPI.Data.Repositories
 		                    employee.full_name,
 		                    task.due_date
 		                    FROM[dbo].[task]
-		                    inner join priority on task.priority = priority.id
+		                    inner join priority on task.priority_id = priority.id
 		                    inner join employee on task.assigned_empid = employee.id
-		                    inner join status on status.id = task.status
+		                    inner join status on status.id = task.status_id
 		                WHERE task.is_deleted = 0 and task.empid = @key",
                       param: new { key }
                );
