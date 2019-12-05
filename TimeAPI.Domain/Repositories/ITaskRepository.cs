@@ -9,7 +9,7 @@ namespace TimeAPI.Domain.Repositories
 {
     public interface ITaskRepository : IRepository<Tasks, string>
     {
-        dynamic FindByTaskDetailsByID(string task_id);
+        dynamic FindByTaskDetailsByEmpID(string empid);
         //Department FindByDepartmentAlias(string alias);
         //IEnumerable<Department> FindDepartmentByOrgID(string OrgID);
         //IEnumerable<DepartmentResultSet> FindAllDepLeadByOrgID(string OrgID);

@@ -186,7 +186,7 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(_Utils.ID));
 
                 oDataTable _oDataTable = new oDataTable();
-                IEnumerable<dynamic> results = _unitOfWork.TaskRepository.FindByTaskDetailsByID(_Utils.ID);
+                IEnumerable<dynamic> results = _unitOfWork.TaskRepository.FindByTaskDetailsByEmpID(_Utils.ID);
                 var xResult = _oDataTable.ToDataTable(results);
                 _unitOfWork.Commit();
 
