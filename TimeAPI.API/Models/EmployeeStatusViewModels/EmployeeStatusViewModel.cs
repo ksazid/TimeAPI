@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace TimeAPI.API.Models.EmployeeStatusViewModels
 {
-    public class IndustryTypeViewModel
+    public class EmployeeStatusViewModel
     {
         public string id { get; set; }
         public string industry_type_name { get; set; }

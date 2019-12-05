@@ -6,7 +6,8 @@ namespace TimeAPI.Domain.Entities
 {
     public class Tasks
     {
-        public string id { get; set; } 
+        public string id { get; set; }
+        public string empid { get; set; }
         public string task_name { get; set; }
         public string task_desc { get; set; }
         public string priority { get; set; }

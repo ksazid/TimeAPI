@@ -48,7 +48,6 @@ namespace TimeAPI.Data.Repositories
             Execute(
                 sql: @"UPDATE dbo.image
                    SET 
-                        id = @id, 
                         user_id = @user_id, 
                         img_name = @img_name, 
                         img_url = @img_url, 

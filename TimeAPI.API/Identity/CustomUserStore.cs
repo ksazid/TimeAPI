@@ -67,12 +67,12 @@ namespace TimeAPI.API.Identity
                     mobile = user.Phone,
                     email = userEntity.Email,
                     createdby = user.FullName,
-                    is_admin = true
+                    is_admin = false,
+                    is_superadmin = true
                 };
 
                 _unitOfWork.UserRepository.Add(userEntity);
                 _unitOfWork.EmployeeRepository.Add(employee);
-
                 _unitOfWork.Commit();
 
                 return Task.FromResult(IdentityResult.Success);

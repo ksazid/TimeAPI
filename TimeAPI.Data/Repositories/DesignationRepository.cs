@@ -68,7 +68,7 @@ namespace TimeAPI.Data.Repositories
         public Designation FindByDesignationName(string dep_name)
         {
             return QuerySingleOrDefault<Designation>(
-                sql: "SELECT * FROM [dbo].[designation] WHERE dep_name = @designation_name and is_deleted = 0",
+                sql: "SELECT * FROM [dbo].[designation] WHERE designation_name = @designation_name and is_deleted = 0",
                 param: new { dep_name }
             );
         }

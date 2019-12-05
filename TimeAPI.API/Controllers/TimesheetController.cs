@@ -73,7 +73,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [HttpPut]
+        [HttpPatch]
         [Route("UpdateTimesheet")]
         public async Task<object> UpdateAddTimesheet([FromBody] TimesheetViewModel timesheetViewModel, CancellationToken cancellationToken)
         {

@@ -17,10 +17,10 @@ namespace TimeAPI.Data.Repositories
             entity.org_id = ExecuteScalar<string>(
                     sql: @"
                     INSERT INTO dbo.organization 
-                            (org_id, user_id, org_name, type, summary, img_url, country, adr1, adr2, city, primary_cont_name,
-                                primary_cont_type, time_zone, created_date, createdby)
-                    VALUES (@org_id, @user_id, @org_name, @type,@summary, @img_url, @country, @adr1, @adr2, @city, @primary_cont_name,
-                               @primary_cont_type, @time_zone, @created_date, @createdby);
+                            (org_id, user_id, org_name, type, summary, img_url, img_name, country_id, adr1, adr2, city, primary_cont_name,
+                                primary_cont_type, time_zone_id, created_date, createdby)
+                    VALUES (@org_id, @user_id, @org_name, @type,@summary, @img_url, img_name, @country_id, @adr1, @adr2, @city, @primary_cont_name,
+                               @primary_cont_type, @time_zone_id, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -56,9 +56,9 @@ namespace TimeAPI.Data.Repositories
         {
             Execute(
                 sql: @"UPDATE dbo.organization
-                           SET  user_id = @user_id, org_name = @org_name, type = @type, summary= @summary, img_url= @img_url, country = @country, 
+                           SET  user_id = @user_id, org_name = @org_name, type = @type, summary= @summary, img_url= @img_url, img_name =@img_name, country_id = @country_id, 
                               adr1 = @adr1, adr2 = @adr2, city = @city, primary_cont_name = @primary_cont_name,  
-                              primary_cont_type = @primary_cont_type, time_zone = @time_zone,  
+                              primary_cont_type = @primary_cont_type, time_zone_id = @time_zone_id,  
                               modified_date = @modified_date, modifiedby = @modifiedby
                          WHERE org_id = @org_id",
                 param: entity

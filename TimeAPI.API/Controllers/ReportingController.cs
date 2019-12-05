@@ -72,7 +72,7 @@ namespace TimeAPI.API.Controllers
         }
 
         
-        [HttpPut]
+        [HttpPatch]
         [Route("UpdateReporting")]
         public async Task<object> UpdateReporting([FromBody] ReportingViewModel reportingViewModel, CancellationToken cancellationToken)
         {

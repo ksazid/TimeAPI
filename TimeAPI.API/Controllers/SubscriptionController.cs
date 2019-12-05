@@ -74,7 +74,7 @@ namespace TimeAPI.API.Controllers
         }
 
         
-        [HttpPut]
+        [HttpPatch]
         [Route("UpdateSubscription")]
         public async Task<object> UpdateSubscription([FromBody] SubscriptionViewModel subscriptionViewModel, CancellationToken cancellationToken)
         {

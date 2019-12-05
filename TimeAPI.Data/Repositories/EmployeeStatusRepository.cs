@@ -18,8 +18,8 @@ namespace TimeAPI.Data.Repositories
 
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.employee_status
-                                  (id, employee_status_name, employee_status_desc, created_date, createdby)
-                           VALUES (@id, @employee_status_name, @employee_status_desc, @created_date, @createdby);
+                                  (id, org_id, employee_status_name, employee_status_desc, created_date, createdby)
+                           VALUES (@id, @org_id, @employee_status_name, @employee_status_desc, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -49,6 +49,7 @@ namespace TimeAPI.Data.Repositories
             Execute(
                 sql: @"UPDATE dbo.employee_status
                    SET 
+                    org_id =@org_id,
                     employee_status_name = @employee_status_name, 
                     employee_status_desc = @employee_status_desc, 
                     modified_date = @modified_date, 

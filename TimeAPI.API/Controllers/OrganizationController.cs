@@ -70,7 +70,7 @@ namespace TimeAPI.API.Controllers
         }
 
 
-        [HttpPost]
+        [HttpPatch]
         [Route("UpdateOrganization")]
         public async Task<object> UpdateOrganization([FromBody] OrganizationViewModel organizationViewModel, CancellationToken cancellationToken)
         {

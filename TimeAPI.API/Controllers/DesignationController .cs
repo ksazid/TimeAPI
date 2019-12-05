@@ -71,7 +71,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [HttpPut]
+        [HttpPatch]
         [Route("UpdateDesignation")]
         public async Task<object> UpdateDesignation([FromBody]  DesignationViewModel designationViewModel, CancellationToken cancellationToken)
         {

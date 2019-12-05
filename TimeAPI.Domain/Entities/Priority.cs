@@ -7,6 +7,7 @@ namespace TimeAPI.Domain.Entities
     public class Priority
     {
         public string id { get; set; }
+        public string org_id { get; set; }
         public string priority_name { get; set; }
         public string priority_desc { get; set; }
         public string created_date { get; set; }

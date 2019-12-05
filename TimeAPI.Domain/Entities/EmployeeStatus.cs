@@ -7,6 +7,7 @@ namespace TimeAPI.Domain.Entities
     public class EmployeeStatus
     {
         public string id { get; set; }
+        public string org_id { get; set; }
         public string employee_status_name { get; set; }
         public string employee_status_desc { get; set; }
         public string created_date { get; set; }

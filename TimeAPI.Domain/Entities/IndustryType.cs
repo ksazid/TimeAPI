@@ -7,6 +7,7 @@ namespace TimeAPI.Domain.Entities
     public class IndustryType
     {
         public string id { get; set; }
+        public string org_id { get; set; }
         public string industry_type_name { get; set; }
         public string industry_type_desc { get; set; }
         public string created_date { get; set; }

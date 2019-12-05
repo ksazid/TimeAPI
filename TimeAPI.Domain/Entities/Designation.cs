@@ -9,7 +9,6 @@ namespace TimeAPI.Domain.Entities
         public string id { get; set; }
         public string dep_id { get; set; }
         public string designation_name { get; set; }
-        public string dep_name { get; set; }
         public string alias { get; set; }
         public string created_date { get; set; }
         public string createdby { get; set; }

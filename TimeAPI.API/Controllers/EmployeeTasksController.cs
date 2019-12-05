@@ -21,6 +21,10 @@ using TimeAPI.Domain.Entities;
 using TimeAPI.API.Models.DesignationViewModels;
 using TimeAPI.API.Models.TaskViewModels;
 using System.Collections.Generic;
+using System.Text.Json;
+using System.Dynamic;
+using System.Data;
+using Newtonsoft.Json;
 
 namespace TimeAPI.API.Controllers
 {
@@ -73,7 +77,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [HttpPut]
+        [HttpPatch]
         [Route("UpdateTask")]
         public async Task<object> UpdateAddTask([FromBody] TaskViewModel TaskViewModel, CancellationToken cancellationToken)
         {
@@ -146,11 +150,10 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("FindByTasksId")]
         public async Task<object> FindByTasksID([FromBody] Utils _Utils, CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -159,10 +162,12 @@ namespace TimeAPI.API.Controllers
                 if (_Utils == null)
                     throw new ArgumentNullException(nameof(_Utils.ID));
 
-                var result = _unitOfWork.TaskRepository.Find(_Utils.ID);
+                oDataTable _oDataTable = new oDataTable();
+                IEnumerable<dynamic> results = _unitOfWork.TaskRepository.FindByTaskDetailsByID(_Utils.ID);
+                var xResult = _oDataTable.ToDataTable(results);
                 _unitOfWork.Commit();
 
-                return await System.Threading.Tasks.Task.FromResult<object>(result).ConfigureAwait(false);
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -170,52 +175,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        //[HttpPost]
-        //[Route("CheckOutByEmpID")]
-        //public async Task<object> CheckOutByEmpID([FromBody] Utils _Utils, CancellationToken cancellationToken)
-        //{
-        //    try
-        //    {
-        //        if (cancellationToken != null)
-        //            cancellationToken.ThrowIfCancellationRequested();
-
-        //        if (_Utils == null)
-        //            throw new ArgumentNullException(nameof(_Utils.ID));
-
-        //        var result = _unitOfWork.TaskRepository.Find(_Utils.ID);
-        //        _unitOfWork.Commit();
-
-        //        return await System.Threading.Tasks.Task.FromResult<object>(result).ConfigureAwait(false);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-        //    }
-        //}
-
-        //[HttpPost]
-        //[Route("FindByEmpName")]
-        //public async Task<object> FindByEmpName([FromBody] UtilsName _UtilsName, CancellationToken cancellationToken)
-        //{
-
-        //    try
-        //    {
-        //        if (cancellationToken != null)
-        //            cancellationToken.ThrowIfCancellationRequested();
-
-        //        if (_UtilsName == null)
-        //            throw new ArgumentNullException(nameof(_UtilsName));
-
-        //        var result = _unitOfWork.TaskRepository.FindByEmpName(_UtilsName.FullName);
-        //        _unitOfWork.Commit();
-
-        //        return await Task.FromResult<object>(result).ConfigureAwait(false);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-        //    }
-        //}
 
     }
 }

@@ -49,6 +49,8 @@ namespace TimeAPI.API
             });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+            services.AddMvc().AddNewtonsoftJson();
+            services.AddControllers().AddNewtonsoftJson();
             services.AddMvcCore().AddApiExplorer();
 
             //Inject appsetting.json for controllers.

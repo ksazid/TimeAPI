@@ -16,10 +16,10 @@ namespace TimeAPI.Data.Repositories
 
             entity.id = ExecuteScalar<string>(
                     sql: @"
-                    INSERT INTO [dbo].[employee] (id, org_id, user_id, deptid, full_name, first_name,last_name, alias, gender, emp_status, emp_type, imgurl, workemail, 
-                                   emp_code, role, designation, dob, joined_date, phone, mobile, email, summary, created_date, createdby, is_admin)
-                    VALUES (@id, @org_id, @user_id, @deptid, @full_name, @first_name, @last_name, @alias,  @gender, @emp_status, @emp_type, @imgurl, @workemail, @emp_code,
-                                  @role, @designation, @dob, @joined_date, @phone, @mobile, @email, @summary, @created_date, @createdby, @is_admin);
+                    INSERT INTO [dbo].[employee] (id, org_id, user_id, deptid, full_name, first_name,last_name, alias, gender, emp_status_id, emp_type_id, imgurl_id, workemail, 
+                                   emp_code, role_id, designation_id, dob, joined_date, phone, mobile, email, summary, created_date, createdby, is_admin, is_superadmin)
+                    VALUES (@id, @org_id, @user_id, @deptid, @full_name, @first_name, @last_name, @alias,  @gender, @emp_status_id, @emp_type_id, @imgurl_id, @workemail, @emp_code,
+                                  @role_id, @designation_id, @dob, @joined_date, @phone, @mobile, @email, @summary, @created_date, @createdby, @is_admin, @is_superadmin);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -57,8 +57,8 @@ namespace TimeAPI.Data.Repositories
                 sql: @"UPDATE dbo.employee
                    SET 
                        deptid = @deptid, full_name = @full_name, first_name = @first_name, last_name = @last_name, alias = @alias, 
-                       gender = @gender, emp_status = @emp_status, emp_type = @emp_type, imgurl = @imgurl, workemail = @workemail, 
-                       emp_code = @emp_code, role = @role, designation = @designation, dob = @dob, joined_date = @joined_date, 
+                       gender = @gender, emp_status_id = @emp_status_id, emp_type_id = @emp_type_id, imgurl_id = @imgurl_id, workemail = @workemail, 
+                       emp_code = @emp_code, role_id = @role_id, designation_id = @designation_id, dob = @dob, joined_date = @joined_date, 
                        phone = @phone, mobile = @mobile, summary = @summary, modified_date = @modified_date, modifiedby = @modifiedby, 
                        is_admin = @is_admin
                     WHERE id = @id",
@@ -93,7 +93,7 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<Employee> FindByRoleName(string role)
         {
             return Query<Employee>(
-                sql: "SELECT * FROM [dbo].[employee] WHERE role = @role and is_deleted = 0",
+                sql: "SELECT * FROM [dbo].[employee] WHERE role_id = @role and is_deleted = 0",
                 param: new { role }
             );
         }

@@ -12,13 +12,14 @@ namespace TimeAPI.Domain.Entities
         public string type { get; set; }
         public string summary { get; set; }
         public string img_url { get; set; }
-        public string country { get; set; }
+        public string img_name { get; set; }
+        public string country_id { get; set; }
         public string adr1 { get; set; }
         public string adr2 { get; set; }
         public string city { get; set; }
         public string primary_cont_name { get; set; }
         public string primary_cont_type { get; set; }
-        public string time_zone { get; set; }
+        public string time_zone_id { get; set; }
         public string created_date { get; set; }
         public string createdby { get; set; }
         public string modified_date { get; set; }

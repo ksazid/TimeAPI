@@ -35,14 +35,11 @@ namespace TimeAPI.Data.Repositories
             Connection.Execute(sql, param, _transaction);
         }
 
-        protected dynamic QueryMultiple(string sql, object param)
+        protected dynamic QuerySingle(string sql, object param)
         {
-            return Connection.QueryMultiple(sql, param, _transaction);
+            return Connection.QuerySingle(sql, param, _transaction);
         }
 
-        //public SqlMapper.GridReader QueryMultiple(this IDbTransaction transaction, string sql, object param = null, int? commandTimeout = default(int?), CommandType? commandType = default(CommandType?))
-        //{
-        //    return SqlMapper.QueryMultiple(Connection, sql, param, transaction);
-        //}
+        
     }
 }

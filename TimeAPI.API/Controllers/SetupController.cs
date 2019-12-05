@@ -123,7 +123,7 @@ namespace TimeAPI.API.Controllers
         }
 
 
-        [HttpPut]
+        [HttpPatch]
         [Route("UpdatePriority")]
         public async Task<object> UpdatePriority([FromBody] PriorityViewModel priorityingViewModel, CancellationToken cancellationToken)
         {
@@ -257,7 +257,7 @@ namespace TimeAPI.API.Controllers
         }
 
 
-        [HttpPut]
+        [HttpPatch]
         [Route("UpdateTaskStatus")]
         public async Task<object> UpdateTaskStatus([FromBody] StatusViewModel statusingViewModel, CancellationToken cancellationToken)
         {
@@ -391,7 +391,7 @@ namespace TimeAPI.API.Controllers
         }
 
 
-        [HttpPut]
+        [HttpPatch]
         [Route("UpdateEmployeeType")]
         public async Task<object> UpdateEmployeeType([FromBody] EmployeeTypeViewModel employeetypeingViewModel, CancellationToken cancellationToken)
         {
@@ -497,7 +497,7 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("AddEmployeeStatus")]
-        public async Task<object> AddEmployeeStatus([FromBody] IndustryTypeViewModel employeestatusViewModel, CancellationToken cancellationToken)
+        public async Task<object> AddEmployeeStatus([FromBody] EmployeeStatusViewModel employeestatusViewModel, CancellationToken cancellationToken)
         {
             try
             {
@@ -509,7 +509,7 @@ namespace TimeAPI.API.Controllers
 
                 employeestatusViewModel.id = Guid.NewGuid().ToString();
                 employeestatusViewModel.created_date = DateTime.Now.ToString();
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<IndustryTypeViewModel, EmployeeStatus>());
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeStatusViewModel, EmployeeStatus>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<EmployeeStatus>(employeestatusViewModel);
 
@@ -525,9 +525,9 @@ namespace TimeAPI.API.Controllers
         }
 
 
-        [HttpPut]
+        [HttpPatch]
         [Route("UpdateEmployeeStatus")]
-        public async Task<object> UpdateEmployeeStatus([FromBody] IndustryTypeViewModel employeestatusViewModel, CancellationToken cancellationToken)
+        public async Task<object> UpdateEmployeeStatus([FromBody] EmployeeStatusViewModel employeestatusViewModel, CancellationToken cancellationToken)
         {
             try
             {
@@ -539,7 +539,7 @@ namespace TimeAPI.API.Controllers
 
                 employeestatusViewModel.modifiedby = employeestatusViewModel.createdby;
                 employeestatusViewModel.modified_date = DateTime.Now.ToString();
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<IndustryTypeViewModel, EmployeeStatus>());
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeStatusViewModel, EmployeeStatus>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<EmployeeStatus>(employeestatusViewModel);
 
@@ -631,7 +631,7 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("AddIndustryType")]
-        public async Task<object> AddIndustryType([FromBody] IndustryTypeViewModel industrytypeViewModel, CancellationToken cancellationToken)
+        public async Task<object> AddIndustryType([FromBody] EmployeeStatusViewModel industrytypeViewModel, CancellationToken cancellationToken)
         {
             try
             {
@@ -643,7 +643,7 @@ namespace TimeAPI.API.Controllers
 
                 industrytypeViewModel.id = Guid.NewGuid().ToString();
                 industrytypeViewModel.created_date = DateTime.Now.ToString();
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<IndustryTypeViewModel, IndustryType>());
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeStatusViewModel, IndustryType>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<IndustryType>(industrytypeViewModel);
 
@@ -659,7 +659,7 @@ namespace TimeAPI.API.Controllers
         }
 
 
-        [HttpPut]
+        [HttpPatch]
         [Route("UpdateIndustryType")]
         public async Task<object> UpdateIndustryType([FromBody] IndustryTypeViewModels industrytypeViewModel, CancellationToken cancellationToken)
         {
@@ -673,7 +673,7 @@ namespace TimeAPI.API.Controllers
 
                 industrytypeViewModel.modifiedby = industrytypeViewModel.createdby;
                 industrytypeViewModel.modified_date = DateTime.Now.ToString();
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<IndustryTypeViewModel, IndustryType>());
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeStatusViewModel, IndustryType>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<IndustryType>(industrytypeViewModel);
 

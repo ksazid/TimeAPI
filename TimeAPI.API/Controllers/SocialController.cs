@@ -74,7 +74,7 @@ namespace TimeAPI.API.Controllroers
         }
 
         
-        [HttpPut]
+        [HttpPatch]
         [Route("UpdateSocial")]
         public async Task<object> UpdateSocial([FromBody] SocialViewModel socialViewModel, CancellationToken cancellationToken)
         {

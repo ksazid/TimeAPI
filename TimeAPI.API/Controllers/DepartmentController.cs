@@ -69,7 +69,7 @@ namespace TimeAPI.API.Controllers
         }
 
         
-        [HttpPut]
+        [HttpPatch]
         [Route("UpdateDepartment")]
         public async Task<object> UpdateDepartment([FromBody] DepartmentViewModel departmentViewModels, CancellationToken cancellationToken)
         {
