@@ -70,7 +70,7 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public dynamic FindByTaskDetailsByID(string key)
+        public dynamic FindByTaskDetailsByEmpID(string key)
         {
             return Query<dynamic>(
                    sql: @"	SELECT 
@@ -85,7 +85,7 @@ namespace TimeAPI.Data.Repositories
 		                    inner join priority on task.priority = priority.id
 		                    inner join employee on task.assigned_empid = employee.id
 		                    inner join status on status.id = task.status
-		                WHERE task.is_deleted = 0 and task.id = @key",
+		                WHERE task.is_deleted = 0 and task.empid = @key",
                       param: new { key }
                );
         }
