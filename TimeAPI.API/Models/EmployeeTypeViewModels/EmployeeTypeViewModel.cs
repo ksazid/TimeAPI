@@ -8,6 +8,7 @@ namespace TimeAPI.API.Models.EmployeeTypeViewModels
     public class EmployeeTypeViewModel
     {
         public string id { get; set; }
+        public string org_id { get; set; }
         public string employee_type_name { get; set; }
         public string employee_type_desc { get; set; }
         public string created_date { get; set; }
