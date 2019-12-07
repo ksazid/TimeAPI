@@ -19,7 +19,7 @@ namespace TimeAPI.Data.Repositories
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.industry_type
                                   (id, org_id, industry_type_name, industry_type_desc, created_date, createdby)
-                           VALUES (@id, org_id, @industry_type_name, @industry_type_desc, @created_date, @createdby);
+                           VALUES (@id, @org_id, @industry_type_name, @industry_type_desc, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
