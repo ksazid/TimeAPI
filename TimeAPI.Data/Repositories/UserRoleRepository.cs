@@ -60,5 +60,6 @@ namespace TimeAPI.Data.Repositories
                 param: new { userId, roleName }
             );
         }
+
     }
 }

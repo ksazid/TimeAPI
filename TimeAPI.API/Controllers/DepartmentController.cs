@@ -36,7 +36,6 @@ namespace TimeAPI.API.Controllers
             _unitOfWork = unitOfWork;
         }
 
-
         [HttpPost]
         [Route("AddDepartment")]
         public async Task<object> AddDepartment([FromBody] DepartmentViewModel departmentViewModels, CancellationToken cancellationToken)

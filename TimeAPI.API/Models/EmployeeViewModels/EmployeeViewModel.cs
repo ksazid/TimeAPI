@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -8,6 +10,7 @@ namespace TimeAPI.API.Models.EmployeeViewModels
 {
     public class EmployeeViewModel
     {
+        public string id { get; set; }
         public string org_id { get; set; }
         public string user_id { get; set; }
         public string deptid { get; set; }
@@ -18,7 +21,9 @@ namespace TimeAPI.API.Models.EmployeeViewModels
         public string gender { get; set; }
         public string emp_status_id { get; set; }
         public string emp_type_id { get; set; }
-        public string imgurl_id { get; set; }
+        public string imgurl { get; set; }
+        [NotMapped]
+        public IFormFile imgurl_name { get; set; }
         public string workemail { get; set; }
         public string emp_code { get; set; }
         public string role_id { get; set; }

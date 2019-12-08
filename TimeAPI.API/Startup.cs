@@ -62,6 +62,8 @@ namespace TimeAPI.API
 
             // Add application services.
             services.AddScoped<IUnitOfWork, DapperUnitOfWork>(provider => new DapperUnitOfWork(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddScoped(provider => new BlobStorageService(Configuration.GetConnectionString("StorageDefaultConnection")));
+
             services.AddTransient<IEmailSender, EmailSender>();
 
             services.AddSwaggerGen(c =>
