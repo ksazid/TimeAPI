@@ -29,6 +29,7 @@ namespace TimeAPI.Domain
         IEmployeeTypeRepository EmployeeTypeRepository { get; }
         IEmployeeStatusRepository EmployeeStatusRepository { get; }
         IIndustryTypeRepository IndustryTypeRepository { get; }
+        IEmployeeRoleRepository EmployeeRoleRepository { get; }
 
         //commit all after all completes
         void Commit();

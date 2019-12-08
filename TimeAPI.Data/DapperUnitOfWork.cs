@@ -38,6 +38,7 @@ namespace TimeAPI.Data
         private IEmployeeTypeRepository _employeeTypeRepository;
         private IEmployeeStatusRepository _employeeStatusRepository;
         private IIndustryTypeRepository _industryTypeRepository;
+        private IEmployeeRoleRepository _employeeRoleRepository;
 
 
 
@@ -258,6 +259,15 @@ namespace TimeAPI.Data
             }
         }
 
+        public IEmployeeRoleRepository EmployeeRoleRepository
+        {
+            get
+            {
+                return _employeeRoleRepository
+                    ?? (_employeeRoleRepository = new EmployeeRoleRepository(_transaction));
+            }
+        }
+
         public void Commit()
         {
             try
@@ -302,6 +312,14 @@ namespace TimeAPI.Data
             _reportingRepository = null;
             _designationRepositiory = null;
             _timesheetRepository = null;
+            _taskRepository = null;
+            _setupRepository = null;
+            _priorityRepository = null;
+            _statusRepository = null;
+            _employeeTypeRepository = null;
+            _employeeStatusRepository = null;
+            _industryTypeRepository = null;
+            _employeeRoleRepository = null;
         }
 
         private void dispose(bool disposing)

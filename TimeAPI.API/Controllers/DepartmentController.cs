@@ -28,7 +28,7 @@ namespace TimeAPI.API.Controllers
         private readonly ILogger _logger;
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
-        public DepartmentController(IUnitOfWork unitOfWork, ILogger<DepartmentController> logger, IEmailSender emailSender,IOptions<ApplicationSettings> AppSettings)
+        public DepartmentController(IUnitOfWork unitOfWork, ILogger<DepartmentController> logger, IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings)
         {
             _emailSender = emailSender;
             _logger = logger;
