@@ -49,12 +49,12 @@ namespace TimeAPI.API.Controllers
                 if (employeeViewModel == null)
                     throw new ArgumentNullException(nameof(employeeViewModel));
 
-                employeeViewModel.id = Guid.NewGuid().ToString();
-                employeeViewModel.created_date = DateTime.Now.ToString();
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeViewModel, Employee>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Employee>(employeeViewModel);
 
+                modal.id = Guid.NewGuid().ToString();
+                modal.created_date = DateTime.Now.ToString();
 
                 _unitOfWork.EmployeeRepository.Add(modal);
                 _unitOfWork.Commit();

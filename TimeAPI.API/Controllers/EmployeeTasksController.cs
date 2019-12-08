@@ -174,7 +174,7 @@ namespace TimeAPI.API.Controllers
         }
 
         [HttpPost]
-        [Route("FetchGridDataByTaskID")]
+        [Route("FetchGridDataByTaskEmpID")]
         public async Task<object> FetchGridDataByTaskEmpID([FromBody] Utils _Utils, CancellationToken cancellationToken)
         {
             try

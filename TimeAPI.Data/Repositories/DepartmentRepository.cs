@@ -112,5 +112,21 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
+        public dynamic FetchGridDataByDepOrgID(string key)
+        {
+            return Query<dynamic>(
+                   sql: @"SELECT 
+                                department.id,
+                                department.dep_name,
+                                employee.full_name as lead_name,
+                                employee.workemail,
+                                department.alias
+                                from department
+                                inner join employee on department.depart_lead_empid = employee.id
+                            WHERE department.org_id = @key",
+                      param: new { key }
+               );
+        }
+
     }
 }

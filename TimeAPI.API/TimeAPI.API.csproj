@@ -11,6 +11,10 @@
     <!--<OutputType>WinExe</OutputType>-->
     <StartupObject />
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Controllers\jw1jsuz1.4uj~" />
+  </ItemGroup>
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.3" />
   </ItemGroup>

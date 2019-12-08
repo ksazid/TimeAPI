@@ -19,6 +19,8 @@ using TimeAPI.Domain;
 using System.Threading;
 using TimeAPI.Domain.Entities;
 using TimeAPI.API.Models.DesignationViewModels;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace TimeAPI.API.Controllers
 {
@@ -242,7 +244,30 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        
+        [HttpPost]
+        [Route("FetchGridDataByDesignationDeptOrgID")]
+        public async Task<object> FetchGridDataByDesignationDeptOrgID([FromBody] UtilsOrgID _UtilsOrgID, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (_UtilsOrgID == null)
+                    throw new ArgumentNullException(nameof(_UtilsOrgID.OrgID));
+
+                oDataTable _oDataTable = new oDataTable();
+                IEnumerable<dynamic> results = _unitOfWork.DesignationRepositiory.FetchGridDataByDesignationByDeptOrgID(_UtilsOrgID.OrgID);
+                var xResult = _oDataTable.ToDataTable(results);
+                _unitOfWork.Commit();
+
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
 
     }
 }

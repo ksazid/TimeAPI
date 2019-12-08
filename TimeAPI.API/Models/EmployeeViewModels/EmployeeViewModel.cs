@@ -8,7 +8,6 @@ namespace TimeAPI.API.Models.EmployeeViewModels
 {
     public class EmployeeViewModel
     {
-        public string id { get; set; }
         public string org_id { get; set; }
         public string user_id { get; set; }
         public string deptid { get; set; }
@@ -30,7 +29,6 @@ namespace TimeAPI.API.Models.EmployeeViewModels
         public string mobile { get; set; }
         public string email { get; set; }
         public string summary { get; set; }
-        public string created_date { get; set; }
         public string createdby { get; set; }
         public string modified_date { get; set; }
         public string modifiedby { get; set; }

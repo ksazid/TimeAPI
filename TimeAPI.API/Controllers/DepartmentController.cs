@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using TimeAPI.API.Models;
 using TimeAPI.API.Models.DepartmentViewModels;
 using TimeAPI.API.Models.EmployeeViewModels;
@@ -27,9 +28,7 @@ namespace TimeAPI.API.Controllers
         private readonly ILogger _logger;
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
-        public DepartmentController(IUnitOfWork unitOfWork, ILogger<EmployeeController> logger,
-            IEmailSender emailSender,
-           IOptions<ApplicationSettings> AppSettings)
+        public DepartmentController(IUnitOfWork unitOfWork, ILogger<DepartmentController> logger, IEmailSender emailSender,IOptions<ApplicationSettings> AppSettings)
         {
             _emailSender = emailSender;
             _logger = logger;
@@ -37,7 +36,7 @@ namespace TimeAPI.API.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        
+
         [HttpPost]
         [Route("AddDepartment")]
         public async Task<object> AddDepartment([FromBody] DepartmentViewModel departmentViewModels, CancellationToken cancellationToken)
@@ -68,7 +67,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        
+
         [HttpPatch]
         [Route("UpdateDepartment")]
         public async Task<object> UpdateDepartment([FromBody] DepartmentViewModel departmentViewModels, CancellationToken cancellationToken)
@@ -98,7 +97,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        
+
         [HttpPost]
         [Route("RemoveDepartment")]
         public async Task<object> RemoveDepartment([FromBody] Utils _Utils, CancellationToken cancellationToken)
@@ -122,7 +121,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        
+
         [HttpGet]
         [Route("GetAllDepartments")]
         public async Task<object> GetAllDepartments(CancellationToken cancellationToken)
@@ -143,7 +142,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        
         [HttpPost]
         [Route("FindByDepartmentName")]
         public async Task<object> FindByDepartmentName([FromBody] UtilsName _UtilsName, CancellationToken cancellationToken)
@@ -168,7 +166,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        
         [HttpPost]
         [Route("FindByDepartmentAlias")]
         public async Task<object> FindByDepartmentAlias([FromBody] UtilsAlias _UtilsAlias, CancellationToken cancellationToken)
@@ -193,7 +190,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        
         [HttpPost]
         [Route("FindDepartmentByOrgID")]
         public async Task<object> FindDepartmentByOrgID([FromBody] Utils _Utils, CancellationToken cancellationToken)
@@ -218,7 +214,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        
         [HttpPost]
         [Route("FindByDepartmentID")]
         public async Task<object> FindByDepartmentID([FromBody] Utils _Utils, CancellationToken cancellationToken)
@@ -243,7 +238,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        
         [HttpPost]
         [Route("FindDepLeadByDepID")]
         public async Task<object> FindDepLeadByDepID([FromBody] Utils _Utils, CancellationToken cancellationToken)
@@ -264,6 +258,31 @@ namespace TimeAPI.API.Controllers
             catch (Exception ex)
             {
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("FetchGridDataByDepartmentOrgID")]
+        public async Task<object> FetchGridDataByDepartmentOrgID([FromBody] UtilsOrgID _UtilsOrgID, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (_UtilsOrgID == null)
+                    throw new ArgumentNullException(nameof(_UtilsOrgID.OrgID));
+
+                oDataTable _oDataTable = new oDataTable();
+                IEnumerable<dynamic> results = _unitOfWork.DepartmentRepository.FetchGridDataByDepOrgID(_UtilsOrgID.OrgID);
+                var xResult = _oDataTable.ToDataTable(results);
+                _unitOfWork.Commit();
+
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
 
