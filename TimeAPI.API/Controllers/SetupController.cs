@@ -92,6 +92,26 @@ namespace TimeAPI.API.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("GetEmployeeRoles")]
+        public async Task<object> GetEmployeeRoles(CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                var result = _unitOfWork.EmployeeRoleRepository.GetEmployeeRoles();
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
         #region Priority
 
         [HttpPost]
@@ -762,136 +782,121 @@ namespace TimeAPI.API.Controllers
 
         #endregion IndustryType
 
-        #region EmployeeRole
-
-        [HttpPost]
-        [Route("AddEmployeeRole")]
-        //public async Task<object> AddEmployeeRole([FromBody] EmployeeRoleViewModel employeeroleViewModel, CancellationToken cancellationToken)
-        //{
-        //    try
-        //    {
-        //        if (cancellationToken != null)
-        //            cancellationToken.ThrowIfCancellationRequested();
-
-        //        if (employeeroleViewModel == null)
-        //            throw new ArgumentNullException(nameof(employeeroleViewModel));
-
-        //        employeeroleViewModel.id = Guid.NewGuid().ToString();
-        //        employeeroleViewModel.created_date = DateTime.Now.ToString();
-        //        var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeRoleViewModel, EmployeeRole>());
-        //        var mapper = config.CreateMapper();
-        //        var modal = mapper.Map<EmployeeRole>(employeeroleViewModel);
-
-        //        _unitOfWork.EmployeeRoleRepository.Add(modal);
-        //        _unitOfWork.Commit();
-
-        //        return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "EmployeeRole registered succefully." }).ConfigureAwait(false);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-        //    }
-        //}
-
-
-        //[HttpPatch]
-        //[Route("UpdateEmployeeRole")]
-        //public async Task<object> UpdateEmployeeRole([FromBody] EmployeeRoleViewModel employeeroleViewModel, CancellationToken cancellationToken)
-        //{
-        //    try
-        //    {
-        //        if (cancellationToken != null)
-        //            cancellationToken.ThrowIfCancellationRequested();
-
-        //        if (employeeroleViewModel == null)
-        //            throw new ArgumentNullException(nameof(employeeroleViewModel));
-
-        //        employeeroleViewModel.modifiedby = employeeroleViewModel.createdby;
-        //        employeeroleViewModel.modified_date = DateTime.Now.ToString();
-        //        var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeRoleViewModel, EmployeeRole>());
-        //        var mapper = config.CreateMapper();
-        //        var modal = mapper.Map<EmployeeRole>(employeeroleViewModel);
-
-
-        //        _unitOfWork.EmployeeRoleRepository.Update(modal);
-        //        _unitOfWork.Commit();
-
-        //        return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "EmployeeRole updated succefully." }).ConfigureAwait(false);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-        //    }
-        //}
-
-
-        //[HttpPost]
-        //[Route("RemoveEmployeeRole")]
-        //public async Task<object> RemoveEmployeeRole([FromBody] Utils _Utils, CancellationToken cancellationToken)
-        //{
-        //    try
-        //    {
-        //        if (cancellationToken != null)
-        //            cancellationToken.ThrowIfCancellationRequested();
-
-        //        if (_Utils == null)
-        //            throw new ArgumentNullException(nameof(_Utils.ID));
-
-        //        _unitOfWork.EmployeeRoleRepository.Remove(_Utils.ID);
-        //        _unitOfWork.Commit();
-
-        //        return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "EmployeeRole removed succefully." }).ConfigureAwait(false);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-        //    }
-        //}
-
-
-        //[HttpGet]
-        //[Route("GetAllEmployeeRole")]
-        //public async Task<object> GetAllEmployeeRole(CancellationToken cancellationToken)
-        //{
-        //    try
-        //    {
-        //        if (cancellationToken != null)
-        //            cancellationToken.ThrowIfCancellationRequested();
-
-        //        var result = _unitOfWork.EmployeeRoleRepository.All();
-        //        _unitOfWork.Commit();
-
-        //        return await Task.FromResult<object>(result).ConfigureAwait(false);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-        //    }
-        //}
-
-
-        [HttpGet]
-        [Route("GetEmployeeRoles")]
-        public async Task<object> GetEmployeeRoles(CancellationToken cancellationToken)
-        {
-            try
-            {
-                if (cancellationToken != null)
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                var result = _unitOfWork.EmployeeRoleRepository.GetEmployeeRoles();
-                _unitOfWork.Commit();
-
-                return await Task.FromResult<object>(result).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-            }
-        }
-
-        #endregion EmployeeRole
+        
 
 
     }
 }
+
+
+#region EmployeeRole
+
+//[HttpPost]
+//[Route("AddEmployeeRole")]
+//public async Task<object> AddEmployeeRole([FromBody] EmployeeRoleViewModel employeeroleViewModel, CancellationToken cancellationToken)
+//{
+//    try
+//    {
+//        if (cancellationToken != null)
+//            cancellationToken.ThrowIfCancellationRequested();
+
+//        if (employeeroleViewModel == null)
+//            throw new ArgumentNullException(nameof(employeeroleViewModel));
+
+//        employeeroleViewModel.id = Guid.NewGuid().ToString();
+//        employeeroleViewModel.created_date = DateTime.Now.ToString();
+//        var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeRoleViewModel, EmployeeRole>());
+//        var mapper = config.CreateMapper();
+//        var modal = mapper.Map<EmployeeRole>(employeeroleViewModel);
+
+//        _unitOfWork.EmployeeRoleRepository.Add(modal);
+//        _unitOfWork.Commit();
+
+//        return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "EmployeeRole registered succefully." }).ConfigureAwait(false);
+//    }
+//    catch (Exception ex)
+//    {
+//        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+//    }
+//}
+
+
+//[HttpPatch]
+//[Route("UpdateEmployeeRole")]
+//public async Task<object> UpdateEmployeeRole([FromBody] EmployeeRoleViewModel employeeroleViewModel, CancellationToken cancellationToken)
+//{
+//    try
+//    {
+//        if (cancellationToken != null)
+//            cancellationToken.ThrowIfCancellationRequested();
+
+//        if (employeeroleViewModel == null)
+//            throw new ArgumentNullException(nameof(employeeroleViewModel));
+
+//        employeeroleViewModel.modifiedby = employeeroleViewModel.createdby;
+//        employeeroleViewModel.modified_date = DateTime.Now.ToString();
+//        var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeRoleViewModel, EmployeeRole>());
+//        var mapper = config.CreateMapper();
+//        var modal = mapper.Map<EmployeeRole>(employeeroleViewModel);
+
+
+//        _unitOfWork.EmployeeRoleRepository.Update(modal);
+//        _unitOfWork.Commit();
+
+//        return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "EmployeeRole updated succefully." }).ConfigureAwait(false);
+//    }
+//    catch (Exception ex)
+//    {
+//        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+//    }
+//}
+
+
+//[HttpPost]
+//[Route("RemoveEmployeeRole")]
+//public async Task<object> RemoveEmployeeRole([FromBody] Utils _Utils, CancellationToken cancellationToken)
+//{
+//    try
+//    {
+//        if (cancellationToken != null)
+//            cancellationToken.ThrowIfCancellationRequested();
+
+//        if (_Utils == null)
+//            throw new ArgumentNullException(nameof(_Utils.ID));
+
+//        _unitOfWork.EmployeeRoleRepository.Remove(_Utils.ID);
+//        _unitOfWork.Commit();
+
+//        return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "EmployeeRole removed succefully." }).ConfigureAwait(false);
+//    }
+//    catch (Exception ex)
+//    {
+//        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+//    }
+//}
+
+
+//[HttpGet]
+//[Route("GetAllEmployeeRole")]
+//public async Task<object> GetAllEmployeeRole(CancellationToken cancellationToken)
+//{
+//    try
+//    {
+//        if (cancellationToken != null)
+//            cancellationToken.ThrowIfCancellationRequested();
+
+//        var result = _unitOfWork.EmployeeRoleRepository.All();
+//        _unitOfWork.Commit();
+
+//        return await Task.FromResult<object>(result).ConfigureAwait(false);
+//    }
+//    catch (Exception ex)
+//    {
+//        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+//    }
+//}
+
+
+
+
+#endregion EmployeeRole
