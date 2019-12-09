@@ -134,7 +134,8 @@ namespace TimeAPI.API
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
 
-            app.UseCors("CorsPolicy");
+            
+            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
             if (env.IsDevelopment())
             {
@@ -145,8 +146,8 @@ namespace TimeAPI.API
                 app.UseExceptionHandler("/Home/Error");
             }
             app.UseAuthentication();
-            app.UseStaticFiles();
-            app.UseRouting();
+            //app.UseStaticFiles();
+            //app.UseRouting();
             app.UseAuthorization();
             app.UseCookiePolicy();
 
@@ -156,7 +157,7 @@ namespace TimeAPI.API
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
-
+            app.UseCors("CorsPolicy");
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
@@ -164,6 +165,12 @@ namespace TimeAPI.API
 
             });
 
+
+            //app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()); 
+            //app.UseAuthentication(); 
+            //app.UseAuthorization(); 
+            //app.UseCors(); 
+            //app.UseEndpoints(endpoints => { endpoints.MapControllerRoute(name: "default", pattern: "{controller}/{action=Index}/{id?}"); });
         }
     }
 }
