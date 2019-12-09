@@ -122,7 +122,7 @@ namespace TimeAPI.Data.Repositories
                                 employee.workemail,
                                 department.alias
                                 from department
-                                inner join employee on department.depart_lead_empid = employee.id
+                                left join employee on department.depart_lead_empid = employee.id
                             WHERE department.org_id = @key",
                       param: new { key }
                );
