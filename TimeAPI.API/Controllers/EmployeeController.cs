@@ -92,7 +92,15 @@ namespace TimeAPI.API.Controllers
                     Phone = employeeViewModel.phone
                 };
 
-                var result = await _userManager.CreateAsync(user, user.UserName).ConfigureAwait(true);
+                string password = Guid.NewGuid()
+                    .ToString("N")
+                    .ToLower()
+                    .Replace("1", "")
+                    .Replace("o", "")
+                    .Replace("0", "")
+                    .Substring(0, 8);
+
+                var result = await _userManager.CreateAsync(user, password).ConfigureAwait(true);
                 var xRest = await _userManager.AddToRoleAsync(user, role.Name).ConfigureAwait(true);
                 if (result.Succeeded)
                 {
@@ -136,6 +144,9 @@ namespace TimeAPI.API.Controllers
                 var fileStream = new FileStream(Path.Combine(uploads, employeeViewModel.imgurl_name.FileName), FileMode.Create);
                 string mimeType = employeeViewModel.imgurl_name.ContentType;
                 byte[] fileData = new byte[employeeViewModel.imgurl_name.Length];
+
+                //var configuration = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
+                //var apikey = configuration.GetValue<string>(key: "ApiKey");
 
                 BlobStorageService objBlobService = new BlobStorageService(_configuration.GetConnectionString("StorageDefaultConnection"));
 
