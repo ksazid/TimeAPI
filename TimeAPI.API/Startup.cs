@@ -41,11 +41,19 @@ namespace TimeAPI.API
             ////Cross Platform Enabled
             services.AddCors(options =>
             {
+                //options.AddPolicy("CorsPolicy",
+                //    builder => builder.WithOrigins("https://enforce.azurewebsites.net", "http://localhost:4200/", "https://timeapi.azurewebsites.net/")
+                //    .AllowAnyOrigin()
+                //    .AllowAnyMethod()
+                //    .AllowAnyHeader()
+                //    .AllowCredentials());
+
+
                 options.AddPolicy("CorsPolicy",
-                    builder => builder.WithOrigins("https://enforce.azurewebsites.net", "http://localhost:4200/", "https://timeapi.azurewebsites.net/")
-                    .AllowAnyMethod()
-                    .AllowAnyHeader()
-                    .AllowCredentials());
+                        builder => builder
+                        .AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
             });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
@@ -155,6 +163,7 @@ namespace TimeAPI.API
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Time API");
 
             });
+
         }
     }
 }
