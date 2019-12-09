@@ -148,7 +148,9 @@ namespace TimeAPI.API.Controllers
                 //var configuration = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
                 //var apikey = configuration.GetValue<string>(key: "ApiKey");
 
-                BlobStorageService objBlobService = new BlobStorageService(_configuration.GetConnectionString("StorageDefaultConnection"));
+                string value = _configuration.GetValue<string>("StorageSettings:StorageDefaultConnection");
+
+                BlobStorageService objBlobService = new BlobStorageService(value);
 
                 employeeViewModel.imgurl = objBlobService.UploadFileToBlob(employeeViewModel.imgurl_name.FileName, fileData, mimeType);
 
