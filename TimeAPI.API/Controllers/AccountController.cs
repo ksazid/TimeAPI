@@ -23,7 +23,7 @@ using System.Threading;
 namespace TimeAPI.API.Controllers
 {
     //[ApiKeyAuth]
-    [EnableCors("CorsPolicy")]
+    //[EnableCors("CorsPolicy")]
     [Route("[controller]")]
     public class AccountController : Controller
     {

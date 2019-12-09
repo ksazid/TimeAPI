@@ -41,12 +41,20 @@ namespace TimeAPI.API
             ////Cross Platform Enabled
             services.AddCors(options =>
             {
-                options.AddPolicy("CorsPolicy",
-                    builder => builder.WithOrigins("https://enforce.azurewebsites.net", "http://localhost:4200/")
-                    .AllowAnyMethod()
-                    .AllowAnyHeader()
-                    .AllowCredentials());
+                //options.AddPolicy("CorsPolicy",
+                //    builder => builder.WithOrigins("https://enforce.azurewebsites.net", "http://localhost:4200/")
+                //    .AllowAnyMethod()
+                //    .AllowAnyHeader());
+
+
+                options.AddPolicy("CorsPolicy", // I introduced a string constant just as a label "AllowAllOriginsPolicy"
+                builder =>
+                {
+                    builder.AllowAnyOrigin();
+                });
             });
+
+
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
             services.AddMvc().AddNewtonsoftJson();
@@ -124,9 +132,6 @@ namespace TimeAPI.API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-
-            app.UseCors("CorsPolicy");
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -135,6 +140,7 @@ namespace TimeAPI.API
             {
                 app.UseExceptionHandler("/Home/Error");
             }
+            app.UseCors("CorsPolicy");
             app.UseAuthentication();
             app.UseStaticFiles();
             app.UseRouting();

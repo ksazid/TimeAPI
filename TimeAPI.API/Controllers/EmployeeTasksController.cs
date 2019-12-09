@@ -29,7 +29,7 @@ using Newtonsoft.Json;
 namespace TimeAPI.API.Controllers
 {
     //[ApiKeyAuth]
-    [EnableCors("CorsPolicy")]
+    //[EnableCors("CorsPolicy")]
     [Route("[controller]")]
     //[Authorize(Roles = "superadmin")]
     public class EmployeeTasksController : Controller

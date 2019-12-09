@@ -18,7 +18,7 @@ using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.API.Controllers
 {
-    [EnableCors("CorsPolicy")]
+    //[EnableCors("CorsPolicy")]
     [Route("[controller]")]
     //[Authorize]
     public class UserController : Controller

@@ -23,7 +23,7 @@ using TimeAPI.API.Models.SocialViewModels;
 namespace TimeAPI.API.Controllroers
 {
     //[ApiKeyAuth]
-    [EnableCors("CorsPolicy")]
+    //[EnableCors("CorsPolicy")]
     [Route("[controller]")]
     //[Authorize(Roles = "superadmin")]
     public class SocialController : Controller

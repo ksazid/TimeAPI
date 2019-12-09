@@ -25,7 +25,7 @@ using System.Collections.Generic;
 namespace TimeAPI.API.Controllers
 {
     //[ApiKeyAuth]
-    [EnableCors("CorsPolicy")]
+    //[EnableCors("CorsPolicy")]
     [Route("[controller]")]
     //[Authorize(Roles = "superadmin")]
     public class TimesheetController : Controller
