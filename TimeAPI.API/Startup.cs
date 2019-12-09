@@ -42,10 +42,10 @@ namespace TimeAPI.API
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy",
-                    builder => builder.WithOrigins("https://enforce.azurewebsites.net", "http://localhost:4200/", "https://timeapi.azurewebsites.net/")
-                    .AllowAnyOrigin()
+                    builder => builder.WithOrigins("https://enforce.azurewebsites.net", "http://localhost:4200/")
                     .AllowAnyMethod()
-                    .AllowAnyHeader());
+                    .AllowAnyHeader()
+                    .AllowCredentials());
             });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
@@ -62,7 +62,6 @@ namespace TimeAPI.API
 
             // Add application services.
             services.AddScoped<IUnitOfWork, DapperUnitOfWork>(provider => new DapperUnitOfWork(Configuration.GetConnectionString("DefaultConnection")));
-
             services.AddTransient<IEmailSender, EmailSender>();
 
             services.AddSwaggerGen(c =>
@@ -102,32 +101,31 @@ namespace TimeAPI.API
             //JWT Auth for Token Based Authentication
             var key = Encoding.UTF8.GetBytes(Configuration["ApplicationSettings:JWT_Secret"]);
             services.AddAuthentication(x =>
-                                {
-                                    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                                    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                                    x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                                })
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
                     .AddJwtBearer(x =>
-                                {
-                                    x.RequireHttpsMetadata = false;
-                                    x.SaveToken = false;
-                                    x.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-                                    {
-                                        ValidateIssuerSigningKey = false,
-                                        IssuerSigningKey = new SymmetricSecurityKey(key),
-                                        ValidateIssuer = false,
-                                        ValidateAudience = false,
-                                        ClockSkew = TimeSpan.Zero
-                                    };
-                                });
+                    {
+                        x.RequireHttpsMetadata = false;
+                        x.SaveToken = false;
+                        x.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                        {
+                            ValidateIssuerSigningKey = false,
+                            IssuerSigningKey = new SymmetricSecurityKey(key),
+                            ValidateIssuer = false,
+                            ValidateAudience = false,
+                            ClockSkew = TimeSpan.Zero
+                        };
+                    });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
 
-
-            //app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            app.UseCors("CorsPolicy");
 
             if (env.IsDevelopment())
             {
@@ -150,48 +148,12 @@ namespace TimeAPI.API
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            app.UseCors("CorsPolicy");
-
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Time API");
 
             });
-
-
-            //app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
-            //app.UseAuthentication();
-            //app.UseAuthorization();
-            //app.UseCors();
-            //app.UseEndpoints(endpoints => { endpoints.MapControllerRoute(name: "default", pattern: "{controller}/{action=Index}/{id?}"); });
-
-
-            //if (env.IsDevelopment())
-            //{
-            //    app.UseDeveloperExceptionPage();
-            //}
-            //else
-            //{
-            //    app.UseExceptionHandler("/Home/Error");
-            //}
-
-            //app.UseStaticFiles();
-
-            //// Add the EndpointRoutingMiddleware
-            //app.UseRouting();
-
-            //// All middleware from here onwards know which endpoint will be invoked
-            //app.UseCors();
-
-            //// Execute the endpoint selected by the routing middleware
-            //app.UseCors("CorsPolicy");
-            //app.UseSwagger();
-            //app.UseSwaggerUI(c =>
-            //{
-            //    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Time API");
-
-            //});
         }
     }
 }
