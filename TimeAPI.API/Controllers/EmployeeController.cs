@@ -33,7 +33,7 @@ namespace TimeAPI.API.Controllers
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
         public IConfiguration _configuration;
-        public IHostingEnvironment _hostingEnvironment;
+        //public IHostingEnvironment _hostingEnvironment;
         private readonly UserManager<ApplicationUser> _userManager;
         public EmployeeController(IUnitOfWork unitOfWork, ILogger<EmployeeController> logger, UserManager<ApplicationUser> userManager,
             IEmailSender emailSender,
@@ -45,7 +45,7 @@ namespace TimeAPI.API.Controllers
             _appSettings = AppSettings.Value;
             _unitOfWork = unitOfWork;
             _configuration = configuration;
-            _hostingEnvironment = hostingEnvironment;
+            //_hostingEnvironment = hostingEnvironment;
             _userManager = userManager;
         }
 
@@ -135,7 +135,7 @@ namespace TimeAPI.API.Controllers
 
                 #region Read File Content
 
-                var uploads = Path.Combine(_hostingEnvironment.WebRootPath, "Uploads");
+                var uploads = ""; //Path.Combine(_hostingEnvironment.WebRootPath, "Uploads");
                 bool exists = Directory.Exists(uploads);
                 if (!exists)
                     Directory.CreateDirectory(uploads);

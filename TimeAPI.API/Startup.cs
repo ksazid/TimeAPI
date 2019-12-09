@@ -126,8 +126,8 @@ namespace TimeAPI.API
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
 
-            
-            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+
+            //app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
             if (env.IsDevelopment())
             {
@@ -149,7 +149,9 @@ namespace TimeAPI.API
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
+
             app.UseCors("CorsPolicy");
+
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
@@ -158,11 +160,38 @@ namespace TimeAPI.API
             });
 
 
-            //app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()); 
-            //app.UseAuthentication(); 
-            //app.UseAuthorization(); 
-            //app.UseCors(); 
+            //app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            //app.UseAuthentication();
+            //app.UseAuthorization();
+            //app.UseCors();
             //app.UseEndpoints(endpoints => { endpoints.MapControllerRoute(name: "default", pattern: "{controller}/{action=Index}/{id?}"); });
+
+
+            //if (env.IsDevelopment())
+            //{
+            //    app.UseDeveloperExceptionPage();
+            //}
+            //else
+            //{
+            //    app.UseExceptionHandler("/Home/Error");
+            //}
+
+            //app.UseStaticFiles();
+
+            //// Add the EndpointRoutingMiddleware
+            //app.UseRouting();
+
+            //// All middleware from here onwards know which endpoint will be invoked
+            //app.UseCors();
+
+            //// Execute the endpoint selected by the routing middleware
+            //app.UseCors("CorsPolicy");
+            //app.UseSwagger();
+            //app.UseSwaggerUI(c =>
+            //{
+            //    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Time API");
+
+            //});
         }
     }
 }
