@@ -42,7 +42,7 @@ namespace TimeAPI.API
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy",
-                    builder => builder.WithOrigins("https://enforce.azurewebsites.net", "http://localhost:4200/")
+                    builder => builder.WithOrigins("https://enforce.azurewebsites.net", "http://localhost:4200/", "https://timeapi.azurewebsites.net/")
                     .AllowAnyMethod()
                     .AllowAnyHeader()
                     .AllowCredentials());
