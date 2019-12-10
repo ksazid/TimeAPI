@@ -48,7 +48,7 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("AddUploadProfile")]
-        public async Task<object> AddUploadProfile([FromBody] EmployeeProfileViewModel employeeprofileViewModel, [FromForm] IFormFile formFile, CancellationToken cancellationToken)
+        public async Task<object> AddUploadProfile([FromBody] EmployeeProfileViewModel employeeprofileViewModel, CancellationToken cancellationToken)
         {
             try
             {
