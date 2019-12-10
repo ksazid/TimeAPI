@@ -124,6 +124,7 @@ namespace TimeAPI.API.Controllers
                 modal.id = Guid.NewGuid().ToString();
                 modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
                 modal.is_deleted = false;
+                modal.user_id = user.Id;
 
                 _unitOfWork.EmployeeRepository.Add(modal);
 
