@@ -63,6 +63,7 @@ namespace TimeAPI.API
 
             //Inject appsetting.json for controllers.
             services.Configure<ApplicationSettings>(Configuration.GetSection("ApplicationSettings"));
+            services.Configure<StorageSettings>(Configuration.GetSection("StorageSettings"));
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
               .AddCustomStores()

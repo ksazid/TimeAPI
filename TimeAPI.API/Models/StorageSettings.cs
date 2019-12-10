@@ -7,7 +7,8 @@ namespace TimeAPI.API.Models
 {
     public class StorageSettings
     {
-        public string StorageConnectionString { get; set; }
+        public string StorageDefaultConnection { get; set; }
+        public string Container { get; set; }
         public string AccountName { get; set; }
         public string AccountKey { get; set; }
         public string DefaultEndpointsProtocol { get; set; }

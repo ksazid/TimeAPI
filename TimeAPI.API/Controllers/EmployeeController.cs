@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using TimeAPI.API.Models;
 using TimeAPI.API.Models.EmployeeProfileViewModels;
 using TimeAPI.API.Models.EmployeeViewModels;
@@ -38,16 +39,13 @@ namespace TimeAPI.API.Controllers
         //public IHostingEnvironment _hostingEnvironment;
         private readonly UserManager<ApplicationUser> _userManager;
         public EmployeeController(IUnitOfWork unitOfWork, ILogger<EmployeeController> logger, UserManager<ApplicationUser> userManager,
-            IEmailSender emailSender,
-           IOptions<ApplicationSettings> AppSettings, IConfiguration configuration,
-           IHostingEnvironment hostingEnvironment)
+            IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings, IConfiguration configuration)
         {
             _emailSender = emailSender;
             _logger = logger;
             _appSettings = AppSettings.Value;
             _unitOfWork = unitOfWork;
             _configuration = configuration;
-            //_hostingEnvironment = hostingEnvironment;
             _userManager = userManager;
         }
 
@@ -92,8 +90,8 @@ namespace TimeAPI.API.Controllers
                     Role = role.Name,
                     Phone = employeeViewModel.phone
                 };
-
-                string password = GeneratePassword();
+                oDataTable _oDataTable = new oDataTable();
+                string password = _oDataTable.GeneratePassword();
 
                 var result = await _userManager.CreateAsync(user, password).ConfigureAwait(true);
                 var xRest = await _userManager.AddToRoleAsync(user, role.Name).ConfigureAwait(true);
@@ -139,8 +137,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
-
 
         [HttpPatch]
         [Route("UpdateEmployee")]
@@ -341,15 +337,33 @@ namespace TimeAPI.API.Controllers
         }
 
 
-        private static string GeneratePassword()
+
+
+
+        [HttpPost]
+        [Route("FetchGridDataEmployeeByOrgID")]
+        public async Task<object> FetchGridDataEmployeeByOrgID([FromBody] UtilsOrgID UtilsOrgID, CancellationToken cancellationToken)
         {
-            return Guid.NewGuid()
-                .ToString("N")
-                .ToLower()
-                .Replace("1", "")
-                .Replace("o", "")
-                .Replace("0", "")
-                .Substring(0, 8);
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (UtilsOrgID == null)
+                    throw new ArgumentNullException(nameof(UtilsOrgID.OrgID));
+
+                oDataTable _oDataTable = new oDataTable();
+                IEnumerable<dynamic> results = _unitOfWork.EmployeeRepository.FetchGridDataEmployeeByOrgID(UtilsOrgID.OrgID);
+                var xResult = _oDataTable.ToDataTable(results);
+                _unitOfWork.Commit();
+
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
         }
+        
     }
 }
