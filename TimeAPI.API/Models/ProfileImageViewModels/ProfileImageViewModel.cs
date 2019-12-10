@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace TimeAPI.API.Models.PriorityViewModels
+namespace TimeAPI.API.Models.ProfileImageViewModels
 {
     public class ProfileImageViewModel
     {
         public string id { get; set; }
-        public string org_id { get; set; }
-        public string priority_name { get; set; }
-        public string priority_desc { get; set; }
+        public string user_id { get; set; }
+        public string img_name { get; set; }
+        public string img_url { get; set; }
         public string created_date { get; set; }
         public string createdby { get; set; }
         public string modified_date { get; set; }

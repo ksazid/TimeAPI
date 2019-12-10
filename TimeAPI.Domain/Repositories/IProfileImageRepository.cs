@@ -7,5 +7,6 @@ namespace TimeAPI.Domain.Repositories
 {
     public interface IProfileImageRepository : IRepository<Image, string>
     {
+        public Image FindByProfileUserID(string key);
     }
 }

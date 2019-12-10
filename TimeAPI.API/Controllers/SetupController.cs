@@ -117,7 +117,7 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("AddPriority")]
-        public async Task<object> AddPriority([FromBody] PriorityViewModel priorityingViewModel, CancellationToken cancellationToken)
+        public async Task<object> AddPriority([FromBody] ProfileImageViewModel priorityingViewModel, CancellationToken cancellationToken)
         {
             try
             {
@@ -128,7 +128,7 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(priorityingViewModel));
 
 
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<PriorityViewModel, Priority>());
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<ProfileImageViewModel, Priority>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Priority>(priorityingViewModel);
 
@@ -150,7 +150,7 @@ namespace TimeAPI.API.Controllers
 
         [HttpPatch]
         [Route("UpdatePriority")]
-        public async Task<object> UpdatePriority([FromBody] PriorityViewModel priorityingViewModel, CancellationToken cancellationToken)
+        public async Task<object> UpdatePriority([FromBody] ProfileImageViewModel priorityingViewModel, CancellationToken cancellationToken)
         {
             try
             {
@@ -160,7 +160,7 @@ namespace TimeAPI.API.Controllers
                 if (priorityingViewModel == null)
                     throw new ArgumentNullException(nameof(priorityingViewModel));
 
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<PriorityViewModel, Priority>());
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<ProfileImageViewModel, Priority>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Priority>(priorityingViewModel);
 

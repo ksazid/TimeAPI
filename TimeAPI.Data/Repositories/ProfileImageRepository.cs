@@ -65,5 +65,13 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
+        public Image FindByProfileUserID(string key)
+        {
+            return QuerySingleOrDefault<Image>(
+                sql: "SELECT * FROM dbo.image WHERE user_id = @key and  is_deleted = 0",
+                param: new { key }
+            );
+        }
+
     }
 }

@@ -71,6 +71,7 @@ namespace TimeAPI.API.Services
                 CloudBlobClient cloudBlobClient = cloudStorageAccount.CreateCloudBlobClient();
                 string strContainerName = "Profile Images";
                 CloudBlobContainer cloudBlobContainer =  cloudBlobClient.GetContainerReference(strContainerName);
+
                 string fileName = this.GenerateFileName(strFileName);
 
                 if (await cloudBlobContainer.CreateIfNotExistsAsync())
@@ -81,7 +82,10 @@ namespace TimeAPI.API.Services
                 if (fileName != null && fileData != null)
                 {
                     CloudBlockBlob cloudBlockBlob = cloudBlobContainer.GetBlockBlobReference(fileName);
-                    cloudBlockBlob.Properties.ContentType = fileMimeType;
+                    cloudBlockBlob.Properties.ContentType = "image/jpg";
+                    cloudBlockBlob.SetPropertiesAsync();
+
+                    //cloudBlockBlob.Properties.ContentType = fileMimeType;
                     await cloudBlockBlob.UploadFromByteArrayAsync(fileData, 0, fileData.Length);
                     return cloudBlockBlob.Uri.AbsoluteUri;
                 }
