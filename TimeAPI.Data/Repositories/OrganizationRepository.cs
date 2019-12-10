@@ -68,7 +68,7 @@ namespace TimeAPI.Data.Repositories
         public Organization FindByOrgName(string org_name)
         {
             return QuerySingleOrDefault<Organization>(
-                sql: "SELECT * FROM [dbo].[organization] WHERE org_name = @org_name and  is_deleted = 0",
+                sql: "SELECT * FROM [dbo].[organization] WHERE org_name = @org_name and  is_deleted = 0 ORDER BY org_name ASC",
                 param: new { org_name }
             );
         }
