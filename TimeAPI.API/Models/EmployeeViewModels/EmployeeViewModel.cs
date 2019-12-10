@@ -22,8 +22,7 @@ namespace TimeAPI.API.Models.EmployeeViewModels
         public string emp_status_id { get; set; }
         public string emp_type_id { get; set; }
         public string imgurl { get; set; }
-        [NotMapped]
-        public IFormFile imgurl_name { get; set; }
+        public string imgurl_name { get; set; }
         public string workemail { get; set; }
         public string emp_code { get; set; }
         public string role_id { get; set; }

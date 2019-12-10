@@ -129,8 +129,6 @@ namespace TimeAPI.API.Controllers
 
                 #endregion
 
-               
-
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee registered succefully." }).ConfigureAwait(false);

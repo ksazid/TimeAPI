@@ -64,7 +64,7 @@ namespace TimeAPI.Data.Repositories
             return Query<Designation>(
                 sql: @"SELECT * FROM [dbo].[designation] WITH (NOLOCK) 
                             WHERE is_deleted = 0         
-                            ORDER BY designation.dep_name ASC"
+                            ORDER BY designation.designation_name ASC"
             );
         }
 
@@ -82,7 +82,7 @@ namespace TimeAPI.Data.Repositories
             return QuerySingleOrDefault<Designation>(
                 sql: @"SELECT * FROM [dbo].[designation] WITH (NOLOCK) 
                                 WHERE alias = @alias and is_deleted = 0  
-                                ORDER BY designation.dep_name ASC",
+                                ORDER BY designation.designation_name ASC",
                 param: new { alias }
             );
         }
@@ -92,7 +92,7 @@ namespace TimeAPI.Data.Repositories
             return Query<Designation>(
                 sql: @"SELECT * FROM [dbo].[designation] WITH (NOLOCK) 
                             WHERE dep_id = @dep_id and is_deleted = 0  
-                            ORDER BY designation.dep_name ASC",
+                            ORDER BY designation.designation_name ASC",
                 param: new { dep_id }
             );
         }
@@ -109,7 +109,7 @@ namespace TimeAPI.Data.Repositories
 	                        from designation WITH (NOLOCK)
 	                    INNER JOIN department on designation.dep_id = department.id
                         WHERE department.org_id = @key AND designation.is_deleted = 0
-                        ORDER BY designation.dep_name ASC",
+                        ORDER BY designation.designation_name ASC",
                       param: new { key }
                );
         }

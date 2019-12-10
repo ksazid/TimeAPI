@@ -64,7 +64,7 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<Department> All()
         {
             return Query<Department>(
-                sql: "SELECT * FROM [dbo].[department] WITH (NOLOCK) where is_deleted = 0"
+                sql: "SELECT * FROM [dbo].[department] WITH (NOLOCK) where is_deleted = 0  ORDER BY department.dep_name ASC"
             );
         }
 

@@ -57,8 +57,6 @@ namespace TimeAPI.API.Controllers
                 if (designationViewModel == null)
                     throw new ArgumentNullException(nameof(designationViewModel));
 
-                designationViewModel.id = Guid.NewGuid().ToString();
-                designationViewModel.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<DesignationViewModel, Designation>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Designation>(designationViewModel);
