@@ -19,6 +19,7 @@ using TimeAPI.Domain;
 using System.Threading;
 using TimeAPI.Domain.Entities;
 using TimeAPI.API.Models.SocialViewModels;
+using System.Globalization;
 
 namespace TimeAPI.API.Controllroers
 {
@@ -55,12 +56,14 @@ namespace TimeAPI.API.Controllroers
 
                 if (socialViewModel == null)
                     throw new ArgumentNullException(nameof(socialViewModel));
-
-                socialViewModel.id = Guid.NewGuid().ToString();
-                socialViewModel.created_date = DateTime.Now.ToString();
+ 
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<SocialViewModel, Social>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Social>(socialViewModel);
+
+                modal.id = Guid.NewGuid().ToString();
+                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.is_deleted = false;
 
                 _unitOfWork.SocialRepository.Add(modal);
                 _unitOfWork.Commit();
@@ -89,6 +92,7 @@ namespace TimeAPI.API.Controllroers
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<SocialViewModel, Social>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Social>(socialViewModel);
+                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
 
                 _unitOfWork.SocialRepository.Update(modal);
                 _unitOfWork.Commit();
@@ -104,17 +108,17 @@ namespace TimeAPI.API.Controllroers
         
         [HttpPost]
         [Route("RemoveSocial")]
-        public async Task<object> RemoveSocial([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        public async Task<object> RemoveSocial([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.ID));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                _unitOfWork.SocialRepository.Remove(_Utils.ID);
+                _unitOfWork.SocialRepository.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Social ID removed succefully." }).ConfigureAwait(false);
@@ -150,17 +154,17 @@ namespace TimeAPI.API.Controllroers
         
         [HttpPost]
         [Route("FindBySocailID")]
-        public async Task<object> FindBySocailID([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        public async Task<object> FindBySocailID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.ID));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.SocialRepository.Find(_Utils.ID);
+                var result = _unitOfWork.SocialRepository.Find(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
@@ -174,17 +178,17 @@ namespace TimeAPI.API.Controllroers
         
         [HttpPost]
         [Route("FindSocialIdsByEmpID")]
-        public async Task<object> FindSocialIdsByEmpID([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        public async Task<object> FindSocialIdsByEmpID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.ID));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.SocialRepository.FindSocialIdsByEmpID(_Utils.ID);
+                var result = _unitOfWork.SocialRepository.FindSocialIdsByEmpID(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);

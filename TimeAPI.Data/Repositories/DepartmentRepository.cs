@@ -28,7 +28,7 @@ namespace TimeAPI.Data.Repositories
         public Department Find(string key)  
         {
             return QuerySingleOrDefault<Department>(
-                sql: "SELECT * FROM dbo.department WHERE is_deleted = 0 and id = @key",
+                sql: "SELECT * FROM dbo.department WHERE is_deleted = 0 and id = @key ORDER BY department.dep_name ASC",
                 param: new { key }
             );
         }
@@ -64,14 +64,16 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<Department> All()
         {
             return Query<Department>(
-                sql: "SELECT * FROM [dbo].[department] where is_deleted = 0"
+                sql: "SELECT * FROM [dbo].[department] WITH (NOLOCK) where is_deleted = 0"
             );
         }
 
         public Department FindByDepartmentName(string dep_name)
         {
             return QuerySingleOrDefault<Department>(
-                sql: "SELECT * FROM [dbo].[department] WHERE dep_name = @dep_name and is_deleted = 0",
+                sql: @"SELECT * FROM [dbo].[department] WITH (NOLOCK)
+                        WHERE dep_name = @dep_name and is_deleted = 0 
+                        ORDER BY department.dep_name ASC",
                 param: new { dep_name }
             );
         }
@@ -79,7 +81,9 @@ namespace TimeAPI.Data.Repositories
         public Department FindByDepartmentAlias(string alias)
         {
             return QuerySingleOrDefault<Department>(
-                sql: "SELECT * FROM [dbo].[department] WHERE alias = @alias and is_deleted = 0",
+                sql: @"SELECT * FROM [dbo].[department] WITH (NOLOCK)
+                        WHERE alias = @alias and is_deleted = 0     
+                        ORDER BY department.dep_name ASC",
                 param: new { alias }
             );
         }
@@ -87,27 +91,42 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<Department> FindDepartmentByOrgID(string org_id)
         {
             return Query<Department>(
-                sql: "SELECT * FROM [dbo].[department] WHERE org_id = @org_id and is_deleted = 0",
+                sql: @"SELECT * FROM [dbo].[department] WITH (NOLOCK)
+                       WHERE org_id = @org_id and is_deleted = 0 
+                       ORDER BY department.dep_name ASC",
                 param: new { org_id }
             );
         }
 
-        public IEnumerable<DepartmentResultSet> FindAllDepLeadByOrgID(string org_id)
+        public IEnumerable<dynamic> FindAllDepLeadByOrgID(string org_id)
         {
-            return Query<DepartmentResultSet>(
-                sql: @"select e.full_name, e.email, e.designation, d.dep_name from employee e
-                        join department d on e.id = d.depart_lead_empid
-                        where d.org_id = @org_id and d.is_deleted = 0",
+            return Query<dynamic>(
+                sql: @"SELECT 
+	                    employee.full_name,
+	                    employee.workemail,
+	                    designation.designation_name,
+	                    department.dep_name
+                    FROM department WITH (NOLOCK)
+                    LEFT JOIN employee ON department.depart_lead_empid = employee.id
+                    INNER JOIN designation ON department.id = designation.dep_id
+                    WHERE employee.org_id= @org_id and department.is_deleted = 0 
+                    ORDER BY employee.full_name ASC",
                 param: new { org_id }
             );
         }
 
-        public DepartmentResultSet FindDepLeadByDepID(string DepID)
+        public dynamic FindDepLeadByDepID(string DepID)
         {
-            return QuerySingleOrDefault<DepartmentResultSet>(
-                sql: @"select e.full_name, e.email, e.designation, d.dep_name from employee e
-                        join department d on e.id = d.depart_lead_empid
-                        where d.id = @DepID  and d.is_deleted = 0",
+            return QuerySingleOrDefault<dynamic>(
+                sql: @"SELECT 
+	                        employee.full_name,
+	                        designation.designation_name,
+                            department.dep_name
+                        FROM department WITH (NOLOCK)
+                        LEFT JOIN employee ON department.depart_lead_empid = employee.id
+                        INNER JOIN designation ON department.id = designation.dep_id
+                        WHERE department.id= @DepID and department.is_deleted = 0 
+                        ORDER BY employee.full_name ASC",
                 param: new { DepID }
             );
         }
@@ -121,9 +140,10 @@ namespace TimeAPI.Data.Repositories
                                 employee.full_name as lead_name,
                                 employee.workemail,
                                 department.alias
-                                from department
-                                left join employee on department.depart_lead_empid = employee.id
-                            WHERE department.org_id = @key",
+                            FROM department WITH (NOLOCK)
+                            LEFT JOIN employee on department.depart_lead_empid = employee.id
+                            WHERE department.org_id = @key AND department.is_deleted = 0
+                            ORDER BY department.dep_name ASC",
                       param: new { key }
                );
         }

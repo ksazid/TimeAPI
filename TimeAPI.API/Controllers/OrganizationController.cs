@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -49,13 +50,12 @@ namespace TimeAPI.API.Controllers
                 if (organizationViewModel == null)
                     throw new ArgumentNullException(nameof(organizationViewModel));
 
-                //organizationViewModel.org_id = Guid.NewGuid().ToString();
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationViewModel, Organization>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Organization>(organizationViewModel);
 
                 modal.org_id = Guid.NewGuid().ToString();
-                modal.created_date = DateTime.Now.ToString();
+                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
                 modal.is_deleted = false;
 
                 _unitOfWork.OrganizationRepository.Add(modal);
@@ -82,10 +82,10 @@ namespace TimeAPI.API.Controllers
                 if (organizationViewModel == null)
                     throw new ArgumentNullException(nameof(organizationViewModel));
 
-                organizationViewModel.modified_date = DateTime.Now.ToString();
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationViewModel, Organization>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Organization>(organizationViewModel);
+                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
 
                 _unitOfWork.OrganizationRepository.Update(modal);
                 _unitOfWork.Commit();
@@ -101,17 +101,17 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("RemoveOrganization")]
-        public async Task<object> RemoveOrganization([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        public async Task<object> RemoveOrganization([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.ID));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                _unitOfWork.OrganizationRepository.Remove(_Utils.ID);
+                _unitOfWork.OrganizationRepository.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Organization remvoed succefully." }).ConfigureAwait(false);
@@ -124,17 +124,17 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("FindByOrgId")]
-        public async Task<object> FindByOrgId([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        public async Task<object> FindByOrgId([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.ID));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.OrganizationRepository.Find(_Utils.ID);
+                var result = _unitOfWork.OrganizationRepository.Find(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
@@ -147,17 +147,17 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("FindByUsersId")]
-        public async Task<object> FindByUsersId([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        public async Task<object> FindByUsersId([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.ID));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.OrganizationRepository.FindByUsersID(_Utils.ID);
+                var result = _unitOfWork.OrganizationRepository.FindByUsersID(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
@@ -170,17 +170,17 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("FindByOrgName")]
-        public async Task<object> FindOrganizationByName([FromBody] UtilsName _UtilsName, CancellationToken cancellationToken)
+        public async Task<object> FindOrganizationByName([FromBody] UtilsName UtilsName, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_UtilsName == null)
-                    throw new ArgumentNullException(nameof(_UtilsName.FullName));
+                if (UtilsName == null)
+                    throw new ArgumentNullException(nameof(UtilsName.FullName));
 
-                var result = _unitOfWork.OrganizationRepository.FindByOrgName(_UtilsName.FullName);
+                var result = _unitOfWork.OrganizationRepository.FindByOrgName(UtilsName.FullName);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);

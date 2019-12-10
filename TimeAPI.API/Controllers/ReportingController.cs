@@ -19,6 +19,7 @@ using TimeAPI.Domain;
 using TimeAPI.API.Models.ReportingViewModels;
 using System.Threading;
 using TimeAPI.Domain.Entities;
+using System.Globalization;
 
 namespace TimeAPI.API.Controllers
 {
@@ -54,11 +55,13 @@ namespace TimeAPI.API.Controllers
                 if (reportingViewModel == null)
                     throw new ArgumentNullException(nameof(reportingViewModel));
 
-                reportingViewModel.id = Guid.NewGuid().ToString();
-                reportingViewModel.created_date = DateTime.Now.ToString();
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<ReportingViewModel, Reporting>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Reporting>(reportingViewModel);
+
+                modal.id = Guid.NewGuid().ToString();
+                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.is_deleted = false;
 
                 _unitOfWork.ReportingRepository.Add(modal);
                 _unitOfWork.Commit();
@@ -84,12 +87,10 @@ namespace TimeAPI.API.Controllers
                 if (reportingViewModel == null)
                     throw new ArgumentNullException(nameof(reportingViewModel));
 
-                reportingViewModel.modifiedby = reportingViewModel.createdby;
-                reportingViewModel.modified_date = DateTime.Now.ToString();
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<ReportingViewModel, Reporting>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Reporting>(reportingViewModel);
-
+                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
 
                 _unitOfWork.ReportingRepository.Update(modal);
                 _unitOfWork.Commit();
@@ -105,17 +106,17 @@ namespace TimeAPI.API.Controllers
         
         [HttpPost]
         [Route("RemoveReporting")]
-        public async Task<object> RemoveReporting([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        public async Task<object> RemoveReporting([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.ID));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                _unitOfWork.ReportingRepository.Remove(_Utils.ID);
+                _unitOfWork.ReportingRepository.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Reporting removed succefully." }).ConfigureAwait(false);
@@ -150,7 +151,7 @@ namespace TimeAPI.API.Controllers
         
         [HttpPost]
         [Route("FindByReportEmpID")]
-        public async Task<object> FindByReportEmpID([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        public async Task<object> FindByReportEmpID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
 
             try
@@ -158,10 +159,10 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.ID));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.ReportingRepository.FindByReportEmpID(_Utils.ID);
+                var result = _unitOfWork.ReportingRepository.FindByReportEmpID(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
@@ -175,17 +176,17 @@ namespace TimeAPI.API.Controllers
         
         [HttpPost]
         [Route("FindReportingHeadByEmpID")]
-        public async Task<object> FindReportingHeadByEmpID([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        public async Task<object> FindReportingHeadByEmpID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.ID));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.ReportingRepository.FindReportingHeadByEmpID(_Utils.ID);
+                var result = _unitOfWork.ReportingRepository.FindReportingHeadByEmpID(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);

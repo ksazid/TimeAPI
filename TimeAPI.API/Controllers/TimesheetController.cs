@@ -21,6 +21,7 @@ using TimeAPI.Domain.Entities;
 using TimeAPI.API.Models.DesignationViewModels;
 using TimeAPI.API.Models.TimesheetViewModels;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace TimeAPI.API.Controllers
 {
@@ -56,11 +57,14 @@ namespace TimeAPI.API.Controllers
                 if (timesheetViewModel == null)
                     throw new ArgumentNullException(nameof(timesheetViewModel));
 
-                timesheetViewModel.id = Guid.NewGuid().ToString();
-                timesheetViewModel.created_date = DateTime.Now.ToString();
+
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetViewModel, Timesheet>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Timesheet>(timesheetViewModel);
+
+                modal.id = Guid.NewGuid().ToString();
+                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.is_deleted = false;
 
                 _unitOfWork.TimesheetRepository.Add(modal);
                 _unitOfWork.Commit();
@@ -85,10 +89,12 @@ namespace TimeAPI.API.Controllers
                 if (timesheetViewModel == null)
                     throw new ArgumentNullException(nameof(timesheetViewModel));
 
-                timesheetViewModel.modified_date = DateTime.Now.ToString();
+                timesheetViewModel.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetViewModel, Timesheet>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Timesheet>(timesheetViewModel);
+
+                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
 
 
                 _unitOfWork.TimesheetRepository.Update(modal);
@@ -104,17 +110,17 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("RemoveTimesheet")]
-        public async Task<object> RemoveTimesheet([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        public async Task<object> RemoveTimesheet([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.ID));
+                if (Utils == null)
+                    throw new ArgumentNullException(paramName: nameof(Utils.ID));
 
-                _unitOfWork.TimesheetRepository.Remove(_Utils.ID);
+                _unitOfWork.TimesheetRepository.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Timesheet removed succefully." }).ConfigureAwait(false);
@@ -148,17 +154,17 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("CheckOutByEmpID")]
-        public async Task<object> CheckOutByEmpID([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        public async Task<object> CheckOutByEmpID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.ID));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.TimesheetRepository.Find(_Utils.ID);
+                var result = _unitOfWork.TimesheetRepository.Find(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);

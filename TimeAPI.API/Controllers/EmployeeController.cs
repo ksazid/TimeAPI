@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using ailogica.Azure.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Hosting;
@@ -78,7 +80,6 @@ namespace TimeAPI.API.Controllers
                     role = _unitOfWork.RoleRepository.Find(employeeViewModel.role_id.ToString());
                     if (role.NormalizedName == "ADMIN")
                         employeeViewModel.is_admin = true;
-
                 }
 
                 var user = new ApplicationUser()
@@ -92,13 +93,7 @@ namespace TimeAPI.API.Controllers
                     Phone = employeeViewModel.phone
                 };
 
-                string password = Guid.NewGuid()
-                    .ToString("N")
-                    .ToLower()
-                    .Replace("1", "")
-                    .Replace("o", "")
-                    .Replace("0", "")
-                    .Substring(0, 8);
+                string password = GeneratePassword();
 
                 var result = await _userManager.CreateAsync(user, password).ConfigureAwait(true);
                 var xRest = await _userManager.AddToRoleAsync(user, role.Name).ConfigureAwait(true);
@@ -110,7 +105,7 @@ namespace TimeAPI.API.Controllers
                     {
                         var code = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true);
                         var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
-                        await _emailSender.SendEmailConfirmationAsync(user.Email, callbackUrl).ConfigureAwait(true);
+                        await _emailSender.SendEmailConfirmationAsync(user.Email, callbackUrl, password).ConfigureAwait(true);
                     }
                     else
                     {
@@ -127,51 +122,14 @@ namespace TimeAPI.API.Controllers
                 var modal = mapper.Map<Employee>(employeeViewModel);
 
                 modal.id = Guid.NewGuid().ToString();
-                modal.created_date = DateTime.Now.ToString();
+                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.is_deleted = false;
 
                 _unitOfWork.EmployeeRepository.Add(modal);
 
                 #endregion
 
-                #region Read File Content
-
-                var uploads = ""; //Path.Combine(_hostingEnvironment.WebRootPath, "Uploads");
-                bool exists = Directory.Exists(uploads);
-                if (!exists)
-                    Directory.CreateDirectory(uploads);
-
-                var fileName = Path.GetFileName(employeeViewModel.imgurl_name.FileName);
-                var fileStream = new FileStream(Path.Combine(uploads, employeeViewModel.imgurl_name.FileName), FileMode.Create);
-                string mimeType = employeeViewModel.imgurl_name.ContentType;
-                byte[] fileData = new byte[employeeViewModel.imgurl_name.Length];
-
-                //var configuration = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
-                //var apikey = configuration.GetValue<string>(key: "ApiKey");
-
-                string value = _configuration.GetValue<string>("StorageSettings:StorageDefaultConnection");
-
-                BlobStorageService objBlobService = new BlobStorageService(value);
-
-                employeeViewModel.imgurl = objBlobService.UploadFileToBlob(employeeViewModel.imgurl_name.FileName, fileData, mimeType);
-
-                EmployeeProfileViewModel employeeProfileViewModel = new EmployeeProfileViewModel
-                {
-                    user_id = "",
-                    img_name = fileName,
-                    img_url = employeeViewModel.imgurl,
-                    createdby = employeeViewModel.createdby
-                };
-
-
-                var config1 = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeProfileViewModel, Image>());
-                var mapper1 = config.CreateMapper();
-                var modal1 = mapper.Map<Image>(employeeProfileViewModel);
-
-                modal1.id = Guid.NewGuid().ToString();
-                modal1.created_date = DateTime.Now.ToString();
-                _unitOfWork.ProfileImageRepository.Add(modal1);
-
-                #endregion
+               
 
                 _unitOfWork.Commit();
 
@@ -182,6 +140,7 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
+
 
 
         [HttpPatch]
@@ -196,11 +155,11 @@ namespace TimeAPI.API.Controllers
                 if (employeeViewModel == null)
                     throw new ArgumentNullException(nameof(employeeViewModel));
 
-                employeeViewModel.modified_date = DateTime.Now.ToString();
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeViewModel, Employee>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Employee>(employeeViewModel);
 
+                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
 
                 _unitOfWork.EmployeeRepository.Update(modal);
                 _unitOfWork.Commit();
@@ -216,17 +175,17 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("RemoveEmployee")]
-        public async Task<object> RemoveEmployee([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        public async Task<object> RemoveEmployee([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.ID));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                _unitOfWork.EmployeeRepository.Remove(_Utils.ID);
+                _unitOfWork.EmployeeRepository.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee removed succefully." }).ConfigureAwait(false);
@@ -262,17 +221,17 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("FindByEmpID")]
-        public async Task<object> FindByEmpID([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        public async Task<object> FindByEmpID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.ID));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.EmployeeRepository.Find(_Utils.ID);
+                var result = _unitOfWork.EmployeeRepository.Find(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
@@ -286,7 +245,7 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("FindByEmpName")]
-        public async Task<object> FindByEmpName([FromBody] UtilsName _UtilsName, CancellationToken cancellationToken)
+        public async Task<object> FindByEmpName([FromBody] UtilsName UtilsName, CancellationToken cancellationToken)
         {
 
             try
@@ -294,10 +253,10 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_UtilsName == null)
-                    throw new ArgumentNullException(nameof(_UtilsName));
+                if (UtilsName == null)
+                    throw new ArgumentNullException(nameof(UtilsName));
 
-                var result = _unitOfWork.EmployeeRepository.FindByEmpName(_UtilsName.FullName);
+                var result = _unitOfWork.EmployeeRepository.FindByEmpName(UtilsName.FullName);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
@@ -311,17 +270,17 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("FindByOrgID")]
-        public async Task<object> FindByOrgID([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        public async Task<object> FindByOrgID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.ID));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.EmployeeRepository.FindByOrgIDCode(_Utils.ID);
+                var result = _unitOfWork.EmployeeRepository.FindByOrgIDCode(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
@@ -360,7 +319,7 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("FindByRoleName")]
-        public async Task<object> FindByRoleName([FromBody] UtilsRole _UtilsRole, CancellationToken cancellationToken)
+        public async Task<object> FindByRoleName([FromBody] UtilsRole UtilsRole, CancellationToken cancellationToken)
         {
 
             try
@@ -368,10 +327,10 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_UtilsRole == null)
-                    throw new ArgumentNullException(nameof(_UtilsRole.Role));
+                if (UtilsRole == null)
+                    throw new ArgumentNullException(nameof(UtilsRole.Role));
 
-                var result = _unitOfWork.EmployeeRepository.FindByRoleName(_UtilsRole.Role);
+                var result = _unitOfWork.EmployeeRepository.FindByRoleName(UtilsRole.Role);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
@@ -382,5 +341,16 @@ namespace TimeAPI.API.Controllers
             }
         }
 
+
+        private static string GeneratePassword()
+        {
+            return Guid.NewGuid()
+                .ToString("N")
+                .ToLower()
+                .Replace("1", "")
+                .Replace("o", "")
+                .Replace("0", "")
+                .Substring(0, 8);
+        }
     }
 }

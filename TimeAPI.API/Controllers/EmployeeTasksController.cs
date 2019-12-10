@@ -25,6 +25,7 @@ using System.Text.Json;
 using System.Dynamic;
 using System.Data;
 using Newtonsoft.Json;
+using System.Globalization;
 
 namespace TimeAPI.API.Controllers
 {
@@ -60,11 +61,13 @@ namespace TimeAPI.API.Controllers
                 if (TaskViewModel == null)
                     throw new ArgumentNullException(nameof(TaskViewModel));
 
-                TaskViewModel.id = Guid.NewGuid().ToString();
-                TaskViewModel.created_date = DateTime.Now.ToString();
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TaskViewModel, Domain.Entities.Tasks>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Domain.Entities.Tasks>(TaskViewModel);
+
+                modal.id = Guid.NewGuid().ToString();
+                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.is_deleted = false;
 
                 _unitOfWork.TaskRepository.Add(modal);
                 _unitOfWork.Commit();
@@ -89,10 +92,10 @@ namespace TimeAPI.API.Controllers
                 if (TaskViewModel == null)
                     throw new ArgumentNullException(nameof(TaskViewModel));
 
-                TaskViewModel.modified_date = DateTime.Now.ToString();
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TaskViewModel, Domain.Entities.Tasks>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Domain.Entities.Tasks>(TaskViewModel);
+                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
 
 
                 _unitOfWork.TaskRepository.Update(modal);
@@ -108,17 +111,17 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("RemoveTask")]
-        public async Task<object> RemoveTask([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        public async Task<object> RemoveTask([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.ID));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                _unitOfWork.TaskRepository.Remove(_Utils.ID);
+                _unitOfWork.TaskRepository.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Task removed succefully." }).ConfigureAwait(false);
@@ -152,17 +155,17 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("FindByTasksId")]
-        public async Task<object> FindByTasksID([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        public async Task<object> FindByTasksID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.ID));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                var results = _unitOfWork.TaskRepository.Find(_Utils.ID);
+                var results = _unitOfWork.TaskRepository.Find(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await System.Threading.Tasks.Task.FromResult<object>(results).ConfigureAwait(false);
@@ -175,18 +178,18 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("FetchGridDataByTaskEmpID")]
-        public async Task<object> FetchGridDataByTaskEmpID([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        public async Task<object> FetchGridDataByTaskEmpID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.ID));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
                 oDataTable _oDataTable = new oDataTable();
-                IEnumerable<dynamic> results = _unitOfWork.TaskRepository.FindByTaskDetailsByEmpID(_Utils.ID);
+                IEnumerable<dynamic> results = _unitOfWork.TaskRepository.FindByTaskDetailsByEmpID(Utils.ID);
                 var xResult = _oDataTable.ToDataTable(results);
                 _unitOfWork.Commit();
 

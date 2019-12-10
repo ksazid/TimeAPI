@@ -11,6 +11,6 @@ namespace TimeAPI.Domain.Repositories
         Employee FindByEmpCode(string emp_code);
         IEnumerable<Employee> FindByOrgIDCode(string org_id);
         IEnumerable<Employee> FindByRoleName(string role);
-        
+        dynamic FetchGridDataEmployeeByOrgID(string org_id);
     }
 }

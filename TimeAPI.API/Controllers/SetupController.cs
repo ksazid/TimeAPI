@@ -26,6 +26,7 @@ using TimeAPI.API.Models.StatusViewModels;
 using TimeAPI.API.Models.EmployeeTypeViewModels;
 using TimeAPI.API.Models.EmployeeStatusViewModels;
 using TimeAPI.API.Models.EmployeeRoleViewModels;
+using System.Globalization;
 
 namespace TimeAPI.API.Controllers
 {
@@ -126,11 +127,14 @@ namespace TimeAPI.API.Controllers
                 if (priorityingViewModel == null)
                     throw new ArgumentNullException(nameof(priorityingViewModel));
 
-                priorityingViewModel.id = Guid.NewGuid().ToString();
-                priorityingViewModel.created_date = DateTime.Now.ToString();
+
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<PriorityViewModel, Priority>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Priority>(priorityingViewModel);
+
+                modal.id = Guid.NewGuid().ToString();
+                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.is_deleted = false;
 
                 _unitOfWork.PriorityRepository.Add(modal);
                 _unitOfWork.Commit();
@@ -156,11 +160,11 @@ namespace TimeAPI.API.Controllers
                 if (priorityingViewModel == null)
                     throw new ArgumentNullException(nameof(priorityingViewModel));
 
-                priorityingViewModel.modifiedby = priorityingViewModel.createdby;
-                priorityingViewModel.modified_date = DateTime.Now.ToString();
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<PriorityViewModel, Priority>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Priority>(priorityingViewModel);
+
+                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
 
 
                 _unitOfWork.PriorityRepository.Update(modal);
@@ -177,17 +181,17 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("RemovePriority")]
-        public async Task<object> RemovePriority([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        public async Task<object> RemovePriority([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.ID));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                _unitOfWork.PriorityRepository.Remove(_Utils.ID);
+                _unitOfWork.PriorityRepository.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Priority removed succefully." }).ConfigureAwait(false);
@@ -222,7 +226,7 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("FindByPriorityID")]
-        public async Task<object> FindByPriorityID([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        public async Task<object> FindByPriorityID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
 
             try
@@ -230,10 +234,10 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.ID));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.PriorityRepository.Find(_Utils.ID);
+                var result = _unitOfWork.PriorityRepository.Find(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
@@ -260,11 +264,13 @@ namespace TimeAPI.API.Controllers
                 if (statusingViewModel == null)
                     throw new ArgumentNullException(nameof(statusingViewModel));
 
-                statusingViewModel.id = Guid.NewGuid().ToString();
-                statusingViewModel.created_date = DateTime.Now.ToString();
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<StatusViewModel, Status>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Status>(statusingViewModel);
+
+                modal.id = Guid.NewGuid().ToString();
+                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.is_deleted = false;
 
                 _unitOfWork.StatusRepository.Add(modal);
                 _unitOfWork.Commit();
@@ -290,11 +296,13 @@ namespace TimeAPI.API.Controllers
                 if (statusingViewModel == null)
                     throw new ArgumentNullException(nameof(statusingViewModel));
 
-                statusingViewModel.modifiedby = statusingViewModel.createdby;
-                statusingViewModel.modified_date = DateTime.Now.ToString();
+
+                statusingViewModel.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<StatusViewModel, Status>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Status>(statusingViewModel);
+
+                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
 
 
                 _unitOfWork.StatusRepository.Update(modal);
@@ -311,17 +319,17 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("RemoveTaskStatus")]
-        public async Task<object> RemoveTaskStatus([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        public async Task<object> RemoveTaskStatus([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.ID));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                _unitOfWork.StatusRepository.Remove(_Utils.ID);
+                _unitOfWork.StatusRepository.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Status removed succefully." }).ConfigureAwait(false);
@@ -356,7 +364,7 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("FindByTaskStatusID")]
-        public async Task<object> FindByTaskStatusID([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        public async Task<object> FindByTaskStatusID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
 
             try
@@ -364,10 +372,10 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.ID));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.StatusRepository.Find(_Utils.ID);
+                var result = _unitOfWork.StatusRepository.Find(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
@@ -394,11 +402,13 @@ namespace TimeAPI.API.Controllers
                 if (employeetypeingViewModel == null)
                     throw new ArgumentNullException(nameof(employeetypeingViewModel));
 
-                employeetypeingViewModel.id = Guid.NewGuid().ToString();
-                employeetypeingViewModel.created_date = DateTime.Now.ToString();
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeTypeViewModel, EmployeeType>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<EmployeeType>(employeetypeingViewModel);
+
+                modal.id = Guid.NewGuid().ToString();
+                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.is_deleted = false;
 
                 _unitOfWork.EmployeeTypeRepository.Add(modal);
                 _unitOfWork.Commit();
@@ -424,11 +434,10 @@ namespace TimeAPI.API.Controllers
                 if (employeetypeingViewModel == null)
                     throw new ArgumentNullException(nameof(employeetypeingViewModel));
 
-                employeetypeingViewModel.modifiedby = employeetypeingViewModel.createdby;
-                employeetypeingViewModel.modified_date = DateTime.Now.ToString();
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeTypeViewModel, EmployeeType>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<EmployeeType>(employeetypeingViewModel);
+                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
 
 
                 _unitOfWork.EmployeeTypeRepository.Update(modal);
@@ -445,17 +454,17 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("RemoveEmployeeType")]
-        public async Task<object> RemoveEmployeeType([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        public async Task<object> RemoveEmployeeType([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.ID));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                _unitOfWork.EmployeeTypeRepository.Remove(_Utils.ID);
+                _unitOfWork.EmployeeTypeRepository.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "EmployeeType removed succefully." }).ConfigureAwait(false);
@@ -490,7 +499,7 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("FindByEmployeeTypeID")]
-        public async Task<object> FindByEmployeeTypeID([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        public async Task<object> FindByEmployeeTypeID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
 
             try
@@ -498,10 +507,10 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.ID));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.EmployeeTypeRepository.Find(_Utils.ID);
+                var result = _unitOfWork.EmployeeTypeRepository.Find(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
@@ -528,11 +537,14 @@ namespace TimeAPI.API.Controllers
                 if (employeestatusViewModel == null)
                     throw new ArgumentNullException(nameof(employeestatusViewModel));
 
-                employeestatusViewModel.id = Guid.NewGuid().ToString();
-                employeestatusViewModel.created_date = DateTime.Now.ToString();
+
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeStatusViewModel, EmployeeStatus>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<EmployeeStatus>(employeestatusViewModel);
+
+                modal.id = Guid.NewGuid().ToString();
+                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.is_deleted = false;
 
                 _unitOfWork.EmployeeStatusRepository.Add(modal);
                 _unitOfWork.Commit();
@@ -558,11 +570,10 @@ namespace TimeAPI.API.Controllers
                 if (employeestatusViewModel == null)
                     throw new ArgumentNullException(nameof(employeestatusViewModel));
 
-                employeestatusViewModel.modifiedby = employeestatusViewModel.createdby;
-                employeestatusViewModel.modified_date = DateTime.Now.ToString();
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeStatusViewModel, EmployeeStatus>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<EmployeeStatus>(employeestatusViewModel);
+                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
 
 
                 _unitOfWork.EmployeeStatusRepository.Update(modal);
@@ -579,17 +590,17 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("RemoveEmployeeStatus")]
-        public async Task<object> RemoveEmployeeStatus([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        public async Task<object> RemoveEmployeeStatus([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.ID));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                _unitOfWork.EmployeeStatusRepository.Remove(_Utils.ID);
+                _unitOfWork.EmployeeStatusRepository.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "EmployeeStatus removed succefully." }).ConfigureAwait(false);
@@ -624,7 +635,7 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("FindByEmployeeStatusID")]
-        public async Task<object> FindByEmployeeStatusID([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        public async Task<object> FindByEmployeeStatusID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
 
             try
@@ -632,10 +643,10 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.ID));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.EmployeeStatusRepository.Find(_Utils.ID);
+                var result = _unitOfWork.EmployeeStatusRepository.Find(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
@@ -662,11 +673,13 @@ namespace TimeAPI.API.Controllers
                 if (industrytypeViewModel == null)
                     throw new ArgumentNullException(nameof(industrytypeViewModel));
 
-                industrytypeViewModel.id = Guid.NewGuid().ToString();
-                industrytypeViewModel.created_date = DateTime.Now.ToString();
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeStatusViewModel, IndustryType>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<IndustryType>(industrytypeViewModel);
+
+                modal.id = Guid.NewGuid().ToString();
+                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.is_deleted = false;
 
                 _unitOfWork.IndustryTypeRepository.Add(modal);
                 _unitOfWork.Commit();
@@ -692,12 +705,10 @@ namespace TimeAPI.API.Controllers
                 if (industrytypeViewModel == null)
                     throw new ArgumentNullException(nameof(industrytypeViewModel));
 
-                industrytypeViewModel.modifiedby = industrytypeViewModel.createdby;
-                industrytypeViewModel.modified_date = DateTime.Now.ToString();
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeStatusViewModel, IndustryType>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<IndustryType>(industrytypeViewModel);
-
+                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
 
                 _unitOfWork.IndustryTypeRepository.Update(modal);
                 _unitOfWork.Commit();
@@ -713,17 +724,17 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("RemoveIndustryType")]
-        public async Task<object> RemoveIndustryType([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        public async Task<object> RemoveIndustryType([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.ID));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                _unitOfWork.IndustryTypeRepository.Remove(_Utils.ID);
+                _unitOfWork.IndustryTypeRepository.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "IndustryType removed succefully." }).ConfigureAwait(false);
@@ -758,7 +769,7 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("FindByIndustryTypeID")]
-        public async Task<object> FindByIndustryTypeID([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        public async Task<object> FindByIndustryTypeID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
 
             try
@@ -766,10 +777,10 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.ID));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.IndustryTypeRepository.Find(_Utils.ID);
+                var result = _unitOfWork.IndustryTypeRepository.Find(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);

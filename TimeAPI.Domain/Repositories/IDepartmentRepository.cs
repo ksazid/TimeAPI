@@ -11,11 +11,9 @@ namespace TimeAPI.Domain.Repositories
         Department FindByDepartmentName(string dep_name);
         Department FindByDepartmentAlias(string alias);
         IEnumerable<Department> FindDepartmentByOrgID(string OrgID);
-        IEnumerable<DepartmentResultSet> FindAllDepLeadByOrgID(string OrgID);
-        DepartmentResultSet FindDepLeadByDepID(string OrgID);
+        IEnumerable<dynamic> FindAllDepLeadByOrgID(string OrgID);
+        dynamic FindDepLeadByDepID(string OrgID);
+        dynamic FetchGridDataByDepOrgID(string OrgID);
 
-        dynamic FetchGridDataByDepOrgID (string OrgID);
-
-        
     }
 }

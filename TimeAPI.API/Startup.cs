@@ -47,7 +47,7 @@ namespace TimeAPI.API
                 //    .AllowAnyHeader());
 
 
-                options.AddPolicy("CorsPolicy", // I introduced a string constant just as a label "AllowAllOriginsPolicy"
+                options.AddPolicy("CorsPolicy", 
                 builder =>
                 {
                     builder.AllowAnyOrigin();

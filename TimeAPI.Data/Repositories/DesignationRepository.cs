@@ -26,7 +26,8 @@ namespace TimeAPI.Data.Repositories
         public Designation Find(string key)
         {
             return QuerySingleOrDefault<Designation>(
-                sql: "SELECT * FROM dbo.designation WHERE is_deleted = 0 and id = @key",
+                sql: @"SELECT * FROM dbo.designation WITH (NOLOCK)
+                        WHERE is_deleted = 0 and id = @key",
                 param: new { key }
             );
         }
@@ -61,14 +62,17 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<Designation> All()
         {
             return Query<Designation>(
-                sql: "SELECT * FROM [dbo].[designation] where is_deleted = 0"
+                sql: @"SELECT * FROM [dbo].[designation] WITH (NOLOCK) 
+                            WHERE is_deleted = 0         
+                            ORDER BY designation.dep_name ASC"
             );
         }
 
         public Designation FindByDesignationName(string dep_name)
         {
             return QuerySingleOrDefault<Designation>(
-                sql: "SELECT * FROM [dbo].[designation] WHERE designation_name = @designation_name and is_deleted = 0",
+                sql: @"SELECT * FROM [dbo].[designation] WITH (NOLOCK) 
+                        WHERE designation_name = @designation_name and is_deleted = 0",
                 param: new { dep_name }
             );
         }
@@ -76,7 +80,9 @@ namespace TimeAPI.Data.Repositories
         public Designation FindByDesignationAlias(string alias)
         {
             return QuerySingleOrDefault<Designation>(
-                sql: "SELECT * FROM [dbo].[designation] WHERE alias = @alias and is_deleted = 0",
+                sql: @"SELECT * FROM [dbo].[designation] WITH (NOLOCK) 
+                                WHERE alias = @alias and is_deleted = 0  
+                                ORDER BY designation.dep_name ASC",
                 param: new { alias }
             );
         }
@@ -84,7 +90,9 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<Designation> FindDesignationByDeptID(string dep_id)
         {
             return Query<Designation>(
-                sql: "SELECT * FROM [dbo].[designation] WHERE dep_id = @dep_id and is_deleted = 0",
+                sql: @"SELECT * FROM [dbo].[designation] WITH (NOLOCK) 
+                            WHERE dep_id = @dep_id and is_deleted = 0  
+                            ORDER BY designation.dep_name ASC",
                 param: new { dep_id }
             );
         }
@@ -94,12 +102,14 @@ namespace TimeAPI.Data.Repositories
             return Query<dynamic>(
                    sql: @"SELECT 
 	                        designation.id,
+	                        designation.alias,
 	                        department.dep_name,
 	                        designation.designation_name,
 	                        designation.alias
-	                        from designation
-	                        inner join department on designation.dep_id = department.id
-                        WHERE department.org_id = @key",
+	                        from designation WITH (NOLOCK)
+	                    INNER JOIN department on designation.dep_id = department.id
+                        WHERE department.org_id = @key AND designation.is_deleted = 0
+                        ORDER BY designation.dep_name ASC",
                       param: new { key }
                );
         }

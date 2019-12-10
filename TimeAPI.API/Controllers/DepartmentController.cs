@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
@@ -49,11 +50,15 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(departmentViewModels));
 
                 departmentViewModels.id = Guid.NewGuid().ToString();
-                departmentViewModels.created_date = DateTime.Now.ToString();
+                departmentViewModels.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
 
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<DepartmentViewModel, Department>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Department>(departmentViewModels);
+
+                modal.id = Guid.NewGuid().ToString();
+                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.is_deleted = false;
 
                 _unitOfWork.DepartmentRepository.Add(modal);
                 _unitOfWork.Commit();
@@ -79,11 +84,11 @@ namespace TimeAPI.API.Controllers
                 if (departmentViewModels == null)
                     throw new ArgumentNullException(nameof(departmentViewModels));
 
-                departmentViewModels.modified_date = DateTime.Now.ToString();
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<DepartmentViewModel, Department>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Department>(departmentViewModels);
 
+                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
 
                 _unitOfWork.DepartmentRepository.Update(modal);
                 _unitOfWork.Commit();
@@ -99,17 +104,17 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("RemoveDepartment")]
-        public async Task<object> RemoveDepartment([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        public async Task<object> RemoveDepartment([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.ID));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                _unitOfWork.DepartmentRepository.Remove(_Utils.ID);
+                _unitOfWork.DepartmentRepository.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Department removed succefully." }).ConfigureAwait(false);
@@ -143,7 +148,7 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("FindByDepartmentName")]
-        public async Task<object> FindByDepartmentName([FromBody] UtilsName _UtilsName, CancellationToken cancellationToken)
+        public async Task<object> FindByDepartmentName([FromBody] UtilsName UtilsName, CancellationToken cancellationToken)
         {
 
             try
@@ -151,10 +156,10 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_UtilsName == null)
-                    throw new ArgumentNullException(nameof(_UtilsName.FullName));
+                if (UtilsName == null)
+                    throw new ArgumentNullException(nameof(UtilsName.FullName));
 
-                var result = _unitOfWork.DepartmentRepository.FindByDepartmentName(_UtilsName.FullName);
+                var result = _unitOfWork.DepartmentRepository.FindByDepartmentName(UtilsName.FullName);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
@@ -167,7 +172,7 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("FindByDepartmentAlias")]
-        public async Task<object> FindByDepartmentAlias([FromBody] UtilsAlias _UtilsAlias, CancellationToken cancellationToken)
+        public async Task<object> FindByDepartmentAlias([FromBody] UtilsAlias UtilsAlias, CancellationToken cancellationToken)
         {
 
             try
@@ -175,10 +180,10 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_UtilsAlias == null)
-                    throw new ArgumentNullException(nameof(_UtilsAlias.Alias));
+                if (UtilsAlias == null)
+                    throw new ArgumentNullException(nameof(UtilsAlias.Alias));
 
-                var result = _unitOfWork.DepartmentRepository.FindByDepartmentAlias(_UtilsAlias.Alias);
+                var result = _unitOfWork.DepartmentRepository.FindByDepartmentAlias(UtilsAlias.Alias);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
@@ -191,7 +196,7 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("FindDepartmentByOrgID")]
-        public async Task<object> FindDepartmentByOrgID([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        public async Task<object> FindDepartmentByOrgID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
 
             try
@@ -199,10 +204,10 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.ID));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.DepartmentRepository.FindDepartmentByOrgID(_Utils.ID);
+                var result = _unitOfWork.DepartmentRepository.FindDepartmentByOrgID(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
@@ -215,7 +220,7 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("FindByDepartmentID")]
-        public async Task<object> FindByDepartmentID([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        public async Task<object> FindByDepartmentID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
 
             try
@@ -223,10 +228,10 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.ID));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.DepartmentRepository.Find(_Utils.ID);
+                var result = _unitOfWork.DepartmentRepository.Find(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
@@ -239,17 +244,17 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("FindDepLeadByDepID")]
-        public async Task<object> FindDepLeadByDepID([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        public async Task<object> FindDepLeadByDepID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.ID));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.DepartmentRepository.FindDepLeadByDepID(_Utils.ID);
+                var result = _unitOfWork.DepartmentRepository.FindDepLeadByDepID(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
@@ -262,18 +267,18 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("FetchGridDataByDepartmentOrgID")]
-        public async Task<object> FetchGridDataByDepartmentOrgID([FromBody] UtilsOrgID _UtilsOrgID, CancellationToken cancellationToken)
+        public async Task<object> FetchGridDataByDepartmentOrgID([FromBody] UtilsOrgID UtilsOrgID, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_UtilsOrgID == null)
-                    throw new ArgumentNullException(nameof(_UtilsOrgID.OrgID));
+                if (UtilsOrgID == null)
+                    throw new ArgumentNullException(nameof(UtilsOrgID.OrgID));
 
                 oDataTable _oDataTable = new oDataTable();
-                IEnumerable<dynamic> results = _unitOfWork.DepartmentRepository.FetchGridDataByDepOrgID(_UtilsOrgID.OrgID);
+                IEnumerable<dynamic> results = _unitOfWork.DepartmentRepository.FetchGridDataByDepOrgID(UtilsOrgID.OrgID);
                 var xResult = _oDataTable.ToDataTable(results);
                 _unitOfWork.Commit();
 

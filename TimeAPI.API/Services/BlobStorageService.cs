@@ -59,7 +59,7 @@ namespace TimeAPI.API.Services
         {
             string strFileName = string.Empty;
             string[] strName = fileName.Split('.');
-            strFileName = DateTime.Now.ToUniversalTime().ToString("yyyy-MM-dd") + "/" + DateTime.Now.ToUniversalTime().ToString("yyyyMMdd\\THHmmssfff") + "." + strName[strName.Length - 1];
+            strFileName = DateTime.Now.ToUniversalTime().ToString("yyyy-MM-dd") +  "." + strName[strName.Length - 1];
             return strFileName;
         }
 
@@ -69,8 +69,8 @@ namespace TimeAPI.API.Services
             {
                 CloudStorageAccount cloudStorageAccount = CloudStorageAccount.Parse(_accessKey);
                 CloudBlobClient cloudBlobClient = cloudStorageAccount.CreateCloudBlobClient();
-                string strContainerName = "uploads";
-                CloudBlobContainer cloudBlobContainer = cloudBlobClient.GetContainerReference(strContainerName);
+                string strContainerName = "Profile Images";
+                CloudBlobContainer cloudBlobContainer =  cloudBlobClient.GetContainerReference(strContainerName);
                 string fileName = this.GenerateFileName(strFileName);
 
                 if (await cloudBlobContainer.CreateIfNotExistsAsync())

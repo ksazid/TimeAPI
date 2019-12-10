@@ -102,13 +102,12 @@ namespace TimeAPI.API.Controllers
 
             var user = new ApplicationUser()
             {
-
                 UserName = _userName,
                 Email = UserModel.Email,
                 FirstName = UserModel.FirstName,
                 LastName = UserModel.LastName,
                 FullName = UserModel.FullName,
-                Role = "superadmin",
+                Role = "Superadmin",
                 Phone = UserModel.Phone
             };
 
@@ -122,7 +121,7 @@ namespace TimeAPI.API.Controllers
                 {
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true);
                     var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
-                    await _emailSender.SendEmailConfirmationAsync(UserModel.Email, callbackUrl).ConfigureAwait(true);
+                    await _emailSender.SendEmailConfirmationAsync(UserModel.Email, callbackUrl, UserModel.Password).ConfigureAwait(true);
                 }
                 else
                 {

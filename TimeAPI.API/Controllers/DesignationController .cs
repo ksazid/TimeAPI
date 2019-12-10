@@ -21,6 +21,7 @@ using TimeAPI.Domain.Entities;
 using TimeAPI.API.Models.DesignationViewModels;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace TimeAPI.API.Controllers
 {
@@ -57,10 +58,14 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(designationViewModel));
 
                 designationViewModel.id = Guid.NewGuid().ToString();
-                designationViewModel.created_date = DateTime.Now.ToString();
+                designationViewModel.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<DesignationViewModel, Designation>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Designation>(designationViewModel);
+
+                modal.id = Guid.NewGuid().ToString();
+                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.is_deleted = false;
 
                 _unitOfWork.DesignationRepositiory.Add(modal);
                 _unitOfWork.Commit();
@@ -89,7 +94,8 @@ namespace TimeAPI.API.Controllers
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Designation>(designationViewModel);
 
-                designationViewModel.modified_date = DateTime.Now.ToString();
+                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+
                 _unitOfWork.DesignationRepositiory.Update(modal);
                 _unitOfWork.Commit();
 
@@ -101,20 +107,20 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        
+
         [HttpPost]
         [Route("RemoveDesignation")]
-        public async Task<object> RemoveDesignation([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        public async Task<object> RemoveDesignation([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.ID));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                _unitOfWork.DesignationRepositiory.Remove(_Utils.ID);
+                _unitOfWork.DesignationRepositiory.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Designation removed succefully." }).ConfigureAwait(false);
@@ -125,7 +131,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        
+
         [HttpGet]
         [Route("GetAllDesignation")]
         public async Task<object> GetAllDesignation(CancellationToken cancellationToken)
@@ -151,17 +157,17 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("FindByDesignationID")]
-        public async Task<object> FindByDesignationID([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        public async Task<object> FindByDesignationID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.ID));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.DesignationRepositiory.Find(_Utils.ID);
+                var result = _unitOfWork.DesignationRepositiory.Find(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
@@ -175,17 +181,17 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("FindByDesignationName")]
-        public async Task<object> FindByDesignationName([FromBody] UtilsName _Utils, CancellationToken cancellationToken)
+        public async Task<object> FindByDesignationName([FromBody] UtilsName Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.FullName));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.FullName));
 
-                var result = _unitOfWork.DesignationRepositiory.FindByDesignationName(_Utils.FullName);
+                var result = _unitOfWork.DesignationRepositiory.FindByDesignationName(Utils.FullName);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
@@ -196,20 +202,20 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        
+
         [HttpPost]
         [Route("FindByDesignationAlias")]
-        public async Task<object> FindByDesignationAlias([FromBody] UtilsAlias _UtilsAlias, CancellationToken cancellationToken)
+        public async Task<object> FindByDesignationAlias([FromBody] UtilsAlias UtilsAlias, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_UtilsAlias == null)
-                    throw new ArgumentNullException(nameof(_UtilsAlias.Alias));
+                if (UtilsAlias == null)
+                    throw new ArgumentNullException(nameof(UtilsAlias.Alias));
 
-                var result = _unitOfWork.DesignationRepositiory.FindByDesignationAlias(_UtilsAlias.Alias);
+                var result = _unitOfWork.DesignationRepositiory.FindByDesignationAlias(UtilsAlias.Alias);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
@@ -220,20 +226,20 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        
+
         [HttpPost]
         [Route("FindDesignationByDeptID")]
-        public async Task<object> FindDesignationByDeptID([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        public async Task<object> FindDesignationByDeptID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_Utils == null)
-                    throw new ArgumentNullException(nameof(_Utils.ID));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.DesignationRepositiory.FindDesignationByDeptID(_Utils.ID);
+                var result = _unitOfWork.DesignationRepositiory.FindDesignationByDeptID(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
@@ -246,18 +252,18 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("FetchGridDataByDesignationDeptOrgID")]
-        public async Task<object> FetchGridDataByDesignationDeptOrgID([FromBody] UtilsOrgID _UtilsOrgID, CancellationToken cancellationToken)
+        public async Task<object> FetchGridDataByDesignationDeptOrgID([FromBody] UtilsOrgID UtilsOrgID, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (_UtilsOrgID == null)
-                    throw new ArgumentNullException(nameof(_UtilsOrgID.OrgID));
+                if (UtilsOrgID == null)
+                    throw new ArgumentNullException(nameof(UtilsOrgID.OrgID));
 
                 oDataTable _oDataTable = new oDataTable();
-                IEnumerable<dynamic> results = _unitOfWork.DesignationRepositiory.FetchGridDataByDesignationByDeptOrgID(_UtilsOrgID.OrgID);
+                IEnumerable<dynamic> results = _unitOfWork.DesignationRepositiory.FetchGridDataByDesignationByDeptOrgID(UtilsOrgID.OrgID);
                 var xResult = _oDataTable.ToDataTable(results);
                 _unitOfWork.Commit();
 
