@@ -98,9 +98,6 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-
-
-
         public dynamic FetchGridDataEmployeeByOrgID(string key)
         {
             return Query<dynamic>(

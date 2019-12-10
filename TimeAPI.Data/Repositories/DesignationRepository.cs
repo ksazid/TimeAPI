@@ -105,7 +105,6 @@ namespace TimeAPI.Data.Repositories
 	                        designation.alias,
 	                        department.dep_name,
 	                        designation.designation_name,
-	                        designation.alias
 	                        from designation WITH (NOLOCK)
 	                    INNER JOIN department on designation.dep_id = department.id
                         WHERE department.org_id = @key AND designation.is_deleted = 0
