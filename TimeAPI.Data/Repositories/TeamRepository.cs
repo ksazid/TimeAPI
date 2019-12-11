@@ -16,12 +16,12 @@ namespace TimeAPI.Data.Repositories
         {
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.team
-                                  (id, team_id, team_name, team_by, team_department_id, created_date, createdby)
-                           VALUES (@id, @org_id, @team_name, @team_by, @team_department_id, @created_date, @createdby);
+                                  (id, team_id, team_name, team_by, team_department_id, team_lead_empid, created_date, createdby)
+                           VALUES (@id, @org_id, @team_name, @team_by, @team_department_id, @team_lead_empid, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
-        }
+        }   
         public Team Find(string key)
         {
             return QuerySingleOrDefault<Team>(
@@ -71,23 +71,26 @@ namespace TimeAPI.Data.Repositories
         {
             return QuerySingleOrDefault<dynamic>(
                    sql: @"SELECT 
-		                        team.id,
+		                        team.id as team_id,
 		                        team.team_name,
 		                        team.team_by,
+                                team_members.id as team_members_id,
 		                        department.dep_name,
-		                        employee.full_name,
-		                        employee.workemail,
-		                        employee.emp_code
+		                        e.full_name,
+		                        e.workemail,
+		                        e.emp_code,
+								e_tl.full_name as teamlead
 	                        FROM dbo.team WITH(NOLOCK)
 	                        LEFT JOIN team_members ON team.id = team_members.team_id
-	                        LEFT JOIN employee ON team_members.emp_id = employee.id
+	                        LEFT JOIN employee e ON team_members.emp_id = e.id
+	                        LEFT JOIN employee e_tl ON team.team_lead_empid = e.id
 	                        LEFT JOIN department ON team.team_department_id = department.id
 	                        WHERE team.id =  @key 
-                            AND employee.is_deleted = 0 
+                            AND e.is_deleted = 0 
                             AND team_members.is_deleted = 0 
                             AND team.is_deleted = 0
-	                        AND employee.is_superadmin = 0 
-	                        ORDER BY employee.full_name ASC",
+	                        AND e.is_superadmin = 0 
+	                        ORDER BY e.full_name ASC",
                       param: new { key }
                );
         }
@@ -100,19 +103,21 @@ namespace TimeAPI.Data.Repositories
 		                        team.team_by,
                                 team_members.id as team_members_id,
 		                        department.dep_name,
-		                        employee.full_name,
-		                        employee.workemail,
-		                        employee.emp_code
+		                        e.full_name,
+		                        e.workemail,
+		                        e.emp_code,
+								e_tl.full_name as teamlead
 	                        FROM dbo.team WITH(NOLOCK)
 	                        LEFT JOIN team_members ON team.id = team_members.team_id
-	                        LEFT JOIN employee ON team_members.emp_id = employee.id
+	                        LEFT JOIN employee e ON team_members.emp_id = e.id
+	                        LEFT JOIN employee e_tl ON team.team_lead_empid = e.id
 	                        LEFT JOIN department ON team.team_department_id = department.id
 	                        WHERE team.id =  @key 
-                                AND employee.is_deleted = 0 
-                                AND team_members.is_deleted = 0 
-                                AND team.is_deleted = 0
-	                            AND employee.is_superadmin = 0 
-	                            ORDER BY team.team_name ASC",
+                            AND e.is_deleted = 0 
+                            AND team_members.is_deleted = 0 
+                            AND team.is_deleted = 0
+	                        AND e.is_superadmin = 0 
+	                        ORDER BY e.full_name ASC",
                       param: new { key }
                );
         }

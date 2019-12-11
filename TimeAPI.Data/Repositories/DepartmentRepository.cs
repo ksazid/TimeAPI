@@ -119,6 +119,8 @@ namespace TimeAPI.Data.Repositories
         {
             return QuerySingleOrDefault<dynamic>(
                 sql: @"SELECT 
+                            designation.id as department_id,
+	                        employee.id as employee_id,
 	                        employee.full_name,
 	                        designation.designation_name,
                             department.dep_name
@@ -135,8 +137,8 @@ namespace TimeAPI.Data.Repositories
         {
             return Query<dynamic>(
                    sql: @"SELECT 
-                                department.id,
-                                department.dep_name,
+                                department.id as department_id,
+	                            employee.id as employee_id,
                                 employee.full_name as lead_name,
                                 employee.workemail,
                                 department.alias
@@ -152,7 +154,8 @@ namespace TimeAPI.Data.Repositories
         {
             return Query<dynamic>(
                 sql: @"SELECT 
-	                        employee.id,
+                            department.id as department_id,
+	                        employee.id as employee_id,
 	                        employee.full_name,
 	                        designation.designation_name,
                             department.dep_name
