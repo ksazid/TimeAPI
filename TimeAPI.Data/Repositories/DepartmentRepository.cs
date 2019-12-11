@@ -98,7 +98,7 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<dynamic> FindAllDepLeadByOrgID(string org_id)
+        public dynamic FindAllDepLeadByOrgID(string org_id)
         {
             return Query<dynamic>(
                 sql: @"SELECT 
@@ -108,8 +108,8 @@ namespace TimeAPI.Data.Repositories
 	                    department.dep_name
                     FROM department WITH (NOLOCK)
                     LEFT JOIN employee ON department.depart_lead_empid = employee.id
-                    INNER JOIN designation ON department.id = designation.dep_id
-                    WHERE employee.org_id= @org_id and department.is_deleted = 0 
+                    LEFT JOIN designation ON department.id = designation.dep_id
+                    WHERE department.org_id= @org_id and department.is_deleted = 0 
                     ORDER BY employee.full_name ASC",
                 param: new { org_id }
             );
@@ -124,7 +124,7 @@ namespace TimeAPI.Data.Repositories
                             department.dep_name
                         FROM department WITH (NOLOCK)
                         LEFT JOIN employee ON department.depart_lead_empid = employee.id
-                        INNER JOIN designation ON department.id = designation.dep_id
+                        LEFT JOIN designation ON department.id = designation.dep_id
                         WHERE department.id= @DepID and department.is_deleted = 0 
                         ORDER BY employee.full_name ASC",
                 param: new { DepID }
@@ -147,6 +147,25 @@ namespace TimeAPI.Data.Repositories
                       param: new { key }
                );
         }
+
+        public dynamic FindAllDepMembersByDepID(string DepID)
+        {
+            return Query<dynamic>(
+                sql: @"SELECT 
+	                        employee.id,
+	                        employee.full_name,
+	                        designation.designation_name,
+                            department.dep_name
+                        FROM department WITH (NOLOCK)
+                        LEFT JOIN employee ON department.depart_lead_empid = employee.id
+                        LEFT JOIN designation ON department.id = designation.dep_id
+                        WHERE department.id= @DepID and department.is_deleted = 0 
+                        ORDER BY employee.full_name ASC",
+                param: new { DepID }
+            );
+        }
+
+        
 
     }
 }

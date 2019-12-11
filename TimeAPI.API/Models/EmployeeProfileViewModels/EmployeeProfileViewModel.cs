@@ -18,7 +18,6 @@ namespace TimeAPI.API.Models.EmployeeProfileViewModels
         public string modified_date { get; set; }
         public string modifiedby { get; set; }
         public bool is_deleted { get; set; }
-        public IFormFile Iform { get; set; }
 
     }
 }

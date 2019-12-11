@@ -254,7 +254,7 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("AddTaskStatus")]
-        public async Task<object> AddTaskStatus([FromBody] StatusViewModel statusingViewModel, CancellationToken cancellationToken)
+        public async Task<object> AddTaskStatus([FromBody] TeamViewModel statusingViewModel, CancellationToken cancellationToken)
         {
             try
             {
@@ -264,7 +264,7 @@ namespace TimeAPI.API.Controllers
                 if (statusingViewModel == null)
                     throw new ArgumentNullException(nameof(statusingViewModel));
 
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<StatusViewModel, Status>());
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TeamViewModel, Status>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Status>(statusingViewModel);
 
@@ -286,7 +286,7 @@ namespace TimeAPI.API.Controllers
 
         [HttpPatch]
         [Route("UpdateTaskStatus")]
-        public async Task<object> UpdateTaskStatus([FromBody] StatusViewModel statusingViewModel, CancellationToken cancellationToken)
+        public async Task<object> UpdateTaskStatus([FromBody] TeamViewModel statusingViewModel, CancellationToken cancellationToken)
         {
             try
             {
@@ -298,7 +298,7 @@ namespace TimeAPI.API.Controllers
 
 
                 statusingViewModel.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<StatusViewModel, Status>());
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TeamViewModel, Status>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Status>(statusingViewModel);
 
@@ -663,7 +663,7 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("AddIndustryType")]
-        public async Task<object> AddIndustryType([FromBody] EmployeeStatusViewModel industrytypeViewModel, CancellationToken cancellationToken)
+        public async Task<object> AddIndustryType([FromBody] IndustryTypeViewModel industrytypeViewModel, CancellationToken cancellationToken)
         {
             try
             {
@@ -695,7 +695,7 @@ namespace TimeAPI.API.Controllers
 
         [HttpPatch]
         [Route("UpdateIndustryType")]
-        public async Task<object> UpdateIndustryType([FromBody] IndustryTypeViewModels industrytypeViewModel, CancellationToken cancellationToken)
+        public async Task<object> UpdateIndustryType([FromBody] IndustryTypeViewModel industrytypeViewModel, CancellationToken cancellationToken)
         {
             try
             {

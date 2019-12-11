@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Text;
 
-namespace TimeAPI.API.Models.EmployeeStatusViewModels
+namespace TimeAPI.Domain.Entities
 {
-    public class IndustryTypeViewModel
+    public class Team
     {
         public string id { get; set; }
         public string org_id { get; set; }
-        public string industry_type_name { get; set; }
-        public string industry_type_desc { get; set; }
+        public string team_name { get; set; }
+        public string team_by { get; set; }
+        public string team_desc { get; set; }
+        public string team_department { get; set; }
         public string created_date { get; set; }
         public string createdby { get; set; }
         public string modified_date { get; set; }

@@ -17,6 +17,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
 using TimeAPI.API.Models;
 using TimeAPI.API.Models.EmployeeProfileViewModels;
@@ -46,21 +48,60 @@ namespace TimeAPI.API.Controllers
             _storageSettings = StorageSettings.Value;
         }
 
+
         [HttpPost]
         [Route("AddUploadProfile")]
-        public async Task<object> AddUploadProfile([FromBody] EmployeeProfileViewModel employeeprofileViewModel, CancellationToken cancellationToken)
+        public async Task<object> AddUploadProfile([FromForm] IFormFile FormFile, [FromForm] string UserID, [FromForm] string CreatedBy, CancellationToken cancellationToken)
         {
             try
             {
+                EmployeeProfileViewModel employeeProfileViewModel = new EmployeeProfileViewModel();
+
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (employeeprofileViewModel == null)
-                    throw new ArgumentNullException(nameof(employeeprofileViewModel));
+                if (FormFile == null)
+                    throw new ArgumentNullException(nameof(FormFile));
+
+                try
+                {
+                    if (CloudStorageAccount.TryParse(_storageSettings.StorageDefaultConnection, out CloudStorageAccount storageAccount))
+                    {
+                        CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
+
+                        CloudBlobContainer container = blobClient.GetContainerReference(_storageSettings.Container);
+
+                        CloudBlockBlob blockBlob = container.GetBlockBlobReference(FormFile.FileName);
+
+                        if (await container.ExistsAsync())
+                        {
+                            CloudBlob file = container.GetBlobReference(FormFile.FileName);
+
+                            if (await file.ExistsAsync())
+                            {
+                                await file.DeleteAsync();
+                            }
+                        }
+
+                        await blockBlob.UploadFromStreamAsync(FormFile.OpenReadStream()).ConfigureAwait(false);
+
+                        employeeProfileViewModel.img_url = blockBlob.Uri.AbsoluteUri;
+                    }
+                }
+                catch (Exception et)
+                {
+                    return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = et.Message, Desc = et.Message });
+                }
+
+
+                employeeProfileViewModel.user_id = UserID;
+                employeeProfileViewModel.img_name = FormFile.FileName;
+                employeeProfileViewModel.createdby = CreatedBy;
+
 
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeProfileViewModel, Image>());
                 var mapper = config.CreateMapper();
-                var modal = mapper.Map<Image>(employeeprofileViewModel);
+                var modal = mapper.Map<Image>(employeeProfileViewModel);
 
                 modal.id = Guid.NewGuid().ToString();
                 modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
@@ -69,10 +110,14 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.ProfileImageRepository.Add(modal);
                 _unitOfWork.Commit();
 
+                //return new OkResult();
+
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Profile image uploaded succefully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
+
+                //return new OkResult();
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }

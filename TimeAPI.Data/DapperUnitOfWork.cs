@@ -39,6 +39,8 @@ namespace TimeAPI.Data
         private IEmployeeStatusRepository _employeeStatusRepository;
         private IIndustryTypeRepository _industryTypeRepository;
         private IEmployeeRoleRepository _employeeRoleRepository;
+        private ITeamRepository _teamRepository;
+        private ITeamMemberRepository _teamMemberRepository;
 
 
 
@@ -265,6 +267,24 @@ namespace TimeAPI.Data
             {
                 return _employeeRoleRepository
                     ?? (_employeeRoleRepository = new EmployeeRoleRepository(_transaction));
+            }
+        }
+
+        public ITeamRepository TeamRepository
+        {
+            get
+            {
+                return _teamRepository
+                    ?? (_teamRepository = new TeamRepository(_transaction));
+            }
+        }
+
+        public ITeamMemberRepository TeamMemberRepository
+        {
+            get
+            {
+                return _teamMemberRepository
+                    ?? (_teamMemberRepository = new TeamMemberRepository(_transaction));
             }
         }
 

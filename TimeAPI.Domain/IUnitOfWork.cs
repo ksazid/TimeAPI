@@ -30,6 +30,8 @@ namespace TimeAPI.Domain
         IEmployeeStatusRepository EmployeeStatusRepository { get; }
         IIndustryTypeRepository IndustryTypeRepository { get; }
         IEmployeeRoleRepository EmployeeRoleRepository { get; }
+        ITeamRepository TeamRepository { get; }
+        ITeamMemberRepository TeamMemberRepository { get; }
 
         //commit all after all completes
         void Commit();

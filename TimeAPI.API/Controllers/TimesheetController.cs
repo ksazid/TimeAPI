@@ -47,7 +47,7 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("AddTimesheet")]
-        public async Task<object> AddTimesheet([FromBody]  TimesheetViewModel timesheetViewModel, CancellationToken cancellationToken)
+        public async Task<object> AddTimesheet([FromBody] TimesheetViewModel timesheetViewModel, CancellationToken cancellationToken)
         {
             try
             {
@@ -56,6 +56,12 @@ namespace TimeAPI.API.Controllers
 
                 if (timesheetViewModel == null)
                     throw new ArgumentNullException(nameof(timesheetViewModel));
+
+                //Check if TeamId and OutsourcedId row > 0
+                    //if yes -> search for In the Team Table. List of Employees 
+                    //check if the current user is within the team. if yes except current user from the team
+                    //
+
 
 
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetViewModel, Timesheet>());

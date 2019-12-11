@@ -32,10 +32,10 @@ namespace TimeAPI.API.Models
         public string Role { get; set; }
     }
 
-    public class UtilsOrg
-    {
-        public string OrgID { get; set; }
-    }
+    //public class UtilsOrg
+    //{
+    //    public string OrgID { get; set; }
+    //}
 
     public class UtilsAlias
     {

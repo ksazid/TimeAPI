@@ -275,7 +275,7 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(UtilsOrgID.OrgID));
 
                 oDataTable _oDataTable = new oDataTable();
-                IEnumerable<dynamic> results = _unitOfWork.DepartmentRepository.FetchGridDataByDepOrgID(UtilsOrgID.OrgID);
+                dynamic results = _unitOfWork.DepartmentRepository.FetchGridDataByDepOrgID(UtilsOrgID.OrgID);
                 var xResult = _oDataTable.ToDataTable(results);
                 _unitOfWork.Commit();
 
