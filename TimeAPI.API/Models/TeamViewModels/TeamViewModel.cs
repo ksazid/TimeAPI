@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace TimeAPI.API.Models.StatusViewModels
+namespace TimeAPI.API.Models.TeamViewModels
 {
     public class TeamViewModel
     {

@@ -27,6 +27,7 @@ using TimeAPI.API.Models.EmployeeTypeViewModels;
 using TimeAPI.API.Models.EmployeeStatusViewModels;
 using TimeAPI.API.Models.EmployeeRoleViewModels;
 using System.Globalization;
+using TimeAPI.API.Models.StatusViewModels;
 
 namespace TimeAPI.API.Controllers
 {
@@ -254,7 +255,7 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("AddTaskStatus")]
-        public async Task<object> AddTaskStatus([FromBody] TeamViewModel statusingViewModel, CancellationToken cancellationToken)
+        public async Task<object> AddTaskStatus([FromBody] StatusViewModel statusingViewModel, CancellationToken cancellationToken)
         {
             try
             {
@@ -264,7 +265,7 @@ namespace TimeAPI.API.Controllers
                 if (statusingViewModel == null)
                     throw new ArgumentNullException(nameof(statusingViewModel));
 
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TeamViewModel, Status>());
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<StatusViewModel, Status>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Status>(statusingViewModel);
 
@@ -286,7 +287,7 @@ namespace TimeAPI.API.Controllers
 
         [HttpPatch]
         [Route("UpdateTaskStatus")]
-        public async Task<object> UpdateTaskStatus([FromBody] TeamViewModel statusingViewModel, CancellationToken cancellationToken)
+        public async Task<object> UpdateTaskStatus([FromBody] StatusViewModel statusingViewModel, CancellationToken cancellationToken)
         {
             try
             {
@@ -298,7 +299,7 @@ namespace TimeAPI.API.Controllers
 
 
                 statusingViewModel.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TeamViewModel, Status>());
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<StatusViewModel, Status>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Status>(statusingViewModel);
 
