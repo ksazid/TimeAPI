@@ -21,6 +21,7 @@ using TimeAPI.Domain.Entities;
 using TimeAPI.API.Models.TeamViewModels;
 using System.Globalization;
 using TimeAPI.API.Models.StatusViewModels;
+using System.Collections.Generic;
 
 namespace TimeAPI.API.Controllroers
 {
@@ -66,7 +67,17 @@ namespace TimeAPI.API.Controllroers
 
                 _unitOfWork.TeamRepository.Add(modal);
 
-                foreach (var item in teamViewModel.teammember_empids)
+                List<string> TeamMembersList = teamViewModel.teammember_empids.Cast<string>().ToList();
+
+                //current user
+                if (teamViewModel.is_addme_as_team)
+                {
+                    TeamMembersList.Add(teamViewModel.current_user_empid);
+                }
+
+                TeamMembersList.Add(teamViewModel.team_lead_empid);
+
+                foreach (var item in TeamMembersList)
                 {
                     var Employee = _unitOfWork.EmployeeRepository.Find(item);
 
