@@ -79,16 +79,19 @@ namespace TimeAPI.API.Controllroers
 
                 foreach (var item in TeamMembersList)
                 {
-                    var Employee = _unitOfWork.EmployeeRepository.Find(item);
+                    bool isTeamLead = false;
+                    if (teamViewModel.team_lead_empid == item)
+                        isTeamLead = true;
 
                     TeamMembers teamMembers = new TeamMembers
                     {
                         id = Guid.NewGuid().ToString(),
                         team_id = modal.id,
-                        emp_id = Employee.id,
+                        emp_id = item,
                         created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
                         createdby = teamViewModel.createdby,
-                        is_deleted = false
+                        is_deleted = false,
+                        is_teamlead = isTeamLead
                     };
 
                     _unitOfWork.TeamMemberRepository.Add(teamMembers);
