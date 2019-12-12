@@ -11,12 +11,11 @@ namespace TimeAPI.Data.Repositories
     {
         public TeamRepository(IDbTransaction transaction) : base(transaction)
         { }
-
         public void Add(Team entity)
         {
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.team
-                                  (id, team_id, team_name, team_by, team_department_id, team_lead_empid, created_date, createdby)
+                                  (id, org_id, team_name, team_by, team_department_id, team_lead_empid, created_date, createdby)
                            VALUES (@id, @org_id, @team_name, @team_by, @team_department_id, @team_lead_empid, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
