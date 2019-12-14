@@ -24,6 +24,7 @@ using System.Reflection;
 using System.IO;
 using TimeAPI.API.Filters;
 using System.Linq;
+using Newtonsoft.Json.Serialization;
 
 namespace TimeAPI.API
 {
@@ -47,17 +48,16 @@ namespace TimeAPI.API
                 //    .AllowAnyHeader());
 
 
-                options.AddPolicy("CorsPolicy", 
+                options.AddPolicy("CorsPolicy",
                 builder =>
                 {
                     builder.AllowAnyOrigin();
                 });
             });
 
-
-
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
-            services.AddMvc().AddNewtonsoftJson();
+            services.AddMvc().AddNewtonsoftJson(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
+
             services.AddControllers().AddNewtonsoftJson();
             services.AddMvcCore().AddApiExplorer();
 
@@ -114,8 +114,7 @@ namespace TimeAPI.API
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-                    .AddJwtBearer(x =>
+            }).AddJwtBearer(x =>
                     {
                         x.RequireHttpsMetadata = false;
                         x.SaveToken = false;

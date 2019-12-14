@@ -110,6 +110,7 @@ namespace TimeAPI.Data.Repositories
 	                        employee_type.employee_type_name,
 	                        AspNetRoles.Name as role_name,
 	                        department.dep_name,
+                            department.id as department_id,
 	                        designation.designation_name
                           FROM dbo.employee WITH(NOLOCK)
 	                          LEFT JOIN employee_status ON employee.emp_status_id = employee_status.id
