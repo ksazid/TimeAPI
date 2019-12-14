@@ -123,7 +123,7 @@ namespace TimeAPI.Data.Repositories
                );
         }
 
-        public IEnumerable<dynamic> FetchByAllTeamsByOrgID(string key)
+        public IEnumerable<dynamic> FetchAllTeamsByOrgID(string key)
         {
             return Query<dynamic>(
                    sql: @"SELECT 

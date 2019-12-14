@@ -265,8 +265,8 @@ namespace TimeAPI.API.Controllroers
         }
 
         [HttpPost]
-        [Route("FetchByAllTeamsByOrgID")]
-        public async Task<object> FetchByAllTeamsByOrgID([FromBody] UtilsOrgID Utils, CancellationToken cancellationToken)
+        [Route("FetchAllTeamsByOrgID")]
+        public async Task<object> FetchAllTeamsByOrgID([FromBody] UtilsOrgID Utils, CancellationToken cancellationToken)
         {
             try
             {
@@ -276,7 +276,7 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.OrgID));
 
-                var result = _unitOfWork.TeamRepository.FetchByAllTeamsByOrgID(Utils.OrgID);
+                var result = _unitOfWork.TeamRepository.FetchAllTeamsByOrgID(Utils.OrgID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
