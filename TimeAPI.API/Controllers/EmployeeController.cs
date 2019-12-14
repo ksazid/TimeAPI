@@ -337,9 +337,6 @@ namespace TimeAPI.API.Controllers
         }
 
 
-
-
-
         [HttpPost]
         [Route("FetchGridDataEmployeeByOrgID")]
         public async Task<object> FetchGridDataEmployeeByOrgID([FromBody] UtilsOrgID UtilsOrgID, CancellationToken cancellationToken)

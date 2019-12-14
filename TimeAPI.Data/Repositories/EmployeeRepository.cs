@@ -124,5 +124,33 @@ namespace TimeAPI.Data.Repositories
                );
         }
 
+
+
+        public IEnumerable<Employee> FindEmployeeListByDesignationID(string DesignationID)
+        {
+            return Query<Employee>(
+                sql: @"SELECT  * FROM dbo.employee
+                            INNER JOIN designation ON employee.designation_id = designation.id
+                        WHERE  employee.is_deleted = 0
+                        AND employee.is_superadmin = 0
+                        AND designation.id = @DesignationID
+                        ORDER BY employee.full_name ASC",
+                param: new { DesignationID }
+            );
+        }
+
+        public IEnumerable<Employee> FindEmployeeListByDepartmentID(string DepartmentID)
+        {
+            return Query<Employee>(
+                sql: @"SELECT  * FROM dbo.employee
+                        INNER JOIN department ON employee.deptid = department.id
+                        WHERE  employee.is_deleted = 0
+                        AND employee.is_superadmin = 0 
+                        AND department.id = @DepartmentID
+                        ORDER BY employee.full_name ASC",
+                param: new { DepartmentID }
+            );
+        }
+
     }
 }
