@@ -361,6 +361,62 @@ namespace TimeAPI.API.Controllers
                 return System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
+
+
         
+
+
+        [HttpPost]
+        [Route("FindEmployeeListByDesignationID")]
+        public async Task<object> FindEmployeeListByDesignationID([FromBody] Utils utils, CancellationToken cancellationToken)
+        {
+
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (utils == null)
+                    throw new ArgumentNullException(nameof(utils.ID));
+
+                var result = _unitOfWork.EmployeeRepository.FindEmployeeListByDesignationID(utils.ID);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+
+        [HttpPost]
+        [Route("FindEmployeeListByDepartmentID")]
+        public async Task<object> FindEmployeeListByDepartmentID([FromBody] Utils utils, CancellationToken cancellationToken)
+        {
+
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (utils == null)
+                    throw new ArgumentNullException(nameof(utils.ID));
+
+                var result = _unitOfWork.EmployeeRepository.FindEmployeeListByDepartmentID(utils.ID);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+
+
+
     }
 }

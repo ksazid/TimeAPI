@@ -68,9 +68,9 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
-        public dynamic FindByTeamID(string key)
+        public Team FindByTeamID(string key)
         {
-            return QuerySingleOrDefault<dynamic>(
+            return QuerySingleOrDefault<Team>(
                    sql: @"SELECT 
 		                        team.id as team_id,
 		                        team.team_name,
@@ -115,7 +115,6 @@ namespace TimeAPI.Data.Repositories
                       param: new { key }
                );
         }
-
         public IEnumerable<dynamic> FetchAllTeamsByOrgID(string key)
         {
             return Query<dynamic>(

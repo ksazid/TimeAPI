@@ -253,10 +253,11 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.TeamRepository.FetchByAllTeamMembersTeamID(Utils.ID);
-                _unitOfWork.Commit();
+                oDataTable _oDataTable = new oDataTable();
+                IEnumerable<dynamic> results = _unitOfWork.TeamRepository.FetchByAllTeamMembersTeamID(Utils.ID);
+                var xResult = _oDataTable.ToDataTable(results);
 
-                return await Task.FromResult<object>(result).ConfigureAwait(false);
+                return await Task.FromResult<object>(xResult).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -276,10 +277,11 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.OrgID));
 
-                var result = _unitOfWork.TeamRepository.FetchAllTeamsByOrgID(Utils.OrgID);
-                _unitOfWork.Commit();
+                oDataTable _oDataTable = new oDataTable();
+                IEnumerable<dynamic> results = _unitOfWork.TeamRepository.FetchAllTeamsByOrgID(Utils.OrgID);
+                var xResult = _oDataTable.ToDataTable(results);
 
-                return await Task.FromResult<object>(result).ConfigureAwait(false);
+                return await Task.FromResult<object>(xResult).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
