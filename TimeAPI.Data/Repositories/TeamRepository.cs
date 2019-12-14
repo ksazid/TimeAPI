@@ -68,9 +68,9 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
-        public Team FindByTeamID(string key)
+        public dynamic FindByTeamID(string key)
         {
-            return QuerySingleOrDefault<Team>(
+            return QuerySingleOrDefault<dynamic>(
                    sql: @"SELECT 
 		                        team.id as team_id,
 		                        team.team_name,
@@ -81,10 +81,8 @@ namespace TimeAPI.Data.Repositories
 	                        FROM dbo.team WITH(NOLOCK)
 	                        LEFT JOIN employee e_tl ON team.team_lead_empid = e_tl.id
 	                        WHERE team.id =  @key  
-							AND e_tl.is_deleted = 0 
-                            AND team.is_deleted = 0
-	                        AND e_tl.is_superadmin = 0 
-	                        ORDER BY team.team_name ASC",
+							AND team.is_deleted = 0
+                            ORDER BY team.team_name ASC",
                       param: new { key }
                );
         }
@@ -107,11 +105,8 @@ namespace TimeAPI.Data.Repositories
 	                        LEFT JOIN employee e_tl ON team.team_lead_empid = e.id
 	                        LEFT JOIN department ON team.team_department_id = department.id
 	                        WHERE team.id =  @key 
-                            AND e.is_deleted = 0 
-                            AND team_members.is_deleted = 0 
                             AND team.is_deleted = 0
-	                        AND e.is_superadmin = 0 
-	                        ORDER BY e.full_name ASC",
+                            ORDER BY team.team_name ASC",
                       param: new { key }
                );
         }
@@ -132,10 +127,7 @@ namespace TimeAPI.Data.Repositories
                             LEFT JOIN employee e ON team_members.emp_id = e.id
                             LEFT JOIN employee e_tl ON team.team_lead_empid = e.id
                             WHERE team.org_id =  @key
-                            AND e.is_deleted = 0 
-                            AND team_members.is_deleted = 0 
                             AND team.is_deleted = 0
-                            AND e.is_superadmin = 0 
                             ORDER BY team.team_name ASC",
                       param: new { key }
                );

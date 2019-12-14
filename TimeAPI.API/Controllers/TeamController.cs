@@ -22,6 +22,7 @@ using TimeAPI.API.Models.TeamViewModels;
 using System.Globalization;
 using TimeAPI.API.Models.StatusViewModels;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace TimeAPI.API.Controllroers
 {
@@ -230,10 +231,9 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.TeamRepository.FindByTeamID(Utils.ID);
-                _unitOfWork.Commit();
-
-                return await Task.FromResult<object>(result).ConfigureAwait(false);
+                oDataTable _oDataTable = new oDataTable();
+                dynamic results = _unitOfWork.TeamRepository.FindByTeamID(Utils.ID);
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(results, Formatting.Indented)).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -257,7 +257,7 @@ namespace TimeAPI.API.Controllroers
                 IEnumerable<dynamic> results = _unitOfWork.TeamRepository.FetchByAllTeamMembersTeamID(Utils.ID);
                 var xResult = _oDataTable.ToDataTable(results);
 
-                return await Task.FromResult<object>(xResult).ConfigureAwait(false);
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -280,8 +280,7 @@ namespace TimeAPI.API.Controllroers
                 oDataTable _oDataTable = new oDataTable();
                 IEnumerable<dynamic> results = _unitOfWork.TeamRepository.FetchAllTeamsByOrgID(Utils.OrgID);
                 var xResult = _oDataTable.ToDataTable(results);
-
-                return await Task.FromResult<object>(xResult).ConfigureAwait(false);
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
