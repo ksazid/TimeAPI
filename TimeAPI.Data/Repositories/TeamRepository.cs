@@ -122,5 +122,33 @@ namespace TimeAPI.Data.Repositories
                       param: new { key }
                );
         }
+
+        public IEnumerable<dynamic> FetchByAllTeamsByOrgID(string key)
+        {
+            return Query<dynamic>(
+                   sql: @"SELECT 
+		                        team.id as team_id,
+		                        team.team_name,
+		                        team.team_by,
+                                team_members.id as team_members_id,
+		                        department.dep_name,
+		                        e.full_name,
+		                        e.workemail,
+		                        e.emp_code,
+								e_tl.full_name as teamlead
+	                        FROM dbo.team WITH(NOLOCK)
+	                        LEFT JOIN team_members ON team.id = team_members.team_id
+	                        LEFT JOIN employee e ON team_members.emp_id = e.id
+	                        LEFT JOIN employee e_tl ON team.team_lead_empid = e.id
+	                        LEFT JOIN department ON team.team_department_id = department.id
+	                        WHERE team.org_id =  @key 
+                            AND e.is_deleted = 0 
+                            AND team_members.is_deleted = 0 
+                            AND team.is_deleted = 0
+	                        AND e.is_superadmin = 0 
+	                        ORDER BY e.full_name ASC",
+                      param: new { key }
+               );
+        }
     }
 }

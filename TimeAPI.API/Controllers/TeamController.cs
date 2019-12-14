@@ -264,5 +264,28 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
+        [HttpPost]
+        [Route("FetchByAllTeamsByOrgID")]
+        public async Task<object> FetchByAllTeamsByOrgID([FromBody] UtilsOrgID Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.OrgID));
+
+                var result = _unitOfWork.TeamRepository.FetchByAllTeamsByOrgID(Utils.OrgID);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
     }
 }
