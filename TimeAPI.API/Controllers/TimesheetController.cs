@@ -57,22 +57,21 @@ namespace TimeAPI.API.Controllers
                 if (timesheetViewModel == null)
                     throw new ArgumentNullException(nameof(timesheetViewModel));
 
-                //Check if TeamId and OutsourcedId row > 0
-                    //if yes -> search for In the Team Table. List of Employees 
-                    //check if the current user is within the team. if yes except current user from the team
-                    //
-
-
-
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetViewModel, Timesheet>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Timesheet>(timesheetViewModel);
 
-                modal.id = Guid.NewGuid().ToString();
-                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
-                modal.is_deleted = false;
+                var _groupid = Guid.NewGuid().ToString();
+                foreach (var item in timesheetViewModel.team_member_empid.Distinct())
+                {
+                    modal.id = Guid.NewGuid().ToString();
+                    modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                    modal.is_deleted = false;
+                    modal.groupid = _groupid;
 
-                _unitOfWork.TimesheetRepository.Add(modal);
+                    _unitOfWork.TimesheetRepository.Add(modal);
+                }
+
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Timesheet registered succefully." }).ConfigureAwait(false);

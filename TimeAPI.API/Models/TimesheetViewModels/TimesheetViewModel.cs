@@ -9,9 +9,7 @@ namespace TimeAPI.API.Models.TimesheetViewModels
     public class TimesheetViewModel
     {
         public string id { get; set; }
-        public string empid { get; set; }
-        public List<string> teamid { get; set; }
-        public List<string> outsourcedid { get; set; }
+        public List<string> team_member_empid { get; set; }
         public string ondate { get; set; }
         public string check_in { get; set; }
         public string check_out { get; set; }
