@@ -66,25 +66,22 @@ namespace TimeAPI.API.Controllroers
                 modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
                 modal.is_deleted = false;
 
-                _unitOfWork.TeamRepository.Add(modal);
 
                 List<string> TeamMembersList = teamViewModel.teammember_empids.Cast<string>().ToList();
 
                 //current user
                 if (teamViewModel.is_addme_as_team)
-                {
                     TeamMembersList.Add(teamViewModel.current_user_empid);
-                }
 
                 TeamMembersList.Add(teamViewModel.team_lead_empid);
 
-                foreach (var item in TeamMembersList)
+                foreach (var item in TeamMembersList.Distinct())
                 {
                     bool isTeamLead = false;
                     if (teamViewModel.team_lead_empid == item)
                         isTeamLead = true;
 
-                    TeamMembers teamMembers = new TeamMembers
+                    var teamMembers = new TeamMembers
                     {
                         id = Guid.NewGuid().ToString(),
                         team_id = modal.id,
@@ -94,9 +91,9 @@ namespace TimeAPI.API.Controllroers
                         is_deleted = false,
                         is_teamlead = isTeamLead
                     };
-
                     _unitOfWork.TeamMemberRepository.Add(teamMembers);
                 }
+                _unitOfWork.TeamRepository.Add(modal);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Team saved successfully." }).ConfigureAwait(false);
@@ -303,6 +300,7 @@ namespace TimeAPI.API.Controllroers
                 oDataTable _oDataTable = new oDataTable();
                 IEnumerable<dynamic> results = _unitOfWork.TeamRepository.FetchAllTeamMembersByTeamID(Utils.ID);
                 var xResult = _oDataTable.ToDataTable(results);
+
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
             }
             catch (Exception ex)
