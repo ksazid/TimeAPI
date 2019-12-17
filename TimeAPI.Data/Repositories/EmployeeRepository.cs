@@ -175,5 +175,17 @@ namespace TimeAPI.Data.Repositories
                );
         }
 
+        public IEnumerable<Employee> GetAllOutsourcedEmpByOrgID(string OrgID)
+        {
+            return Query<Employee>(
+                sql: @"select * from employee
+                        INNER JOIN employee_type on employee.emp_type_id = employee_type.id
+                        WHERE UPPER(employee_type.employee_type_name) = 'OUTSOURCED'
+                        AND org_id = @OrgID 
+                        AND is_deleted = 0",
+                param: new { OrgID }
+            );
+        }
+
     }
 }

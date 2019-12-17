@@ -426,7 +426,28 @@ namespace TimeAPI.API.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("GetAllOutsourcedEmpByOrgID")]
+        public async Task<object> GetAllOutsourcedEmpByOrgID([FromBody] UtilsOrgID UtilsOrgID, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
 
+                if (UtilsOrgID == null)
+                    throw new ArgumentNullException(nameof(UtilsOrgID.OrgID));
+
+                var result = _unitOfWork.EmployeeRepository.GetAllOutsourcedEmpByOrgID(UtilsOrgID.OrgID);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
 
     }
 }

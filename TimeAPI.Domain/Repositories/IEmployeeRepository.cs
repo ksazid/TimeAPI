@@ -15,5 +15,6 @@ namespace TimeAPI.Domain.Repositories
         IEnumerable<Employee> FindEmployeeListByDesignationID(string DesignationID);
         IEnumerable<Employee> FindEmployeeListByDepartmentID(string DesignationID);
         dynamic FindEmpDepartDesignByEmpID(string EmpID);
+        IEnumerable<Employee> GetAllOutsourcedEmpByOrgID(string OrgID);
     }
 }
