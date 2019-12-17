@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
@@ -67,6 +68,7 @@ namespace TimeAPI.API.Identity
                     mobile = user.Phone,
                     email = userEntity.Email,
                     createdby = user.FullName,
+                    created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
                     is_admin = false,
                     is_superadmin = true
                 };
@@ -212,7 +214,7 @@ namespace TimeAPI.API.Identity
             }
         }
 
-    
+
 
         public void Dispose()
         {

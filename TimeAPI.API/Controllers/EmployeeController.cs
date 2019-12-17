@@ -74,11 +74,15 @@ namespace TimeAPI.API.Controllers
                 }
                 if (employeeViewModel.role_id != null)
                 {
-                    role = _unitOfWork.RoleRepository.Find(employeeViewModel.role_id.ToString());
+                    role = _unitOfWork.RoleRepository.Find(employeeViewModel.role_id);
                     if (role.NormalizedName == "ADMIN")
                         employeeViewModel.is_admin = true;
+                    else
+                    {
+                        employeeViewModel.is_admin = false;
+                        employeeViewModel.is_superadmin = false;
+                    }
                 }
-
                 var user = new ApplicationUser()
                 {
                     UserName = _userName,

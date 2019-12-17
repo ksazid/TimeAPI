@@ -13,16 +13,15 @@ namespace TimeAPI.Data.Repositories
 
         public void Add(Employee entity)
         {
-
             entity.id = ExecuteScalar<string>(
-                    sql: @"
+                        sql: @"
                     INSERT INTO [dbo].[employee] (id, org_id, user_id, deptid, full_name, first_name,last_name, alias, gender, emp_status_id, emp_type_id, imgurl_id, workemail, 
                                    emp_code, role_id, designation_id, dob, joined_date, phone, mobile, email, summary, created_date, createdby, is_admin, is_superadmin)
                     VALUES (@id, @org_id, @user_id, @deptid, @full_name, @first_name, @last_name, @alias,  @gender, @emp_status_id, @emp_type_id, @imgurl_id, @workemail, @emp_code,
                                   @role_id, @designation_id, @dob, @joined_date, @phone, @mobile, @email, @summary, @created_date, @createdby, @is_admin, @is_superadmin);
                     SELECT SCOPE_IDENTITY()",
-                    param: entity
-                );
+                        param: entity
+                    );
         }
 
         public Employee Find(string key)
@@ -186,6 +185,5 @@ namespace TimeAPI.Data.Repositories
                 param: new { OrgID }
             );
         }
-
     }
 }
