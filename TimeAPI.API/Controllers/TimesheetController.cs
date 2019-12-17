@@ -60,8 +60,8 @@ namespace TimeAPI.API.Controllers
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetViewModel, Timesheet>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Timesheet>(timesheetViewModel);
-
                 var _groupid = Guid.NewGuid().ToString();
+
                 foreach (var item in timesheetViewModel.team_member_empid.Distinct())
                 {
                     modal.id = Guid.NewGuid().ToString();
@@ -169,7 +169,7 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.TimesheetRepository.Find(Utils.ID);
+                var result = _unitOfWork.TimesheetRepository.CheckOutByEmpID(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);

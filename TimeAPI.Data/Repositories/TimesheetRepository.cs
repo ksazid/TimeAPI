@@ -71,7 +71,17 @@ namespace TimeAPI.Data.Repositories
         public Timesheet CheckOutByEmpID(string key)
         {
             return QuerySingleOrDefault<Timesheet>(
-                 sql: "SELECT * FROM dbo.timesheet WHERE is_deleted = 0 and empid = @key",
+                 sql: @"UPDATE dbo.timesheet
+                   SET
+                    empid = @empid,
+                    ondate = @ondate,
+                    check_in = @check_in,
+                    check_out = @check_out,
+                    is_checkout = @is_checkout,
+                    groupid = @groupid,
+                    modified_date = @modified_date,
+                    modifiedby = @modifiedby
+                    WHERE id = @id empid = @key",
                  param: new { key }
              );
         }

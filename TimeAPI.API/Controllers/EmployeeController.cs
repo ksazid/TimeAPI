@@ -49,7 +49,6 @@ namespace TimeAPI.API.Controllers
             _userManager = userManager;
         }
 
-
         [HttpPost]
         [Route("AddEmployee")]
         public async Task<object> AddEmployee([FromBody] EmployeeViewModel employeeViewModel, CancellationToken cancellationToken)
@@ -167,7 +166,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpPost]
         [Route("RemoveEmployee")]
         public async Task<object> RemoveEmployee([FromBody] Utils Utils, CancellationToken cancellationToken)
@@ -191,7 +189,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpGet]
         [Route("GetAllEmployees")]
         public async Task<object> GetAllEmployees(CancellationToken cancellationToken)
@@ -212,7 +209,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
 
         [HttpPost]
         [Route("FindByEmpID")]
@@ -236,7 +232,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
 
         [HttpPost]
         [Route("FindByEmpName")]
@@ -262,7 +257,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpPost]
         [Route("FindByOrgID")]
         public async Task<object> FindByOrgID([FromBody] Utils Utils, CancellationToken cancellationToken)
@@ -285,7 +279,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
 
         [HttpPost]
         [Route("FindByEmpCode")]
@@ -311,7 +304,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpPost]
         [Route("FindByRoleName")]
         public async Task<object> FindByRoleName([FromBody] UtilsRole UtilsRole, CancellationToken cancellationToken)
@@ -335,7 +327,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
 
         [HttpPost]
         [Route("FetchGridDataEmployeeByOrgID")]
@@ -362,10 +353,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
-        
-
-
         [HttpPost]
         [Route("FindEmployeeListByDesignationID")]
         public async Task<object> FindEmployeeListByDesignationID([FromBody] Utils utils, CancellationToken cancellationToken)
@@ -389,7 +376,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
 
         [HttpPost]
         [Route("FindEmployeeListByDepartmentID")]
@@ -415,6 +401,30 @@ namespace TimeAPI.API.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("FindEmpDepartDesignByEmpID")]
+        public async Task<object> FindEmpDepartDesignByEmpID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                oDataTable _oDataTable = new oDataTable();
+                IEnumerable<dynamic> results = _unitOfWork.EmployeeRepository.FindEmpDepartDesignByEmpID(Utils.ID);
+                var xResult = _oDataTable.ToDataTable(results);
+                _unitOfWork.Commit();
+
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
 
 
 

@@ -14,5 +14,6 @@ namespace TimeAPI.Domain.Repositories
         dynamic FetchGridDataEmployeeByOrgID(string org_id);
         IEnumerable<Employee> FindEmployeeListByDesignationID(string DesignationID);
         IEnumerable<Employee> FindEmployeeListByDepartmentID(string DesignationID);
+        dynamic FindEmpDepartDesignByEmpID(string EmpID);
     }
 }

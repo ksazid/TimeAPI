@@ -125,8 +125,6 @@ namespace TimeAPI.Data.Repositories
                );
         }
 
-
-
         public IEnumerable<Employee> FindEmployeeListByDesignationID(string DesignationID)
         {
             return Query<Employee>(
@@ -151,6 +149,30 @@ namespace TimeAPI.Data.Repositories
                         ORDER BY employee.full_name ASC",
                 param: new { DepartmentID }
             );
+        }
+
+        public dynamic FindEmpDepartDesignByEmpID(string key)
+        {
+            return Query<dynamic>(
+                   sql: @"	SELECT 
+	                        employee.id,
+	                        employee.full_name,
+	                        employee.workemail,
+	                        employee.emp_code,
+	                        employee_type.employee_type_name,
+	                        department.dep_name,
+	                        designation.designation_name
+	                    FROM dbo.employee WITH(NOLOCK)
+	                LEFT JOIN employee_status ON employee.emp_status_id = employee_status.id
+	                LEFT JOIN employee_type ON employee.emp_type_id = employee_type.id
+	                LEFT JOIN AspNetRoles ON employee.role_id = AspNetRoles.id
+	                LEFT JOIN department ON employee.deptid = department.id
+	                LEFT JOIN designation ON employee.designation_id = designation.id
+	                WHERE employee.id =  @key AND employee.is_deleted = 0
+	                AND employee.is_superadmin = 0 
+	                ORDER BY employee.full_name ASC",
+                      param: new { key }
+               );
         }
 
     }
