@@ -105,7 +105,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpPost]
         [Route("RemoveDesignation")]
         public async Task<object> RemoveDesignation([FromBody] Utils Utils, CancellationToken cancellationToken)
@@ -129,7 +128,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpGet]
         [Route("GetAllDesignation")]
         public async Task<object> GetAllDesignation(CancellationToken cancellationToken)
@@ -150,8 +148,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
-
 
         [HttpPost]
         [Route("FindByDesignationID")]
@@ -176,7 +172,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpPost]
         [Route("FindByDesignationName")]
         public async Task<object> FindByDesignationName([FromBody] UtilsName Utils, CancellationToken cancellationToken)
@@ -200,7 +195,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpPost]
         [Route("FindByDesignationAlias")]
         public async Task<object> FindByDesignationAlias([FromBody] UtilsAlias UtilsAlias, CancellationToken cancellationToken)
@@ -223,7 +217,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
 
         [HttpPost]
         [Route("FindDesignationByDeptID")]
@@ -262,6 +255,31 @@ namespace TimeAPI.API.Controllers
 
                 oDataTable _oDataTable = new oDataTable();
                 dynamic results = _unitOfWork.DesignationRepositiory.FetchGridDataByDesignationByDeptOrgID(UtilsOrgID.OrgID);
+                var xResult = _oDataTable.ToDataTable(results);
+                _unitOfWork.Commit();
+
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("GetAllDesignationByOrgID")]
+        public async Task<object> GetAllDesignationByOrgID([FromBody] UtilsOrgID UtilsOrgID, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (UtilsOrgID == null)
+                    throw new ArgumentNullException(nameof(UtilsOrgID.OrgID));
+
+                oDataTable _oDataTable = new oDataTable();
+                dynamic results = _unitOfWork.DesignationRepositiory.GetAllDesignationByOrgID(UtilsOrgID.OrgID);
                 var xResult = _oDataTable.ToDataTable(results);
                 _unitOfWork.Commit();
 

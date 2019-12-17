@@ -418,11 +418,10 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 oDataTable _oDataTable = new oDataTable();
-                IEnumerable<dynamic> results = _unitOfWork.EmployeeRepository.FindEmpDepartDesignByEmpID(Utils.ID);
-                var xResult = _oDataTable.ToDataTable(results);
+                var results = _unitOfWork.EmployeeRepository.FindEmpDepartDesignByEmpID(Utils.ID);
                 _unitOfWork.Commit();
 
-                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
+                return await Task.FromResult<object>(results).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

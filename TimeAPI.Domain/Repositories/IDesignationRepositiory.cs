@@ -11,5 +11,6 @@ namespace TimeAPI.Domain.Repositories
         Designation FindByDesignationAlias(string alias);
         IEnumerable<Designation> FindDesignationByDeptID(string DeptID);
         dynamic FetchGridDataByDesignationByDeptOrgID(string OrgID);
+        dynamic GetAllDesignationByOrgID(string OrgID);
     }
 }

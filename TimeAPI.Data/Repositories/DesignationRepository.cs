@@ -113,5 +113,20 @@ namespace TimeAPI.Data.Repositories
                );
         }
 
+        public dynamic GetAllDesignationByOrgID(string key)
+        {
+            return Query<dynamic>(
+                   sql: @"SELECT 
+	                        designation.id,
+                            department.dep_name,
+	                        designation.designation_name
+	                    FROM designation WITH (NOLOCK)
+	                    INNER JOIN department on designation.dep_id = department.id
+                        WHERE department.org_id = @key AND designation.is_deleted = 0
+                        ORDER BY designation.designation_name ASC",
+                      param: new { key }
+               );
+        }
+
     }
 }
