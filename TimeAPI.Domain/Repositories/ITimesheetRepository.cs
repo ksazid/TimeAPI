@@ -7,6 +7,6 @@ namespace TimeAPI.Domain.Repositories
 {
     public interface ITimesheetRepository : IRepository<Timesheet, string>
     {
-        public Timesheet CheckOutByEmpID(string key);
+        public void CheckOutByEmpID(string key);
     }
 }

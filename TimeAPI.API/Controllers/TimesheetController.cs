@@ -106,7 +106,6 @@ namespace TimeAPI.API.Controllers
 
                 modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
 
-
                 _unitOfWork.TimesheetRepository.Update(modal);
                 _unitOfWork.Commit();
 
@@ -164,20 +163,20 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("CheckOutByEmpID")]
-        public async Task<object> CheckOutByEmpID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        public async Task<object> CheckOutByEmpID([FromBody] Utils timesheetViewModel, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (Utils == null)
-                    throw new ArgumentNullException(nameof(Utils.ID));
+                if (timesheetViewModel == null)
+                    throw new ArgumentNullException(nameof(timesheetViewModel));
 
-                var result = _unitOfWork.TimesheetRepository.CheckOutByEmpID(Utils.ID);
-                _unitOfWork.Commit();
+                    _unitOfWork.TimesheetRepository.CheckOutByEmpID(timesheetViewModel.ID);
+                    _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(result).ConfigureAwait(false);
+                return Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "", Desc = "" });
             }
             catch (Exception ex)
             {

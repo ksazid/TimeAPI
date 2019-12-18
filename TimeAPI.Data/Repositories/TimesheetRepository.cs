@@ -68,9 +68,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public Timesheet CheckOutByEmpID(string key)
+        public void CheckOutByEmpID(string key)
         {
-            return QuerySingleOrDefault<Timesheet>(
+            Execute(
                  sql: @"UPDATE dbo.timesheet
                    SET
                     empid = @empid,

@@ -127,7 +127,7 @@ namespace TimeAPI.Data.Repositories
         public dynamic FindEmployeeListByDesignationID(string DesignationID)
         {
             return Query<dynamic>(
-                sql: @"SELECT  * FROM dbo.employee
+                sql: @"SELECT  employee.id, employee.full_name FROM dbo.employee
                             INNER JOIN designation ON employee.designation_id = designation.id
                         WHERE  employee.is_deleted = 0
                         AND employee.is_superadmin = 0
@@ -140,7 +140,7 @@ namespace TimeAPI.Data.Repositories
         public dynamic FindEmployeeListByDepartmentID(string DepartmentID)
         {
             return Query<dynamic>(
-                sql: @"SELECT  * FROM dbo.employee
+                sql: @"SELECT employee.id, employee.full_name FROM dbo.employee
                         INNER JOIN department ON employee.deptid = department.id
                         WHERE  employee.is_deleted = 0
                         AND employee.is_superadmin = 0 
@@ -174,10 +174,10 @@ namespace TimeAPI.Data.Repositories
                );
         }
 
-        public IEnumerable<Employee> GetAllOutsourcedEmpByOrgID(string OrgID)
+        public dynamic GetAllOutsourcedEmpByOrgID(string OrgID)
         {
-            return Query<Employee>(
-                sql: @"select * from employee
+            return Query<dynamic>(
+                sql: @"select employee.id, employee.full_name from employee
                         INNER JOIN employee_type on employee.emp_type_id = employee_type.id
                         WHERE UPPER(employee_type.employee_type_name) = 'OUTSOURCED'
                         AND employee.org_id = @OrgID 
@@ -189,7 +189,7 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<Employee> GetAllFreelancerEmpByOrgID(string OrgID)
         {
             return Query<Employee>(
-                sql: @"select * from employee
+                sql: @"select employee.id, employee.full_name from employee
                         INNER JOIN employee_type on employee.emp_type_id = employee_type.id
                         WHERE UPPER(employee_type.employee_type_name) = 'FREELANCER'
                         AND employee.org_id = @OrgID 
