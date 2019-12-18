@@ -150,7 +150,6 @@ namespace TimeAPI.Data.Repositories
                       param: new { key }
                );
         }
-
         public dynamic GetAllTeamMembersByTeamID(string key)
         {
             return Query<dynamic>(

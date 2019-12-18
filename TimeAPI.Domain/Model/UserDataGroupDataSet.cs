@@ -10,5 +10,7 @@ namespace TimeAPI.Domain.Model
         public User User { get; set; }
         public Employee Employee { get; set; }
         public IEnumerable<Organization> Organization { get; set; }
+        public Timesheet Timesheet { get; set; }
+        //public Timesheet Timesheet { get; set; }
     }
 }

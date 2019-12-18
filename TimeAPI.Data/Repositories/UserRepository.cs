@@ -94,9 +94,20 @@ namespace TimeAPI.Data.Repositories
                 sql: @"select * from Organization WHERE user_id = @UserID and is_deleted = 0;",
                 param: new { UserID }
             );
+
             var resultsEmployee = QuerySingleOrDefault<Employee>(
                 sql: @"select * from Employee WHERE user_id = @UserID and is_deleted = 0;",
                 param: new { UserID }
+            );
+
+            var resultsTimesheet = QuerySingleOrDefault<Timesheet>(
+             sql: @"select * from timesheet	
+                    INNER JOIN employee on timesheet.empid = employee.id
+                    WHERE employee.user_id = @UserID
+                    AND timesheet.is_checkout = 0 
+                    AND FORMAT(cast(timesheet.ondate as date), 'd', 'en-us') = FORMAT(getdate(), 'd', 'en-us') 
+                    AND timesheet.is_deleted = 0;",
+             param: new { UserID }
             );
 
             UserDataGroupDataSet _UserDataGroupDataSet = new UserDataGroupDataSet();
@@ -104,6 +115,7 @@ namespace TimeAPI.Data.Repositories
             _UserDataGroupDataSet.User = resultsAspNetUsers;
             _UserDataGroupDataSet.Organization = resultsOrganization;
             _UserDataGroupDataSet.Employee = resultsEmployee;
+            _UserDataGroupDataSet.Timesheet = resultsTimesheet;
 
             return _UserDataGroupDataSet;
         }

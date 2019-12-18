@@ -62,6 +62,11 @@ namespace TimeAPI.API.Controllers
                 var modal = mapper.Map<Timesheet>(timesheetViewModel);
                 var _groupid = Guid.NewGuid().ToString();
 
+                if (timesheetViewModel.groupid != null)
+                {
+                    _groupid = timesheetViewModel.groupid;
+                }
+
                 foreach (var item in timesheetViewModel.team_member_empid.Distinct())
                 {
                     modal.id = Guid.NewGuid().ToString();

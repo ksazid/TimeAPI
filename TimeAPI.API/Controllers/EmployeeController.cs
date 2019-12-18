@@ -372,10 +372,9 @@ namespace TimeAPI.API.Controllers
 
                 oDataTable _oDataTable = new oDataTable();
                 var results = _unitOfWork.EmployeeRepository.FindEmployeeListByDesignationID(utils.ID);
-                var xResult = _oDataTable.ToDataTable(results);
                 _unitOfWork.Commit();
 
-                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(results, Formatting.Indented)).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -398,10 +397,9 @@ namespace TimeAPI.API.Controllers
 
                 oDataTable _oDataTable = new oDataTable();
                 var results = _unitOfWork.EmployeeRepository.FindEmployeeListByDepartmentID(utils.ID);
-                var xResult = _oDataTable.ToDataTable(results);
                 _unitOfWork.Commit();
 
-                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(results, Formatting.Indented)).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
