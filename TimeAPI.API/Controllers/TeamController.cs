@@ -229,7 +229,7 @@ namespace TimeAPI.API.Controllroers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 oDataTable _oDataTable = new oDataTable();
-                dynamic results = _unitOfWork.TeamRepository.FindByTeamID(Utils.ID);
+                var results = _unitOfWork.TeamRepository.FindByTeamID(Utils.ID);
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(results, Formatting.Indented)).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -275,7 +275,7 @@ namespace TimeAPI.API.Controllroers
                     throw new ArgumentNullException(nameof(Utils.OrgID));
 
                 oDataTable _oDataTable = new oDataTable();
-                IEnumerable<dynamic> results = _unitOfWork.TeamRepository.FetchAllTeamsByOrgID(Utils.OrgID);
+                var results = _unitOfWork.TeamRepository.FetchAllTeamsByOrgID(Utils.OrgID);
                 var xResult = _oDataTable.ToDataTable(results);
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
             }
@@ -298,7 +298,7 @@ namespace TimeAPI.API.Controllroers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 oDataTable _oDataTable = new oDataTable();
-                IEnumerable<dynamic> results = _unitOfWork.TeamRepository.FetchAllTeamMembersByTeamID(Utils.ID);
+                var results = _unitOfWork.TeamRepository.FetchAllTeamMembersByTeamID(Utils.ID);
                 var xResult = _oDataTable.ToDataTable(results);
 
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);

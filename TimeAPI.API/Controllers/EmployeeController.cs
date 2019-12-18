@@ -345,7 +345,7 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(UtilsOrgID.OrgID));
 
                 oDataTable _oDataTable = new oDataTable();
-                IEnumerable<dynamic> results = _unitOfWork.EmployeeRepository.FetchGridDataEmployeeByOrgID(UtilsOrgID.OrgID);
+                var results = _unitOfWork.EmployeeRepository.FetchGridDataEmployeeByOrgID(UtilsOrgID.OrgID);
                 var xResult = _oDataTable.ToDataTable(results);
                 _unitOfWork.Commit();
 
@@ -421,7 +421,8 @@ namespace TimeAPI.API.Controllers
                 var results = _unitOfWork.EmployeeRepository.FindEmpDepartDesignByEmpID(Utils.ID);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(results).ConfigureAwait(false);
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(results, Formatting.Indented)).ConfigureAwait(false);
+
             }
             catch (Exception ex)
             {

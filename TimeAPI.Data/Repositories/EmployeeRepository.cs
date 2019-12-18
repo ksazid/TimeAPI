@@ -152,7 +152,7 @@ namespace TimeAPI.Data.Repositories
 
         public dynamic FindEmpDepartDesignByEmpID(string key)
         {
-            return Query<dynamic>(
+            return QuerySingleOrDefault<dynamic>(
                    sql: @"	SELECT 
 	                        employee.id,
 	                        employee.full_name,
