@@ -12,9 +12,11 @@ namespace TimeAPI.Domain.Repositories
         IEnumerable<Employee> FindByOrgIDCode(string org_id);
         IEnumerable<Employee> FindByRoleName(string role);
         dynamic FetchGridDataEmployeeByOrgID(string org_id);
-        IEnumerable<Employee> FindEmployeeListByDesignationID(string DesignationID);
-        IEnumerable<Employee> FindEmployeeListByDepartmentID(string DesignationID);
+        dynamic FindEmployeeListByDesignationID(string DesignationID);
+        dynamic FindEmployeeListByDepartmentID(string DesignationID);
         dynamic FindEmpDepartDesignByEmpID(string EmpID);
         IEnumerable<Employee> GetAllOutsourcedEmpByOrgID(string OrgID);
+        IEnumerable<Employee> GetAllFreelancerEmpByOrgID(string OrgID);
+
     }
 }

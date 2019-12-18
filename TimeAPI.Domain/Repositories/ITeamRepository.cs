@@ -12,5 +12,7 @@ namespace TimeAPI.Domain.Repositories
         //IEnumerable<dynamic> FetchByAllTeamMembersTeamID(string TeamID);
         IEnumerable<dynamic> FetchAllTeamsByOrgID(string OrgID);
         IEnumerable<dynamic> FetchAllTeamMembersByTeamID(string key);
+        dynamic GetAllTeamMembersByTeamID(string key);
+        
     }
 }

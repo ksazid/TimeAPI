@@ -124,9 +124,9 @@ namespace TimeAPI.Data.Repositories
                );
         }
 
-        public IEnumerable<Employee> FindEmployeeListByDesignationID(string DesignationID)
+        public dynamic FindEmployeeListByDesignationID(string DesignationID)
         {
-            return Query<Employee>(
+            return Query<dynamic>(
                 sql: @"SELECT  * FROM dbo.employee
                             INNER JOIN designation ON employee.designation_id = designation.id
                         WHERE  employee.is_deleted = 0
@@ -137,9 +137,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<Employee> FindEmployeeListByDepartmentID(string DepartmentID)
+        public dynamic FindEmployeeListByDepartmentID(string DepartmentID)
         {
-            return Query<Employee>(
+            return Query<dynamic>(
                 sql: @"SELECT  * FROM dbo.employee
                         INNER JOIN department ON employee.deptid = department.id
                         WHERE  employee.is_deleted = 0
@@ -185,5 +185,19 @@ namespace TimeAPI.Data.Repositories
                 param: new { OrgID }
             );
         }
+
+        public IEnumerable<Employee> GetAllFreelancerEmpByOrgID(string OrgID)
+        {
+            return Query<Employee>(
+                sql: @"select * from employee
+                        INNER JOIN employee_type on employee.emp_type_id = employee_type.id
+                        WHERE UPPER(employee_type.employee_type_name) = 'FREELANCER'
+                        AND employee.org_id = @OrgID 
+                        AND employee.is_deleted = 0",
+                param: new { OrgID }
+            );
+        }
+
+        
     }
 }

@@ -370,10 +370,12 @@ namespace TimeAPI.API.Controllers
                 if (utils == null)
                     throw new ArgumentNullException(nameof(utils.ID));
 
-                var result = _unitOfWork.EmployeeRepository.FindEmployeeListByDesignationID(utils.ID);
+                oDataTable _oDataTable = new oDataTable();
+                var results = _unitOfWork.EmployeeRepository.FindEmployeeListByDesignationID(utils.ID);
+                var xResult = _oDataTable.ToDataTable(results);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(result).ConfigureAwait(false);
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -394,10 +396,12 @@ namespace TimeAPI.API.Controllers
                 if (utils == null)
                     throw new ArgumentNullException(nameof(utils.ID));
 
-                var result = _unitOfWork.EmployeeRepository.FindEmployeeListByDepartmentID(utils.ID);
+                oDataTable _oDataTable = new oDataTable();
+                var results = _unitOfWork.EmployeeRepository.FindEmployeeListByDepartmentID(utils.ID);
+                var xResult = _oDataTable.ToDataTable(results);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(result).ConfigureAwait(false);
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -453,5 +457,28 @@ namespace TimeAPI.API.Controllers
             }
         }
 
+
+        [HttpPost]
+        [Route("GetAllFreelancerEmpByOrgID")]
+        public async Task<object> GetAllFreelancerEmpByOrgID([FromBody] UtilsOrgID UtilsOrgID, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (UtilsOrgID == null)
+                    throw new ArgumentNullException(nameof(UtilsOrgID.OrgID));
+
+                var result = _unitOfWork.EmployeeRepository.GetAllFreelancerEmpByOrgID(UtilsOrgID.OrgID);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
     }
 }
