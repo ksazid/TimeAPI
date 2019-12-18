@@ -101,13 +101,13 @@ namespace TimeAPI.Data.Repositories
             );
 
             var resultsTimesheet = QuerySingleOrDefault<Timesheet>(
-             sql: @"select * from timesheet	
+                sql: @"select * from timesheet	
                     INNER JOIN employee on timesheet.empid = employee.id
                     WHERE employee.user_id = @UserID
                     AND timesheet.is_checkout = 0 
                     AND FORMAT(cast(timesheet.ondate as date), 'd', 'en-us') = FORMAT(getdate(), 'd', 'en-us') 
                     AND timesheet.is_deleted = 0;",
-             param: new { UserID }
+                param: new { UserID }
             );
 
             UserDataGroupDataSet _UserDataGroupDataSet = new UserDataGroupDataSet();
