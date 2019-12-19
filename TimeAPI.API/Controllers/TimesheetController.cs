@@ -57,7 +57,8 @@ namespace TimeAPI.API.Controllers
                 if (timesheetViewModel == null)
                     throw new ArgumentNullException(nameof(timesheetViewModel));
 
-                if (timesheetViewModel.groupid == "string")
+                if (timesheetViewModel.groupid == "string" || string.IsNullOrWhiteSpace(timesheetViewModel.groupid)
+                    || string.IsNullOrEmpty(timesheetViewModel.groupid))
                     timesheetViewModel.groupid = null;
 
                 timesheetViewModel.is_deleted = false;
@@ -65,6 +66,7 @@ namespace TimeAPI.API.Controllers
                 timesheetViewModel.check_out = null;
                 timesheetViewModel.total_hrs = null;
                 timesheetViewModel.ondate = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                timesheetViewModel.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
 
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetViewModel, Timesheet>());
                 var mapper = config.CreateMapper();
@@ -185,6 +187,8 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(timesheetViewModel));
 
                 timesheetViewModel.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                timesheetViewModel.total_hrs = null;
+
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetViewModel, Timesheet>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Timesheet>(timesheetViewModel);
@@ -194,6 +198,7 @@ namespace TimeAPI.API.Controllers
                     modal.empid = item;
                     modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
                     modal.is_checkout = true;
+                    modal.is_deleted = false;
                     modal.groupid = timesheetViewModel.groupid;
 
                     _unitOfWork.TimesheetRepository.CheckOutByEmpID(modal);

@@ -80,5 +80,13 @@ namespace TimeAPI.Data.Repositories
                  param: new { entity }
              );
         }
+
+        //public string TotalHours(string Checkin, string Checkout)
+        //{
+        //    return QuerySingleOrDefault<Timesheet>(
+        //        sql: "SELECT * FROM dbo.timesheet WHERE is_deleted = 0 and id = @key",
+        //        param: new { Checkin, Checkout }
+        //    );
+        //}
     }
 }
