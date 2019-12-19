@@ -15,7 +15,7 @@ namespace TimeAPI.Data.Repositories
         public void Add(Timesheet entity)
         {
 
-            entity.id = ExecuteScalar<string>(
+            entity.groupid = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.timesheet
                                   (id, empid, ondate, check_in, check_out, is_checkout, groupid, created_date, createdby)
                            VALUES (@id, @empid, @ondate, @check_in, @check_out, @is_checkout, @groupid, @created_date, @createdby);
@@ -67,22 +67,17 @@ namespace TimeAPI.Data.Repositories
                 sql: "SELECT * FROM [dbo].[timesheet] where is_deleted = 0"
             );
         }
-
-        public void CheckOutByEmpID(string key)
+        public void CheckOutByEmpID(Timesheet entity)
         {
             Execute(
                  sql: @"UPDATE dbo.timesheet
                    SET
-                    empid = @empid,
-                    ondate = @ondate,
-                    check_in = @check_in,
                     check_out = @check_out,
                     is_checkout = @is_checkout,
-                    groupid = @groupid,
                     modified_date = @modified_date,
                     modifiedby = @modifiedby
-                    WHERE id = @id empid = @key",
-                 param: new { key }
+                    WHERE empid = @empid and groupid = @groupid",
+                 param: new { entity }
              );
         }
     }

@@ -57,11 +57,20 @@ namespace TimeAPI.API.Controllers
                 if (timesheetViewModel == null)
                     throw new ArgumentNullException(nameof(timesheetViewModel));
 
+                if (timesheetViewModel.groupid == "string")
+                    timesheetViewModel.groupid = null;
+
+                timesheetViewModel.is_deleted = false;
+                timesheetViewModel.is_checkout = false;
+                timesheetViewModel.check_out = null;
+                timesheetViewModel.total_hrs = null;
+                timesheetViewModel.ondate = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetViewModel, Timesheet>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Timesheet>(timesheetViewModel);
-                var _groupid = Guid.NewGuid().ToString();
 
+                var _groupid = Guid.NewGuid().ToString();
                 if (timesheetViewModel.groupid != null)
                 {
                     _groupid = timesheetViewModel.groupid;
@@ -70,9 +79,11 @@ namespace TimeAPI.API.Controllers
                 foreach (var item in timesheetViewModel.team_member_empid.Distinct())
                 {
                     modal.id = Guid.NewGuid().ToString();
+                    modal.empid = item;
                     modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
                     modal.is_deleted = false;
                     modal.groupid = _groupid;
+                    //GroupID = modal.groupid;
 
                     _unitOfWork.TimesheetRepository.Add(modal);
                 }
@@ -163,7 +174,7 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("CheckOutByEmpID")]
-        public async Task<object> CheckOutByEmpID([FromBody] Utils timesheetViewModel, CancellationToken cancellationToken)
+        public async Task<object> CheckOutByEmpID([FromBody] TimesheetViewModel timesheetViewModel, CancellationToken cancellationToken)
         {
             try
             {
@@ -173,10 +184,24 @@ namespace TimeAPI.API.Controllers
                 if (timesheetViewModel == null)
                     throw new ArgumentNullException(nameof(timesheetViewModel));
 
-                    _unitOfWork.TimesheetRepository.CheckOutByEmpID(timesheetViewModel.ID);
-                    _unitOfWork.Commit();
+                timesheetViewModel.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetViewModel, Timesheet>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<Timesheet>(timesheetViewModel);
 
-                return Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "", Desc = "" });
+                foreach (var item in timesheetViewModel.team_member_empid.Distinct())
+                {
+                    modal.empid = item;
+                    modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                    modal.is_checkout = true;
+                    modal.groupid = timesheetViewModel.groupid;
+
+                    _unitOfWork.TimesheetRepository.CheckOutByEmpID(modal);
+                }
+
+                _unitOfWork.Commit();
+
+                return Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Checkout Successfully", Desc = "Checkout Successfully" });
             }
             catch (Exception ex)
             {
