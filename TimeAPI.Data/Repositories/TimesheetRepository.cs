@@ -15,7 +15,7 @@ namespace TimeAPI.Data.Repositories
         public void Add(Timesheet entity)
         {
 
-            entity.groupid = ExecuteScalar<string>(
+            entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.timesheet
                                   (id, empid, ondate, check_in, check_out, is_checkout, groupid, created_date, createdby)
                            VALUES (@id, @empid, @ondate, @check_in, @check_out, @is_checkout, @groupid, @created_date, @createdby);
@@ -29,6 +29,14 @@ namespace TimeAPI.Data.Repositories
             return QuerySingleOrDefault<Timesheet>(
                 sql: "SELECT * FROM dbo.timesheet WHERE is_deleted = 0 and id = @key",
                 param: new { key }
+            );
+        }
+
+        public Timesheet FindTimeSheetByEmpID(string empid, string groupid)
+        {
+            return QuerySingleOrDefault<Timesheet>(
+                sql: "SELECT * FROM dbo.timesheet WHERE is_deleted = 0 and empid = @empid and groupid = @groupid",
+                param: new { empid, groupid }
             );
         }
 
@@ -71,22 +79,23 @@ namespace TimeAPI.Data.Repositories
         {
             Execute(
                  sql: @"UPDATE dbo.timesheet
-                   SET
+                   SET 
                     check_out = @check_out,
                     is_checkout = @is_checkout,
-                    modified_date = @modified_date,
+                    total_hrs = @total_hrs,
+                    modified_date = @modified_date, 
                     modifiedby = @modifiedby
                     WHERE empid = @empid and groupid = @groupid",
-                 param: new { entity }
+                 param: entity 
              );
         }
 
-        //public string TotalHours(string Checkin, string Checkout)
-        //{
-        //    return QuerySingleOrDefault<Timesheet>(
-        //        sql: "SELECT * FROM dbo.timesheet WHERE is_deleted = 0 and id = @key",
-        //        param: new { Checkin, Checkout }
-        //    );
-        //}
+        public string TotalHours(string Checkin, string Checkout)
+        {
+            return QuerySingleOrDefault<string>(
+                sql: "Select FORMAT(DATEADD(MINUTE,DATEDIFF(MINUTE, @Checkin, @Checkout),0), 'hh:mm', 'en-US' )",
+                param: new { Checkin, Checkout }
+            );
+        }
     }
 }

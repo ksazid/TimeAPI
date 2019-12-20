@@ -187,7 +187,6 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(timesheetViewModel));
 
                 timesheetViewModel.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
-                timesheetViewModel.total_hrs = null;
 
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetViewModel, Timesheet>());
                 var mapper = config.CreateMapper();
@@ -196,6 +195,10 @@ namespace TimeAPI.API.Controllers
                 foreach (var item in timesheetViewModel.team_member_empid.Distinct())
                 {
                     modal.empid = item;
+
+                    var Timesheet = _unitOfWork.TimesheetRepository.FindTimeSheetByEmpID(modal.empid, modal.groupid);
+                    modal.total_hrs = _unitOfWork.TimesheetRepository.TotalHours(Timesheet.check_in.ToString(), modal.check_out.ToString());
+
                     modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
                     modal.is_checkout = true;
                     modal.is_deleted = false;
