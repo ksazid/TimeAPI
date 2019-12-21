@@ -101,10 +101,12 @@ namespace TimeAPI.API
             //Asp.net Identity Password Config
             services.Configure<IdentityOptions>(options =>
             {
-                options.Password.RequireDigit = false;
-                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireDigit = true;
+                options.Password.RequiredLength = 6;
+                options.Password.RequireNonAlphanumeric = true;
                 options.Password.RequireLowercase = false;
                 options.Password.RequireUppercase = false;
+                options.Password.RequiredUniqueChars = 1;
             });
 
             //JWT Auth for Token Based Authentication

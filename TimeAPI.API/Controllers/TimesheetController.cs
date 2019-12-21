@@ -197,7 +197,19 @@ namespace TimeAPI.API.Controllers
                     modal.empid = item;
 
                     var Timesheet = _unitOfWork.TimesheetRepository.FindTimeSheetByEmpID(modal.empid, modal.groupid);
-                    modal.total_hrs = _unitOfWork.TimesheetRepository.TotalHours(Timesheet.check_in.ToString(), modal.check_out.ToString());
+
+                    var temp = Timesheet.check_in;
+                    var check_in = temp.ConvertFromToTime("h:mm tt", "HH:mm");
+
+                    var temp1 = modal.check_out;
+                    var check_out = temp1.ConvertFromToTime("h:mm tt", "HH:mm");
+
+                    //DateTime dt = DateTime.Now;
+                    //DateTime dt2 = DateTime.Now;
+                    //TimeSpan ts = (dt2 - dt);
+                    ////this.Text = ts.ToString(@"hh\:mm\:ss");
+
+                    modal.total_hrs = _unitOfWork.TimesheetRepository.TotalHours(check_in, check_out);
 
                     modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
                     modal.is_checkout = true;
