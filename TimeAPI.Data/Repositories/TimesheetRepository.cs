@@ -8,7 +8,6 @@ namespace TimeAPI.Data.Repositories
 {
     public class TimesheetRepository : RepositoryBase, ITimesheetRepository
     {
-
         public TimesheetRepository(IDbTransaction transaction) : base(transaction)
         { }
 
@@ -90,12 +89,5 @@ namespace TimeAPI.Data.Repositories
              );
         }
 
-        public string TotalHours(string Checkin, string Checkout)
-        {
-            return QuerySingleOrDefault<string>(
-                sql: "Select FORMAT(DATEADD(MINUTE,DATEDIFF(MINUTE, @Checkin, @Checkout),0), 'hh:mm', 'en-US' )",
-                param: new { Checkin, Checkout }
-            );
-        }
     }
 }

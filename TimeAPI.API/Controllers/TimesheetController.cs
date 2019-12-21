@@ -31,6 +31,7 @@ namespace TimeAPI.API.Controllers
     //[Authorize(Roles = "superadmin")]
     public class TimesheetController : Controller
     {
+        private const string FormatTime = @"hh\:mm";
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
         private readonly ApplicationSettings _appSettings;
@@ -198,19 +199,10 @@ namespace TimeAPI.API.Controllers
 
                     var Timesheet = _unitOfWork.TimesheetRepository.FindTimeSheetByEmpID(modal.empid, modal.groupid);
 
-                    var temp = Timesheet.check_in;
-                    var check_in = temp.ConvertFromToTime("h:mm tt", "HH:mm");
+                    var _TotalMinutes = (Convert.ToDateTime(modal.check_out) - Convert.ToDateTime(Timesheet.check_in)).TotalMinutes;
+                    TimeSpan spWorkMin = TimeSpan.FromMinutes(_TotalMinutes);
 
-                    var temp1 = modal.check_out;
-                    var check_out = temp1.ConvertFromToTime("h:mm tt", "HH:mm");
-
-                    //DateTime dt = DateTime.Now;
-                    //DateTime dt2 = DateTime.Now;
-                    //TimeSpan ts = (dt2 - dt);
-                    ////this.Text = ts.ToString(@"hh\:mm\:ss");
-
-                    modal.total_hrs = _unitOfWork.TimesheetRepository.TotalHours(check_in, check_out);
-
+                    modal.total_hrs = spWorkMin.ToString(FormatTime);
                     modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
                     modal.is_checkout = true;
                     modal.is_deleted = false;
@@ -221,7 +213,7 @@ namespace TimeAPI.API.Controllers
 
                 _unitOfWork.Commit();
 
-                return Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Checkout Successfully", Desc = "Checkout Successfully" });
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Checkout Successfully", Desc = "Checkout Successfully" }).ConfigureAwait(true);
             }
             catch (Exception ex)
             {

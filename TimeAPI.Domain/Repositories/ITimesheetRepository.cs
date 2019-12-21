@@ -9,7 +9,5 @@ namespace TimeAPI.Domain.Repositories
     {
         void CheckOutByEmpID(Timesheet entity);
         Timesheet FindTimeSheetByEmpID(string empid, string groupid);
-        string TotalHours(string Checkin, string Checkout);
-
     }
 }

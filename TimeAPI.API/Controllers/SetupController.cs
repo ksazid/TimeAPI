@@ -42,8 +42,7 @@ namespace TimeAPI.API.Controllers
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
         public SetupController(IUnitOfWork unitOfWork, ILogger<SetupController> logger,
-            IEmailSender emailSender,
-            IOptions<ApplicationSettings> AppSettings)
+                        IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings)
         {
             _emailSender = emailSender;
             _logger = logger;
@@ -71,7 +70,6 @@ namespace TimeAPI.API.Controllers
                 return System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
 
         [HttpGet]
         [Route("GetAllTimeZones")]
@@ -148,7 +146,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpPatch]
         [Route("UpdatePriority")]
         public async Task<object> UpdatePriority([FromBody] ProfileImageViewModel priorityingViewModel, CancellationToken cancellationToken)
@@ -179,7 +176,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpPost]
         [Route("RemovePriority")]
         public async Task<object> RemovePriority([FromBody] Utils Utils, CancellationToken cancellationToken)
@@ -203,7 +199,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpGet]
         [Route("GetAllPriority")]
         public async Task<object> GetAllPriority(CancellationToken cancellationToken)
@@ -223,7 +218,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
 
         [HttpPost]
         [Route("FindByPriorityID")]
@@ -284,7 +278,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpPatch]
         [Route("UpdateTaskStatus")]
         public async Task<object> UpdateTaskStatus([FromBody] StatusViewModel statusingViewModel, CancellationToken cancellationToken)
@@ -317,7 +310,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpPost]
         [Route("RemoveTaskStatus")]
         public async Task<object> RemoveTaskStatus([FromBody] Utils Utils, CancellationToken cancellationToken)
@@ -341,7 +333,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpGet]
         [Route("GetAllTaskStatus")]
         public async Task<object> GetAllTaskStatus(CancellationToken cancellationToken)
@@ -361,7 +352,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
 
         [HttpPost]
         [Route("FindByTaskStatusID")]
@@ -422,7 +412,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpPatch]
         [Route("UpdateEmployeeType")]
         public async Task<object> UpdateEmployeeType([FromBody] EmployeeTypeViewModel employeetypeingViewModel, CancellationToken cancellationToken)
@@ -452,7 +441,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpPost]
         [Route("RemoveEmployeeType")]
         public async Task<object> RemoveEmployeeType([FromBody] Utils Utils, CancellationToken cancellationToken)
@@ -476,7 +464,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpGet]
         [Route("GetAllEmployeeType")]
         public async Task<object> GetAllEmployeeType(CancellationToken cancellationToken)
@@ -496,7 +483,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
 
         [HttpPost]
         [Route("FindByEmployeeTypeID")]
@@ -558,7 +544,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpPatch]
         [Route("UpdateEmployeeStatus")]
         public async Task<object> UpdateEmployeeStatus([FromBody] EmployeeStatusViewModel employeestatusViewModel, CancellationToken cancellationToken)
@@ -588,7 +573,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpPost]
         [Route("RemoveEmployeeStatus")]
         public async Task<object> RemoveEmployeeStatus([FromBody] Utils Utils, CancellationToken cancellationToken)
@@ -612,7 +596,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpGet]
         [Route("GetAllEmployeeStatus")]
         public async Task<object> GetAllEmployeeStatus(CancellationToken cancellationToken)
@@ -632,7 +615,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
 
         [HttpPost]
         [Route("FindByEmployeeStatusID")]
@@ -693,7 +675,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpPatch]
         [Route("UpdateIndustryType")]
         public async Task<object> UpdateIndustryType([FromBody] IndustryTypeViewModel industrytypeViewModel, CancellationToken cancellationToken)
@@ -722,7 +703,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpPost]
         [Route("RemoveIndustryType")]
         public async Task<object> RemoveIndustryType([FromBody] Utils Utils, CancellationToken cancellationToken)
@@ -746,7 +726,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpGet]
         [Route("GetAllIndustryType")]
         public async Task<object> GetAllIndustryType(CancellationToken cancellationToken)
@@ -766,7 +745,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
 
         [HttpPost]
         [Route("FindByIndustryTypeID")]
