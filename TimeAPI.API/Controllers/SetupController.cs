@@ -674,7 +674,7 @@ namespace TimeAPI.API.Controllers
                 if (industrytypeViewModel == null)
                     throw new ArgumentNullException(nameof(industrytypeViewModel));
 
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeStatusViewModel, IndustryType>());
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<IndustryTypeViewModel, IndustryType>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<IndustryType>(industrytypeViewModel);
 
@@ -706,7 +706,7 @@ namespace TimeAPI.API.Controllers
                 if (industrytypeViewModel == null)
                     throw new ArgumentNullException(nameof(industrytypeViewModel));
 
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeStatusViewModel, IndustryType>());
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<IndustryTypeViewModel, IndustryType>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<IndustryType>(industrytypeViewModel);
                 modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
