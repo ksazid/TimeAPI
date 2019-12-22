@@ -32,9 +32,9 @@ namespace TimeAPI.Data.Repositories
         {
             Execute(
                 sql: @"UPDATE dbo.team
-                   SET
-                       modified_date = @modified_date, modifiedby = @modifiedby, is_deleted = 1
-                    WHERE id = @key",
+                    SET
+                        modified_date = GETDATE(), is_deleted = 1
+                    WHERE team_id = @key",
                 param: new { key }
             );
         }

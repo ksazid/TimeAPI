@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -25,16 +26,18 @@ namespace TimeAPI.API.Controllers
     //[Authorize]
     public class DepartmentController : Controller
     {
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
-        public DepartmentController(IUnitOfWork unitOfWork, ILogger<DepartmentController> logger, IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings)
+        public DepartmentController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager, ILogger<DepartmentController> logger, IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings)
         {
             _emailSender = emailSender;
             _logger = logger;
             _appSettings = AppSettings.Value;
             _unitOfWork = unitOfWork;
+            _userManager = userManager;
         }
 
         [HttpPost]
@@ -98,7 +101,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpPost]
         [Route("RemoveDepartment")]
         public async Task<object> RemoveDepartment([FromBody] Utils Utils, CancellationToken cancellationToken)
@@ -121,7 +123,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
 
         [HttpGet]
         [Route("GetAllDepartments")]

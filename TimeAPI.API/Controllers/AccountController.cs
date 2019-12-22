@@ -32,13 +32,11 @@ namespace TimeAPI.API.Controllers
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
         private readonly ApplicationSettings _appSettings;
-        private readonly IUnitOfWork _unitOfWork;
 
-        public AccountController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager,
+        public AccountController(UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager, IEmailSender emailSender,
             ILogger<AccountController> logger, IOptions<ApplicationSettings> AppSettings)
         {
-            unitOfWork = _unitOfWork;
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
@@ -138,7 +136,6 @@ namespace TimeAPI.API.Controllers
             //return BadRequest(new { message = "OOP! Please enter a valid user details." });
         }
 
-
         [HttpPost]
         [Route("Logout")]
         public async Task<object> Logout()
@@ -147,7 +144,6 @@ namespace TimeAPI.API.Controllers
             _logger.LogInformation("User logged out.");
             return Ok(new SuccessViewModel { Code = "200", Status = "Success" });
         }
-
 
         [HttpGet]
         [Route("ConfirmEmail")]
@@ -165,7 +161,6 @@ namespace TimeAPI.API.Controllers
             var result = await _userManager.ConfirmEmailAsync(user, code).ConfigureAwait(true);
             return Ok(result.Succeeded ? "ConfirmEmail" : "Error");
         }
-
 
         [HttpPost]
         [Route("ForgotPassword")]
@@ -191,7 +186,6 @@ namespace TimeAPI.API.Controllers
             //// If we got this far, something failed, redisplay form
             //return Ok(model);
         }
-
 
         [HttpPost]
         [Route("ResetPassword")]
@@ -219,7 +213,6 @@ namespace TimeAPI.API.Controllers
                 Desc = result.Errors.ToString()
             });
         }
-
 
         #region Helpers
         private void AddErrors(IdentityResult result)
