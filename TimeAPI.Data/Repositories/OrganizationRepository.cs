@@ -45,7 +45,7 @@ namespace TimeAPI.Data.Repositories
         {
             Execute(
                 sql: @"UPDATE dbo.organization
-                  SET
+                   SET
                        modified_date = GETDATE(), is_deleted = 1
                     WHERE org_id = @key",
                 param: new { key }

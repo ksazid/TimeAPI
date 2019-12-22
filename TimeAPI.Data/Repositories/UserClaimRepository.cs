@@ -68,7 +68,8 @@ namespace TimeAPI.Data.Repositories
                         AspNetUsers u ON c.UserId = u.Id
                     WHERE
 	                    c.ClaimType = @claimType AND
-                        c.ClaimValue = @claimValue",
+                        c.ClaimValue = @claimValue
+                ",
                 param: new { claimType, claimValue }
             );
         }

@@ -105,6 +105,7 @@ namespace TimeAPI.Data.Repositories
 	                        employee.full_name,
 	                        employee.workemail,
 	                        employee.emp_code,
+	                        employee.phone,
 	                        employee_status.employee_status_name,
 	                        employee_type.employee_type_name,
 	                        AspNetRoles.Name as role_name,

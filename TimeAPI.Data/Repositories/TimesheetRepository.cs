@@ -43,9 +43,9 @@ namespace TimeAPI.Data.Repositories
         {
             Execute(
                 sql: @"UPDATE dbo.timesheet
-                  SET
-                        modified_date = GETDATE(), is_deleted = 1
-                    WHERE team_id = @key",
+                   SET
+                       modified_date = GETDATE(), is_deleted = 1
+                    WHERE id = @key",
                 param: new { key }
             );
         }

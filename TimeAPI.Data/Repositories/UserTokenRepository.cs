@@ -13,12 +13,6 @@ namespace TimeAPI.Data.Repositories
 
         public void Add(UserToken entity)
         {
-            //Execute(
-            //    sql: @"
-            //        INSERT INTO AspNetUserTokens(UserId, LoginProvider, [Name], Value)
-            //        VALUES(@UserId, @LoginProvider, @Name, @Value)",
-            //    param: entity
-            //);
             Execute(
                 sql: @"
                     INSERT INTO AspNetUserTokens(UserId, LoginProvider, [Name], Value)

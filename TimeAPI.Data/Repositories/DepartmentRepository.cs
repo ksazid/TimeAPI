@@ -35,6 +35,7 @@ namespace TimeAPI.Data.Repositories
 
         public void Remove(string key)
         {
+            //DELETE FROM AspNetRoles WHERE Id
             Execute(
                 sql: @"UPDATE dbo.department
                    SET
