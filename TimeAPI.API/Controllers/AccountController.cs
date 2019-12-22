@@ -75,7 +75,7 @@ namespace TimeAPI.API.Controllers
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var securityToken = tokenHandler.CreateToken(tokenDescriptor);
                 var token = tokenHandler.WriteToken(securityToken);
-                return Ok(new { token , user.Id });
+                return Ok(new { token, user.Id });
             }
             else
                 return Ok(new SuccessViewModel { Code = "201", Status = "Error", Desc = "Please enter a valid user and password." });
@@ -91,11 +91,11 @@ namespace TimeAPI.API.Controllers
             //{
 
             string _userName = "";
-            if (UserModel.Email != null)
+            if (UserModel.Email != null || !string.IsNullOrEmpty(UserModel.Email) || !string.IsNullOrWhiteSpace(UserModel.Email))
             {
                 _userName = UserModel.Email;
             }
-            if (UserModel.Phone != null)
+            if (UserModel.Phone != null || !string.IsNullOrEmpty(UserModel.Phone) || !string.IsNullOrWhiteSpace(UserModel.Phone))
             {
                 _userName = UserModel.Phone;
             }
@@ -108,13 +108,13 @@ namespace TimeAPI.API.Controllers
                 LastName = UserModel.LastName,
                 FullName = UserModel.FullName,
                 Role = "Superadmin",
-                Phone = UserModel.Phone
+                PhoneNumber = UserModel.Phone
             };
 
             var result = await _userManager.CreateAsync(user, UserModel.Password).ConfigureAwait(true);
-            var xRest = await _userManager.AddToRoleAsync(user, user.Role).ConfigureAwait(true);
             if (result.Succeeded)
             {
+                await _userManager.AddToRoleAsync(user, user.Role).ConfigureAwait(true);
                 _logger.LogInformation("User created a new account with password.");
 
                 if (user.Email != null)
@@ -219,7 +219,7 @@ namespace TimeAPI.API.Controllers
                 Desc = result.Errors.ToString()
             });
         }
-       
+
 
         #region Helpers
         private void AddErrors(IdentityResult result)

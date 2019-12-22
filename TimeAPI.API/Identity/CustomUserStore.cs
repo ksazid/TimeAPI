@@ -65,7 +65,7 @@ namespace TimeAPI.API.Identity
                     full_name = user.FullName,
                     first_name = user.FirstName,
                     last_name = user.LastName,
-                    mobile = user.Phone,
+                    mobile = user.PhoneNumber,
                     email = userEntity.Email,
                     createdby = user.FullName,
                     created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),

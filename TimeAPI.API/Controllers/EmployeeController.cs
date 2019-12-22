@@ -91,7 +91,7 @@ namespace TimeAPI.API.Controllers
                     LastName = employeeViewModel.last_name,
                     FullName = employeeViewModel.full_name,
                     Role = role.Name,
-                    Phone = employeeViewModel.phone
+                    PhoneNumber = employeeViewModel.phone
                 };
                 oDataTable _oDataTable = new oDataTable();
                 string password = _oDataTable.GeneratePassword();
