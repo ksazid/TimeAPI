@@ -9,5 +9,7 @@ namespace TimeAPI.Domain.Repositories
     {
         public IEnumerable<Country> Country();
         public IEnumerable<Timezones> Timezones();
+        public IEnumerable<Country> PhoneCodes();
+
     }
 }

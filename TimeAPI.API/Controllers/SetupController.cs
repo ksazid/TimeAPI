@@ -93,6 +93,26 @@ namespace TimeAPI.API.Controllers
         }
 
         [HttpGet]
+        [Route("GetAllPhoneCode")]
+        public async Task<object> GetAllPhoneCode(CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                var result = _unitOfWork.SetupRepository.PhoneCodes();
+                _unitOfWork.Commit();
+
+                return await System.Threading.Tasks.Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpGet]
         [Route("GetEmployeeRoles")]
         public async Task<object> GetEmployeeRoles(CancellationToken cancellationToken)
         {
@@ -771,7 +791,6 @@ namespace TimeAPI.API.Controllers
         }
 
         #endregion IndustryType
-
         
     }
 }

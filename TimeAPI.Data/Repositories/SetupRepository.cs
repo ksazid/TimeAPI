@@ -26,5 +26,13 @@ namespace TimeAPI.Data.Repositories
                 sql: "SELECT * FROM timezones"
             );
         }
+
+        public IEnumerable<Country> PhoneCodes()
+        {
+            return Query<Country>(
+                sql: "SELECT * FROM countries"
+            );
+        }
+        
     }
 }
