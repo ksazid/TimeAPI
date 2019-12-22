@@ -58,6 +58,11 @@ namespace TimeAPI.API.Identity
                     throw new ArgumentNullException(nameof(user));
 
                 var userEntity = getUserEntity(user);
+                bool SuperAdmin = false;
+                if (user.isSuperAdmin)
+                {
+                    SuperAdmin = true;
+                }
                 var employee = new Employee()
                 {
                     id = Guid.NewGuid().ToString(),
@@ -66,11 +71,11 @@ namespace TimeAPI.API.Identity
                     first_name = user.FirstName,
                     last_name = user.LastName,
                     mobile = user.PhoneNumber,
-                    email = userEntity.Email,
+                    workemail = userEntity.Email,
                     createdby = user.FullName,
                     created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
                     is_admin = false,
-                    is_superadmin = true
+                    is_superadmin = SuperAdmin
                 };
 
                 _unitOfWork.UserRepository.Add(userEntity);

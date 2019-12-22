@@ -92,8 +92,8 @@ namespace TimeAPI.API.Controllers
             if (UserModel.Email != null || !string.IsNullOrEmpty(UserModel.Email) || !string.IsNullOrWhiteSpace(UserModel.Email))
             {
                 _userName = UserModel.Email;
-            }
-            if (UserModel.Phone != null || !string.IsNullOrEmpty(UserModel.Phone) || !string.IsNullOrWhiteSpace(UserModel.Phone))
+            } 
+            else if (UserModel.Phone != null || !string.IsNullOrEmpty(UserModel.Phone) || !string.IsNullOrWhiteSpace(UserModel.Phone))
             {
                 _userName = UserModel.Phone;
             }
@@ -106,7 +106,8 @@ namespace TimeAPI.API.Controllers
                 LastName = UserModel.LastName,
                 FullName = UserModel.FullName,
                 Role = "Superadmin",
-                PhoneNumber = UserModel.Phone
+                PhoneNumber = UserModel.Phone,
+                isSuperAdmin = true
             };
 
             var result = await _userManager.CreateAsync(user, UserModel.Password).ConfigureAwait(true);

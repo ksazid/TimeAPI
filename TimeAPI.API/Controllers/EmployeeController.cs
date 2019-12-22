@@ -63,16 +63,18 @@ namespace TimeAPI.API.Controllers
 
                 #region User
 
-                string _userName = "";
                 Role role = null;
-                if (employeeViewModel.email != null)
+
+                string _userName = "";
+                if (employeeViewModel.workemail != null || !string.IsNullOrEmpty(employeeViewModel.workemail) || !string.IsNullOrWhiteSpace(employeeViewModel.workemail))
                 {
-                    _userName = employeeViewModel.email;
+                    _userName = employeeViewModel.workemail;
                 }
-                if (employeeViewModel.phone != null)
+                else if (employeeViewModel.phone != null || !string.IsNullOrEmpty(employeeViewModel.phone) || !string.IsNullOrWhiteSpace(employeeViewModel.phone))
                 {
                     _userName = employeeViewModel.phone;
                 }
+
                 if (employeeViewModel.role_id != null)
                 {
                     role = _unitOfWork.RoleRepository.Find(employeeViewModel.role_id);
@@ -84,18 +86,20 @@ namespace TimeAPI.API.Controllers
                         employeeViewModel.is_superadmin = false;
                     }
                 }
+
                 var user = new ApplicationUser()
                 {
                     UserName = _userName,
-                    Email = employeeViewModel.email,
+                    Email = employeeViewModel.workemail,
+                    FullName = employeeViewModel.first_name + " " + employeeViewModel.last_name,
                     FirstName = employeeViewModel.first_name,
                     LastName = employeeViewModel.last_name,
-                    FullName = employeeViewModel.full_name,
                     Role = role.Name,
-                    PhoneNumber = employeeViewModel.phone
+                    PhoneNumber = employeeViewModel.phone,
+                    isSuperAdmin = false
                 };
                 oDataTable _oDataTable = new oDataTable();
-                string password = _oDataTable.GeneratePassword();
+                string password = _oDataTable.GeneratePassword() + "@";
 
                 var result = await _userManager.CreateAsync(user, password).ConfigureAwait(true);
                 if (result.Succeeded)
@@ -105,6 +109,10 @@ namespace TimeAPI.API.Controllers
 
                     if (user.Email != null)
                     {
+                        var code1 = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true);
+                        var callbackUrl1 = Url.EmailConfirmationLink(user.Id, code1, Request.Scheme);
+                        await _emailSender.SendEmailConfirmationAsync(user.Email, callbackUrl1).ConfigureAwait(true);
+
                         var code = await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(true);
                         var callbackUrl = Url.PasswordLink(user.Id, code, Request.Scheme);
                         await _emailSender.SendSetupPasswordAsync(user.Email, callbackUrl).ConfigureAwait(true);
@@ -113,28 +121,34 @@ namespace TimeAPI.API.Controllers
                     {
                         // check if its a phone 
                     }
+
+
+                    //#region Employee
+
+                    //var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeViewModel, Employee>());
+                    //var mapper = config.CreateMapper();
+                    //var modal = mapper.Map<Employee>(employeeViewModel);
+
+                    //modal.id = Guid.NewGuid().ToString();
+                    //modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                    //modal.is_deleted = false;
+                    //modal.user_id = user.Id;
+
+                    //_unitOfWork.EmployeeRepository.Add(modal);
+
+                    //#endregion
+
+                    //_unitOfWork.Commit();
+
+                    return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee registered succefully." }).ConfigureAwait(false);
                 }
+                else
+                { return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = result.Succeeded.ToString(), Desc = result.Errors.Select(s => s.Description).ToString() }); ; }
+
 
                 #endregion User
 
-                #region Employee
 
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeViewModel, Employee>());
-                var mapper = config.CreateMapper();
-                var modal = mapper.Map<Employee>(employeeViewModel);
-
-                modal.id = Guid.NewGuid().ToString();
-                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
-                modal.is_deleted = false;
-                modal.user_id = user.Id;
-
-                _unitOfWork.EmployeeRepository.Add(modal);
-
-                #endregion
-
-                _unitOfWork.Commit();
-
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee registered succefully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -483,5 +497,5 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-    } 
+    }
 }
