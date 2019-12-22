@@ -7,7 +7,16 @@ namespace Microsoft.AspNetCore.Mvc
         public static string EmailConfirmationLink(this IUrlHelper urlHelper, string userId, string code, string scheme)
         {
             return urlHelper.Action(
-                action: nameof(HomeController.Get),
+                action: nameof(AccountController.ConfirmEmail),
+                controller: "Account",
+                values: new { userId, code },
+                protocol: scheme);
+        }
+
+        public static string PasswordLink(this IUrlHelper urlHelper, string userId, string code, string scheme)
+        {
+            return urlHelper.Action(
+                action: nameof(AccountController.ResetPassword),
                 controller: "Account",
                 values: new { userId, code },
                 protocol: scheme);

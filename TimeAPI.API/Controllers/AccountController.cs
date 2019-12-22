@@ -119,7 +119,7 @@ namespace TimeAPI.API.Controllers
                 {
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true);
                     var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
-                    await _emailSender.SendEmailConfirmationAsync(UserModel.Email, callbackUrl, UserModel.Password).ConfigureAwait(true);
+                    await _emailSender.SendEmailConfirmationAsync(UserModel.Email, callbackUrl).ConfigureAwait(true);
                 }
                 else
                 {
@@ -201,9 +201,10 @@ namespace TimeAPI.API.Controllers
                 return Ok(new SuccessViewModel { Code = "201", Status = "Error", Desc = "Please enter a valid email" });
             }
             var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password).ConfigureAwait(true);
+            
             if (result.Succeeded)
             {
-                return Ok(new SuccessViewModel { Code = "200", Status = "Success", Desc = "Password reset successful." });
+                return Ok(new SuccessViewModel { Code = "200", Status = "Success", Desc = "Password set successful." });
             }
             AddErrors(result);
             return Ok(new SuccessViewModel

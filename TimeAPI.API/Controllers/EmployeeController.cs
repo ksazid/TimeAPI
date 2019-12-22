@@ -62,6 +62,7 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(employeeViewModel));
 
                 #region User
+
                 string _userName = "";
                 Role role = null;
                 if (employeeViewModel.email != null)
@@ -97,16 +98,16 @@ namespace TimeAPI.API.Controllers
                 string password = _oDataTable.GeneratePassword();
 
                 var result = await _userManager.CreateAsync(user, password).ConfigureAwait(true);
-                var xRest = await _userManager.AddToRoleAsync(user, role.Name).ConfigureAwait(true);
                 if (result.Succeeded)
                 {
+                    var xRest = await _userManager.AddToRoleAsync(user, role.Name).ConfigureAwait(true);
                     _logger.LogInformation("User created a new account with password.");
 
                     if (user.Email != null)
                     {
-                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true);
-                        var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
-                        await _emailSender.SendEmailConfirmationAsync(user.Email, callbackUrl, password).ConfigureAwait(true);
+                        var code = await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(true);
+                        var callbackUrl = Url.PasswordLink(user.Id, code, Request.Scheme);
+                        await _emailSender.SendSetupPasswordAsync(user.Email, callbackUrl).ConfigureAwait(true);
                     }
                     else
                     {
