@@ -257,8 +257,8 @@ namespace TimeAPI.API.Controllers
             {
                 return Ok(new SuccessViewModel { Code = "201", Status = "Error", Desc = "Please enter a valid email" });
             }
-            string code = System.Net.WebUtility.UrlDecode(model.Code);
-            var result = await _userManager.ResetPasswordAsync(user, code, model.Password).ConfigureAwait(true);
+            //string code = System.Net.WebUtility.UrlDecode(model.Code);
+            var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password).ConfigureAwait(true);
 
             if (result.Succeeded)
             {

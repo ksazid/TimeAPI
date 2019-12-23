@@ -103,7 +103,7 @@ namespace TimeAPI.API.Controllers
                 };
 
                 oDataTable _oDataTable = new oDataTable();
-                string password = _oDataTable.GeneratePassword() + "@";
+                string password = "P@ssw0rd123";// _oDataTable.GeneratePassword() + "@";
 
                 var result = await _userManager.CreateAsync(user, password).ConfigureAwait(true);
                 if (result.Succeeded)
