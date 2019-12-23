@@ -203,7 +203,7 @@ namespace TimeAPI.API.Controllers
             {
                 throw new ApplicationException($"Unable to load user with ID '{userId}'.");
             }
-            code = System.Net.WebUtility.UrlEncode(code);
+            code = System.Net.WebUtility.UrlDecode(code);
             var result = await _userManager.ConfirmEmailAsync(user, code).ConfigureAwait(true);
             //return Ok(result.Succeeded ? "ConfirmEmail" : "Error");
             string _Code = "", _Description = "";
@@ -257,7 +257,7 @@ namespace TimeAPI.API.Controllers
             {
                 return Ok(new SuccessViewModel { Code = "201", Status = "Error", Desc = "Please enter a valid email" });
             }
-            string code = System.Net.WebUtility.UrlEncode(model.Code);
+            string code = System.Net.WebUtility.UrlDecode(model.Code);
             var result = await _userManager.ResetPasswordAsync(user, code, model.Password).ConfigureAwait(true);
 
             if (result.Succeeded)

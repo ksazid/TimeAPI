@@ -114,12 +114,12 @@ namespace TimeAPI.API.Controllers
                     if (user.Email != "")
                     {
                         var code1 = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true);
-                        code1 = System.Web.HttpUtility.UrlEncode(code1);
+                        //code1 = System.Web.HttpUtility.UrlEncode(code1);
                         var callbackUrl1 = Url.EmailConfirmationLink(user.Id, code1, Request.Scheme);
                         await _emailSender.SendEmailConfirmationAsync(user.Email, callbackUrl1).ConfigureAwait(true);
 
                         var code = await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(true);
-                        code = System.Web.HttpUtility.UrlEncode(code);
+                        //code = System.Web.HttpUtility.UrlEncode(code);
                         var callbackUrl = Url.PasswordLink(user.Id, code, Request.Scheme);
                         await _emailSender.SendSetupPasswordAsync(user.Email, callbackUrl).ConfigureAwait(true);
                     }
