@@ -156,6 +156,7 @@ namespace TimeAPI.API.Controllers
                 };
 
                 _unitOfWork.EmployeeRepository.Add(employee);
+                _unitOfWork.Commit();
 
                 #endregion
 
