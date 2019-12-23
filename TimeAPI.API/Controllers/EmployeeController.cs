@@ -62,15 +62,15 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(employeeViewModel));
 
                 #region User
-
                 Role role = null;
-
                 string _userName = "";
-                if (employeeViewModel.workemail != null || !string.IsNullOrEmpty(employeeViewModel.workemail) || !string.IsNullOrWhiteSpace(employeeViewModel.workemail))
+                if (!string.IsNullOrEmpty(employeeViewModel.workemail)
+                    || !string.IsNullOrWhiteSpace(employeeViewModel.workemail) || employeeViewModel.workemail != "")
                 {
                     _userName = employeeViewModel.workemail;
                 }
-                else if (employeeViewModel.phone != null || !string.IsNullOrEmpty(employeeViewModel.phone) || !string.IsNullOrWhiteSpace(employeeViewModel.phone))
+                else if (!string.IsNullOrEmpty(employeeViewModel.phone)
+                    || !string.IsNullOrWhiteSpace(employeeViewModel.phone) || employeeViewModel.phone != "")
                 {
                     _userName = employeeViewModel.phone;
                 }
@@ -98,6 +98,7 @@ namespace TimeAPI.API.Controllers
                     PhoneNumber = employeeViewModel.phone,
                     isSuperAdmin = false
                 };
+
                 oDataTable _oDataTable = new oDataTable();
                 string password = _oDataTable.GeneratePassword() + "@";
 
@@ -107,13 +108,15 @@ namespace TimeAPI.API.Controllers
                     var xRest = await _userManager.AddToRoleAsync(user, role.Name).ConfigureAwait(true);
                     _logger.LogInformation("User created a new account with password.");
 
-                    if (user.Email != null)
+                    if (user.Email != "")
                     {
                         var code1 = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true);
+                        code1 = System.Web.HttpUtility.UrlEncode(code1);
                         var callbackUrl1 = Url.EmailConfirmationLink(user.Id, code1, Request.Scheme);
                         await _emailSender.SendEmailConfirmationAsync(user.Email, callbackUrl1).ConfigureAwait(true);
 
                         var code = await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(true);
+                        code = System.Web.HttpUtility.UrlEncode(code);
                         var callbackUrl = Url.PasswordLink(user.Id, code, Request.Scheme);
                         await _emailSender.SendSetupPasswordAsync(user.Email, callbackUrl).ConfigureAwait(true);
                     }
@@ -122,23 +125,22 @@ namespace TimeAPI.API.Controllers
                         // check if its a phone 
                     }
 
+                    #region Employee
 
-                    //#region Employee
+                    var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeViewModel, Employee>());
+                    var mapper = config.CreateMapper();
+                    var modal = mapper.Map<Employee>(employeeViewModel);
 
-                    //var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeViewModel, Employee>());
-                    //var mapper = config.CreateMapper();
-                    //var modal = mapper.Map<Employee>(employeeViewModel);
+                    modal.id = Guid.NewGuid().ToString();
+                    modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                    modal.is_deleted = false;
+                    modal.user_id = user.Id;
 
-                    //modal.id = Guid.NewGuid().ToString();
-                    //modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
-                    //modal.is_deleted = false;
-                    //modal.user_id = user.Id;
+                    _unitOfWork.EmployeeRepository.Add(modal);
 
-                    //_unitOfWork.EmployeeRepository.Add(modal);
+                    #endregion
 
-                    //#endregion
-
-                    //_unitOfWork.Commit();
+                    _unitOfWork.Commit();
 
                     return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee registered succefully." }).ConfigureAwait(false);
                 }

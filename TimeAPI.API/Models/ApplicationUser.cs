@@ -13,5 +13,7 @@ namespace TimeAPI.API.Models
         public string LastName { get; set; }
         public string PhoneNumber { get; set; }
         public bool isSuperAdmin { get; set; }
+
+
     }
 }

@@ -58,28 +58,7 @@ namespace TimeAPI.API.Identity
                     throw new ArgumentNullException(nameof(user));
 
                 var userEntity = getUserEntity(user);
-                bool SuperAdmin = false;
-                if (user.isSuperAdmin)
-                {
-                    SuperAdmin = true;
-                }
-                var employee = new Employee()
-                {
-                    id = Guid.NewGuid().ToString(),
-                    user_id = userEntity.Id,
-                    full_name = user.FullName,
-                    first_name = user.FirstName,
-                    last_name = user.LastName,
-                    mobile = user.PhoneNumber,
-                    workemail = userEntity.Email,
-                    createdby = user.FullName,
-                    created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
-                    is_admin = false,
-                    is_superadmin = SuperAdmin
-                };
-
                 _unitOfWork.UserRepository.Add(userEntity);
-                _unitOfWork.EmployeeRepository.Add(employee);
                 _unitOfWork.Commit();
 
                 return Task.FromResult(IdentityResult.Success);
@@ -918,6 +897,7 @@ namespace TimeAPI.API.Identity
             entity.SecurityStamp = ApplicationUser.SecurityStamp;
             entity.TwoFactorEnabled = ApplicationUser.TwoFactorEnabled;
             entity.UserName = ApplicationUser.UserName;
+ 
         }
 
         private ApplicationUser getApplicationUser(User entity)

@@ -17,6 +17,8 @@ using Microsoft.AspNetCore.Cors;
 using TimeAPI.API.Filters;
 using TimeAPI.Domain;
 using System.Threading;
+using TimeAPI.Domain.Entities;
+using System.Globalization;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -32,8 +34,10 @@ namespace TimeAPI.API.Controllers
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
         private readonly ApplicationSettings _appSettings;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public AccountController(UserManager<ApplicationUser> userManager,
+
+        public AccountController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager, IEmailSender emailSender,
             ILogger<AccountController> logger, IOptions<ApplicationSettings> AppSettings)
         {
@@ -42,6 +46,7 @@ namespace TimeAPI.API.Controllers
             _emailSender = emailSender;
             _logger = logger;
             _appSettings = AppSettings.Value;
+            _unitOfWork = unitOfWork;
         }
 
         [TempData]
@@ -89,11 +94,13 @@ namespace TimeAPI.API.Controllers
             //{
 
             string _userName = "";
-            if (UserModel.Email != null || !string.IsNullOrEmpty(UserModel.Email) || !string.IsNullOrWhiteSpace(UserModel.Email))
+            if (UserModel.Email != null || !string.IsNullOrEmpty(UserModel.Email)
+                || !string.IsNullOrWhiteSpace(UserModel.Email) || UserModel.Email != "")
             {
                 _userName = UserModel.Email;
-            } 
-            else if (UserModel.Phone != null || !string.IsNullOrEmpty(UserModel.Phone) || !string.IsNullOrWhiteSpace(UserModel.Phone))
+            }
+            else if (UserModel.Phone != null || !string.IsNullOrEmpty(UserModel.Phone)
+                || !string.IsNullOrWhiteSpace(UserModel.Phone) || (UserModel.Phone) != "")
             {
                 _userName = UserModel.Phone;
             }
@@ -116,9 +123,10 @@ namespace TimeAPI.API.Controllers
                 await _userManager.AddToRoleAsync(user, user.Role).ConfigureAwait(true);
                 _logger.LogInformation("User created a new account with password.");
 
-                if (user.Email != null)
+                if (user.Email != "")
                 {
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true);
+                    code = System.Web.HttpUtility.UrlEncode(code);
                     var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
                     await _emailSender.SendEmailConfirmationAsync(UserModel.Email, callbackUrl).ConfigureAwait(true);
                 }
@@ -126,6 +134,28 @@ namespace TimeAPI.API.Controllers
                 {
                     // check if its a phone 
                 }
+
+                #region Employee
+
+                var employee = new Employee()
+                {
+                    id = Guid.NewGuid().ToString(),
+                    user_id = user.Id,
+                    full_name = user.FullName,
+                    first_name = user.FirstName,
+                    last_name = user.LastName,
+                    mobile = user.PhoneNumber,
+                    workemail = user.Email,
+                    createdby = user.FullName,
+                    created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                    is_admin = false,
+                    is_superadmin = true
+                };
+
+                _unitOfWork.EmployeeRepository.Add(employee);
+
+                #endregion
+
                 return Ok(new SuccessViewModel { Code = "200", Status = "Success", Desc = "User created a new account with password." });
             }
             else
@@ -159,6 +189,7 @@ namespace TimeAPI.API.Controllers
             {
                 throw new ApplicationException($"Unable to load user with ID '{userId}'.");
             }
+            code = System.Net.WebUtility.UrlDecode(code);
             var result = await _userManager.ConfirmEmailAsync(user, code).ConfigureAwait(true);
             return Ok(result.Succeeded ? "ConfirmEmail" : "Error");
         }
@@ -201,8 +232,9 @@ namespace TimeAPI.API.Controllers
             {
                 return Ok(new SuccessViewModel { Code = "201", Status = "Error", Desc = "Please enter a valid email" });
             }
-            var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password).ConfigureAwait(true);
-            
+            string code = System.Net.WebUtility.UrlDecode(model.Code);
+            var result = await _userManager.ResetPasswordAsync(user, code, model.Password).ConfigureAwait(true);
+
             if (result.Succeeded)
             {
                 return Ok(new SuccessViewModel { Code = "200", Status = "Success", Desc = "Password set successful." });
@@ -212,7 +244,7 @@ namespace TimeAPI.API.Controllers
             {
                 Code = "201",
                 Status = "Error",
-                Desc = result.Errors.ToString()
+                Desc = result.Errors.Select(s => s.Description).ToString()
             });
         }
 
