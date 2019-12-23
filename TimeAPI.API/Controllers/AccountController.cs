@@ -165,7 +165,17 @@ namespace TimeAPI.API.Controllers
             else
             {
                 AddErrors(result);
-                { return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = result.Succeeded.ToString(), Desc = result.Errors.Select(s => s.Description).ToString() });}
+                string _Code = "", _Description = "";
+                if (result.Errors != null)
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        _Code = error.Code;
+                        _Description = error.Description;
+                    }
+                }
+
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = _Code, Desc = _Description });
             }
             //}
             //return BadRequest(new { message = "OOP! Please enter a valid user details." });
@@ -193,7 +203,7 @@ namespace TimeAPI.API.Controllers
             {
                 throw new ApplicationException($"Unable to load user with ID '{userId}'.");
             }
-            code = System.Net.WebUtility.UrlDecode(code);
+            //code = System.Net.WebUtility.UrlDecode(code);
             var result = await _userManager.ConfirmEmailAsync(user, code).ConfigureAwait(true);
             return Ok(result.Succeeded ? "ConfirmEmail" : "Error");
         }
@@ -236,8 +246,8 @@ namespace TimeAPI.API.Controllers
             {
                 return Ok(new SuccessViewModel { Code = "201", Status = "Error", Desc = "Please enter a valid email" });
             }
-            string code = System.Net.WebUtility.UrlDecode(model.Code);
-            var result = await _userManager.ResetPasswordAsync(user, code, model.Password).ConfigureAwait(true);
+            //string code = System.Net.WebUtility.UrlDecode(model.Code);
+            var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password).ConfigureAwait(true);
 
             if (result.Succeeded)
             {

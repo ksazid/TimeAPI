@@ -148,12 +148,23 @@ namespace TimeAPI.API.Controllers
                     return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee registered succefully." }).ConfigureAwait(false);
                 }
                 else
-                { return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = result.Succeeded.ToString(), Desc = result.Errors.Select(s => s.Description).ToString() }); ; }
+                {
+                    AddErrors(result);
+                    string _Code = "", _Description = "";
+                    if (result.Errors != null)
+                    {
+                        foreach (var error in result.Errors)
+                        {
+                            _Code = error.Code;
+                            _Description = error.Description;
+                        }
+                    }
+
+                    return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = _Code, Desc = _Description });
+                }
 
 
                 #endregion User
-
-
             }
             catch (Exception ex)
             {
@@ -502,5 +513,27 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
+
+        #region Helpers
+        private void AddErrors(IdentityResult result)
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+        }
+
+        private IActionResult RedirectToLocal(string returnUrl)
+        {
+            if (Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+            else
+            {
+                return RedirectToAction(nameof(HomeController.Index), "Home");
+            }
+        }
+        #endregion
     }
 }
