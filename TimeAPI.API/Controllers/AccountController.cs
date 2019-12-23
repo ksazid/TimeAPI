@@ -203,9 +203,20 @@ namespace TimeAPI.API.Controllers
             {
                 throw new ApplicationException($"Unable to load user with ID '{userId}'.");
             }
-            //code = System.Net.WebUtility.UrlDecode(code);
+            code = System.Net.WebUtility.UrlEncode(code);
             var result = await _userManager.ConfirmEmailAsync(user, code).ConfigureAwait(true);
-            return Ok(result.Succeeded ? "ConfirmEmail" : "Error");
+            //return Ok(result.Succeeded ? "ConfirmEmail" : "Error");
+            string _Code = "", _Description = "";
+            if (result.Errors != null)
+            {
+                foreach (var error in result.Errors)
+                {
+                    _Code = error.Code;
+                    _Description = error.Description;
+                }
+            }
+
+            return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = _Code, Desc = _Description });
         }
 
         [HttpPost]
@@ -246,20 +257,24 @@ namespace TimeAPI.API.Controllers
             {
                 return Ok(new SuccessViewModel { Code = "201", Status = "Error", Desc = "Please enter a valid email" });
             }
-            //string code = System.Net.WebUtility.UrlDecode(model.Code);
-            var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password).ConfigureAwait(true);
+            string code = System.Net.WebUtility.UrlEncode(model.Code);
+            var result = await _userManager.ResetPasswordAsync(user, code, model.Password).ConfigureAwait(true);
 
             if (result.Succeeded)
             {
                 return Ok(new SuccessViewModel { Code = "200", Status = "Success", Desc = "Password set successful." });
             }
             AddErrors(result);
-            return Ok(new SuccessViewModel
+            string _Code = "", _Description = "";
+            if (result.Errors != null)
             {
-                Code = "201",
-                Status = "Error",
-                Desc = result.Errors.Select(s => s.Description).ToString()
-            });
+                foreach (var error in result.Errors)
+                {
+                    _Code = error.Code;
+                    _Description = error.Description;
+                }
+            }
+            return Ok(new SuccessViewModel { Status = "201", Code = _Code, Desc = _Description });
         }
 
         #region Helpers
