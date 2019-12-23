@@ -72,7 +72,10 @@ namespace TimeAPI.API.Controllers
                 else if (!string.IsNullOrEmpty(employeeViewModel.phone)
                     || !string.IsNullOrWhiteSpace(employeeViewModel.phone) || employeeViewModel.phone != "")
                 {
-                    _userName = employeeViewModel.phone;
+                    if (employeeViewModel.phone.Contains("+"))
+                        _userName = employeeViewModel.phone.Substring(1);
+                    else
+                        _userName = employeeViewModel.phone;
                 }
 
                 if (employeeViewModel.role_id != null)
