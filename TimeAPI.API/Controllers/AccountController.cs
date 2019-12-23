@@ -164,7 +164,7 @@ namespace TimeAPI.API.Controllers
             else
             {
                 AddErrors(result);
-                return Ok(result);
+                { return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = result.Succeeded.ToString(), Desc = result.Errors.Select(s => s.Description).ToString() });}
             }
             //}
             //return BadRequest(new { message = "OOP! Please enter a valid user details." });
