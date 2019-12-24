@@ -19,8 +19,8 @@
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.3" />
   </ItemGroup>
 
-  
-    
+
+
   <ItemGroup>
     <PackageReference Include="ailogica.Azure.Helpers" Version="1.0.1" />
     <PackageReference Include="AutoMapper" Version="9.0.0" />
@@ -53,6 +53,7 @@
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUi" Version="6.0.0-rc1-final" />-->
   </ItemGroup>
 
+  
 
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.2" />
