@@ -130,7 +130,7 @@ namespace TimeAPI.API
                         };
                     });
 
-            services.Configure<SecurityStampValidatorOptions>(o => o.ValidationInterval = TimeSpan.FromSeconds(100));
+            services.Configure<SecurityStampValidatorOptions>(o => o.ValidationInterval = TimeSpan.FromDays(100));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

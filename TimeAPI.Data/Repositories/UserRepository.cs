@@ -120,5 +120,17 @@ namespace TimeAPI.Data.Repositories
             return _UserDataGroupDataSet;
         }
 
+        public void CustomEmailConfirmedFlagUpdate(string UserID)
+        {
+            Execute(
+                sql: @"
+                    UPDATE AspNetUsers SET 
+                        EmailConfirmed = 1
+                    WHERE Id = @UserID",
+                param: UserID);
+        }
+
+
+
     }
 }

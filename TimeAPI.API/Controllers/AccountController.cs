@@ -19,6 +19,7 @@ using TimeAPI.Domain;
 using System.Threading;
 using TimeAPI.Domain.Entities;
 using System.Globalization;
+using System.Web;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -128,8 +129,9 @@ namespace TimeAPI.API.Controllers
 
                 if (user.Email != "")
                 {
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true);
-                    code = System.Web.HttpUtility.UrlEncode(code);
+                    //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true);
+                    var code = await _userManager.GenerateUserTokenAsync(user, "Default", "passwordless-auth").ConfigureAwait(true);
+                    code = HttpUtility.UrlEncode(code);
                     var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
                     await _emailSender.SendEmailConfirmationAsync(UserModel.Email, callbackUrl).ConfigureAwait(true);
                 }
@@ -203,31 +205,39 @@ namespace TimeAPI.API.Controllers
             {
                 throw new ApplicationException($"Unable to load user with ID '{userId}'.");
             }
-            code = System.Web.HttpUtility.UrlDecode(code);
-            var result = await _userManager.ConfirmEmailAsync(user, code).ConfigureAwait(true);
-            //return Ok(result.Succeeded ? "ConfirmEmail" : "Error");
+
+            //#region
+            //var result = await _userManager.ConfirmEmailAsync(user, code).ConfigureAwait(true);
+
+            //string _Status = "", _Code = "", _Description = "";
+            //if (result.Errors != null)
+            //    foreach (var error in result.Errors)
+            //    {
+            //        _Status = "201";
+            //        _Code = error.Code;
+            //        _Description = error.Description;
+            //        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = _Code, Desc = _Description });
+            //    }
+
+            //if (result.Succeeded)
+            //    _Status = "200"; _Code = "Success"; _Description = "Email Confirmed";
+
+            //return Task.FromResult<object>(new SuccessViewModel { Status = _Status, Code = _Code, Desc = _Description });
+            //#endregion
 
 
-
-            string _Status = "", _Code = "", _Description = "";
-            if (result.Errors != null)
+            #region
+            code = HttpUtility.UrlDecode(code);
+            var result = await _userManager.VerifyUserTokenAsync(user, "Default", "passwordless-auth", code).ConfigureAwait(true); ;  //await _userManager.VerifyUserTokenAsync(user, code).ConfigureAwait(true);
+            if (result)
             {
-                foreach (var error in result.Errors)
-                {
-                    _Status = "201";
-                    _Code = error.Code;
-                    _Description = error.Description;
-                    return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = _Code, Desc = _Description });
-                }
+                await _userManager.UpdateSecurityStampAsync(user).ConfigureAwait(true);
+                _unitOfWork.UserRepository.CustomEmailConfirmedFlagUpdate(user.Id);
 
+                return Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Email Confirmed" });
             }
-
-            if (result.Succeeded)
-                _Status = "200"; _Code = "Success"; _Description = "Email Confirmed";
-
-
-            return Task.FromResult<object>(new SuccessViewModel { Status = _Status, Code = _Code, Desc = _Description });
-
+            else { return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = "Error", Desc = "Email Not Confirmed" }); }
+            #endregion
         }
 
         [HttpPost]
