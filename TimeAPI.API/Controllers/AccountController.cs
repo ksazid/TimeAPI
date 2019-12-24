@@ -227,7 +227,7 @@ namespace TimeAPI.API.Controllers
 
 
             #region
-            code = HttpUtility.UrlDecode(code);
+            //code = HttpUtility.UrlDecode(code);
             var result = await _userManager.VerifyUserTokenAsync(user, "Default", "passwordless-auth", code).ConfigureAwait(true); ;  //await _userManager.VerifyUserTokenAsync(user, code).ConfigureAwait(true);
             if (result)
             {
