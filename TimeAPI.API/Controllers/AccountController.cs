@@ -131,7 +131,7 @@ namespace TimeAPI.API.Controllers
                 {
                     //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true);
                     var code = await _userManager.GenerateUserTokenAsync(user, "Default", "passwordless-auth").ConfigureAwait(true);
-                    code = HttpUtility.UrlEncode(code);
+                    //code = HttpUtility.UrlEncode(code);
                     var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
                     await _emailSender.SendEmailConfirmationAsync(UserModel.Email, callbackUrl).ConfigureAwait(true);
                 }
@@ -278,7 +278,7 @@ namespace TimeAPI.API.Controllers
             {
                 return Ok(new SuccessViewModel { Code = "201", Status = "Error", Desc = "Please enter a valid email" });
             }
-            model.Code = System.Web.HttpUtility.UrlDecode(model.Code);
+            //model.Code = System.Web.HttpUtility.UrlDecode(model.Code);
             var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password).ConfigureAwait(true);
 
             if (result.Succeeded)
