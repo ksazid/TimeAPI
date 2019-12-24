@@ -129,6 +129,8 @@ namespace TimeAPI.API
                             ClockSkew = TimeSpan.Zero
                         };
                     });
+
+            services.Configure<SecurityStampValidatorOptions>(o => o.ValidationInterval = TimeSpan.FromSeconds(100));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
