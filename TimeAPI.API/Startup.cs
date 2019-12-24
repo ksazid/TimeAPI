@@ -54,6 +54,7 @@ namespace TimeAPI.API
                     builder.AllowAnyOrigin();
                 });
             });
+            services.AddDataProtection();
             services.AddAuthentication();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
             services.AddMvc().AddNewtonsoftJson(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
