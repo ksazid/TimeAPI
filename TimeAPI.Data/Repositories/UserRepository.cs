@@ -127,7 +127,9 @@ namespace TimeAPI.Data.Repositories
                     UPDATE AspNetUsers SET 
                         EmailConfirmed = 1
                     WHERE Id = @UserID",
-                param: UserID);
+              param: new { UserID }
+
+                );
         }
 
 
