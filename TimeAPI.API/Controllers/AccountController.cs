@@ -127,18 +127,6 @@ namespace TimeAPI.API.Controllers
                 await _userManager.AddToRoleAsync(user, user.Role).ConfigureAwait(true);
                 _logger.LogInformation("User created a new account with password.");
 
-                if (user.Email != "")
-                {
-                    //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true);
-                    var code = await _userManager.GenerateUserTokenAsync(user, "EmailConfirmation", "passwordless-auth").ConfigureAwait(true);
-                    code = HttpUtility.UrlEncode(code);
-                    var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
-                    await _emailSender.SendEmailConfirmationAsync(UserModel.Email, callbackUrl).ConfigureAwait(true);
-                }
-                else
-                {
-                    // check if its a phone 
-                }
 
                 #region Employee
 
@@ -161,6 +149,19 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.Commit();
 
                 #endregion
+
+                if (user.Email != "")
+                {
+                    //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true);
+                    var code = await _userManager.GenerateUserTokenAsync(user, "Default", "passwordless-auth").ConfigureAwait(true);
+                    code = HttpUtility.UrlEncode(code);
+                    var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
+                    await _emailSender.SendEmailConfirmationAsync(UserModel.Email, callbackUrl).ConfigureAwait(true);
+                }
+                else
+                {
+                    // check if its a phone 
+                }
 
                 return Ok(new SuccessViewModel { Code = "200", Status = "Success", Desc = "User created a new account with password." });
             }
@@ -228,7 +229,7 @@ namespace TimeAPI.API.Controllers
 
             #region
             code = HttpUtility.UrlDecode(code);
-            var result = await _userManager.VerifyUserTokenAsync(user, "EmailConfirmation", "passwordless-auth", code).ConfigureAwait(true); ;  //await _userManager.VerifyUserTokenAsync(user, code).ConfigureAwait(true);
+            var result = await _userManager.VerifyUserTokenAsync(user, "Default", "passwordless-auth", code).ConfigureAwait(true); ;  //await _userManager.VerifyUserTokenAsync(user, code).ConfigureAwait(true);
             if (result)
             {
                 await _userManager.UpdateSecurityStampAsync(user).ConfigureAwait(true);

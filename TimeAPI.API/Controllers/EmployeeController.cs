@@ -111,6 +111,20 @@ namespace TimeAPI.API.Controllers
                     var xRest = await _userManager.AddToRoleAsync(user, role.Name).ConfigureAwait(true);
                     _logger.LogInformation("User created a new account with password.");
 
+                    #region Employee
+                    var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeViewModel, Employee>());
+                    var mapper = config.CreateMapper();
+                    var modal = mapper.Map<Employee>(employeeViewModel);
+
+                    modal.id = Guid.NewGuid().ToString();
+                    modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                    modal.is_deleted = false;
+                    modal.user_id = user.Id;
+
+                    _unitOfWork.EmployeeRepository.Add(modal);
+                    _unitOfWork.Commit();
+                    #endregion
+
                     if (user.Email != "")
                     {
                         var code1 = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true);
@@ -127,23 +141,6 @@ namespace TimeAPI.API.Controllers
                     {
                         // check if its a phone 
                     }
-
-                    #region Employee
-
-                    var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeViewModel, Employee>());
-                    var mapper = config.CreateMapper();
-                    var modal = mapper.Map<Employee>(employeeViewModel);
-
-                    modal.id = Guid.NewGuid().ToString();
-                    modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
-                    modal.is_deleted = false;
-                    modal.user_id = user.Id;
-
-                    _unitOfWork.EmployeeRepository.Add(modal);
-
-                    #endregion
-
-                    _unitOfWork.Commit();
 
                     return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee registered succefully." }).ConfigureAwait(false);
                 }
