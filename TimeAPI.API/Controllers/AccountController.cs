@@ -155,7 +155,7 @@ namespace TimeAPI.API.Controllers
                 {
                     //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true);
                     var code = await _userManager.GenerateUserTokenAsync(user, "Default", "Confirmation").ConfigureAwait(true);
-                    code = System.Net.WebUtility.HtmlEncode(code);// HttpUtility.UrlEncode(code);
+                    code = EncodeServerName(code); // HttpUtility.UrlEncode(code, );
                     var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
                     await _emailSender.SendEmailConfirmationAsync(UserModel.Email, callbackUrl).ConfigureAwait(true);
                 }
@@ -229,10 +229,11 @@ namespace TimeAPI.API.Controllers
 
 
             #region
-           
-            
-            code = System.Net.WebUtility.HtmlDecode(code); //HttpUtility.UrlDecode(code);
-            var result = await _userManager.VerifyUserTokenAsync(user, "Default", "Confirmation", code).ConfigureAwait(true); ;  //await _userManager.VerifyUserTokenAsync(user, code).ConfigureAwait(true);
+
+
+            //code = HttpUtility.HtmlDecode(code); //HttpUtility.UrlDecode(code);
+            code = DecodeServerName(code);
+            var result = await _userManager.VerifyUserTokenAsync(user, "Default", "Confirmation", code).ConfigureAwait(true);  //await _userManager.VerifyUserTokenAsync(user, code).ConfigureAwait(true);
             if (result)
             {
                 await _userManager.UpdateSecurityStampAsync(user).ConfigureAwait(true);
@@ -323,6 +324,17 @@ namespace TimeAPI.API.Controllers
             {
                 return RedirectToAction(nameof(HomeController.Index), "Home");
             }
+        }
+
+
+        public static string EncodeServerName(string serverName)
+        {
+            return Convert.ToBase64String(Encoding.UTF8.GetBytes(serverName));
+        }
+
+        public static string DecodeServerName(string encodedServername)
+        {
+            return Encoding.UTF8.GetString(Convert.FromBase64String(encodedServername));
         }
         #endregion
     }

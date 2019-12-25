@@ -8,9 +8,8 @@ using Microsoft.Extensions.Options;
 
 namespace TimeAPI.API.Extensions
 {
-    //public class DataProtectionTokenProvider
+    //public static class DataProtectionTokenProvider
     //{
-
     //    /// <summary>
     //    /// Provides protection and validation of identity tokens.
     //    /// </summary>
@@ -64,7 +63,7 @@ namespace TimeAPI.API.Extensions
     //        /// <param name="manager">The <see cref="UserManager{TUser}"/> to retrieve user properties from.</param>
     //        /// <param name="user">The <typeparamref name="TUser"/> the token will be generated from.</param>
     //        /// <returns>A <see cref="Task{TResult}"/> representing the generated token.</returns>
-    //        public virtual async Task<string> GenerateAsync(string purpose, UserManager<TUser> manager, TUser user)
+    //        public virtual async Task<string> GenerateAsync(string purpose, UserManager<TUser> manager, tjhio TUser user)
     //        {
     //            if (user == null)
     //            {
@@ -170,7 +169,7 @@ namespace TimeAPI.API.Extensions
     //    {
     //        internal static readonly Encoding DefaultEncoding = new UTF8Encoding(false, true);
 
-    //        public static BinaryReader CreateReader(this Stream stream)
+    //        public static BinaryReader ader(this Stream stream)
     //        {
     //            return new BinaryReader(stream, DefaultEncoding, true);
     //        }
