@@ -82,8 +82,11 @@ namespace TimeAPI.API.Controllers
                 if (employeeViewModel.role_id != null)
                 {
                     role = _unitOfWork.RoleRepository.Find(employeeViewModel.role_id);
-                    if (role.NormalizedName == "ADMIN")
-                        employeeViewModel.is_admin = true;
+                    if (role != null)
+                    {
+                        if (role.NormalizedName == "ADMIN")
+                            employeeViewModel.is_admin = true;
+                    }
                     else
                     {
                         employeeViewModel.is_admin = false;

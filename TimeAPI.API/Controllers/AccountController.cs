@@ -208,7 +208,7 @@ namespace TimeAPI.API.Controllers
                 throw new ApplicationException($"Unable to load user with ID '{userId}'.");
             }
 
-            //#region
+            #region
             //var result = await _userManager.ConfirmEmailAsync(user, code).ConfigureAwait(true);
 
             //string _Status = "", _Code = "", _Description = "";
@@ -225,7 +225,7 @@ namespace TimeAPI.API.Controllers
             //    _Status = "200"; _Code = "Success"; _Description = "Email Confirmed";
 
             //return Task.FromResult<object>(new SuccessViewModel { Status = _Status, Code = _Code, Desc = _Description });
-            //#endregion
+            #endregion
 
 
             #region
