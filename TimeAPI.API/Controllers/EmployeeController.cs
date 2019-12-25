@@ -35,11 +35,11 @@ namespace TimeAPI.API.Controllers
         private readonly ILogger _logger;
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
-        public IConfiguration _configuration;
+        private IConfiguration _configuration;
         //public IHostingEnvironment _hostingEnvironment;
         private readonly UserManager<ApplicationUser> _userManager;
         public EmployeeController(IUnitOfWork unitOfWork, ILogger<EmployeeController> logger, UserManager<ApplicationUser> userManager,
-            IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings, IConfiguration configuration)
+                                  IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings, IConfiguration configuration)
         {
             _emailSender = emailSender;
             _logger = logger;
@@ -62,6 +62,7 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(employeeViewModel));
 
                 #region User
+
                 Role role = null;
                 string _userName = "";
                 if (!string.IsNullOrEmpty(employeeViewModel.workemail)
@@ -112,6 +113,7 @@ namespace TimeAPI.API.Controllers
                     _logger.LogInformation("User created a new account with password.");
 
                     #region Employee
+
                     var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeViewModel, Employee>());
                     var mapper = config.CreateMapper();
                     var modal = mapper.Map<Employee>(employeeViewModel);
@@ -123,6 +125,7 @@ namespace TimeAPI.API.Controllers
 
                     _unitOfWork.EmployeeRepository.Add(modal);
                     _unitOfWork.Commit();
+
                     #endregion
 
                     if (user.Email != "")
@@ -159,7 +162,6 @@ namespace TimeAPI.API.Controllers
 
                     return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = _Code, Desc = _Description });
                 }
-
 
                 #endregion User
             }
@@ -531,6 +533,7 @@ namespace TimeAPI.API.Controllers
                 return RedirectToAction(nameof(HomeController.Index), "Home");
             }
         }
+
         #endregion
     }
 }
