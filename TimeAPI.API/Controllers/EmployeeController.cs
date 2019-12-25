@@ -81,6 +81,7 @@ namespace TimeAPI.API.Controllers
 
                 if (employeeViewModel.role_id != null)
                 {
+                    employeeViewModel.role_id = "3";
                     role = _unitOfWork.RoleRepository.Find(employeeViewModel.role_id);
                     if (role != null)
                     {
