@@ -20,6 +20,7 @@ using System.Threading;
 using TimeAPI.Domain.Entities;
 using System.Globalization;
 using System.Web;
+using NuGet.Common;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -154,7 +155,7 @@ namespace TimeAPI.API.Controllers
                 {
                     //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true);
                     var code = await _userManager.GenerateUserTokenAsync(user, "Default", "passwordless-auth").ConfigureAwait(true);
-                    code = System.Net.WebUtility.UrlEncode(code);// HttpUtility.UrlEncode(code);
+                    code = System.Net.WebUtility.UrlEncode(Convert.FromBase64String(code).ToString());// HttpUtility.UrlEncode(code);
                     var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
                     await _emailSender.SendEmailConfirmationAsync(UserModel.Email, callbackUrl).ConfigureAwait(true);
                 }
@@ -228,7 +229,8 @@ namespace TimeAPI.API.Controllers
 
 
             #region
-            code = System.Net.WebUtility.UrlDecode(code); //HttpUtility.UrlDecode(code);
+            //var unprotectedData = Protector.Unprotect(Convert.FromBase64String(code));
+            code = System.Net.WebUtility.UrlDecode(Convert.FromBase64String(code).ToString()); //HttpUtility.UrlDecode(code);
             var result = await _userManager.VerifyUserTokenAsync(user, "Default", "passwordless-auth", code).ConfigureAwait(true); ;  //await _userManager.VerifyUserTokenAsync(user, code).ConfigureAwait(true);
             if (result)
             {
