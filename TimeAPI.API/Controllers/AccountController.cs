@@ -20,7 +20,7 @@ using System.Threading;
 using TimeAPI.Domain.Entities;
 using System.Globalization;
 using System.Web;
-using NuGet.Common;
+using Microsoft.AspNetCore.DataProtection;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -154,8 +154,8 @@ namespace TimeAPI.API.Controllers
                 if (user.Email != "")
                 {
                     //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true);
-                    var code = await _userManager.GenerateUserTokenAsync(user, "Default", "passwordless-auth").ConfigureAwait(true);
-                    code = System.Net.WebUtility.UrlEncode(Convert.FromBase64String(code).ToString());// HttpUtility.UrlEncode(code);
+                    var code = await _userManager.GenerateUserTokenAsync(user, "Default", "Confirmation").ConfigureAwait(true);
+                    code = System.Net.WebUtility.HtmlEncode(code);// HttpUtility.UrlEncode(code);
                     var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
                     await _emailSender.SendEmailConfirmationAsync(UserModel.Email, callbackUrl).ConfigureAwait(true);
                 }
@@ -229,9 +229,10 @@ namespace TimeAPI.API.Controllers
 
 
             #region
-            //var unprotectedData = Protector.Unprotect(Convert.FromBase64String(code));
-            code = System.Net.WebUtility.UrlDecode(Convert.FromBase64String(code).ToString()); //HttpUtility.UrlDecode(code);
-            var result = await _userManager.VerifyUserTokenAsync(user, "Default", "passwordless-auth", code).ConfigureAwait(true); ;  //await _userManager.VerifyUserTokenAsync(user, code).ConfigureAwait(true);
+           
+            
+            code = System.Net.WebUtility.HtmlDecode(code); //HttpUtility.UrlDecode(code);
+            var result = await _userManager.VerifyUserTokenAsync(user, "Default", "Confirmation", code).ConfigureAwait(true); ;  //await _userManager.VerifyUserTokenAsync(user, code).ConfigureAwait(true);
             if (result)
             {
                 await _userManager.UpdateSecurityStampAsync(user).ConfigureAwait(true);
@@ -241,6 +242,7 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Email Confirmed" });
             }
             else { return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = "Error", Desc = "Email Not Confirmed" }); }
+
             #endregion
         }
 
