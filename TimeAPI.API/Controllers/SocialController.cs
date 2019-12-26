@@ -47,7 +47,7 @@ namespace TimeAPI.API.Controllroers
         
         [HttpPost]
         [Route("AddSocial")]
-        public async Task<object> AddSocial([FromBody] AdministrativeViewModel socialViewModel, CancellationToken cancellationToken)
+        public async Task<object> AddSocial([FromBody] SocialViewModel socialViewModel, CancellationToken cancellationToken)
         {
             try
             {
@@ -57,7 +57,7 @@ namespace TimeAPI.API.Controllroers
                 if (socialViewModel == null)
                     throw new ArgumentNullException(nameof(socialViewModel));
  
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<AdministrativeViewModel, Social>());
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<SocialViewModel, Social>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Social>(socialViewModel);
 
@@ -79,7 +79,7 @@ namespace TimeAPI.API.Controllroers
         
         [HttpPatch]
         [Route("UpdateSocial")]
-        public async Task<object> UpdateSocial([FromBody] AdministrativeViewModel socialViewModel, CancellationToken cancellationToken)
+        public async Task<object> UpdateSocial([FromBody] SocialViewModel socialViewModel, CancellationToken cancellationToken)
         {
             try
             {
@@ -89,7 +89,7 @@ namespace TimeAPI.API.Controllroers
                 if (socialViewModel == null)
                     throw new ArgumentNullException(nameof(socialViewModel));
 
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<AdministrativeViewModel, Social>());
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<SocialViewModel, Social>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Social>(socialViewModel);
                 modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);

@@ -54,10 +54,10 @@ namespace TimeAPI.API
                     builder.AllowAnyOrigin();
                 });
             });
-            //services.AddDataProtection(options =>
-            //{
-            //    options.ApplicationDiscriminator = "appgroup1";
-            //});
+            services.AddDataProtection(options =>
+            {
+                options.ApplicationDiscriminator = "TimeAPI.API";
+            });
 
             services.AddAuthentication();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TimeAPI.API.Models.SocialViewModels
 {
-    public class AdministrativeViewModel
+    public class SocialViewModel
     {
         public string id { get; set; }
         public string empid { get; set; }
