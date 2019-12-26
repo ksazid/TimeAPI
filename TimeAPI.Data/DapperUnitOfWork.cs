@@ -33,6 +33,7 @@ namespace TimeAPI.Data
         private ITimesheetRepository _timesheetRepository;
         private ITaskRepository _taskRepository;
         private ISetupRepository _setupRepository;
+        private IAdministrativeRepository _administrativeRepository;
         private IPriorityRepository _priorityRepository;
         private IStatusRepository _statusRepository;
         private IEmployeeTypeRepository _employeeTypeRepository;
@@ -41,8 +42,8 @@ namespace TimeAPI.Data
         private IEmployeeRoleRepository _employeeRoleRepository;
         private ITeamRepository _teamRepository;
         private ITeamMemberRepository _teamMemberRepository;
-
-
+        private ITimesheetProjectCategoryRepository _timesheetProjectCategoryRepository;
+        private ITimesheetAdministrativeRepository _timesheetAdministrativeRepository;
 
         private bool _disposed;
         #endregion
@@ -163,6 +164,15 @@ namespace TimeAPI.Data
             }
         }
 
+        public IAdministrativeRepository AdministrativeRepository
+        {
+            get
+            {
+                return _administrativeRepository
+                    ?? (_administrativeRepository = new AdministrativeRepository(_transaction));
+            }
+        }
+
         public ISubscriptionRepository SubscriptionRepository
         {
             get
@@ -216,6 +226,7 @@ namespace TimeAPI.Data
                     ?? (_setupRepository = new SetupRepository(_transaction));
             }
         }
+
         public IPriorityRepository PriorityRepository
         {
             get
@@ -288,6 +299,25 @@ namespace TimeAPI.Data
             }
         }
 
+        public ITimesheetProjectCategoryRepository TimesheetProjectCategoryRepository
+        {
+            get
+            {
+                return _timesheetProjectCategoryRepository
+                    ?? (_timesheetProjectCategoryRepository = new TimesheetProjectCategoryRepository(_transaction));
+            }
+        }
+
+        public ITimesheetAdministrativeRepository TimesheetAdministrativeRepository
+        {
+            get
+            {
+                return _timesheetAdministrativeRepository
+                    ?? (_timesheetAdministrativeRepository = new TimesheetAdministrativeRepository(_transaction));
+            }
+        }
+
+
         public void Commit()
         {
             try
@@ -328,6 +358,7 @@ namespace TimeAPI.Data
             _departmentRepository = null;
             _profileImageRepository = null;
             _socialRepository = null;
+            _administrativeRepository = null;
             _subscriptionRepository = null;
             _reportingRepository = null;
             _designationRepositiory = null;
@@ -340,6 +371,9 @@ namespace TimeAPI.Data
             _employeeStatusRepository = null;
             _industryTypeRepository = null;
             _employeeRoleRepository = null;
+            _teamRepository = null;
+            _timesheetProjectCategoryRepository = null;
+            _timesheetAdministrativeRepository = null;
         }
 
         private void dispose(bool disposing)

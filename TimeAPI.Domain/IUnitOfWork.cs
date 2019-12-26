@@ -19,6 +19,7 @@ namespace TimeAPI.Domain
         IProfileImageRepository ProfileImageRepository { get; }
         IReportingRepository ReportingRepository { get; }
         ISocialRepository SocialRepository { get; }
+        IAdministrativeRepository AdministrativeRepository { get; }
         ISubscriptionRepository SubscriptionRepository { get; }
         IDesignationRepositiory DesignationRepositiory { get; }
         ITimesheetRepository TimesheetRepository { get; }
@@ -32,6 +33,8 @@ namespace TimeAPI.Domain
         IEmployeeRoleRepository EmployeeRoleRepository { get; }
         ITeamRepository TeamRepository { get; }
         ITeamMemberRepository TeamMemberRepository { get; }
+        ITimesheetProjectCategoryRepository TimesheetProjectCategoryRepository { get; }
+        ITimesheetAdministrativeRepository TimesheetAdministrativeRepository { get; }
 
         //commit all after all completes
         void Commit();

@@ -28,6 +28,7 @@ using TimeAPI.API.Models.EmployeeStatusViewModels;
 using TimeAPI.API.Models.EmployeeRoleViewModels;
 using System.Globalization;
 using TimeAPI.API.Models.StatusViewModels;
+using TimeAPI.API.Models.AdministrativeViewModels;
 
 namespace TimeAPI.API.Controllers
 {
@@ -132,24 +133,157 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        #region Priority
+        #region Administrative
 
         [HttpPost]
-        [Route("AddPriority")]
-        public async Task<object> AddPriority([FromBody] ProfileImageViewModel priorityingViewModel, CancellationToken cancellationToken)
+        [Route("AddAdministrative")]
+        public async Task<object> AddAdministrative([FromBody] AdministrativeViewModel administrativeViewModel, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (priorityingViewModel == null)
-                    throw new ArgumentNullException(nameof(priorityingViewModel));
+                if (administrativeViewModel == null)
+                    throw new ArgumentNullException(nameof(administrativeViewModel));
+
+
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<AdministrativeViewModel, Administrative>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<Administrative>(administrativeViewModel);
+
+                modal.id = Guid.NewGuid().ToString();
+                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.is_deleted = false;
+
+                _unitOfWork.AdministrativeRepository.Add(modal);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Administrative registered succefully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPatch]
+        [Route("UpdateAdministrative")]
+        public async Task<object> UpdateAdministrative([FromBody] AdministrativeViewModel administrativeViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (administrativeViewModel == null)
+                    throw new ArgumentNullException(nameof(administrativeViewModel));
+
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<AdministrativeViewModel, Administrative>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<Administrative>(administrativeViewModel);
+
+                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+
+
+                _unitOfWork.AdministrativeRepository.Update(modal);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Administrative updated succefully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("RemoveAdministrative")]
+        public async Task<object> RemoveAdministrative([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                _unitOfWork.AdministrativeRepository.Remove(Utils.ID);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Administrative removed succefully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("GetAllAdministrative")]
+        public async Task<object> GetAllAdministrative(CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                var result = _unitOfWork.AdministrativeRepository.All();
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("FindByAdministrativeID")]
+        public async Task<object> FindByAdministrativeID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                var result = _unitOfWork.AdministrativeRepository.Find(Utils.ID);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        #endregion Administrative
+
+        #region Priority
+
+        [HttpPost]
+        [Route("AddPriority")]
+        public async Task<object> AddPriority([FromBody] ProfileImageViewModel administrativeViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (administrativeViewModel == null)
+                    throw new ArgumentNullException(nameof(administrativeViewModel));
 
 
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<ProfileImageViewModel, Priority>());
                 var mapper = config.CreateMapper();
-                var modal = mapper.Map<Priority>(priorityingViewModel);
+                var modal = mapper.Map<Priority>(administrativeViewModel);
 
                 modal.id = Guid.NewGuid().ToString();
                 modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
@@ -168,19 +302,19 @@ namespace TimeAPI.API.Controllers
 
         [HttpPatch]
         [Route("UpdatePriority")]
-        public async Task<object> UpdatePriority([FromBody] ProfileImageViewModel priorityingViewModel, CancellationToken cancellationToken)
+        public async Task<object> UpdatePriority([FromBody] ProfileImageViewModel administrativeViewModel, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (priorityingViewModel == null)
-                    throw new ArgumentNullException(nameof(priorityingViewModel));
+                if (administrativeViewModel == null)
+                    throw new ArgumentNullException(nameof(administrativeViewModel));
 
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<ProfileImageViewModel, Priority>());
                 var mapper = config.CreateMapper();
-                var modal = mapper.Map<Priority>(priorityingViewModel);
+                var modal = mapper.Map<Priority>(administrativeViewModel);
 
                 modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
 

@@ -156,6 +156,7 @@ namespace TimeAPI.API.Controllers
                     //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true);
                     var code = await _userManager.GenerateUserTokenAsync(user, "Default", "Confirmation").ConfigureAwait(true);
                     //code = EncodeServerName(code); // HttpUtility.UrlEncode(code, );
+
                     code = HttpUtility.UrlPathEncode(code); 
                     var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
                     await _emailSender.SendEmailConfirmationAsync(UserModel.Email, callbackUrl).ConfigureAwait(true);

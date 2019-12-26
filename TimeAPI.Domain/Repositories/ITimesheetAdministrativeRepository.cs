@@ -5,11 +5,8 @@ using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.Domain.Repositories
 {
-    public interface ITimesheetRepository : IRepository<Timesheet, string>
+    public interface ITimesheetAdministrativeRepository : IRepository<TimesheetAdministrative, string>
     {
-        void CheckOutByEmpID(Timesheet entity);
-        Timesheet FindTimeSheetByEmpID(string empid, string groupid);
         void RemoveByGroupID(string GroupID);
-
     }
 }

@@ -50,6 +50,17 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
+        public void RemoveByGroupID(string GroupID)
+        {
+            Execute(
+                sql: @"UPDATE dbo.timesheet
+                   SET
+                       modified_date = GETDATE(), is_deleted = 1
+                    WHERE groupid = @GroupID",
+                param: new { GroupID }
+            );
+        }
+
         public void Update(Timesheet entity)
         {
             Execute(

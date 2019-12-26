@@ -21,5 +21,13 @@ namespace TimeAPI.API.Models.TimesheetViewModels
         public string modified_date { get; set; }
         public string modifiedby { get; set; }
         public bool is_deleted { get; set; }
+
+        //For TimesheetActivity
+        public string project_category_type_id { get; set; }
+        public string system_id { get; set; }
+
+        //FOr TimesheetAdministrative
+        public List<string> team_administrative { get; set; }
+
     }
 }

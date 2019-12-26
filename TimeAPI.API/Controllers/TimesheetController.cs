@@ -75,9 +75,9 @@ namespace TimeAPI.API.Controllers
 
                 var _groupid = Guid.NewGuid().ToString();
                 if (timesheetViewModel.groupid != null)
-                {
                     _groupid = timesheetViewModel.groupid;
-                }
+
+                #region TimesheetWithTeamMembers
 
                 foreach (var item in timesheetViewModel.team_member_empid.Distinct())
                 {
@@ -86,10 +86,49 @@ namespace TimeAPI.API.Controllers
                     modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
                     modal.is_deleted = false;
                     modal.groupid = _groupid;
-                    //GroupID = modal.groupid;
 
                     _unitOfWork.TimesheetRepository.Add(modal);
                 }
+
+                #endregion TimesheetWithTeamMembers
+
+                #region TimesheetProjectCategory
+
+                if (timesheetViewModel.project_category_type_id != "")
+                {
+                    var project_category_type = new TimesheetProjectCategory
+                    {
+                        id = Guid.NewGuid().ToString(),
+                        timesheet_id = modal.id,
+                        groupid = modal.groupid,
+                        project_category_type_id = timesheetViewModel.project_category_type_id,
+                        system_id = timesheetViewModel.system_id,
+                        is_deleted = false,
+                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        createdby = modal.createdby
+                    };
+                    _unitOfWork.TimesheetProjectCategoryRepository.Add(project_category_type);
+                }
+
+                #endregion TimesheetProjectCategory
+
+                #region TimesheetAdministrative
+
+                foreach (var item in timesheetViewModel.team_administrative.Distinct())
+                {
+                    var project_administrative = new TimesheetAdministrative
+                    {
+                        id = Guid.NewGuid().ToString(),
+                        administrative_id = item,
+                        groupid = modal.groupid,
+                        is_deleted = false,
+                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        createdby = modal.createdby
+                    };
+                    _unitOfWork.TimesheetAdministrativeRepository.Add(project_administrative);
+                }
+
+                #endregion TimesheetAdministrative
 
                 _unitOfWork.Commit();
 
@@ -117,10 +156,68 @@ namespace TimeAPI.API.Controllers
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetViewModel, Timesheet>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Timesheet>(timesheetViewModel);
-
                 modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
 
-                _unitOfWork.TimesheetRepository.Update(modal);
+                #region TimesheetWithTeamMembers
+
+                //Remove TeamMembers with this CurrentGroupID
+                _unitOfWork.TimesheetRepository.RemoveByGroupID(modal.groupid);
+
+                foreach (var item in timesheetViewModel.team_member_empid.Distinct())
+                {
+                    modal.id = Guid.NewGuid().ToString();
+                    modal.empid = item;
+                    modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                    modal.is_deleted = false;
+                    modal.groupid = timesheetViewModel.groupid;
+
+                    _unitOfWork.TimesheetRepository.Add(modal);
+                }
+
+                #endregion TimesheetWithTeamMembers
+
+                #region TimesheetActivity
+
+                //Remove ProjectCategory with this CurrentGroupID
+                _unitOfWork.TimesheetProjectCategoryRepository.RemoveByGroupID(modal.groupid);
+                if (timesheetViewModel.project_category_type_id != "")
+                {
+                    var timesheet_activity = new TimesheetProjectCategory
+                    {
+                        id = Guid.NewGuid().ToString(),
+                        timesheet_id = modal.id,
+                        groupid = modal.groupid,
+                        project_category_type_id = timesheetViewModel.project_category_type_id,
+                        system_id = timesheetViewModel.system_id,
+                        is_deleted = false,
+                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        createdby = modal.createdby
+                    };
+
+                    _unitOfWork.TimesheetProjectCategoryRepository.Add(timesheet_activity);
+                }
+
+                #endregion TimesheetActivity
+
+                #region TimesheetAdministrative
+
+                _unitOfWork.TimesheetAdministrativeRepository.RemoveByGroupID(modal.groupid);
+                foreach (var item in timesheetViewModel.team_administrative.Distinct())
+                {
+                    var project_administrative = new TimesheetAdministrative
+                    {
+                        id = Guid.NewGuid().ToString(),
+                        administrative_id = item,
+                        groupid = modal.groupid,
+                        is_deleted = false,
+                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        createdby = modal.createdby
+                    };
+                    _unitOfWork.TimesheetAdministrativeRepository.Add(project_administrative);
+                }
+
+                #endregion TimesheetAdministrative
+
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Timesheet updated succefully." }).ConfigureAwait(false);
@@ -144,6 +241,11 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(paramName: nameof(Utils.ID));
 
                 _unitOfWork.TimesheetRepository.Remove(Utils.ID);
+                var Timesheet = _unitOfWork.TimesheetRepository.Find(Utils.ID);
+                _unitOfWork.TimesheetRepository.RemoveByGroupID(Timesheet.groupid);
+                _unitOfWork.TimesheetProjectCategoryRepository.RemoveByGroupID(Timesheet.groupid);
+                _unitOfWork.TimesheetAdministrativeRepository.RemoveByGroupID(Timesheet.groupid);
+
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Timesheet removed succefully." }).ConfigureAwait(false);
