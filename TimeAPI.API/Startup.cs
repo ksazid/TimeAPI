@@ -46,14 +46,17 @@ namespace TimeAPI.API
                 //    builder => builder.WithOrigins("https://enforce.azurewebsites.net", "http://localhost:4200/")
                 //    .AllowAnyMethod()
                 //    .AllowAnyHeader());
+                //.AllowCredentials()
+                //    .SetIsOriginAllowed((hosts) => true));
 
 
-                options.AddPolicy("CorsPolicy",
+            options.AddPolicy("CorsPolicy",
                 builder =>
                 {
                     builder.AllowAnyOrigin();
                 });
             });
+
             services.AddDataProtection(options =>
             {
                 options.ApplicationDiscriminator = "TimeAPI.API";
