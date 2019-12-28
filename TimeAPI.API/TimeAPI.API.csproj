@@ -15,6 +15,7 @@
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <Optimize>false</Optimize>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Controllers\jw1jsuz1.4uj~" />

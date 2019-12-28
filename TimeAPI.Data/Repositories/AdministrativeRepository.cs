@@ -57,7 +57,7 @@ namespace TimeAPI.Data.Repositories
                 sql: @"UPDATE dbo.administrative
                    SET 
                        administrative_name = @administrative_name, 
-                       org_id  = @org_id
+                       org_id  = @org_id,
                        summary = @summary,
                        modified_date = @modified_date, 
                        modifiedby = @modifiedby
