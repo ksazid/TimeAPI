@@ -77,6 +77,7 @@ namespace TimeAPI.API.Controllers
                 if (timesheetViewModel.groupid != null)
                     _groupid = timesheetViewModel.groupid;
 
+                
                 #region TimesheetWithTeamMembers
 
                 foreach (var item in timesheetViewModel.team_member_empid.Distinct())
@@ -91,6 +92,24 @@ namespace TimeAPI.API.Controllers
                 }
 
                 #endregion TimesheetWithTeamMembers
+
+                #region Teams
+
+                foreach (var item in timesheetViewModel.teamid.Distinct())
+                {
+                    var timesheet_team = new TimesheetTeam
+                    {
+                        id = Guid.NewGuid().ToString(),
+                        teamid = item,
+                        groupid = modal.groupid,
+                        is_deleted = false,
+                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        createdby = modal.createdby
+                    };
+                    _unitOfWork.TimesheetTeamRepository.Add(timesheet_team);
+                }
+
+                #endregion Teams
 
                 #region TimesheetProjectCategory
 
@@ -114,7 +133,7 @@ namespace TimeAPI.API.Controllers
 
                 #region TimesheetAdministrative
 
-                foreach (var item in timesheetViewModel.team_administrative.Distinct())
+                foreach (var item in timesheetViewModel.timesheet_administrative.Distinct())
                 {
                     var project_administrative = new TimesheetAdministrative
                     {
@@ -158,6 +177,7 @@ namespace TimeAPI.API.Controllers
                 var modal = mapper.Map<Timesheet>(timesheetViewModel);
                 modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
 
+
                 #region TimesheetWithTeamMembers
 
                 //Remove TeamMembers with this CurrentGroupID
@@ -175,6 +195,27 @@ namespace TimeAPI.API.Controllers
                 }
 
                 #endregion TimesheetWithTeamMembers
+
+                #region Teams
+
+                //Remove TeamMembers with this CurrentGroupID
+                _unitOfWork.TimesheetTeamRepository.RemoveByGroupID(modal.groupid);
+
+                foreach (var item in timesheetViewModel.teamid.Distinct())
+                {
+                    var timesheet_team = new TimesheetTeam
+                    {
+                        id = Guid.NewGuid().ToString(),
+                        teamid = item,
+                        groupid = modal.groupid,
+                        is_deleted = false,
+                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        createdby = modal.createdby
+                    };
+                    _unitOfWork.TimesheetTeamRepository.Add(timesheet_team);
+                }
+
+                #endregion Teams
 
                 #region TimesheetActivity
 
@@ -202,7 +243,7 @@ namespace TimeAPI.API.Controllers
                 #region TimesheetAdministrative
 
                 _unitOfWork.TimesheetAdministrativeRepository.RemoveByGroupID(modal.groupid);
-                foreach (var item in timesheetViewModel.team_administrative.Distinct())
+                foreach (var item in timesheetViewModel.timesheet_administrative.Distinct())
                 {
                     var project_administrative = new TimesheetAdministrative
                     {
@@ -242,7 +283,9 @@ namespace TimeAPI.API.Controllers
 
                 _unitOfWork.TimesheetRepository.Remove(Utils.ID);
                 var Timesheet = _unitOfWork.TimesheetRepository.Find(Utils.ID);
+
                 _unitOfWork.TimesheetRepository.RemoveByGroupID(Timesheet.groupid);
+                _unitOfWork.TimesheetTeamRepository.RemoveByGroupID(Timesheet.groupid);
                 _unitOfWork.TimesheetProjectCategoryRepository.RemoveByGroupID(Timesheet.groupid);
                 _unitOfWork.TimesheetAdministrativeRepository.RemoveByGroupID(Timesheet.groupid);
 

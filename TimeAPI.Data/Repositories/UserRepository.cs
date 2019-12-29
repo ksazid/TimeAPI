@@ -83,43 +83,6 @@ namespace TimeAPI.Data.Repositories
                 param: entity);
         }
 
-        public UserDataGroupDataSet GetUserDataGroupByUserID(string UserID)
-        {
-            var resultsAspNetUsers = QuerySingleOrDefault<User>(
-                sql: @"select * from AspNetUsers WHERE id = @UserID;",
-                param: new { UserID }
-            );
-
-            var resultsOrganization = Query<Organization>(
-                sql: @"select * from Organization WHERE user_id = @UserID and is_deleted = 0;",
-                param: new { UserID }
-            );
-
-            var resultsEmployee = QuerySingleOrDefault<Employee>(
-                sql: @"select * from Employee WHERE user_id = @UserID and is_deleted = 0;",
-                param: new { UserID }
-            );
-
-            var resultsTimesheet = QuerySingleOrDefault<Timesheet>(
-                sql: @"select  top 1 timesheet.* from timesheet	
-                        LEFT JOIN employee on timesheet.empid = employee.id
-                        WHERE employee.user_id = @UserID
-                        AND timesheet.is_checkout = 0 
-                        AND FORMAT(cast(timesheet.ondate as date), 'd', 'en-us') = FORMAT(getdate(), 'd', 'en-us') 
-                        AND timesheet.is_deleted = 0;",
-                param: new { UserID }
-            );
-
-            UserDataGroupDataSet _UserDataGroupDataSet = new UserDataGroupDataSet();
-
-            _UserDataGroupDataSet.User = resultsAspNetUsers;
-            _UserDataGroupDataSet.Organization = resultsOrganization;
-            _UserDataGroupDataSet.Employee = resultsEmployee;
-            _UserDataGroupDataSet.Timesheet = resultsTimesheet;
-
-            return _UserDataGroupDataSet;
-        }
-
         public void CustomEmailConfirmedFlagUpdate(string UserID)
         {
             Execute(
@@ -130,6 +93,134 @@ namespace TimeAPI.Data.Repositories
               param: new { UserID }
 
                 );
+        }
+
+        public UserDataGroupDataSet GetUserDataGroupByUserID(string UserID)
+        {
+            var resultsAspNetUsers = QuerySingleOrDefault<User>(
+                sql: @"SELECT * from AspNetUsers WITH (NOLOCK) WHERE id = @UserID;",
+                param: new { UserID }
+            );
+
+            var resultsOrganization = Query<Organization>(
+                sql: @"SELECT * from Organization WITH (NOLOCK) WHERE user_id = @UserID and is_deleted = 0;",
+                param: new { UserID }
+            );
+
+            var resultsEmployee = QuerySingleOrDefault<Employee>(
+                sql: @"SELECT * from Employee WITH (NOLOCK) WHERE user_id = @UserID and is_deleted = 0;",
+                param: new { UserID }
+            );
+
+            var resultsTimesheetGrpID = Query<string>(
+                sql: @"SELECT distinct(groupid) from timesheet WITH (NOLOCK)
+                        WHERE empid = @empid
+                        AND FORMAT(cast(timesheet.ondate as date), 'd', 'en-us') = FORMAT(getdate(), 'd', 'en-us') 
+                        AND timesheet.is_deleted = 0;",
+                param: new { empid = resultsEmployee.id }
+            );
+
+
+            List<RootTimesheetData> RootTimesheetDataList = new List<RootTimesheetData>();
+
+            foreach (var item in resultsTimesheetGrpID)
+            {
+                RootTimesheetData rootTimesheetData = new RootTimesheetData();
+
+                List<TimesheetDataModel> TimesheetDataModelList = new List<TimesheetDataModel>();
+                List<TimesheetAdministrativeDataModel> TimesheetAdministrativeDataModelList = new List<TimesheetAdministrativeDataModel>();
+                List<TimesheetProjectCategoryDataModel> TimesheetProjectCategoryDataModelList = new List<TimesheetProjectCategoryDataModel>();
+                List<TimesheetTeamDataModel> TimesheetTeamDataModelList = new List<TimesheetTeamDataModel>();
+
+
+                var ResultTimesheetData = GetTimesheetDataModel(item);
+                var ResultTimesheetAdministrativeDataModel = GetTimesheetAdministrativeDataModel(item);
+                var ResultProjectCategoryDataModel = GetTimesheetProjectCategoryDataModel(item);
+                var ResultTimesheetTeamDataModel = GetTimesheetTeamDataModel(item);
+
+
+                TimesheetDataModelList.AddRange(ResultTimesheetData);
+                TimesheetAdministrativeDataModelList.AddRange(ResultTimesheetAdministrativeDataModel);
+                TimesheetProjectCategoryDataModelList.AddRange(ResultProjectCategoryDataModel);
+                TimesheetTeamDataModelList.AddRange(ResultTimesheetTeamDataModel);
+
+                rootTimesheetData.timesheetDataModels = TimesheetDataModelList;
+                rootTimesheetData.TimesheetAdministrativeDataModel = TimesheetAdministrativeDataModelList;
+                rootTimesheetData.TimesheetProjectCategoryDataModel = TimesheetProjectCategoryDataModelList;
+                rootTimesheetData.TimesheetTeamDataModel = TimesheetTeamDataModelList;
+
+                RootTimesheetDataList.Add(rootTimesheetData);
+            }
+
+            UserDataGroupDataSet _UserDataGroupDataSet = new UserDataGroupDataSet();
+
+            _UserDataGroupDataSet.User = resultsAspNetUsers;
+            _UserDataGroupDataSet.Organization = resultsOrganization;
+            _UserDataGroupDataSet.Employee = resultsEmployee;
+            _UserDataGroupDataSet.Timesheet = RootTimesheetDataList;
+
+            return _UserDataGroupDataSet;
+        }
+
+        public IEnumerable<TimesheetDataModel> GetTimesheetDataModel(string GroupID)
+        {
+            var TimesheetDataModel = Query<TimesheetDataModel>(
+                sql: @"SELECT 
+                                timesheet.id, employee.full_name as emp_name, timesheet.groupid, timesheet.teamid,  
+                                team.team_name, timesheet.ondate, timesheet.check_in, timesheet.check_out, 
+                                timesheet.is_checkout, timesheet.total_hrs, timesheet.created_date, 
+                                timesheet.createdby, timesheet.modified_date, timesheet.modifiedby, timesheet.is_deleted  
+                    FROM timesheet WITH (NOLOCK)
+                        LEFT JOIN employee on timesheet.empid = Employee.id
+                        LEFT JOIN team on timesheet.teamid = team.id
+                        WHERE timesheet.groupid = @GroupID;",
+                param: new { GroupID }
+            );
+
+            return TimesheetDataModel;
+        }
+
+        public IEnumerable<TimesheetAdministrativeDataModel> GetTimesheetAdministrativeDataModel(string GroupID)
+        {
+            var TimesheetAdministrativeDataModel = Query<TimesheetAdministrativeDataModel>(
+                sql: @"SELECT 
+                            timesheet_x_administrative.id, timesheet_x_administrative.administrative_id, administrative.administrative_name
+                        FROM timesheet_x_administrative WITH (NOLOCK)
+                        LEFT JOIN administrative on timesheet_x_administrative.administrative_id = administrative.id
+                        WHERE timesheet_x_administrative.groupid = @GroupID;",
+                param: new { GroupID }
+            );
+
+            return TimesheetAdministrativeDataModel;
+        }
+
+        public IEnumerable<TimesheetProjectCategoryDataModel> GetTimesheetProjectCategoryDataModel(string GroupID)
+        {
+            var TimesheetAdministrativeDataModel = Query<TimesheetProjectCategoryDataModel>(
+                sql: @"SELECT 
+                        timesheet_x_project_category.id, timesheet_x_project_category.groupid,  
+                        timesheet_x_project_category.project_category_type_id as project_name,
+                        timesheet_x_project_category.system_id as system_name 
+                    FROM timesheet_x_project_category   WITH (NOLOCK)
+                    WHERE timesheet_x_project_category.groupid = @GroupID;",
+                param: new { GroupID }
+            );
+
+            return TimesheetAdministrativeDataModel;
+        }
+
+        public IEnumerable<TimesheetTeamDataModel> GetTimesheetTeamDataModel(string GroupID)
+        {
+            var TimesheetTeamDataModel = Query<TimesheetTeamDataModel>(
+                sql: @"SELECT 
+                        timesheet_x_team.id, timesheet_x_team.teamid, team.team_name
+                    FROM timesheet_x_team   WITH (NOLOCK)
+                    LEFT JOIN team on timesheet_x_team.teamid = team.id
+                    WHERE timesheet_x_team.groupid = @GroupID;",
+                param: new { GroupID }
+            );
+
+            return TimesheetTeamDataModel;
         }
 
     }

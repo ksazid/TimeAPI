@@ -15,7 +15,7 @@ namespace TimeAPI.Data.Repositories
         {
 
             entity.id = ExecuteScalar<string>(
-                    sql: @"INSERT INTO dbo.timesheet_administrative
+                    sql: @"INSERT INTO dbo.timesheet_x_administrative
                                   (id, administrative_id, groupid, created_date, createdby)
                            VALUES (@id, @administrative_id, @groupid,  @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
@@ -26,7 +26,7 @@ namespace TimeAPI.Data.Repositories
         public TimesheetAdministrative Find(string key)
         {
             return QuerySingleOrDefault<TimesheetAdministrative>(
-                sql: "SELECT * FROM dbo.timesheet_administrative WHERE is_deleted = 0 and id = @key",
+                sql: "SELECT * FROM dbo.timesheet_x_administrative WHERE is_deleted = 0 and id = @key",
                 param: new { key }
             );
         }
@@ -34,7 +34,7 @@ namespace TimeAPI.Data.Repositories
         public void Remove(string key)
         {
             Execute(
-                sql: @"UPDATE dbo.timesheet_administrative
+                sql: @"UPDATE dbo.timesheet_x_administrative
                    SET
                        modified_date = GETDATE(), is_deleted = 1
                     WHERE id = @key",
@@ -45,7 +45,7 @@ namespace TimeAPI.Data.Repositories
         public void RemoveByGroupID(string GroupID)
         {
             Execute(
-                sql: @"UPDATE dbo.timesheet_administrative
+                sql: @"UPDATE dbo.timesheet_x_administrative
                    SET
                        modified_date = GETDATE(), is_deleted = 1
                     WHERE groupid = @GroupID",
@@ -56,7 +56,7 @@ namespace TimeAPI.Data.Repositories
         public void Update(TimesheetAdministrative entity)
         {
             Execute(
-                sql: @"UPDATE dbo.timesheet_administrative
+                sql: @"UPDATE dbo.timesheet_x_administrative
                    SET 
                     administrative_id = @administrative_id,
                     groupid = @groupid,
@@ -70,7 +70,7 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<TimesheetAdministrative> All()
         {
             return Query<TimesheetAdministrative>(
-                sql: "SELECT * FROM [dbo].[timesheet_administrative] where is_deleted = 0"
+                sql: "SELECT * FROM [dbo].[timesheet_x_administrative] where is_deleted = 0"
             );
         }
      

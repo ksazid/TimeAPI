@@ -44,6 +44,7 @@ namespace TimeAPI.Data
         private ITeamMemberRepository _teamMemberRepository;
         private ITimesheetProjectCategoryRepository _timesheetProjectCategoryRepository;
         private ITimesheetAdministrativeRepository _timesheetAdministrativeRepository;
+        private ITimesheetTeamRepository _timesheetTeamRepository;
 
         private bool _disposed;
         #endregion
@@ -317,6 +318,15 @@ namespace TimeAPI.Data
             }
         }
 
+        public ITimesheetTeamRepository TimesheetTeamRepository
+        {
+            get
+            {
+                return _timesheetTeamRepository
+                    ?? (_timesheetTeamRepository = new TimesheetTeamRepository(_transaction));
+            }
+        }
+
 
         public void Commit()
         {
@@ -374,6 +384,7 @@ namespace TimeAPI.Data
             _teamRepository = null;
             _timesheetProjectCategoryRepository = null;
             _timesheetAdministrativeRepository = null;
+            _timesheetTeamRepository = null;
         }
 
         private void dispose(bool disposing)

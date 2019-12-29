@@ -11,6 +11,7 @@ namespace TimeAPI.API.Models.TimesheetViewModels
         public string id { get; set; }
         public List<string> team_member_empid { get; set; }
         public string groupid { get; set; }
+        public List<string> teamid { get; set; }
         public string ondate { get; set; }
         public string check_in { get; set; }
         public string check_out { get; set; }
@@ -27,7 +28,7 @@ namespace TimeAPI.API.Models.TimesheetViewModels
         public string system_id { get; set; }
 
         //FOr TimesheetAdministrative
-        public List<string> team_administrative { get; set; }
+        public List<string> timesheet_administrative { get; set; }
 
     }
 }
