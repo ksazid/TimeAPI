@@ -31,4 +31,12 @@ namespace TimeAPI.API.Models.TimesheetViewModels
         public List<string> timesheet_administrative { get; set; }
 
     }
+
+    public class TimesheetCheckoutViewModel
+    {
+        public List<string> team_member_empid { get; set; }
+        public string groupid { get; set; }
+        public string check_out { get; set; }
+        public string modifiedby { get; set; }
+    }
 }

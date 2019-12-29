@@ -77,7 +77,7 @@ namespace TimeAPI.API.Controllers
                 if (timesheetViewModel.groupid != null)
                     _groupid = timesheetViewModel.groupid;
 
-                
+
                 #region TimesheetWithTeamMembers
 
                 foreach (var item in timesheetViewModel.team_member_empid.Distinct())
@@ -322,7 +322,7 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("CheckOutByEmpID")]
-        public async Task<object> CheckOutByEmpID([FromBody] TimesheetViewModel timesheetViewModel, CancellationToken cancellationToken)
+        public async Task<object> CheckOutByEmpID([FromBody] TimesheetCheckoutViewModel timesheetViewModel, CancellationToken cancellationToken)
         {
             try
             {
@@ -332,15 +332,16 @@ namespace TimeAPI.API.Controllers
                 if (timesheetViewModel == null)
                     throw new ArgumentNullException(nameof(timesheetViewModel));
 
-                timesheetViewModel.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
-
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetViewModel, Timesheet>());
-                var mapper = config.CreateMapper();
-                var modal = mapper.Map<Timesheet>(timesheetViewModel);
+                //var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetViewModel, Timesheet>());
+                //var mapper = config.CreateMapper();
+                //var modal = mapper.Map<Timesheet>(timesheetViewModel);
 
                 foreach (var item in timesheetViewModel.team_member_empid.Distinct())
                 {
+                    Timesheet modal = new Timesheet();
+
                     modal.empid = item;
+                    modal.groupid = timesheetViewModel.groupid;
 
                     var Timesheet = _unitOfWork.TimesheetRepository.FindTimeSheetByEmpID(modal.empid, modal.groupid);
 
@@ -351,7 +352,8 @@ namespace TimeAPI.API.Controllers
                     modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
                     modal.is_checkout = true;
                     modal.is_deleted = false;
-                    modal.groupid = timesheetViewModel.groupid;
+                    //modal.groupid = timesheetViewModel.groupid;
+                    modal.modifiedby = timesheetViewModel.modifiedby;
 
                     _unitOfWork.TimesheetRepository.CheckOutByEmpID(modal);
                 }
