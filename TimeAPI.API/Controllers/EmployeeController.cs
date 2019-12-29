@@ -517,6 +517,33 @@ namespace TimeAPI.API.Controllers
             }
         }
 
+
+        [HttpPost]
+        [Route("FindEmpDepartDesignByTeamID")]
+        public async Task<object> FindEmpDepartDesignByTeamID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                oDataTable _oDataTable = new oDataTable();
+                var results = _unitOfWork.EmployeeRepository.FindEmpDepartDesignByTeamID(Utils.ID);
+                var xResult = _oDataTable.ToDataTable(results);
+                _unitOfWork.Commit();
+
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(results, Formatting.Indented)).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+
         #region Helpers
         private void AddErrors(IdentityResult result)
         {
