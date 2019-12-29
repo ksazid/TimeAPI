@@ -103,12 +103,12 @@ namespace TimeAPI.Data.Repositories
             );
 
             var resultsOrganization = Query<Organization>(
-                sql: @"SELECT * from Organization WITH (NOLOCK) WHERE user_id = @UserID and is_deleted = 0;",
+                sql: @"SELECT * from organization WITH (NOLOCK) WHERE user_id = @UserID and is_deleted = 0;",
                 param: new { UserID }
             );
 
             var resultsEmployee = QuerySingleOrDefault<Employee>(
-                sql: @"SELECT * from Employee WITH (NOLOCK) WHERE user_id = @UserID and is_deleted = 0;",
+                sql: @"SELECT * from employee WITH (NOLOCK) WHERE user_id = @UserID and is_deleted = 0;",
                 param: new { UserID }
             );
 
@@ -166,14 +166,13 @@ namespace TimeAPI.Data.Repositories
         {
             var TimesheetDataModel = Query<TimesheetDataModel>(
                 sql: @"SELECT 
-                                timesheet.id, employee.full_name as emp_name, timesheet.groupid, timesheet.teamid,  
-                                team.team_name, timesheet.ondate, timesheet.check_in, timesheet.check_out, 
-                                timesheet.is_checkout, timesheet.total_hrs, timesheet.created_date, 
-                                timesheet.createdby, timesheet.modified_date, timesheet.modifiedby, timesheet.is_deleted  
-                    FROM timesheet WITH (NOLOCK)
-                        LEFT JOIN employee on timesheet.empid = Employee.id
-                        LEFT JOIN team on timesheet.teamid = team.id
-                        WHERE timesheet.groupid = @GroupID;",
+                            timesheet.id, employee.full_name as emp_name, timesheet.groupid, 
+			                timesheet.ondate, timesheet.check_in, timesheet.check_out, 
+                            timesheet.is_checkout, timesheet.total_hrs, timesheet.created_date, 
+                            timesheet.createdby, timesheet.modified_date, timesheet.modifiedby, timesheet.is_deleted  
+                FROM timesheet WITH (NOLOCK)
+                    LEFT JOIN employee on timesheet.empid = Employee.id
+                    WHERE timesheet.groupid = @GroupID;",
                 param: new { GroupID }
             );
 
