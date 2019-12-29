@@ -172,7 +172,8 @@ namespace TimeAPI.Data.Repositories
                             timesheet.createdby, timesheet.modified_date, timesheet.modifiedby, timesheet.is_deleted  
                 FROM timesheet WITH (NOLOCK)
                     LEFT JOIN employee on timesheet.empid = Employee.id
-                    WHERE timesheet.groupid = @GroupID;",
+                    WHERE timesheet.groupid = @GroupID 			
+                    ORDER BY timesheet.ondate asc;",
                 param: new { GroupID }
             );
 

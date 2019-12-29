@@ -332,10 +332,6 @@ namespace TimeAPI.API.Controllers
                 if (timesheetViewModel == null)
                     throw new ArgumentNullException(nameof(timesheetViewModel));
 
-                //var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetViewModel, Timesheet>());
-                //var mapper = config.CreateMapper();
-                //var modal = mapper.Map<Timesheet>(timesheetViewModel);
-
                 foreach (var item in timesheetViewModel.team_member_empid.Distinct())
                 {
                     Timesheet modal = new Timesheet();
@@ -356,7 +352,7 @@ namespace TimeAPI.API.Controllers
                     modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
                     modal.is_checkout = true;
                     modal.is_deleted = false;
-                    //modal.groupid = timesheetViewModel.groupid;
+                    modal.check_out = timesheetViewModel.check_out;
                     modal.modifiedby = timesheetViewModel.modifiedby;
 
                     _unitOfWork.TimesheetRepository.CheckOutByEmpID(modal);
