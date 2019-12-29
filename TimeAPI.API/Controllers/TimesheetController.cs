@@ -344,6 +344,10 @@ namespace TimeAPI.API.Controllers
                     modal.groupid = timesheetViewModel.groupid;
 
                     var Timesheet = _unitOfWork.TimesheetRepository.FindTimeSheetByEmpID(modal.empid, modal.groupid);
+                    if (Timesheet == null)
+                    {
+                        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = "Not a valid employee", Desc = modal.empid });
+                    }
 
                     var _TotalMinutes = (Convert.ToDateTime(modal.check_out) - Convert.ToDateTime(Timesheet.check_in)).TotalMinutes;
                     TimeSpan spWorkMin = TimeSpan.FromMinutes(_TotalMinutes);
