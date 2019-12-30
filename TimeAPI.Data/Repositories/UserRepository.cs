@@ -199,8 +199,8 @@ namespace TimeAPI.Data.Repositories
             var TimesheetAdministrativeDataModel = Query<TimesheetProjectCategoryDataModel>(
                 sql: @"SELECT 
                         timesheet_x_project_category.id, timesheet_x_project_category.groupid,  
-                        timesheet_x_project_category.project_category_type_id as project_name,
-                        timesheet_x_project_category.system_id as system_name 
+                        timesheet_x_project_category.project_category_id as project_name,
+                        timesheet_x_project_category.project_or_comp_id as system_name 
                     FROM timesheet_x_project_category   WITH (NOLOCK)
                     WHERE timesheet_x_project_category.groupid = @GroupID;",
                 param: new { GroupID }
