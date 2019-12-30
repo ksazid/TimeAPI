@@ -36,6 +36,9 @@ namespace TimeAPI.Domain
         ITimesheetProjectCategoryRepository TimesheetProjectCategoryRepository { get; }
         ITimesheetAdministrativeRepository TimesheetAdministrativeRepository { get; }
         ITimesheetTeamRepository TimesheetTeamRepository { get; }
+        ITimesheetActivityRepository TimesheetActivityRepository { get; }
+        ITimesheetActivityCommentRepository TimesheetActivityCommentRepository { get; }
+        ITimesheetActivityFileRepository TimesheetActivityFileRepository { get; }
 
         //commit all after all completes
         void Commit();
