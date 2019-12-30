@@ -22,6 +22,9 @@ using TimeAPI.API.Models.DesignationViewModels;
 using TimeAPI.API.Models.TimesheetViewModels;
 using System.Collections.Generic;
 using System.Globalization;
+using TimeAPI.API.Models.TimesheetActivityViewModels;
+using TimeAPI.API.Models.TimesheetActivityCommentViewModels;
+using TimeAPI.API.Models.TimesheetActivityFileViewModels;
 
 namespace TimeAPI.API.Controllers
 {
@@ -46,6 +49,8 @@ namespace TimeAPI.API.Controllers
             _unitOfWork = unitOfWork;
         }
 
+        #region Timesheet
+   
         [HttpPost]
         [Route("AddTimesheet")]
         public async Task<object> AddTimesheet([FromBody] TimesheetViewModel timesheetViewModel, CancellationToken cancellationToken)
@@ -438,6 +443,335 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
+
+        #endregion Timesheet
+
+        #region  TimesheetActivity
+
+        [HttpPost]
+        [Route("AddTimesheetActivity")]
+        public async Task<object> AddTimesheetActivity([FromBody] TimesheetActivityViewModel timesheetActivityViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (timesheetActivityViewModel == null)
+                    throw new ArgumentNullException(nameof(timesheetActivityViewModel));
+
+                if (timesheetActivityViewModel.groupid == "string" || string.IsNullOrWhiteSpace(timesheetActivityViewModel.groupid)|| string.IsNullOrEmpty(timesheetActivityViewModel.groupid))
+                     return await Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = "Error", Desc = "Invalid GroupID" }).ConfigureAwait(false);
+
+                timesheetActivityViewModel.is_deleted = false;
+                timesheetActivityViewModel.ondate = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                timesheetActivityViewModel.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetActivityViewModel, TimesheetActivity>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<TimesheetActivity>(timesheetActivityViewModel);
+
+                _unitOfWork.TimesheetActivityRepository.Add(modal);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Timesheet Activity added succefully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPatch]
+        [Route("UpdateTimesheetActivity")]
+        public async Task<object> UpdateAddTimesheetActivity([FromBody] TimesheetActivityViewModel timesheetActivityViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (timesheetActivityViewModel == null)
+                    throw new ArgumentNullException(nameof(timesheetActivityViewModel));
+
+                timesheetActivityViewModel.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetActivityViewModel, TimesheetActivity>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<TimesheetActivity>(timesheetActivityViewModel);
+                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+
+                _unitOfWork.TimesheetActivityRepository.Update(modal);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Timesheet Activity updated succefully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("RemoveTimesheetActivity")]
+        public async Task<object> RemoveTimesheetActivity([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(paramName: nameof(Utils.ID));
+
+                _unitOfWork.TimesheetActivityRepository.Remove(Utils.ID);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Timesheet Activity removed succefully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("GetAllTimesheetActivitys")]
+        public async Task<object> GetAllTimesheetActivitys(CancellationToken cancellationToken)
+        {
+
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                var result = _unitOfWork.TimesheetActivityRepository.All();
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        #endregion  TimesheetActivity
+
+        #region  TimesheetActivityComment
+
+        [HttpPost]
+        [Route("AddTimesheetActivityComment")]
+        public async Task<object> AddTimesheetActivityComment([FromBody] TimesheetActivityCommentViewModel timesheetActivityCommentViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (timesheetActivityCommentViewModel == null)
+                    throw new ArgumentNullException(nameof(timesheetActivityCommentViewModel));
+
+                timesheetActivityCommentViewModel.is_deleted = false;
+                timesheetActivityCommentViewModel.ondate = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                timesheetActivityCommentViewModel.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetActivityCommentViewModel, TimesheetActivityComment>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<TimesheetActivityComment>(timesheetActivityCommentViewModel);
+
+                _unitOfWork.TimesheetActivityCommentRepository.Add(modal);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Comment added succefully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPatch]
+        [Route("UpdateTimesheetActivityComment")]
+        public async Task<object> UpdateAddTimesheetActivityComment([FromBody] TimesheetActivityCommentViewModel timesheetActivityCommentViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (timesheetActivityCommentViewModel == null)
+                    throw new ArgumentNullException(nameof(timesheetActivityCommentViewModel));
+
+                timesheetActivityCommentViewModel.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetActivityCommentViewModel, TimesheetActivityComment>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<TimesheetActivityComment>(timesheetActivityCommentViewModel);
+                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+
+                _unitOfWork.TimesheetActivityCommentRepository.Update(modal);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Comment updated succefully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("RemoveTimesheetActivityComment")]
+        public async Task<object> RemoveTimesheetActivityComment([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(paramName: nameof(Utils.ID));
+
+                _unitOfWork.TimesheetActivityCommentRepository.Remove(Utils.ID);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Comment removed succefully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("GetAllTimesheetActivityComments")]
+        public async Task<object> GetAllTimesheetActivityComments(CancellationToken cancellationToken)
+        {
+
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                var result = _unitOfWork.TimesheetActivityCommentRepository.All();
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        #endregion  TimesheetActivityComment
+
+        #region  TimesheetActivityFile
+
+        [HttpPost]
+        [Route("AddTimesheetActivityFile")]
+        public async Task<object> AddTimesheetActivityFile([FromBody] TimesheetActivityFileViewModel timesheetActivityFileViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (timesheetActivityFileViewModel == null)
+                    throw new ArgumentNullException(nameof(timesheetActivityFileViewModel));
+
+                timesheetActivityFileViewModel.is_deleted = false;
+                timesheetActivityFileViewModel.ondate = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                timesheetActivityFileViewModel.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetActivityFileViewModel, TimesheetActivityFile>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<TimesheetActivityFile>(timesheetActivityFileViewModel);
+
+                _unitOfWork.TimesheetActivityFileRepository.Add(modal);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Comment added succefully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPatch]
+        [Route("UpdateTimesheetActivityFile")]
+        public async Task<object> UpdateAddTimesheetActivityFile([FromBody] TimesheetActivityFileViewModel timesheetActivityFileViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (timesheetActivityFileViewModel == null)
+                    throw new ArgumentNullException(nameof(timesheetActivityFileViewModel));
+
+                timesheetActivityFileViewModel.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetActivityFileViewModel, TimesheetActivityFile>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<TimesheetActivityFile>(timesheetActivityFileViewModel);
+                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+
+                _unitOfWork.TimesheetActivityFileRepository.Update(modal);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Comment updated succefully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("RemoveTimesheetActivityFile")]
+        public async Task<object> RemoveTimesheetActivityFile([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(paramName: nameof(Utils.ID));
+
+                _unitOfWork.TimesheetActivityFileRepository.Remove(Utils.ID);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Comment removed succefully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("GetAllTimesheetActivityFiles")]
+        public async Task<object> GetAllTimesheetActivityFiles(CancellationToken cancellationToken)
+        {
+
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                var result = _unitOfWork.TimesheetActivityFileRepository.All();
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        #endregion  TimesheetActivityFile
 
     }
 }
