@@ -113,15 +113,51 @@ namespace TimeAPI.API.Controllers
 
                 #region TimesheetProjectCategory
 
-                if (timesheetViewModel.project_category_type_id != "")
+                if (timesheetViewModel.project_category_id != "")
                 {
                     var project_category_type = new TimesheetProjectCategory
                     {
                         id = Guid.NewGuid().ToString(),
-                        timesheet_id = modal.id,
+                        //timesheet_id = modal.id,
                         groupid = modal.groupid,
-                        project_category_type_id = timesheetViewModel.project_category_type_id,
-                        system_id = timesheetViewModel.system_id,
+                        project_category_id = timesheetViewModel.project_category_id,
+                        project_or_comp_id = timesheetViewModel.project_or_comp_id,
+                        is_office = false,
+                        is_other = false,
+                        is_deleted = false,
+                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        createdby = modal.createdby
+                    };
+                    _unitOfWork.TimesheetProjectCategoryRepository.Add(project_category_type);
+                }
+                else if (timesheetViewModel.is_office)
+                {
+                    var project_category_type = new TimesheetProjectCategory
+                    {
+                        id = Guid.NewGuid().ToString(),
+                        //timesheet_id = modal.id,
+                        groupid = modal.groupid,
+                        project_category_id = null,
+                        project_or_comp_id = null,
+                        is_office = true,
+                        is_other = false,
+                        is_deleted = false,
+                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        createdby = modal.createdby
+                    };
+                    _unitOfWork.TimesheetProjectCategoryRepository.Add(project_category_type);
+                }
+                else if (timesheetViewModel.is_other)
+                {
+                    var project_category_type = new TimesheetProjectCategory
+                    {
+                        id = Guid.NewGuid().ToString(),
+                        //timesheet_id = modal.id,
+                        groupid = modal.groupid,
+                        project_category_id = null,
+                        project_or_comp_id = null,
+                        is_office = false,
+                        is_other = true,
                         is_deleted = false,
                         created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
                         createdby = modal.createdby
@@ -177,7 +213,6 @@ namespace TimeAPI.API.Controllers
                 var modal = mapper.Map<Timesheet>(timesheetViewModel);
                 modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
 
-
                 #region TimesheetWithTeamMembers
 
                 //Remove TeamMembers with this CurrentGroupID
@@ -217,28 +252,64 @@ namespace TimeAPI.API.Controllers
 
                 #endregion Teams
 
-                #region TimesheetActivity
+                #region TimesheetProjectCategory
 
                 //Remove ProjectCategory with this CurrentGroupID
                 _unitOfWork.TimesheetProjectCategoryRepository.RemoveByGroupID(modal.groupid);
-                if (timesheetViewModel.project_category_type_id != "")
+
+                if (timesheetViewModel.project_category_id != "")
                 {
-                    var timesheet_activity = new TimesheetProjectCategory
+                    var project_category_type = new TimesheetProjectCategory
                     {
                         id = Guid.NewGuid().ToString(),
-                        timesheet_id = modal.id,
+                        //timesheet_id = modal.id,
                         groupid = modal.groupid,
-                        project_category_type_id = timesheetViewModel.project_category_type_id,
-                        system_id = timesheetViewModel.system_id,
+                        project_category_id = timesheetViewModel.project_category_id,
+                        project_or_comp_id = timesheetViewModel.project_or_comp_id,
+                        is_office = false,
+                        is_other = false,
                         is_deleted = false,
                         created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
                         createdby = modal.createdby
                     };
-
-                    _unitOfWork.TimesheetProjectCategoryRepository.Add(timesheet_activity);
+                    _unitOfWork.TimesheetProjectCategoryRepository.Add(project_category_type);
+                }
+                else if (timesheetViewModel.is_office)
+                {
+                    var project_category_type = new TimesheetProjectCategory
+                    {
+                        id = Guid.NewGuid().ToString(),
+                        //timesheet_id = modal.id,
+                        groupid = modal.groupid,
+                        project_category_id = null,
+                        project_or_comp_id = null,
+                        is_office = true,
+                        is_other = false,
+                        is_deleted = false,
+                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        createdby = modal.createdby
+                    };
+                    _unitOfWork.TimesheetProjectCategoryRepository.Add(project_category_type);
+                }
+                else if (timesheetViewModel.is_other)
+                {
+                    var project_category_type = new TimesheetProjectCategory
+                    {
+                        id = Guid.NewGuid().ToString(),
+                        //timesheet_id = modal.id,
+                        groupid = modal.groupid,
+                        project_category_id = null,
+                        project_or_comp_id = null,
+                        is_office = false,
+                        is_other = true,
+                        is_deleted = false,
+                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        createdby = modal.createdby
+                    };
+                    _unitOfWork.TimesheetProjectCategoryRepository.Add(project_category_type);
                 }
 
-                #endregion TimesheetActivity
+                #endregion TimesheetProjectCategory
 
                 #region TimesheetAdministrative
 

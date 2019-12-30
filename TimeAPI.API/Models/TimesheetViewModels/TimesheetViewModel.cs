@@ -24,8 +24,10 @@ namespace TimeAPI.API.Models.TimesheetViewModels
         public bool is_deleted { get; set; }
 
         //For TimesheetActivity
-        public string project_category_type_id { get; set; }
-        public string system_id { get; set; }
+        public string project_category_id { get; set; }
+        public string project_or_comp_id { get; set; }
+        public bool is_office { get; set; }
+        public bool is_other { get; set; }
 
         //FOr TimesheetAdministrative
         public List<string> timesheet_administrative { get; set; }
