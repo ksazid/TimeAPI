@@ -164,7 +164,7 @@ namespace TimeAPI.API
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
-            });
+            }).UseAuthorization();
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>

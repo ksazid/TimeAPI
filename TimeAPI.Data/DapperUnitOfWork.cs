@@ -45,10 +45,12 @@ namespace TimeAPI.Data
         private ITimesheetProjectCategoryRepository _timesheetProjectCategoryRepository;
         private ITimesheetAdministrativeRepository _timesheetAdministrativeRepository;
         private ITimesheetTeamRepository _timesheetTeamRepository;
-
         private ITimesheetActivityRepository _timesheetActivityRepository;
         private ITimesheetActivityCommentRepository _timesheetActivityCommentRepository;
         private ITimesheetActivityFileRepository _timesheetActivityFileRepository;
+        private ITimesheetLocationRepository _timesheetLocationRepository;
+        private ILocationRepository _locationRepository;
+
 
         private bool _disposed;
         #endregion
@@ -358,6 +360,24 @@ namespace TimeAPI.Data
             }
         }
 
+        public ITimesheetLocationRepository TimesheetLocationRepository
+        {
+            get
+            {
+                return _timesheetLocationRepository
+                    ?? (_timesheetLocationRepository = new TimesheetLocationRepository(_transaction));
+            }
+        }
+
+        public ILocationRepository LocationRepository
+        {
+            get
+            {
+                return _locationRepository
+                    ?? (_locationRepository = new LocationRepository(_transaction));
+            }
+        }
+
         public void Commit()
         {
             try
@@ -418,6 +438,8 @@ namespace TimeAPI.Data
             _timesheetActivityRepository = null;
             _timesheetActivityCommentRepository = null;
             _timesheetActivityFileRepository = null;
+            _timesheetLocationRepository = null;
+            _locationRepository = null;
         }
 
         private void dispose(bool disposing)

@@ -105,10 +105,7 @@ namespace TimeAPI.API.Controllers
             else if (UserModel.Phone != null || !string.IsNullOrEmpty(UserModel.Phone)
                 || !string.IsNullOrWhiteSpace(UserModel.Phone) || (UserModel.Phone) != "")
             {
-                if (UserModel.Phone.Contains("+"))
-                    _userName = UserModel.Phone.Substring(1);
-                else
-                    _userName = UserModel.Phone;
+                _userName = UserModel.Phone.Contains("+") ? UserModel.Phone.Substring(1) : UserModel.Phone;
             }
 
             var user = new ApplicationUser()

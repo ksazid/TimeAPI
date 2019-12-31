@@ -1,30 +1,20 @@
-﻿using TimeAPI.API.Models.AccountViewModels;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
-using TimeAPI.API.Models;
-using TimeAPI.API.Services;
-using Microsoft.AspNetCore.Cors;
-using TimeAPI.API.Filters;
-using TimeAPI.Domain;
-using System.Threading;
-using TimeAPI.Domain.Entities;
-using TimeAPI.API.Models.DesignationViewModels;
-using TimeAPI.API.Models.TimesheetViewModels;
 using System.Collections.Generic;
 using System.Globalization;
-using TimeAPI.API.Models.TimesheetActivityViewModels;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using TimeAPI.API.Models;
 using TimeAPI.API.Models.TimesheetActivityCommentViewModels;
 using TimeAPI.API.Models.TimesheetActivityFileViewModels;
+using TimeAPI.API.Models.TimesheetActivityViewModels;
+using TimeAPI.API.Models.TimesheetViewModels;
+using TimeAPI.API.Services;
+using TimeAPI.Domain;
+using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.API.Controllers
 {
@@ -39,6 +29,7 @@ namespace TimeAPI.API.Controllers
         private readonly ILogger _logger;
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
+
         public TimesheetController(IUnitOfWork unitOfWork, ILogger<TimesheetController> logger,
             IEmailSender emailSender,
             IOptions<ApplicationSettings> AppSettings)
@@ -50,7 +41,7 @@ namespace TimeAPI.API.Controllers
         }
 
         #region Timesheet
-   
+
         [HttpPost]
         [Route("AddTimesheet")]
         public async Task<object> AddTimesheet([FromBody] TimesheetViewModel timesheetViewModel, CancellationToken cancellationToken)
@@ -63,8 +54,7 @@ namespace TimeAPI.API.Controllers
                 if (timesheetViewModel == null)
                     throw new ArgumentNullException(nameof(timesheetViewModel));
 
-                if (timesheetViewModel.groupid == "string" || string.IsNullOrWhiteSpace(timesheetViewModel.groupid)
-                    || string.IsNullOrEmpty(timesheetViewModel.groupid))
+                if (string.IsNullOrWhiteSpace(timesheetViewModel.groupid) || string.IsNullOrEmpty(timesheetViewModel.groupid))
                     timesheetViewModel.groupid = null;
 
                 timesheetViewModel.is_deleted = false;
@@ -81,7 +71,6 @@ namespace TimeAPI.API.Controllers
                 var _groupid = Guid.NewGuid().ToString();
                 if (timesheetViewModel.groupid != null)
                     _groupid = timesheetViewModel.groupid;
-
 
                 #region TimesheetWithTeamMembers
 
@@ -118,51 +107,15 @@ namespace TimeAPI.API.Controllers
 
                 #region TimesheetProjectCategory
 
-                if (timesheetViewModel.project_category_id != "")
+                if (timesheetViewModel.TimesheetCategoryViewModel != null)
                 {
                     var project_category_type = new TimesheetProjectCategory
                     {
                         id = Guid.NewGuid().ToString(),
                         //timesheet_id = modal.id,
                         groupid = modal.groupid,
-                        project_category_id = timesheetViewModel.project_category_id,
-                        project_or_comp_id = timesheetViewModel.project_or_comp_id,
-                        is_office = false,
-                        is_other = false,
-                        is_deleted = false,
-                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
-                        createdby = modal.createdby
-                    };
-                    _unitOfWork.TimesheetProjectCategoryRepository.Add(project_category_type);
-                }
-                else if (timesheetViewModel.is_office)
-                {
-                    var project_category_type = new TimesheetProjectCategory
-                    {
-                        id = Guid.NewGuid().ToString(),
-                        //timesheet_id = modal.id,
-                        groupid = modal.groupid,
-                        project_category_id = null,
-                        project_or_comp_id = null,
-                        is_office = true,
-                        is_other = false,
-                        is_deleted = false,
-                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
-                        createdby = modal.createdby
-                    };
-                    _unitOfWork.TimesheetProjectCategoryRepository.Add(project_category_type);
-                }
-                else if (timesheetViewModel.is_other)
-                {
-                    var project_category_type = new TimesheetProjectCategory
-                    {
-                        id = Guid.NewGuid().ToString(),
-                        //timesheet_id = modal.id,
-                        groupid = modal.groupid,
-                        project_category_id = null,
-                        project_or_comp_id = null,
-                        is_office = false,
-                        is_other = true,
+                        project_category_id = timesheetViewModel.TimesheetCategoryViewModel.project_category_id,
+                        project_or_comp_id = timesheetViewModel.TimesheetCategoryViewModel.project_or_comp_id,
                         is_deleted = false,
                         created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
                         createdby = modal.createdby
@@ -174,21 +127,104 @@ namespace TimeAPI.API.Controllers
 
                 #region TimesheetAdministrative
 
-                foreach (var item in timesheetViewModel.timesheet_administrative.Distinct())
+                if (timesheetViewModel.TimesheetAdministrativeViewModel != null)
                 {
-                    var project_administrative = new TimesheetAdministrative
+
+                    foreach (var item in timesheetViewModel.TimesheetAdministrativeViewModel.administrative_id.Distinct())
+                    {
+                        var project_administrative = new TimesheetAdministrative
+                        {
+                            id = Guid.NewGuid().ToString(),
+                            administrative_id = item,
+                            groupid = modal.groupid,
+                            is_deleted = false,
+                            created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                            createdby = modal.createdby
+                        };
+                        _unitOfWork.TimesheetAdministrativeRepository.Add(project_administrative);
+                    }
+
+                }
+
+                #endregion TimesheetAdministrative
+
+                #region TimesheetProjectCategory
+
+                if (timesheetViewModel.TimesheetCategoryViewModel != null)
+                {
+                    var project_category_type = new TimesheetProjectCategory
                     {
                         id = Guid.NewGuid().ToString(),
-                        administrative_id = item,
+                        //timesheet_id = modal.id,
                         groupid = modal.groupid,
+                        project_category_id = timesheetViewModel.TimesheetCategoryViewModel.project_category_id,
+                        project_or_comp_id = timesheetViewModel.TimesheetCategoryViewModel.project_or_comp_id,
                         is_deleted = false,
                         created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
                         createdby = modal.createdby
                     };
-                    _unitOfWork.TimesheetAdministrativeRepository.Add(project_administrative);
+                    _unitOfWork.TimesheetProjectCategoryRepository.Add(project_category_type);
                 }
 
-                #endregion TimesheetAdministrative
+                #endregion TimesheetProjectCategory
+
+                #region TimesheetLocation
+
+                if (timesheetViewModel.TimesheetSearchLocationViewModel != null)
+                {
+                    var TimesheetLocation = new TimesheetLocation
+                    {
+                        id = Guid.NewGuid().ToString(),
+                        groupid = modal.groupid,
+                        formatted_address = timesheetViewModel.TimesheetSearchLocationViewModel.formatted_address,
+                        lat = timesheetViewModel.TimesheetSearchLocationViewModel.lat,
+                        lang = timesheetViewModel.TimesheetSearchLocationViewModel.lang,
+                        street_number = timesheetViewModel.TimesheetSearchLocationViewModel.street_number,
+                        route = timesheetViewModel.TimesheetSearchLocationViewModel.route,
+                        locality = timesheetViewModel.TimesheetSearchLocationViewModel.locality,
+                        administrative_area_level_2 = timesheetViewModel.TimesheetSearchLocationViewModel.administrative_area_level_2,
+                        administrative_area_level_1 = timesheetViewModel.TimesheetSearchLocationViewModel.administrative_area_level_1,
+                        postal_code = timesheetViewModel.TimesheetSearchLocationViewModel.postal_code,
+                        country = timesheetViewModel.TimesheetSearchLocationViewModel.country,
+
+                        is_deleted = false,
+                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        createdby = modal.createdby
+
+                    };
+                    _unitOfWork.TimesheetLocationRepository.Add(TimesheetLocation);
+                }
+
+                #endregion TimesheetLocation
+
+                #region Location
+
+                if (timesheetViewModel.TimesheetCurrentLocationViewModel != null)
+                {
+                    var Location = new Location
+                    {
+                        id = Guid.NewGuid().ToString(),
+                        groupid = modal.groupid,
+                        formatted_address = timesheetViewModel.TimesheetCurrentLocationViewModel.formatted_address,
+                        lat = timesheetViewModel.TimesheetCurrentLocationViewModel.lat,
+                        lang = timesheetViewModel.TimesheetCurrentLocationViewModel.lang,
+                        street_number = timesheetViewModel.TimesheetCurrentLocationViewModel.street_number,
+                        route = timesheetViewModel.TimesheetCurrentLocationViewModel.route,
+                        locality = timesheetViewModel.TimesheetCurrentLocationViewModel.locality,
+                        administrative_area_level_2 = timesheetViewModel.TimesheetCurrentLocationViewModel.administrative_area_level_2,
+                        administrative_area_level_1 = timesheetViewModel.TimesheetCurrentLocationViewModel.administrative_area_level_1,
+                        postal_code = timesheetViewModel.TimesheetCurrentLocationViewModel.postal_code,
+                        country = timesheetViewModel.TimesheetCurrentLocationViewModel.country,
+                        is_deleted = false,
+                        is_checkout = false,
+                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        createdby = modal.createdby
+
+                    };
+                    _unitOfWork.LocationRepository.Add(Location);
+                }
+
+                #endregion Location
 
                 _unitOfWork.Commit();
 
@@ -231,6 +267,9 @@ namespace TimeAPI.API.Controllers
                     modal.is_deleted = false;
                     modal.groupid = timesheetViewModel.groupid;
 
+                    modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                    modal.modifiedby = modal.createdby;
+
                     _unitOfWork.TimesheetRepository.Add(modal);
                 }
 
@@ -249,8 +288,8 @@ namespace TimeAPI.API.Controllers
                         teamid = item,
                         groupid = modal.groupid,
                         is_deleted = false,
-                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
-                        createdby = modal.createdby
+                        modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        modifiedby = modal.createdby
                     };
                     _unitOfWork.TimesheetTeamRepository.Add(timesheet_team);
                 }
@@ -261,55 +300,18 @@ namespace TimeAPI.API.Controllers
 
                 //Remove ProjectCategory with this CurrentGroupID
                 _unitOfWork.TimesheetProjectCategoryRepository.RemoveByGroupID(modal.groupid);
-
-                if (timesheetViewModel.project_category_id != "")
+                if (timesheetViewModel.TimesheetCategoryViewModel != null)
                 {
                     var project_category_type = new TimesheetProjectCategory
                     {
                         id = Guid.NewGuid().ToString(),
                         //timesheet_id = modal.id,
                         groupid = modal.groupid,
-                        project_category_id = timesheetViewModel.project_category_id,
-                        project_or_comp_id = timesheetViewModel.project_or_comp_id,
-                        is_office = false,
-                        is_other = false,
+                        project_category_id = timesheetViewModel.TimesheetCategoryViewModel.project_category_id,
+                        project_or_comp_id = timesheetViewModel.TimesheetCategoryViewModel.project_or_comp_id,
                         is_deleted = false,
-                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
-                        createdby = modal.createdby
-                    };
-                    _unitOfWork.TimesheetProjectCategoryRepository.Add(project_category_type);
-                }
-                else if (timesheetViewModel.is_office)
-                {
-                    var project_category_type = new TimesheetProjectCategory
-                    {
-                        id = Guid.NewGuid().ToString(),
-                        //timesheet_id = modal.id,
-                        groupid = modal.groupid,
-                        project_category_id = null,
-                        project_or_comp_id = null,
-                        is_office = true,
-                        is_other = false,
-                        is_deleted = false,
-                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
-                        createdby = modal.createdby
-                    };
-                    _unitOfWork.TimesheetProjectCategoryRepository.Add(project_category_type);
-                }
-                else if (timesheetViewModel.is_other)
-                {
-                    var project_category_type = new TimesheetProjectCategory
-                    {
-                        id = Guid.NewGuid().ToString(),
-                        //timesheet_id = modal.id,
-                        groupid = modal.groupid,
-                        project_category_id = null,
-                        project_or_comp_id = null,
-                        is_office = false,
-                        is_other = true,
-                        is_deleted = false,
-                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
-                        createdby = modal.createdby
+                        modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        modifiedby = modal.createdby
                     };
                     _unitOfWork.TimesheetProjectCategoryRepository.Add(project_category_type);
                 }
@@ -319,7 +321,7 @@ namespace TimeAPI.API.Controllers
                 #region TimesheetAdministrative
 
                 _unitOfWork.TimesheetAdministrativeRepository.RemoveByGroupID(modal.groupid);
-                foreach (var item in timesheetViewModel.timesheet_administrative.Distinct())
+                foreach (var item in timesheetViewModel.TimesheetAdministrativeViewModel.administrative_id.Distinct())
                 {
                     var project_administrative = new TimesheetAdministrative
                     {
@@ -327,13 +329,69 @@ namespace TimeAPI.API.Controllers
                         administrative_id = item,
                         groupid = modal.groupid,
                         is_deleted = false,
-                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
-                        createdby = modal.createdby
+                        modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        modifiedby = modal.createdby
                     };
                     _unitOfWork.TimesheetAdministrativeRepository.Add(project_administrative);
                 }
 
                 #endregion TimesheetAdministrative
+
+                #region TimesheetLocation
+
+                _unitOfWork.TimesheetLocationRepository.RemoveByGroupID(modal.groupid);
+
+                if (timesheetViewModel.TimesheetSearchLocationViewModel != null)
+                {
+                    var TimesheetLocation = new TimesheetLocation
+                    {
+                        id = Guid.NewGuid().ToString(),
+                        groupid = modal.groupid,
+                        formatted_address = timesheetViewModel.TimesheetSearchLocationViewModel.formatted_address,
+                        lat = timesheetViewModel.TimesheetSearchLocationViewModel.lat,
+                        lang = timesheetViewModel.TimesheetSearchLocationViewModel.lang,
+                        street_number = timesheetViewModel.TimesheetSearchLocationViewModel.street_number,
+                        route = timesheetViewModel.TimesheetSearchLocationViewModel.route,
+                        locality = timesheetViewModel.TimesheetSearchLocationViewModel.locality,
+                        administrative_area_level_2 = timesheetViewModel.TimesheetSearchLocationViewModel.administrative_area_level_2,
+                        administrative_area_level_1 = timesheetViewModel.TimesheetSearchLocationViewModel.administrative_area_level_1,
+                        postal_code = timesheetViewModel.TimesheetSearchLocationViewModel.postal_code,
+                        country = timesheetViewModel.TimesheetSearchLocationViewModel.country,
+                        modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        modifiedby = modal.createdby
+
+                    };
+                    _unitOfWork.TimesheetLocationRepository.Add(TimesheetLocation);
+                }
+
+                #endregion TimesheetLocation
+
+                #region CurrentLocation
+
+                if (timesheetViewModel.TimesheetCurrentLocationViewModel != null)
+                {
+                    var Location = new Location
+                    {
+                        id = Guid.NewGuid().ToString(),
+                        groupid = modal.groupid,
+                        formatted_address = timesheetViewModel.TimesheetCurrentLocationViewModel.formatted_address,
+                        lat = timesheetViewModel.TimesheetCurrentLocationViewModel.lat,
+                        lang = timesheetViewModel.TimesheetCurrentLocationViewModel.lang,
+                        street_number = timesheetViewModel.TimesheetCurrentLocationViewModel.street_number,
+                        route = timesheetViewModel.TimesheetCurrentLocationViewModel.route,
+                        locality = timesheetViewModel.TimesheetCurrentLocationViewModel.locality,
+                        administrative_area_level_2 = timesheetViewModel.TimesheetCurrentLocationViewModel.administrative_area_level_2,
+                        administrative_area_level_1 = timesheetViewModel.TimesheetCurrentLocationViewModel.administrative_area_level_1,
+                        postal_code = timesheetViewModel.TimesheetCurrentLocationViewModel.postal_code,
+                        country = timesheetViewModel.TimesheetCurrentLocationViewModel.country,
+                        modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        modifiedby = modal.createdby
+
+                    };
+                    _unitOfWork.LocationRepository.Add(Location);
+                }
+
+                #endregion CurrentLocation
 
                 _unitOfWork.Commit();
 
@@ -379,7 +437,6 @@ namespace TimeAPI.API.Controllers
         [Route("GetAllTimesheets")]
         public async Task<object> GetAllTimesheets(CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -434,6 +491,34 @@ namespace TimeAPI.API.Controllers
                     _unitOfWork.TimesheetRepository.CheckOutByEmpID(modal);
                 }
 
+                #region Location
+
+                if (timesheetViewModel.TimesheetCurrentLocationViewModel != null)
+                {
+                    var Location = new Location
+                    {
+                        id = Guid.NewGuid().ToString(),
+                        groupid = timesheetViewModel.groupid,
+                        formatted_address = timesheetViewModel.TimesheetCurrentLocationViewModel.formatted_address,
+                        lat = timesheetViewModel.TimesheetCurrentLocationViewModel.lat,
+                        lang = timesheetViewModel.TimesheetCurrentLocationViewModel.lang,
+                        street_number = timesheetViewModel.TimesheetCurrentLocationViewModel.street_number,
+                        route = timesheetViewModel.TimesheetCurrentLocationViewModel.route,
+                        locality = timesheetViewModel.TimesheetCurrentLocationViewModel.locality,
+                        administrative_area_level_2 = timesheetViewModel.TimesheetCurrentLocationViewModel.administrative_area_level_2,
+                        administrative_area_level_1 = timesheetViewModel.TimesheetCurrentLocationViewModel.administrative_area_level_1,
+                        postal_code = timesheetViewModel.TimesheetCurrentLocationViewModel.postal_code,
+                        country = timesheetViewModel.TimesheetCurrentLocationViewModel.country,
+                        is_checkout = true,
+                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        createdby = timesheetViewModel.modifiedby
+                    };
+
+                    _unitOfWork.LocationRepository.Add(Location);
+                }
+
+                #endregion Location
+
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Checkout Successfully", Desc = "Checkout Successfully" }).ConfigureAwait(true);
@@ -446,7 +531,7 @@ namespace TimeAPI.API.Controllers
 
         #endregion Timesheet
 
-        #region  TimesheetActivity
+        #region TimesheetActivity
 
         [HttpPost]
         [Route("AddTimesheetActivity")]
@@ -460,8 +545,8 @@ namespace TimeAPI.API.Controllers
                 if (timesheetActivityViewModel == null)
                     throw new ArgumentNullException(nameof(timesheetActivityViewModel));
 
-                if (timesheetActivityViewModel.groupid == "string" || string.IsNullOrWhiteSpace(timesheetActivityViewModel.groupid)|| string.IsNullOrEmpty(timesheetActivityViewModel.groupid))
-                     return await Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = "Error", Desc = "Invalid GroupID" }).ConfigureAwait(false);
+                if (timesheetActivityViewModel.groupid == "string" || string.IsNullOrWhiteSpace(timesheetActivityViewModel.groupid) || string.IsNullOrEmpty(timesheetActivityViewModel.groupid))
+                    return await Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = "Error", Desc = "Invalid GroupID" }).ConfigureAwait(false);
 
                 timesheetActivityViewModel.is_deleted = false;
                 timesheetActivityViewModel.ondate = DateTime.Now.ToString(CultureInfo.CurrentCulture);
@@ -538,7 +623,6 @@ namespace TimeAPI.API.Controllers
         [Route("GetAllTimesheetActivitys")]
         public async Task<object> GetAllTimesheetActivitys(CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -555,9 +639,9 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        #endregion  TimesheetActivity
+        #endregion TimesheetActivity
 
-        #region  TimesheetActivityComment
+        #region TimesheetActivityComment
 
         [HttpPost]
         [Route("AddTimesheetActivityComment")]
@@ -646,7 +730,6 @@ namespace TimeAPI.API.Controllers
         [Route("GetAllTimesheetActivityComments")]
         public async Task<object> GetAllTimesheetActivityComments(CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -663,9 +746,9 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        #endregion  TimesheetActivityComment
+        #endregion TimesheetActivityComment
 
-        #region  TimesheetActivityFile
+        #region TimesheetActivityFile
 
         [HttpPost]
         [Route("AddTimesheetActivityFile")]
@@ -754,7 +837,6 @@ namespace TimeAPI.API.Controllers
         [Route("GetAllTimesheetActivityFiles")]
         public async Task<object> GetAllTimesheetActivityFiles(CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -771,7 +853,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        #endregion  TimesheetActivityFile
-
+        #endregion TimesheetActivityFile
     }
 }

@@ -12,6 +12,15 @@ namespace TimeAPI.API.Controllers
 
         public HomeController(ILogger<HomeController> logger)
         {
+            //ReverseGeoLookup.ReverseGeoLoc("25.1899157", "55.2634592", out string Address_ShortName,
+            //                                                                      out string Address_country,
+            //                                                                      out string Address_administrative_area_level_1,
+            //                                                                      out string Address_administrative_area_level_2,
+            //                                                                      out string Address_administrative_area_level_3,
+            //                                                                      out string Address_colloquial_area,
+            //                                                                      out string Address_locality,
+            //                                                                      out string Address_sublocality,
+            //                                                                      out string Address_neighborhood);
             _logger = logger;
         }
 
