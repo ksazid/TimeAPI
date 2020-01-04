@@ -14,6 +14,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeAPI.API", "TimeAPI.API\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeAPI.Test", "TimeAPI.Test\TimeAPI.Test.csproj", "{250AACB9-5766-4D2E-B255-749CB1E943AD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeAPI.WebHook", "TimeAPI.WebHook\TimeAPI.WebHook.csproj", "{465D720E-AB5A-451C-9880-DA9702957F44}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,6 +38,10 @@ Global
 		{250AACB9-5766-4D2E-B255-749CB1E943AD}.Debug|Any CPU.Build.0 = Release|Any CPU
 		{250AACB9-5766-4D2E-B255-749CB1E943AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{250AACB9-5766-4D2E-B255-749CB1E943AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{465D720E-AB5A-451C-9880-DA9702957F44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{465D720E-AB5A-451C-9880-DA9702957F44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{465D720E-AB5A-451C-9880-DA9702957F44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{465D720E-AB5A-451C-9880-DA9702957F44}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

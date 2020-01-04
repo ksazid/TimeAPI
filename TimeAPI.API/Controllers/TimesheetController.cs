@@ -44,7 +44,7 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("AddTimesheet")]
-        public async Task<object> AddTimesheet([FromBody] TimesheetViewModel timesheetViewModel, CancellationToken cancellationToken)
+        public async Task<object> AddTimesheet([FromBody] TimesheetPostViewModel timesheetViewModel, CancellationToken cancellationToken)
         {
             try
             {
@@ -54,55 +54,63 @@ namespace TimeAPI.API.Controllers
                 if (timesheetViewModel == null)
                     throw new ArgumentNullException(nameof(timesheetViewModel));
 
-                if (string.IsNullOrWhiteSpace(timesheetViewModel.groupid) || string.IsNullOrEmpty(timesheetViewModel.groupid))
-                    timesheetViewModel.groupid = null;
+                //if (string.IsNullOrWhiteSpace(timesheetViewModel.groupid) || string.IsNullOrEmpty(timesheetViewModel.groupid))
+                //    timesheetViewModel.groupid = null;
 
-                timesheetViewModel.is_deleted = false;
-                timesheetViewModel.is_checkout = false;
-                timesheetViewModel.check_out = null;
-                timesheetViewModel.total_hrs = null;
-                timesheetViewModel.ondate = DateTime.Now.ToString(CultureInfo.CurrentCulture);
-                timesheetViewModel.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                //timesheetViewModel.is_deleted = false;
+                //timesheetViewModel.is_checkout = false;
+                //timesheetViewModel.check_out = null;
+                //timesheetViewModel.total_hrs = null;
+                //timesheetViewModel.ondate = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                //timesheetViewModel.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
 
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetViewModel, Timesheet>());
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetPostViewModel, Timesheet>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Timesheet>(timesheetViewModel);
 
                 var _groupid = Guid.NewGuid().ToString();
-                if (timesheetViewModel.groupid != null)
-                    _groupid = timesheetViewModel.groupid;
+                //if (timesheetViewModel.groupid != null)
+                //    _groupid = timesheetViewModel.groupid;
 
                 #region TimesheetWithTeamMembers
-
-                foreach (var item in timesheetViewModel.team_member_empid.Distinct())
+                if (timesheetViewModel.team_member_empid != null)
                 {
-                    modal.id = Guid.NewGuid().ToString();
-                    modal.empid = item;
-                    modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
-                    modal.is_deleted = false;
-                    modal.groupid = _groupid;
+                    foreach (var item in timesheetViewModel.team_member_empid.Distinct())
+                    {
+                        modal.id = Guid.NewGuid().ToString();
+                        modal.empid = item;
+                        modal.ondate = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                        modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                        modal.is_deleted = false;
+                        modal.groupid = _groupid;
+                        modal.is_deleted = false;
+                        modal.is_checkout = false;
+                        modal.check_out = null;
+                        modal.total_hrs = null;
 
-                    _unitOfWork.TimesheetRepository.Add(modal);
+                        _unitOfWork.TimesheetRepository.Add(modal);
+                    }
                 }
 
                 #endregion TimesheetWithTeamMembers
 
                 #region Teams
-
-                foreach (var item in timesheetViewModel.teamid.Distinct())
+                if (timesheetViewModel.teamid != null)
                 {
-                    var timesheet_team = new TimesheetTeam
+                    foreach (var item in timesheetViewModel.teamid.Distinct())
                     {
-                        id = Guid.NewGuid().ToString(),
-                        teamid = item,
-                        groupid = modal.groupid,
-                        is_deleted = false,
-                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
-                        createdby = modal.createdby
-                    };
-                    _unitOfWork.TimesheetTeamRepository.Add(timesheet_team);
+                        var timesheet_team = new TimesheetTeam
+                        {
+                            id = Guid.NewGuid().ToString(),
+                            teamid = item,
+                            groupid = modal.groupid,
+                            is_deleted = false,
+                            created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                            createdby = modal.createdby
+                        };
+                        _unitOfWork.TimesheetTeamRepository.Add(timesheet_team);
+                    }
                 }
-
                 #endregion Teams
 
                 #region TimesheetProjectCategory

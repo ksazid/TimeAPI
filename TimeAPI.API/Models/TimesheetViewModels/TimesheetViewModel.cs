@@ -6,6 +6,22 @@ using System.Threading.Tasks;
 
 namespace TimeAPI.API.Models.TimesheetViewModels
 {
+
+
+
+    public class TimesheetPostViewModel
+    {
+        public List<string> team_member_empid { get; set; }
+        public List<string> teamid { get; set; }
+        public string check_in { get; set; }
+        public string createdby { get; set; }
+        public TimesheetAdministrativeViewModel TimesheetAdministrativeViewModel { get; set; }
+        public TimesheetCategoryViewModel TimesheetCategoryViewModel { get; set; }
+        public TimesheetSearchLocationViewModel TimesheetSearchLocationViewModel { get; set; }
+        public TimesheetCurrentLocationViewModel TimesheetCurrentLocationViewModel { get; set; }
+
+    }
+
     public class TimesheetViewModel
     {
         public string id { get; set; }
