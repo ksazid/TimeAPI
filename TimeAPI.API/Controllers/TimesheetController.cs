@@ -197,7 +197,7 @@ namespace TimeAPI.API.Controllers
 
                 #endregion TimesheetLocation
 
-                #region Location
+                #region CurrentLocation
 
                 if (timesheetViewModel.TimesheetCurrentLocationViewModel != null)
                 {
@@ -224,7 +224,7 @@ namespace TimeAPI.API.Controllers
                     _unitOfWork.LocationRepository.Add(Location);
                 }
 
-                #endregion Location
+                #endregion CurrentLocation
 
                 _unitOfWork.Commit();
 
