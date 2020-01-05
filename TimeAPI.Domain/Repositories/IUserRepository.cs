@@ -7,7 +7,7 @@ namespace TimeAPI.Domain.Repositories
     {
         User FindByNormalizedUserName(string normalizedUserName);
         User FindByNormalizedEmail(string normalizedEmail);
-        void CustomEmailConfirmedFlagUpdate(string UserID);
+        //void CustomEmailConfirmedFlagUpdate(string UserID);
         UserDataGroupDataSet GetUserDataGroupByUserID(string EmpID);
     }
 }

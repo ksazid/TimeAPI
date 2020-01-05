@@ -17,6 +17,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using TimeAPI.API.Extensions;
 using TimeAPI.API.Models;
 using TimeAPI.API.Models.EmployeeViewModels;
 using TimeAPI.API.Services;

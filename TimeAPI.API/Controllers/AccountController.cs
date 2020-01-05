@@ -22,6 +22,7 @@ using System.Globalization;
 using System.Web;
 using Microsoft.AspNetCore.DataProtection;
 using System.Security.Cryptography;
+using TimeAPI.API.Extensions;
 //using Base64UrlCore;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -66,6 +67,12 @@ namespace TimeAPI.API.Controllers
             var user = await _userManager.FindByNameAsync(model.Email).ConfigureAwait(true);
             if (user != null && await _userManager.CheckPasswordAsync(user, model.Password).ConfigureAwait(true))
             {
+                if (!await _userManager.IsEmailConfirmedAsync(user).ConfigureAwait(false))
+                {
+                    return Ok(new SuccessViewModel { Code = "201", Status = "Error", Desc = "Please verify your user with conf" });
+                }
+
+
                 var role = await _userManager.GetRolesAsync(user).ConfigureAwait(true);
                 IdentityOptions options = new IdentityOptions();
                 var tokenDescriptor = new SecurityTokenDescriptor()
@@ -162,54 +169,13 @@ namespace TimeAPI.API.Controllers
             }
 
             #region
-            //var result = await _userManager.ConfirmEmailAsync(user, code).ConfigureAwait(true);
-
-            //string _Status = "", _Code = "", _Description = "";
-            //if (result.Errors != null)
-            //    foreach (var error in result.Errors)
-            //    {
-            //        _Status = "201";
-            //        _Code = error.Code;
-            //        _Description = error.Description;
-            //        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = _Code, Desc = _Description });
-            //    }
-
-            //if (result.Succeeded)
-            //    _Status = "200"; _Code = "Success"; _Description = "Email Confirmed";
-
-            //return Task.FromResult<object>(new SuccessViewModel { Status = _Status, Code = _Code, Desc = _Description });
-            #endregion
-
-
-            #region
-
-
-            //code = HttpUtility.HtmlDecode(code); //HttpUtility.UrlDecode(code);
-            //code = DecodeServerName(code);
-            //code = Base64UrlEncoder.Decode(code); //HttpUtility.UrlDecode(code);
-
-
-
-            // Base64 encode the hash
-            //var encoded = Convert.FromBase64String(code);
-
-            //var apikey = _appSettings.JWT_Secret;//.GetValue<string>(key: "SendGridApiKey");
-            //var decoded = UserHelpers.Decryptx(code);
-
-
-            //var result = //await _userManager.ConfirmEmailAsync(user, "Default", "Confirmation", code).ConfigureAwait(true);  //
-
-            IdentityResult identityResult = new IdentityResult();
+            
             var xcode = Base64UrlEncoder.Decode(code);
-            identityResult = await _userManager.ConfirmEmailAsync(user, xcode).ConfigureAwait(true);
-
+            IdentityResult identityResult = await _userManager.ConfirmEmailAsync(user, xcode).ConfigureAwait(true);
 
             if (identityResult.Succeeded)
             {
-                //await _userManager.UpdateSecurityStampAsync(user).ConfigureAwait(true);
-                //_unitOfWork.UserRepository.CustomEmailConfirmedFlagUpdate(user.Id);
                 _unitOfWork.Commit();
-
                 return Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Email Confirmed" });
             }
             else { return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = "Error", Desc = "Email Not Confirmed" }); }
@@ -235,7 +201,8 @@ namespace TimeAPI.API.Controllers
             // For more information on how to enable account confirmation and password reset please
             // visit https://go.microsoft.com/fwlink/?LinkID=532713
             var code = await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(true);
-            var callbackUrl = Url.ResetPasswordCallbackLink(user.Id, code, Request.Scheme);
+            var xcode = Base64UrlEncoder.Encode(code);
+            var callbackUrl = Url.ResetPasswordCallbackLink(user.Id, xcode, Request.Scheme);
             await _emailSender.SendEmailAsync(model.Email, "Reset Password", $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>").ConfigureAwait(true);
             return Ok(new SuccessViewModel { Code = "200", Status = "Success", Desc = "Reset password email sent to registerd email." });
             //// If we got this far, something failed, redisplay form
@@ -255,8 +222,8 @@ namespace TimeAPI.API.Controllers
             {
                 return Ok(new SuccessViewModel { Code = "201", Status = "Error", Desc = "Please enter a valid email" });
             }
-            //model.Code = System.Web.HttpUtility.UrlDecode(model.Code);
-            var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password).ConfigureAwait(true);
+            var xcode = Base64UrlEncoder.Encode(model.Code);
+            var result = await _userManager.ResetPasswordAsync(user, xcode, model.Password).ConfigureAwait(true);
 
             if (result.Succeeded)
             {
@@ -342,12 +309,7 @@ namespace TimeAPI.API.Controllers
             if (user.Email != "")
             {
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true);
-                //var code = await _userManager.GenerateUserTokenAsync(user, "Default", "Confirmation").ConfigureAwait(true);
-                //code = EncodeServerName(code); // HttpUtility.UrlEncode(code, );
-                //var apikey = _appSettings.JWT_Secret;
-                //var encoded = UserHelpers.Encryptx(code);
-
-                var xcode = Base64UrlEncoder.Encode(code); // HttpUtility.UrlPathEncode(code); 
+                var xcode = Base64UrlEncoder.Encode(code); 
                 var callbackUrl = Url.EmailConfirmationLink(user.Id, xcode, Request.Scheme);
                 await _emailSender.SendEmailConfirmationAsync(UserModel.Email, callbackUrl).ConfigureAwait(true);
             }

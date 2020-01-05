@@ -20,6 +20,8 @@ namespace TimeAPI.Domain.Model
         public IEnumerable<TimesheetAdministrativeDataModel> TimesheetAdministrativeDataModel { get; set; }
         public IEnumerable<TimesheetProjectCategoryDataModel> TimesheetProjectCategoryDataModel { get; set; }
         public IEnumerable<TimesheetTeamDataModel> TimesheetTeamDataModel { get; set; }
+        public IEnumerable<TimesheetSearchLocationViewModel>  TimesheetSearchLocationViewModel { get; set; }
+        public IEnumerable<TimesheetCurrentLocationViewModel>  TimesheetCurrentLocationViewModel { get; set; }
     }
 
     public class TimesheetDataModel
@@ -64,5 +66,38 @@ namespace TimeAPI.Domain.Model
         public string teamid { get; set; }
         public string team_name { get; set; }
 
+    }
+
+    public class TimesheetSearchLocationViewModel
+    {
+        public string id { get; set; }
+        public string groupid { get; set; }
+        public string formatted_address { get; set; }
+        public string lat { get; set; }
+        public string lang { get; set; }
+        public string street_number { get; set; }
+        public string route { get; set; }
+        public string locality { get; set; }
+        public string administrative_area_level_2 { get; set; }
+        public string administrative_area_level_1 { get; set; }
+        public string postal_code { get; set; }
+        public string country { get; set; }
+    }
+
+    public class TimesheetCurrentLocationViewModel
+    {
+        public string id { get; set; }
+        public string groupid { get; set; }
+        public string formatted_address { get; set; }
+        public string lat { get; set; }
+        public string lang { get; set; }
+        public string street_number { get; set; }
+        public string route { get; set; }
+        public string locality { get; set; }
+        public string administrative_area_level_2 { get; set; }
+        public string administrative_area_level_1 { get; set; }
+        public string postal_code { get; set; }
+        public string country { get; set; }
+        public bool is_checkout { get; set; }
     }
 }

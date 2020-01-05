@@ -5,7 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace TimeAPI.API
+namespace TimeAPI.API.Extensions
 {
     public static class HttpRequestExtensions
     {

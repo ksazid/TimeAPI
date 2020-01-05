@@ -1,7 +1,8 @@
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using TimeAPI.API.Services;
 
-namespace TimeAPI.API.Services
+namespace TimeAPI.API.Extensions
 {
     public static class EmailSenderExtensions
     {

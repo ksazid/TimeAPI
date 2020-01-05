@@ -83,17 +83,17 @@ namespace TimeAPI.Data.Repositories
                 param: entity);
         }
 
-        public void CustomEmailConfirmedFlagUpdate(string UserID)
-        {
-            Execute(
-                sql: @"
-                    UPDATE AspNetUsers SET 
-                        EmailConfirmed = 1
-                    WHERE Id = @UserID",
-              param: new { UserID }
+        //public void CustomEmailConfirmedFlagUpdate(string UserID)
+        //{
+        //    Execute(
+        //        sql: @"
+        //            UPDATE AspNetUsers SET 
+        //                EmailConfirmed = 1
+        //            WHERE Id = @UserID",
+        //      param: new { UserID }
 
-                );
-        }
+        //        );
+        //}
 
         public UserDataGroupDataSet GetUserDataGroupByUserID(string UserID)
         {
@@ -131,23 +131,31 @@ namespace TimeAPI.Data.Repositories
                 List<TimesheetAdministrativeDataModel> TimesheetAdministrativeDataModelList = new List<TimesheetAdministrativeDataModel>();
                 List<TimesheetProjectCategoryDataModel> TimesheetProjectCategoryDataModelList = new List<TimesheetProjectCategoryDataModel>();
                 List<TimesheetTeamDataModel> TimesheetTeamDataModelList = new List<TimesheetTeamDataModel>();
+                List<TimesheetSearchLocationViewModel> TimesheetSearchLocationViewModelList = new List<TimesheetSearchLocationViewModel>();
+                List<TimesheetCurrentLocationViewModel> TimesheetCurrentLocationViewModelList = new List<TimesheetCurrentLocationViewModel>();
 
 
                 var ResultTimesheetData = GetTimesheetDataModel(item);
                 var ResultTimesheetAdministrativeDataModel = GetTimesheetAdministrativeDataModel(item);
                 var ResultProjectCategoryDataModel = GetTimesheetProjectCategoryDataModel(item);
                 var ResultTimesheetTeamDataModel = GetTimesheetTeamDataModel(item);
+                var ResultTimesheetSearchLocationDataModel = GetTimesheetSearchLocationViewModel(item);
+                var ResultTimesheetCurrentLocationDataModel = GetTimesheetCurrentLocationViewModel(item);
 
 
                 TimesheetDataModelList.AddRange(ResultTimesheetData);
                 TimesheetAdministrativeDataModelList.AddRange(ResultTimesheetAdministrativeDataModel);
                 TimesheetProjectCategoryDataModelList.AddRange(ResultProjectCategoryDataModel);
                 TimesheetTeamDataModelList.AddRange(ResultTimesheetTeamDataModel);
+                TimesheetSearchLocationViewModelList.AddRange(ResultTimesheetSearchLocationDataModel);
+                TimesheetCurrentLocationViewModelList.AddRange(ResultTimesheetCurrentLocationDataModel);
 
                 rootTimesheetData.timesheetDataModels = TimesheetDataModelList;
                 rootTimesheetData.TimesheetAdministrativeDataModel = TimesheetAdministrativeDataModelList;
                 rootTimesheetData.TimesheetProjectCategoryDataModel = TimesheetProjectCategoryDataModelList;
                 rootTimesheetData.TimesheetTeamDataModel = TimesheetTeamDataModelList;
+                rootTimesheetData.TimesheetSearchLocationViewModel = TimesheetSearchLocationViewModelList;
+                rootTimesheetData.TimesheetCurrentLocationViewModel = TimesheetCurrentLocationViewModelList;
 
                 RootTimesheetDataList.Add(rootTimesheetData);
             }
@@ -223,5 +231,28 @@ namespace TimeAPI.Data.Repositories
             return TimesheetTeamDataModel;
         }
 
+        public IEnumerable<TimesheetSearchLocationViewModel> GetTimesheetSearchLocationViewModel(string GroupID)
+        {
+            var TimesheetSearchLocationViewModel = Query<TimesheetSearchLocationViewModel>(
+                sql: @"SELECT id, groupid, formatted_address, lat, lang, street_number, route, locality, 
+                       administrative_area_level_2, administrative_area_level_1, postal_code, country
+                    FROM timesheet_location  WITH (NOLOCK) where groupid  = @GroupID;",
+                param: new { GroupID }
+            );
+
+            return TimesheetSearchLocationViewModel;
+        }
+
+        public IEnumerable<TimesheetCurrentLocationViewModel> GetTimesheetCurrentLocationViewModel(string GroupID)
+        {
+            var TimesheetCurrentLocationViewModel = Query<TimesheetCurrentLocationViewModel>(
+               sql: @"SELECT id, groupid, formatted_address, lat, lang, street_number, route, locality, 
+                       administrative_area_level_2, administrative_area_level_1, postal_code, country, is_checkout
+                FROM location  WITH (NOLOCK) where groupid  = @GroupID;",
+                param: new { GroupID }
+            );
+
+            return TimesheetCurrentLocationViewModel;
+        }
     }
 }
