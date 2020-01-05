@@ -2,10 +2,13 @@
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Diagnostics;
+using TimeAPI.API.Filters;
 using TimeAPI.API.Models;
 
 namespace TimeAPI.API.Controllers
 {
+    //[ApiKeyAuth]
+    //[EnableCors("CorsPolicy")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

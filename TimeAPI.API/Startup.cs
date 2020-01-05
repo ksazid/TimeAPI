@@ -50,11 +50,11 @@ namespace TimeAPI.API
                 //    .SetIsOriginAllowed((hosts) => true));
 
 
-            options.AddPolicy("CorsPolicy",
-                builder =>
-                {
-                    builder.AllowAnyOrigin();
-                });
+                options.AddPolicy("CorsPolicy",
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin();
+                    });
             });
 
             services.AddDataProtection(options =>
@@ -101,7 +101,8 @@ namespace TimeAPI.API
                          Id = "Bearer"
                        }
                       },
-                      new string[] { }
+                        //new string[] { }
+                        Array.Empty<string>()
                     }
                   });
             });

@@ -85,7 +85,6 @@ namespace TimeAPI.API.Models.TimesheetViewModels
         public string country { get; set; }
     }
 
-
     public class TimesheetCheckoutViewModel
     {
         public List<string> team_member_empid { get; set; }

@@ -21,6 +21,7 @@ using TimeAPI.Domain.Entities;
 using System.Globalization;
 using System.Web;
 using Microsoft.AspNetCore.DataProtection;
+using System.Security.Cryptography;
 //using Base64UrlCore;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -154,9 +155,13 @@ namespace TimeAPI.API.Controllers
                     //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true);
                     var code = await _userManager.GenerateUserTokenAsync(user, "Default", "Confirmation").ConfigureAwait(true);
                     //code = EncodeServerName(code); // HttpUtility.UrlEncode(code, );
-                   
+
+                    var apikey = _appSettings.JWT_Secret;
+                    var encoded =  UserHelpers.Encrypt(code, true, "TEST");
+
+
                     code = Base64UrlEncoder.Encode(HttpUtility.UrlPathEncode(code)); // HttpUtility.UrlPathEncode(code); 
-                    var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
+                    var callbackUrl = Url.EmailConfirmationLink(user.Id, encoded, Request.Scheme);
                     await _emailSender.SendEmailConfirmationAsync(UserModel.Email, callbackUrl).ConfigureAwait(true);
                 }
                 else
@@ -233,9 +238,18 @@ namespace TimeAPI.API.Controllers
 
             //code = HttpUtility.HtmlDecode(code); //HttpUtility.UrlDecode(code);
             //code = DecodeServerName(code);
-            code = Base64UrlEncoder.Decode(code); //HttpUtility.UrlDecode(code);
+            //code = Base64UrlEncoder.Decode(code); //HttpUtility.UrlDecode(code);
 
-            var result = await _userManager.VerifyUserTokenAsync(user, "Default", "Confirmation", code).ConfigureAwait(true);  //await _userManager.VerifyUserTokenAsync(user, code).ConfigureAwait(true);
+
+
+            // Base64 encode the hash
+            //var encoded = Convert.FromBase64String(code);
+
+            var apikey = _appSettings.JWT_Secret;//.GetValue<string>(key: "SendGridApiKey");
+            var decoded = UserHelpers.Decrypt(code, true, "TEST");
+
+
+            var result = await _userManager.VerifyUserTokenAsync(user, "Default", "Confirmation", decoded).ConfigureAwait(true);  //await _userManager.VerifyUserTokenAsync(user, code).ConfigureAwait(true);
             if (result)
             {
                 await _userManager.UpdateSecurityStampAsync(user).ConfigureAwait(true);

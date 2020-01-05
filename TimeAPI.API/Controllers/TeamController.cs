@@ -20,7 +20,6 @@ using System.Threading;
 using TimeAPI.Domain.Entities;
 using TimeAPI.API.Models.TeamViewModels;
 using System.Globalization;
-using TimeAPI.API.Models.StatusViewModels;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
@@ -66,6 +65,7 @@ namespace TimeAPI.API.Controllroers
                 modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
                 modal.is_deleted = false;
 
+        
 
                 List<string> TeamMembersList = teamViewModel.teammember_empids.Cast<string>().ToList();
 

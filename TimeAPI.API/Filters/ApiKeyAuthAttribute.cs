@@ -18,6 +18,7 @@ namespace TimeAPI.API.Filters
         private const string ApiKeyHeaderName = "ApiKey";
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+            HttpRequestExtensions.IsLocal(context.HttpContext.Request);
             if (!context.HttpContext.Request.Headers.TryGetValue(ApiKeyHeaderName, out var _ApiKey))
             {
                 context.Result = new UnauthorizedResult();
