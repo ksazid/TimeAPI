@@ -39,7 +39,7 @@ namespace TimeAPI.API.Controllers
         private readonly ILogger _logger;
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
-
+        private string _userName = "";
 
         public AccountController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager, IEmailSender emailSender,
@@ -96,78 +96,25 @@ namespace TimeAPI.API.Controllers
         {
             //if (ModelState.IsValid)
             //{
+            //check if user has input email or phone as user
+            GetUserName(UserModel);
 
-            string _userName = "";
-            if (UserModel.Email != null || !string.IsNullOrEmpty(UserModel.Email)
-                || !string.IsNullOrWhiteSpace(UserModel.Email) || UserModel.Email != "")
-            {
-                _userName = UserModel.Email;
-            }
-            else if (UserModel.Phone != null || !string.IsNullOrEmpty(UserModel.Phone)
-                || !string.IsNullOrWhiteSpace(UserModel.Phone) || (UserModel.Phone) != "")
-            {
-                _userName = UserModel.Phone.Contains("+") ? UserModel.Phone.Substring(1) : UserModel.Phone;
-            }
-
-            var user = new ApplicationUser()
-            {
-                UserName = _userName,
-                Email = UserModel.Email,
-                FirstName = UserModel.FirstName,
-                LastName = UserModel.LastName,
-                FullName = UserModel.FullName,
-                Role = "Superadmin",
-                PhoneNumber = UserModel.Phone,
-                isSuperAdmin = true
-            };
-
+            var user = GetUserProperty(UserModel, _userName);
             var result = await _userManager.CreateAsync(user, UserModel.Password).ConfigureAwait(true);
             if (result.Succeeded)
             {
                 await _userManager.AddToRoleAsync(user, user.Role).ConfigureAwait(true);
                 _logger.LogInformation("User created a new account with password.");
 
-
                 #region Employee
 
-                var employee = new Employee()
-                {
-                    id = Guid.NewGuid().ToString(),
-                    user_id = user.Id,
-                    full_name = user.FullName,
-                    first_name = user.FirstName,
-                    last_name = user.LastName,
-                    mobile = user.PhoneNumber,
-                    workemail = user.Email,
-                    createdby = user.FullName,
-                    created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
-                    is_admin = false,
-                    is_superadmin = true
-                };
-
+                var employee = GetEmployeeProperty(user);
                 _unitOfWork.EmployeeRepository.Add(employee);
-                _unitOfWork.Commit();
 
                 #endregion
 
-                if (user.Email != "")
-                {
-                    //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true);
-                    var code = await _userManager.GenerateUserTokenAsync(user, "Default", "Confirmation").ConfigureAwait(true);
-                    //code = EncodeServerName(code); // HttpUtility.UrlEncode(code, );
-
-                    var apikey = _appSettings.JWT_Secret;
-                    var encoded =  UserHelpers.Encrypt(code, true, "TEST");
-
-
-                    code = Base64UrlEncoder.Encode(HttpUtility.UrlPathEncode(code)); // HttpUtility.UrlPathEncode(code); 
-                    var callbackUrl = Url.EmailConfirmationLink(user.Id, encoded, Request.Scheme);
-                    await _emailSender.SendEmailConfirmationAsync(UserModel.Email, callbackUrl).ConfigureAwait(true);
-                }
-                else
-                {
-                    // check if its a phone 
-                }
+                if (_unitOfWork.Commit())
+                    await UserVerificationCode(UserModel, user).ConfigureAwait(true);
 
                 return Ok(new SuccessViewModel { Code = "200", Status = "Success", Desc = "User created a new account with password." });
             }
@@ -189,6 +136,7 @@ namespace TimeAPI.API.Controllers
             //}
             //return BadRequest(new { message = "OOP! Please enter a valid user details." });
         }
+
 
         [HttpPost]
         [Route("Logout")]
@@ -245,12 +193,18 @@ namespace TimeAPI.API.Controllers
             // Base64 encode the hash
             //var encoded = Convert.FromBase64String(code);
 
-            var apikey = _appSettings.JWT_Secret;//.GetValue<string>(key: "SendGridApiKey");
-            var decoded = UserHelpers.Decrypt(code, true, "TEST");
+            //var apikey = _appSettings.JWT_Secret;//.GetValue<string>(key: "SendGridApiKey");
+            //var decoded = UserHelpers.Decryptx(code);
 
 
-            var result = await _userManager.VerifyUserTokenAsync(user, "Default", "Confirmation", decoded).ConfigureAwait(true);  //await _userManager.VerifyUserTokenAsync(user, code).ConfigureAwait(true);
-            if (result)
+            //var result = //await _userManager.ConfirmEmailAsync(user, "Default", "Confirmation", code).ConfigureAwait(true);  //
+
+            IdentityResult identityResult = new IdentityResult();
+            var xcode = Base64UrlEncoder.Decode(code);
+            identityResult = await _userManager.ConfirmEmailAsync(user, xcode).ConfigureAwait(true);
+
+
+            if (identityResult.Succeeded)
             {
                 await _userManager.UpdateSecurityStampAsync(user).ConfigureAwait(true);
                 _unitOfWork.UserRepository.CustomEmailConfirmedFlagUpdate(user.Id);
@@ -343,15 +297,81 @@ namespace TimeAPI.API.Controllers
         }
 
 
-        public static string EncodeServerName(string serverName)
+        private static string EncodeServerName(string serverName)
         {
             return Convert.ToBase64String(Encoding.UTF8.GetBytes(serverName));
         }
 
-        public static string DecodeServerName(string encodedServername)
+        private static string DecodeServerName(string encodedServername)
         {
             return Encoding.UTF8.GetString(Convert.FromBase64String(encodedServername));
         }
+
+        private void GetUserName(RegisterViewModel UserModel)
+        {
+            if (UserModel.Email != null || !string.IsNullOrEmpty(UserModel.Email) || !string.IsNullOrWhiteSpace(UserModel.Email) || UserModel.Email != "")
+            {
+                _userName = UserModel.Email;
+            }
+            else if (UserModel.Phone != null || !string.IsNullOrEmpty(UserModel.Phone) || !string.IsNullOrWhiteSpace(UserModel.Phone) || (UserModel.Phone) != "")
+            {
+                _userName = UserModel.Phone.Contains("+") ? UserModel.Phone.Substring(1) : UserModel.Phone;
+            }
+        }
+
+        private static Employee GetEmployeeProperty(ApplicationUser user)
+        {
+            return new Employee()
+            {
+                id = Guid.NewGuid().ToString(),
+                user_id = user.Id,
+                full_name = user.FullName,
+                first_name = user.FirstName,
+                last_name = user.LastName,
+                mobile = user.PhoneNumber,
+                workemail = user.Email,
+                createdby = user.FullName,
+                created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                is_admin = false,
+                is_superadmin = true
+            };
+        }
+
+        private async Task UserVerificationCode(RegisterViewModel UserModel, ApplicationUser user)
+        {
+            if (user.Email != "")
+            {
+                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true);
+                //var code = await _userManager.GenerateUserTokenAsync(user, "Default", "Confirmation").ConfigureAwait(true);
+                //code = EncodeServerName(code); // HttpUtility.UrlEncode(code, );
+                //var apikey = _appSettings.JWT_Secret;
+                //var encoded = UserHelpers.Encryptx(code);
+
+                var xcode = Base64UrlEncoder.Encode(code); // HttpUtility.UrlPathEncode(code); 
+                var callbackUrl = Url.EmailConfirmationLink(user.Id, xcode, Request.Scheme);
+                await _emailSender.SendEmailConfirmationAsync(UserModel.Email, callbackUrl).ConfigureAwait(true);
+            }
+            else
+            {
+                // check if its a phone 
+            }
+        }
+
+        private static ApplicationUser GetUserProperty(RegisterViewModel UserModel, string _userName)
+        {
+            return new ApplicationUser()
+            {
+                UserName = _userName,
+                Email = UserModel.Email,
+                FirstName = UserModel.FirstName,
+                LastName = UserModel.LastName,
+                FullName = UserModel.FullName,
+                Role = "Superadmin",
+                PhoneNumber = UserModel.Phone,
+                isSuperAdmin = true
+            };
+        }
+
         #endregion
     }
 }

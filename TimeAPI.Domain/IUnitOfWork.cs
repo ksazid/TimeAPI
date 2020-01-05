@@ -43,6 +43,6 @@ namespace TimeAPI.Domain
         ILocationRepository LocationRepository { get; }
 
         //commit all after all completes
-        void Commit();
+        bool Commit();
     }
 }

@@ -378,15 +378,18 @@ namespace TimeAPI.Data
             }
         }
 
-        public void Commit()
+        public bool Commit()
         {
+            bool isSuccess = false;
             try
             {
                 _transaction.Commit();
+                isSuccess = true;
             }
             catch
             {
                 _transaction.Rollback();
+                isSuccess = false;
             }
             finally
             {
@@ -394,6 +397,7 @@ namespace TimeAPI.Data
                 resetRepositories();
                 _transaction = _connection.BeginTransaction();
             }
+            return isSuccess;
         }
 
         public void Dispose()
