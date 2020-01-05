@@ -206,8 +206,8 @@ namespace TimeAPI.API.Controllers
 
             if (identityResult.Succeeded)
             {
-                await _userManager.UpdateSecurityStampAsync(user).ConfigureAwait(true);
-                _unitOfWork.UserRepository.CustomEmailConfirmedFlagUpdate(user.Id);
+                //await _userManager.UpdateSecurityStampAsync(user).ConfigureAwait(true);
+                //_unitOfWork.UserRepository.CustomEmailConfirmedFlagUpdate(user.Id);
                 _unitOfWork.Commit();
 
                 return Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Email Confirmed" });
