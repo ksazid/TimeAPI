@@ -63,16 +63,7 @@ namespace TimeAPI.API.Models
             return dt;
         }
 
-        public string GeneratePassword()
-        {
-            return Guid.NewGuid()
-                .ToString("N")
-                .ToLower()
-                .Replace("1", "")
-                .Replace("o", "")
-                .Replace("0", "")
-                .Substring(0, 8);
-        }
+     
     }
 
 

@@ -23,6 +23,7 @@ using TimeAPI.API.Models.EmployeeViewModels;
 using TimeAPI.API.Services;
 using TimeAPI.Domain;
 using TimeAPI.Domain.Entities;
+using Microsoft.IdentityModel.Tokens;
 
 namespace TimeAPI.API.Controllers
 {
@@ -36,6 +37,8 @@ namespace TimeAPI.API.Controllers
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
         private IConfiguration _configuration;
+        private static string _userName = "";
+
         //public IHostingEnvironment _hostingEnvironment;
         private readonly UserManager<ApplicationUser> _userManager;
         public EmployeeController(IUnitOfWork unitOfWork, ILogger<EmployeeController> logger, UserManager<ApplicationUser> userManager,
@@ -63,91 +66,22 @@ namespace TimeAPI.API.Controllers
 
                 #region User
 
-                Role role = null;
-                string _userName = "";
-                if (!string.IsNullOrEmpty(employeeViewModel.workemail)
-                    || !string.IsNullOrWhiteSpace(employeeViewModel.workemail) || employeeViewModel.workemail != "")
-                {
-                    _userName = employeeViewModel.workemail;
-                }
-                else if (!string.IsNullOrEmpty(employeeViewModel.phone)
-                    || !string.IsNullOrWhiteSpace(employeeViewModel.phone) || employeeViewModel.phone != "")
-                {
-                    if (employeeViewModel.phone.Contains("+"))
-                        _userName = employeeViewModel.phone.Substring(1);
-                    else
-                        _userName = employeeViewModel.phone;
-                }
-
-                if (employeeViewModel.role_id != null)
-                {
-                    employeeViewModel.role_id = "3";
-                    role = _unitOfWork.RoleRepository.Find(employeeViewModel.role_id);
-                    if (role != null)
-                    {
-                        if (role.NormalizedName == "ADMIN")
-                            employeeViewModel.is_admin = true;
-                    }
-                    else
-                    {
-                        employeeViewModel.is_admin = false;
-                        employeeViewModel.is_superadmin = false;
-                    }
-                }
-
-                var user = new ApplicationUser()
-                {
-                    UserName = _userName,
-                    Email = employeeViewModel.workemail,
-                    FullName = employeeViewModel.first_name + " " + employeeViewModel.last_name,
-                    FirstName = employeeViewModel.first_name,
-                    LastName = employeeViewModel.last_name,
-                    Role = role.Name,
-                    PhoneNumber = employeeViewModel.phone,
-                    isSuperAdmin = false
-                };
-
-                oDataTable _oDataTable = new oDataTable();
-                string password = "P@ssw0rd123";// _oDataTable.GeneratePassword() + "@";
+                //Determine if username is email or phone
+                SetUserName(employeeViewModel);
+                var user = GetUserProperty(employeeViewModel);
+                string password = UserHelpers.GeneratePassword();
 
                 var result = await _userManager.CreateAsync(user, password).ConfigureAwait(true);
                 if (result.Succeeded)
                 {
-                    var xRest = await _userManager.AddToRoleAsync(user, role.Name).ConfigureAwait(true);
+                    await _userManager.AddToRoleAsync(user, "Employee").ConfigureAwait(true);
                     _logger.LogInformation("User created a new account with password.");
 
-                    #region Employee
-
-                    var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeViewModel, Employee>());
-                    var mapper = config.CreateMapper();
-                    var modal = mapper.Map<Employee>(employeeViewModel);
-
-                    modal.id = Guid.NewGuid().ToString();
-                    modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
-                    modal.is_deleted = false;
-                    modal.user_id = user.Id;
-
+                    var modal = SetEmployeeProperty(employeeViewModel, user);
                     _unitOfWork.EmployeeRepository.Add(modal);
-                    _unitOfWork.Commit();
 
-                    #endregion
-
-                    if (user.Email != "")
-                    {
-                        var code1 = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true);
-                        //code1 = System.Web.HttpUtility.UrlEncode(code1);
-                        var callbackUrl1 = Url.EmailConfirmationLink(user.Id, code1, Request.Scheme);
-                        await _emailSender.SendEmailConfirmationAsync(user.Email, callbackUrl1).ConfigureAwait(true);
-
-                        var code = await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(true);
-                        //code = System.Web.HttpUtility.UrlEncode(code);
-                        var callbackUrl = Url.PasswordLink(user.Id, code, Request.Scheme);
-                        await _emailSender.SendSetupPasswordAsync(user.Email, callbackUrl).ConfigureAwait(true);
-                    }
-                    else
-                    {
-                        // check if its a phone 
-                    }
+                    if (_unitOfWork.Commit())
+                        await UserVerification(user).ConfigureAwait(true);
 
                     return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee registered succefully." }).ConfigureAwait(false);
                 }
@@ -175,6 +109,8 @@ namespace TimeAPI.API.Controllers
             }
         }
 
+
+
         [HttpPatch]
         [Route("UpdateEmployee")]
         public async Task<object> UpdateEmployee([FromBody] EmployeeViewModel employeeViewModel, CancellationToken cancellationToken)
@@ -190,7 +126,6 @@ namespace TimeAPI.API.Controllers
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeViewModel, Employee>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Employee>(employeeViewModel);
-
                 modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
 
                 _unitOfWork.EmployeeRepository.Update(modal);
@@ -562,6 +497,75 @@ namespace TimeAPI.API.Controllers
             else
             {
                 return RedirectToAction(nameof(HomeController.Index), "Home");
+            }
+        }
+
+        private ApplicationUser GetUserProperty(EmployeeViewModel employeeViewModel)
+        {
+            return new ApplicationUser()
+            {
+                UserName = _userName,
+                Email = employeeViewModel.workemail,
+                FullName = employeeViewModel.first_name + " " + employeeViewModel.last_name,
+                FirstName = employeeViewModel.first_name,
+                LastName = employeeViewModel.last_name,
+                Role = "Employee",
+                PhoneNumber = employeeViewModel.phone,
+                isSuperAdmin = false
+            };
+        }
+
+        private static string SetUserName(EmployeeViewModel employeeViewModel)
+        {
+            if (!string.IsNullOrEmpty(employeeViewModel.workemail)
+                || !string.IsNullOrWhiteSpace(employeeViewModel.workemail) || employeeViewModel.workemail != "")
+            {
+                _userName = employeeViewModel.workemail;
+            }
+            else if (!string.IsNullOrEmpty(employeeViewModel.phone)
+                || !string.IsNullOrWhiteSpace(employeeViewModel.phone) || employeeViewModel.phone != "")
+            {
+                if (employeeViewModel.phone.Contains("+"))
+                    _userName = employeeViewModel.phone.Substring(1);
+                else
+                    _userName = employeeViewModel.phone;
+            }
+
+            return _userName;
+        }
+
+        private static Employee SetEmployeeProperty(EmployeeViewModel employeeViewModel, ApplicationUser user)
+        {
+            var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeViewModel, Employee>());
+            var mapper = config.CreateMapper();
+            var modal = mapper.Map<Employee>(employeeViewModel);
+
+            modal.id = Guid.NewGuid().ToString();
+            modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+            modal.is_deleted = false;
+            modal.user_id = user.Id;
+            modal.is_admin = false;
+            modal.is_superadmin = false;
+            return modal;
+        }
+
+        private async Task UserVerification(ApplicationUser user)
+        {
+            if (user.Email != "")
+            {
+                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true);
+                var xcode = Base64UrlEncoder.Encode(code);
+                var callbackUrl1 = Url.EmailConfirmationLink(user.Id, xcode, Request.Scheme);
+                await _emailSender.SendEmailConfirmationAsync(user.Email, callbackUrl1).ConfigureAwait(true);
+
+                var ResetCode = await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(true);
+                var xResetCode = Base64UrlEncoder.Encode(ResetCode);
+                var callbackUrl = Url.PasswordLink(user.Id, xResetCode, Request.Scheme);
+                await _emailSender.SendSetupPasswordAsync(user.Email, callbackUrl).ConfigureAwait(true);
+            }
+            else
+            {
+                // check if its a phone 
             }
         }
 

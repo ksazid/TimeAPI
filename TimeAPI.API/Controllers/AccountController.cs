@@ -23,9 +23,7 @@ using System.Web;
 using Microsoft.AspNetCore.DataProtection;
 using System.Security.Cryptography;
 using TimeAPI.API.Extensions;
-//using Base64UrlCore;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace TimeAPI.API.Controllers
 {
@@ -69,9 +67,8 @@ namespace TimeAPI.API.Controllers
             {
                 if (!await _userManager.IsEmailConfirmedAsync(user).ConfigureAwait(false))
                 {
-                    return Ok(new SuccessViewModel { Code = "201", Status = "Error", Desc = "Please verify your user with conf" });
+                    return Ok(new SuccessViewModel { Code = "201", Status = "Error", Desc = "Please verify your user." });
                 }
-
 
                 var role = await _userManager.GetRolesAsync(user).ConfigureAwait(true);
                 IdentityOptions options = new IdentityOptions();
@@ -222,7 +219,7 @@ namespace TimeAPI.API.Controllers
             {
                 return Ok(new SuccessViewModel { Code = "201", Status = "Error", Desc = "Please enter a valid email" });
             }
-            var xcode = Base64UrlEncoder.Encode(model.Code);
+            var xcode = Base64UrlEncoder.Decode(model.Code);
             var result = await _userManager.ResetPasswordAsync(user, xcode, model.Password).ConfigureAwait(true);
 
             if (result.Succeeded)

@@ -185,5 +185,13 @@ namespace TimeAPI.API.Models
 
             return false;
         }
+
+        public static string GeneratePassword() => Guid.NewGuid()
+            .ToString("N")
+            .ToLower()
+            .Replace("1", "")
+            .Replace("o", "")
+            .Replace("0", "")
+            .Substring(0, 8) + "@";
     }
 }

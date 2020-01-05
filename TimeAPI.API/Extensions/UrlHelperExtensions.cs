@@ -26,11 +26,12 @@ namespace Microsoft.AspNetCore.Mvc
 
         public static string ResetPasswordCallbackLink(this IUrlHelper urlHelper, string userId, string code, string scheme)
         {
-            return urlHelper.Action(
-                action: nameof(HomeController.Get),
-                controller: "Account",
-                values: new { userId, code },
-                protocol: scheme);
+            return "https://enforce.azurewebsites.net/password-setup?userId=" + userId + "&code=" + code;
+            //return urlHelper.Action(
+            //    action: nameof(HomeController.Get),
+            //    controller: "Account",
+            //    values: new { userId, code },
+            //    protocol: scheme);
         }
     }
 }

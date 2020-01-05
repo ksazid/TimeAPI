@@ -120,7 +120,22 @@ namespace TimeAPI.Data.Repositories
                 param: new { empid = resultsEmployee.id }
             );
 
+            var RootTimesheetDataList = GetTimesheetProperty(resultsTimesheetGrpID);
 
+            UserDataGroupDataSet _UserDataGroupDataSet = new UserDataGroupDataSet();
+
+            _UserDataGroupDataSet.User = resultsAspNetUsers;
+            _UserDataGroupDataSet.Organization = resultsOrganization;
+            _UserDataGroupDataSet.Employee = resultsEmployee;
+            _UserDataGroupDataSet.Timesheet = RootTimesheetDataList;
+
+            return _UserDataGroupDataSet;
+        }
+
+        #region PrivateMethods
+        
+        private List<RootTimesheetData> GetTimesheetProperty(IEnumerable<string> resultsTimesheetGrpID)
+        {
             List<RootTimesheetData> RootTimesheetDataList = new List<RootTimesheetData>();
 
             foreach (var item in resultsTimesheetGrpID)
@@ -160,17 +175,10 @@ namespace TimeAPI.Data.Repositories
                 RootTimesheetDataList.Add(rootTimesheetData);
             }
 
-            UserDataGroupDataSet _UserDataGroupDataSet = new UserDataGroupDataSet();
-
-            _UserDataGroupDataSet.User = resultsAspNetUsers;
-            _UserDataGroupDataSet.Organization = resultsOrganization;
-            _UserDataGroupDataSet.Employee = resultsEmployee;
-            _UserDataGroupDataSet.Timesheet = RootTimesheetDataList;
-
-            return _UserDataGroupDataSet;
+            return RootTimesheetDataList;
         }
 
-        public IEnumerable<TimesheetDataModel> GetTimesheetDataModel(string GroupID)
+        private IEnumerable<TimesheetDataModel> GetTimesheetDataModel(string GroupID)
         {
             var TimesheetDataModel = Query<TimesheetDataModel>(
                 sql: @"SELECT 
@@ -188,7 +196,7 @@ namespace TimeAPI.Data.Repositories
             return TimesheetDataModel;
         }
 
-        public IEnumerable<TimesheetAdministrativeDataModel> GetTimesheetAdministrativeDataModel(string GroupID)
+        private IEnumerable<TimesheetAdministrativeDataModel> GetTimesheetAdministrativeDataModel(string GroupID)
         {
             var TimesheetAdministrativeDataModel = Query<TimesheetAdministrativeDataModel>(
                 sql: @"SELECT 
@@ -202,7 +210,7 @@ namespace TimeAPI.Data.Repositories
             return TimesheetAdministrativeDataModel;
         }
 
-        public IEnumerable<TimesheetProjectCategoryDataModel> GetTimesheetProjectCategoryDataModel(string GroupID)
+        private IEnumerable<TimesheetProjectCategoryDataModel> GetTimesheetProjectCategoryDataModel(string GroupID)
         {
             var TimesheetAdministrativeDataModel = Query<TimesheetProjectCategoryDataModel>(
                 sql: @"SELECT 
@@ -217,7 +225,7 @@ namespace TimeAPI.Data.Repositories
             return TimesheetAdministrativeDataModel;
         }
 
-        public IEnumerable<TimesheetTeamDataModel> GetTimesheetTeamDataModel(string GroupID)
+        private IEnumerable<TimesheetTeamDataModel> GetTimesheetTeamDataModel(string GroupID)
         {
             var TimesheetTeamDataModel = Query<TimesheetTeamDataModel>(
                 sql: @"SELECT 
@@ -231,7 +239,7 @@ namespace TimeAPI.Data.Repositories
             return TimesheetTeamDataModel;
         }
 
-        public IEnumerable<TimesheetSearchLocationViewModel> GetTimesheetSearchLocationViewModel(string GroupID)
+        private IEnumerable<TimesheetSearchLocationViewModel> GetTimesheetSearchLocationViewModel(string GroupID)
         {
             var TimesheetSearchLocationViewModel = Query<TimesheetSearchLocationViewModel>(
                 sql: @"SELECT id, groupid, formatted_address, lat, lang, street_number, route, locality, 
@@ -243,7 +251,7 @@ namespace TimeAPI.Data.Repositories
             return TimesheetSearchLocationViewModel;
         }
 
-        public IEnumerable<TimesheetCurrentLocationViewModel> GetTimesheetCurrentLocationViewModel(string GroupID)
+        private IEnumerable<TimesheetCurrentLocationViewModel> GetTimesheetCurrentLocationViewModel(string GroupID)
         {
             var TimesheetCurrentLocationViewModel = Query<TimesheetCurrentLocationViewModel>(
                sql: @"SELECT id, groupid, formatted_address, lat, lang, street_number, route, locality, 
@@ -254,5 +262,7 @@ namespace TimeAPI.Data.Repositories
 
             return TimesheetCurrentLocationViewModel;
         }
+
+        #endregion PrivateMethods
     }
 }
