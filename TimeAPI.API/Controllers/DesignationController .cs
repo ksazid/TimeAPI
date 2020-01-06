@@ -162,7 +162,6 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 var result = _unitOfWork.DesignationRepositiory.Find(Utils.ID);
-                _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -185,7 +184,6 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(Utils.FullName));
 
                 var result = _unitOfWork.DesignationRepositiory.FindByDesignationName(Utils.FullName);
-                _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -208,7 +206,6 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(UtilsAlias.Alias));
 
                 var result = _unitOfWork.DesignationRepositiory.FindByDesignationAlias(UtilsAlias.Alias);
-                _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -231,7 +228,6 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 var result = _unitOfWork.DesignationRepositiory.FindDesignationByDeptID(Utils.ID);
-                _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -256,7 +252,6 @@ namespace TimeAPI.API.Controllers
                 oDataTable _oDataTable = new oDataTable();
                 var results = _unitOfWork.DesignationRepositiory.FetchGridDataByDesignationByDeptOrgID(UtilsOrgID.OrgID);
                 var xResult = _oDataTable.ToDataTable(results);
-                _unitOfWork.Commit();
 
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
             }
@@ -281,7 +276,6 @@ namespace TimeAPI.API.Controllers
                 oDataTable _oDataTable = new oDataTable();
                 var results = _unitOfWork.DesignationRepositiory.GetAllDesignationByOrgID(UtilsOrgID.OrgID);
                 var xResult = _oDataTable.ToDataTable(results);
-                _unitOfWork.Commit();
 
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
             }

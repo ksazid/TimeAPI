@@ -8,6 +8,7 @@ namespace TimeAPI.Domain.Entities
     {
         public string id { get; set; }
         public string groupid { get; set; }
+        public string manual_address { get; set; }
         public string formatted_address { get; set; }
         public string lat { get; set; }
         public string lang { get; set; }
@@ -23,6 +24,8 @@ namespace TimeAPI.Domain.Entities
         public string modified_date { get; set; }
         public string modifiedby { get; set; }
         public bool is_deleted { get; set; }
+        public bool is_office { get; set; }
+        public bool is_manual { get; set; }
 
     }
 }

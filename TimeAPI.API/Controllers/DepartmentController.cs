@@ -134,7 +134,6 @@ namespace TimeAPI.API.Controllers
                     cancellationToken.ThrowIfCancellationRequested();
 
                 var result = _unitOfWork.DepartmentRepository.All();
-                _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -158,7 +157,6 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(UtilsName.FullName));
 
                 var result = _unitOfWork.DepartmentRepository.FindByDepartmentName(UtilsName.FullName);
-                _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -182,7 +180,6 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(UtilsAlias.Alias));
 
                 var result = _unitOfWork.DepartmentRepository.FindByDepartmentAlias(UtilsAlias.Alias);
-                _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -206,7 +203,6 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 var result = _unitOfWork.DepartmentRepository.FindDepartmentByOrgID(Utils.ID);
-                _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -230,7 +226,6 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 var result = _unitOfWork.DepartmentRepository.Find(Utils.ID);
-                _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -253,7 +248,6 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 var result = _unitOfWork.DepartmentRepository.FindDepLeadByDepID(Utils.ID);
-                _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -278,7 +272,6 @@ namespace TimeAPI.API.Controllers
                 oDataTable _oDataTable = new oDataTable();
                 var results = _unitOfWork.DepartmentRepository.FetchGridDataByDepOrgID(UtilsOrgID.OrgID);
                 var xResult = _oDataTable.ToDataTable(results);
-                _unitOfWork.Commit();
 
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
             }

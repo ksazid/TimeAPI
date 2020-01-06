@@ -76,7 +76,6 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
-        
         [HttpPatch]
         [Route("UpdateSocial")]
         public async Task<object> UpdateSocial([FromBody] SocialViewModel socialViewModel, CancellationToken cancellationToken)
@@ -105,7 +104,6 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
-        
         [HttpPost]
         [Route("RemoveSocial")]
         public async Task<object> RemoveSocial([FromBody] Utils Utils, CancellationToken cancellationToken)
@@ -129,19 +127,16 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
-        
         [HttpGet]
         [Route("GetAllSocial")]
         public async Task<object> GetAllSocial(CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
                 var result = _unitOfWork.SocialRepository.All();
-                _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -151,7 +146,6 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
-        
         [HttpPost]
         [Route("FindBySocailID")]
         public async Task<object> FindBySocailID([FromBody] Utils Utils, CancellationToken cancellationToken)
@@ -165,7 +159,6 @@ namespace TimeAPI.API.Controllroers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 var result = _unitOfWork.SocialRepository.Find(Utils.ID);
-                _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -175,7 +168,6 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
-        
         [HttpPost]
         [Route("FindSocialIdsByEmpID")]
         public async Task<object> FindSocialIdsByEmpID([FromBody] Utils Utils, CancellationToken cancellationToken)
@@ -189,7 +181,6 @@ namespace TimeAPI.API.Controllroers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 var result = _unitOfWork.SocialRepository.FindSocialIdsByEmpID(Utils.ID);
-                _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }

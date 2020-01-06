@@ -242,8 +242,8 @@ namespace TimeAPI.Data.Repositories
         private IEnumerable<TimesheetSearchLocationViewModel> GetTimesheetSearchLocationViewModel(string GroupID)
         {
             var TimesheetSearchLocationViewModel = Query<TimesheetSearchLocationViewModel>(
-                sql: @"SELECT id, groupid, formatted_address, lat, lang, street_number, route, locality, 
-                       administrative_area_level_2, administrative_area_level_1, postal_code, country
+                sql: @"SELECT id, groupid, manual_address, formatted_address, lat, lang, street_number, route, locality, 
+                       administrative_area_level_2, administrative_area_level_1, postal_code, country, is_office, is_manual
                     FROM timesheet_location  WITH (NOLOCK) where groupid  = @GroupID;",
                 param: new { GroupID }
             );

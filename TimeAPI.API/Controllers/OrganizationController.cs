@@ -135,7 +135,6 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 var result = _unitOfWork.OrganizationRepository.Find(Utils.ID);
-                _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -158,8 +157,6 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 var result = _unitOfWork.OrganizationRepository.FindByUsersID(Utils.ID);
-                _unitOfWork.Commit();
-
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -181,8 +178,6 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(UtilsName.FullName));
 
                 var result = _unitOfWork.OrganizationRepository.FindByOrgName(UtilsName.FullName);
-                _unitOfWork.Commit();
-
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -202,8 +197,6 @@ namespace TimeAPI.API.Controllers
                     cancellationToken.ThrowIfCancellationRequested();
 
                 var result = _unitOfWork.OrganizationRepository.All();
-                _unitOfWork.Commit();
-
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)

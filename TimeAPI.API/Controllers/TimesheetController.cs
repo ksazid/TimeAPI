@@ -31,8 +31,7 @@ namespace TimeAPI.API.Controllers
         private readonly IUnitOfWork _unitOfWork;
 
         public TimesheetController(IUnitOfWork unitOfWork, ILogger<TimesheetController> logger,
-            IEmailSender emailSender,
-            IOptions<ApplicationSettings> AppSettings)
+            IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings)
         {
             _emailSender = emailSender;
             _logger = logger;
@@ -54,25 +53,14 @@ namespace TimeAPI.API.Controllers
                 if (timesheetViewModel == null)
                     throw new ArgumentNullException(nameof(timesheetViewModel));
 
-                //if (string.IsNullOrWhiteSpace(timesheetViewModel.groupid) || string.IsNullOrEmpty(timesheetViewModel.groupid))
-                //    timesheetViewModel.groupid = null;
-
-                //timesheetViewModel.is_deleted = false;
-                //timesheetViewModel.is_checkout = false;
-                //timesheetViewModel.check_out = null;
-                //timesheetViewModel.total_hrs = null;
-                //timesheetViewModel.ondate = DateTime.Now.ToString(CultureInfo.CurrentCulture);
-                //timesheetViewModel.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
-
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetPostViewModel, Timesheet>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Timesheet>(timesheetViewModel);
 
                 var _groupid = Guid.NewGuid().ToString();
-                //if (timesheetViewModel.groupid != null)
-                //    _groupid = timesheetViewModel.groupid;
 
                 #region TimesheetWithTeamMembers
+
                 if (timesheetViewModel.team_member_empid != null)
                 {
                     foreach (var item in timesheetViewModel.team_member_empid.Distinct())
@@ -95,6 +83,7 @@ namespace TimeAPI.API.Controllers
                 #endregion TimesheetWithTeamMembers
 
                 #region Teams
+
                 if (timesheetViewModel.teamid != null)
                 {
                     foreach (var item in timesheetViewModel.teamid.Distinct())
@@ -111,6 +100,7 @@ namespace TimeAPI.API.Controllers
                         _unitOfWork.TimesheetTeamRepository.Add(timesheet_team);
                     }
                 }
+
                 #endregion Teams
 
                 #region TimesheetProjectCategory
@@ -137,7 +127,6 @@ namespace TimeAPI.API.Controllers
 
                 if (timesheetViewModel.TimesheetAdministrativeViewModel != null)
                 {
-
                     foreach (var item in timesheetViewModel.TimesheetAdministrativeViewModel.administrative_id.Distinct())
                     {
                         var project_administrative = new TimesheetAdministrative
@@ -151,7 +140,6 @@ namespace TimeAPI.API.Controllers
                         };
                         _unitOfWork.TimesheetAdministrativeRepository.Add(project_administrative);
                     }
-
                 }
 
                 #endregion TimesheetAdministrative
@@ -184,6 +172,7 @@ namespace TimeAPI.API.Controllers
                     {
                         id = Guid.NewGuid().ToString(),
                         groupid = modal.groupid,
+                        manual_address = timesheetViewModel.TimesheetSearchLocationViewModel.manual_address,
                         formatted_address = timesheetViewModel.TimesheetSearchLocationViewModel.formatted_address,
                         lat = timesheetViewModel.TimesheetSearchLocationViewModel.lat,
                         lang = timesheetViewModel.TimesheetSearchLocationViewModel.lang,
@@ -194,11 +183,11 @@ namespace TimeAPI.API.Controllers
                         administrative_area_level_1 = timesheetViewModel.TimesheetSearchLocationViewModel.administrative_area_level_1,
                         postal_code = timesheetViewModel.TimesheetSearchLocationViewModel.postal_code,
                         country = timesheetViewModel.TimesheetSearchLocationViewModel.country,
-
                         is_deleted = false,
+                        is_office = timesheetViewModel.TimesheetSearchLocationViewModel.is_office,
+                        is_manual = timesheetViewModel.TimesheetSearchLocationViewModel.is_manual,
                         created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
                         createdby = modal.createdby
-
                     };
                     _unitOfWork.TimesheetLocationRepository.Add(TimesheetLocation);
                 }
@@ -227,7 +216,6 @@ namespace TimeAPI.API.Controllers
                         is_checkout = false,
                         created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
                         createdby = modal.createdby
-
                     };
                     _unitOfWork.LocationRepository.Add(Location);
                 }
@@ -355,6 +343,7 @@ namespace TimeAPI.API.Controllers
                     {
                         id = Guid.NewGuid().ToString(),
                         groupid = modal.groupid,
+                        manual_address = timesheetViewModel.TimesheetSearchLocationViewModel.formatted_address,
                         formatted_address = timesheetViewModel.TimesheetSearchLocationViewModel.formatted_address,
                         lat = timesheetViewModel.TimesheetSearchLocationViewModel.lat,
                         lang = timesheetViewModel.TimesheetSearchLocationViewModel.lang,
@@ -365,9 +354,10 @@ namespace TimeAPI.API.Controllers
                         administrative_area_level_1 = timesheetViewModel.TimesheetSearchLocationViewModel.administrative_area_level_1,
                         postal_code = timesheetViewModel.TimesheetSearchLocationViewModel.postal_code,
                         country = timesheetViewModel.TimesheetSearchLocationViewModel.country,
+                        is_office = timesheetViewModel.TimesheetSearchLocationViewModel.is_office,
+                        is_manual = timesheetViewModel.TimesheetSearchLocationViewModel.is_manual,
                         modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
                         modifiedby = modal.createdby
-
                     };
                     _unitOfWork.TimesheetLocationRepository.Add(TimesheetLocation);
                 }
@@ -394,7 +384,6 @@ namespace TimeAPI.API.Controllers
                         country = timesheetViewModel.TimesheetCurrentLocationViewModel.country,
                         modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
                         modifiedby = modal.createdby
-
                     };
                     _unitOfWork.LocationRepository.Add(Location);
                 }
@@ -451,7 +440,6 @@ namespace TimeAPI.API.Controllers
                     cancellationToken.ThrowIfCancellationRequested();
 
                 var result = _unitOfWork.TimesheetRepository.All();
-                _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -637,7 +625,6 @@ namespace TimeAPI.API.Controllers
                     cancellationToken.ThrowIfCancellationRequested();
 
                 var result = _unitOfWork.TimesheetActivityRepository.All();
-                _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -744,7 +731,6 @@ namespace TimeAPI.API.Controllers
                     cancellationToken.ThrowIfCancellationRequested();
 
                 var result = _unitOfWork.TimesheetActivityCommentRepository.All();
-                _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -851,7 +837,6 @@ namespace TimeAPI.API.Controllers
                     cancellationToken.ThrowIfCancellationRequested();
 
                 var result = _unitOfWork.TimesheetActivityFileRepository.All();
-                _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }

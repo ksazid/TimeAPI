@@ -196,7 +196,6 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 var result = _unitOfWork.EmployeeRepository.Find(Utils.ID);
-                _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -220,7 +219,6 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(UtilsName));
 
                 var result = _unitOfWork.EmployeeRepository.FindByEmpName(UtilsName.FullName);
-                _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -243,7 +241,6 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 var result = _unitOfWork.EmployeeRepository.FindByOrgIDCode(Utils.ID);
-                _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -267,7 +264,6 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(_EmpCode.Code));
 
                 var result = _unitOfWork.EmployeeRepository.FindByEmpCode(_EmpCode.Code);
-                _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -291,7 +287,6 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(UtilsRole.Role));
 
                 var result = _unitOfWork.EmployeeRepository.FindByRoleName(UtilsRole.Role);
-                _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -342,7 +337,6 @@ namespace TimeAPI.API.Controllers
                 oDataTable _oDataTable = new oDataTable();
                 var results = _unitOfWork.EmployeeRepository.FindEmployeeListByDesignationID(utils.ID);
                 var xResult = _oDataTable.ToDataTable(results);
-                _unitOfWork.Commit();
 
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(results, Formatting.Indented)).ConfigureAwait(false);
             }
@@ -368,7 +362,6 @@ namespace TimeAPI.API.Controllers
                 oDataTable _oDataTable = new oDataTable();
                 var results = _unitOfWork.EmployeeRepository.FindEmployeeListByDepartmentID(utils.ID);
                 var xResult = _oDataTable.ToDataTable(results);
-                _unitOfWork.Commit();
 
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(results, Formatting.Indented)).ConfigureAwait(false);
             }
@@ -392,7 +385,6 @@ namespace TimeAPI.API.Controllers
 
                 oDataTable _oDataTable = new oDataTable();
                 var results = _unitOfWork.EmployeeRepository.FindEmpDepartDesignByEmpID(Utils.ID);
-                _unitOfWork.Commit();
 
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(results, Formatting.Indented)).ConfigureAwait(false);
             }
@@ -468,7 +460,6 @@ namespace TimeAPI.API.Controllers
                 oDataTable _oDataTable = new oDataTable();
                 var results = _unitOfWork.EmployeeRepository.FindEmpDepartDesignByTeamID(Utils.ID);
                 var xResult = _oDataTable.ToDataTable(results);
-                _unitOfWork.Commit();
 
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(results, Formatting.Indented)).ConfigureAwait(false);
             }

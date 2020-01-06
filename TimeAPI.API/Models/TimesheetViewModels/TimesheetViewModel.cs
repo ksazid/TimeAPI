@@ -6,9 +6,6 @@ using System.Threading.Tasks;
 
 namespace TimeAPI.API.Models.TimesheetViewModels
 {
-
-
-
     public class TimesheetPostViewModel
     {
         public List<string> team_member_empid { get; set; }
@@ -19,7 +16,6 @@ namespace TimeAPI.API.Models.TimesheetViewModels
         public TimesheetCategoryViewModel TimesheetCategoryViewModel { get; set; }
         public TimesheetSearchLocationViewModel TimesheetSearchLocationViewModel { get; set; }
         public TimesheetCurrentLocationViewModel TimesheetCurrentLocationViewModel { get; set; }
-
     }
 
     public class TimesheetViewModel
@@ -38,7 +34,6 @@ namespace TimeAPI.API.Models.TimesheetViewModels
         public string modified_date { get; set; }
         public string modifiedby { get; set; }
         public bool is_deleted { get; set; }
-
         public TimesheetAdministrativeViewModel TimesheetAdministrativeViewModel { get; set; }
         public TimesheetCategoryViewModel TimesheetCategoryViewModel { get; set; }
         public TimesheetSearchLocationViewModel TimesheetSearchLocationViewModel { get; set; }
@@ -59,6 +54,7 @@ namespace TimeAPI.API.Models.TimesheetViewModels
 
     public class TimesheetSearchLocationViewModel
     {
+        public string manual_address { get; set; }
         public string formatted_address { get; set; }
         public string lat { get; set; }
         public string lang { get; set; }
@@ -69,6 +65,8 @@ namespace TimeAPI.API.Models.TimesheetViewModels
         public string administrative_area_level_1 { get; set; }
         public string postal_code { get; set; }
         public string country { get; set; }
+        public bool is_office { get; set; }
+        public bool is_manual { get; set; }
     }
 
     public class TimesheetCurrentLocationViewModel
@@ -85,8 +83,6 @@ namespace TimeAPI.API.Models.TimesheetViewModels
         public string country { get; set; }
     }
 
-
-
     //for checkout 
     public class TimesheetCheckoutViewModel
     {
@@ -94,7 +90,6 @@ namespace TimeAPI.API.Models.TimesheetViewModels
         public string groupid { get; set; }
         public string check_out { get; set; }
         public string modifiedby { get; set; }
-
         public TimesheetCurrentLocationViewModel TimesheetCurrentLocationViewModel { get; set; }
     }
 }

@@ -138,7 +138,6 @@ namespace TimeAPI.API.Controllers
                     cancellationToken.ThrowIfCancellationRequested();
 
                 var result = _unitOfWork.ReportingRepository.All();
-                _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -148,7 +147,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        
         [HttpPost]
         [Route("FindByReportEmpID")]
         public async Task<object> FindByReportEmpID([FromBody] Utils Utils, CancellationToken cancellationToken)
@@ -163,7 +161,6 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 var result = _unitOfWork.ReportingRepository.FindByReportEmpID(Utils.ID);
-                _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -187,7 +184,6 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 var result = _unitOfWork.ReportingRepository.FindReportingHeadByEmpID(Utils.ID);
-                _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }

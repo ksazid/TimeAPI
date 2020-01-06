@@ -16,10 +16,10 @@ namespace TimeAPI.Data.Repositories
 
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.timesheet_location
-                                  (id,  groupid, formatted_address, lat, lang, street_number, route, locality, administrative_area_level_2, 
-                                   administrative_area_level_1, postal_code, country, created_date, createdby)
-                           VALUES (@id, @groupid, @formatted_address, @lat, @lang, @street_number, @route, @locality, @administrative_area_level_2, 
-                                   @administrative_area_level_1, @postal_code, @country, @created_date, @createdby);
+                                  (id,  groupid, manual_address, formatted_address, lat, lang, street_number, route, locality, administrative_area_level_2, 
+                                   administrative_area_level_1, postal_code, country, is_office, is_manual, created_date, createdby)
+                           VALUES (@id, @groupid, @manual_address, @formatted_address, @lat, @lang, @street_number, @route, @locality, @administrative_area_level_2, 
+                                   @administrative_area_level_1, @postal_code, @country, @is_office, @is_manual, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -61,6 +61,7 @@ namespace TimeAPI.Data.Repositories
                 sql: @"UPDATE dbo.timesheet_location
                    SET 
                     groupid = @groupid,
+                    manual_address = @manual_address,
                     formatted_address = @formatted_address, 
                     lat = @lat, 
                     lang = @lang, 
@@ -71,6 +72,8 @@ namespace TimeAPI.Data.Repositories
                     administrative_area_level_1 = @administrative_area_level_1,
                     postal_code = @postal_code, 
                     country = @country,
+                    is_office = @is_office,
+                    is_manual = @is_manual,
                     modified_date = @modified_date, 
                     modifiedby = @modifiedby
                     WHERE id = @id",

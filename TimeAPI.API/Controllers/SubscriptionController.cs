@@ -76,7 +76,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        
         [HttpPatch]
         [Route("UpdateSubscription")]
         public async Task<object> UpdateSubscription([FromBody] SubscriptionViewModel subscriptionViewModel, CancellationToken cancellationToken)
@@ -105,7 +104,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        
         [HttpPost]
         [Route("RemoveSubscription")]
         public async Task<object> RemoveSubscription([FromBody] Utils Utils, CancellationToken cancellationToken)
@@ -129,7 +127,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        
         [HttpGet]
         [Route("GetAllSubscription")]
         public async Task<object> GetAllSubscription(CancellationToken cancellationToken)
@@ -141,7 +138,6 @@ namespace TimeAPI.API.Controllers
                     cancellationToken.ThrowIfCancellationRequested();
 
                 var result = _unitOfWork.SubscriptionRepository.All();
-                _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -165,7 +161,6 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 var result = _unitOfWork.SubscriptionRepository.Find(Utils.ID);
-                _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -189,7 +184,6 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 var result = _unitOfWork.SubscriptionRepository.FindByApiKeyOrgID(Utils.ID);
-                _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -213,7 +207,6 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 var result = _unitOfWork.SubscriptionRepository.FindByApiKeyOrgID(Utils.ID);
-                _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }

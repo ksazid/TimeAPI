@@ -143,7 +143,6 @@ namespace TimeAPI.API.Controllers
                     cancellationToken.ThrowIfCancellationRequested();
 
                 var result = _unitOfWork.TaskRepository.All();
-                _unitOfWork.Commit();
 
                 return await System.Threading.Tasks.Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -166,7 +165,6 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 var results = _unitOfWork.TaskRepository.Find(Utils.ID);
-                _unitOfWork.Commit();
 
                 return await System.Threading.Tasks.Task.FromResult<object>(results).ConfigureAwait(false);
             }
@@ -191,7 +189,6 @@ namespace TimeAPI.API.Controllers
                 oDataTable _oDataTable = new oDataTable();
                 var results = _unitOfWork.TaskRepository.FindByTaskDetailsByEmpID(Utils.ID);
                 var xResult = _oDataTable.ToDataTable(results);
-                _unitOfWork.Commit();
 
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
             }

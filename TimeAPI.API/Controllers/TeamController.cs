@@ -36,8 +36,7 @@ namespace TimeAPI.API.Controllroers
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
         public TeamController(IUnitOfWork unitOfWork, ILogger<TeamController> logger,
-            IEmailSender emailSender,
-            IOptions<ApplicationSettings> AppSettings)
+            IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings)
         {
             _emailSender = emailSender;
             _logger = logger;
@@ -183,7 +182,6 @@ namespace TimeAPI.API.Controllroers
                     cancellationToken.ThrowIfCancellationRequested();
 
                 var result = _unitOfWork.TeamRepository.All();
-                _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -206,7 +204,6 @@ namespace TimeAPI.API.Controllroers
                     throw new ArgumentNullException(nameof(Utils.OrgID));
 
                 var result = _unitOfWork.TeamRepository.FindTeamsByOrgID(Utils.OrgID);
-                _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -228,8 +225,8 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                oDataTable _oDataTable = new oDataTable();
                 var results = _unitOfWork.TeamRepository.FindByTeamID(Utils.ID);
+
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(results, Formatting.Indented)).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -277,6 +274,7 @@ namespace TimeAPI.API.Controllroers
                 oDataTable _oDataTable = new oDataTable();
                 var results = _unitOfWork.TeamRepository.FetchAllTeamsByOrgID(Utils.OrgID);
                 var xResult = _oDataTable.ToDataTable(results);
+
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
             }
             catch (Exception ex)

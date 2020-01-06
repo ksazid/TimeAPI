@@ -110,12 +110,9 @@ namespace TimeAPI.API.Controllers
                 await _userManager.AddToRoleAsync(user, user.Role).ConfigureAwait(true);
                 _logger.LogInformation("User created a new account with password.");
 
-                #region Employee
-
+               //Employee
                 var employee = GetEmployeeProperty(user);
                 _unitOfWork.EmployeeRepository.Add(employee);
-
-                #endregion
 
                 if (_unitOfWork.Commit())
                     await UserVerificationCode(user).ConfigureAwait(true);
@@ -173,8 +170,6 @@ namespace TimeAPI.API.Controllers
             {
                 _unitOfWork.Commit();
 
-             
-
                 return Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Email Confirmed" });
             }
             else { return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = "Error", Desc = "Email Not Confirmed" }); }
@@ -228,6 +223,7 @@ namespace TimeAPI.API.Controllers
 
                 return Ok(new SuccessViewModel { Code = "200", Status = "Success", Desc = "Password set successful." });
             }
+
             AddErrors(result);
             string _Code = "", _Description = "";
             if (result.Errors != null)
