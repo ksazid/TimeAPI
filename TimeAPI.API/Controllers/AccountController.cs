@@ -118,7 +118,7 @@ namespace TimeAPI.API.Controllers
                 #endregion
 
                 if (_unitOfWork.Commit())
-                    await UserVerificationCode(UserModel, user).ConfigureAwait(true);
+                    await UserVerificationCode(user).ConfigureAwait(true);
 
                 return Ok(new SuccessViewModel { Code = "200", Status = "Success", Desc = "User created a new account with password." });
             }
@@ -140,7 +140,6 @@ namespace TimeAPI.API.Controllers
             //}
             //return BadRequest(new { message = "OOP! Please enter a valid user details." });
         }
-
 
         [HttpPost]
         [Route("Logout")]
@@ -166,13 +165,16 @@ namespace TimeAPI.API.Controllers
             }
 
             #region
-            
+
             var xcode = Base64UrlEncoder.Decode(code);
             IdentityResult identityResult = await _userManager.ConfirmEmailAsync(user, xcode).ConfigureAwait(true);
 
             if (identityResult.Succeeded)
             {
                 _unitOfWork.Commit();
+
+             
+
                 return Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Email Confirmed" });
             }
             else { return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = "Error", Desc = "Email Not Confirmed" }); }
@@ -195,15 +197,11 @@ namespace TimeAPI.API.Controllers
                 return Ok(new SuccessViewModel { Code = "201", Status = "User not exists." });
             }
 
-            // For more information on how to enable account confirmation and password reset please
-            // visit https://go.microsoft.com/fwlink/?LinkID=532713
             var code = await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(true);
             var xcode = Base64UrlEncoder.Encode(code);
             var callbackUrl = Url.ResetPasswordCallbackLink(user.Id, xcode, Request.Scheme);
             await _emailSender.SendEmailAsync(model.Email, "Reset Password", $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>").ConfigureAwait(true);
             return Ok(new SuccessViewModel { Code = "200", Status = "Success", Desc = "Reset password email sent to registerd email." });
-            //// If we got this far, something failed, redisplay form
-            //return Ok(model);
         }
 
         [HttpPost]
@@ -224,6 +222,10 @@ namespace TimeAPI.API.Controllers
 
             if (result.Succeeded)
             {
+                //check if the new employee added has email confirmed. if no send email for verification
+                if (!await _userManager.IsEmailConfirmedAsync(user).ConfigureAwait(false))
+                    await UserVerificationCode(user).ConfigureAwait(true);
+
                 return Ok(new SuccessViewModel { Code = "200", Status = "Success", Desc = "Password set successful." });
             }
             AddErrors(result);
@@ -259,7 +261,6 @@ namespace TimeAPI.API.Controllers
                 return RedirectToAction(nameof(HomeController.Index), "Home");
             }
         }
-
 
         private static string EncodeServerName(string serverName)
         {
@@ -301,14 +302,14 @@ namespace TimeAPI.API.Controllers
             };
         }
 
-        private async Task UserVerificationCode(RegisterViewModel UserModel, ApplicationUser user)
+        private async Task UserVerificationCode(ApplicationUser user)
         {
             if (user.Email != "")
             {
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true);
-                var xcode = Base64UrlEncoder.Encode(code); 
+                var xcode = Base64UrlEncoder.Encode(code);
                 var callbackUrl = Url.EmailConfirmationLink(user.Id, xcode, Request.Scheme);
-                await _emailSender.SendEmailConfirmationAsync(UserModel.Email, callbackUrl).ConfigureAwait(true);
+                await _emailSender.SendEmailConfirmationAsync(user.Email, callbackUrl).ConfigureAwait(true);
             }
             else
             {

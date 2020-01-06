@@ -553,11 +553,6 @@ namespace TimeAPI.API.Controllers
         {
             if (user.Email != "")
             {
-                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true);
-                var xcode = Base64UrlEncoder.Encode(code);
-                var callbackUrl1 = Url.EmailConfirmationLink(user.Id, xcode, Request.Scheme);
-                await _emailSender.SendEmailConfirmationAsync(user.Email, callbackUrl1).ConfigureAwait(true);
-
                 var ResetCode = await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(true);
                 var xResetCode = Base64UrlEncoder.Encode(ResetCode);
                 var callbackUrl = Url.PasswordLink(user.Id, xResetCode, Request.Scheme);
