@@ -144,25 +144,6 @@ namespace TimeAPI.API.Controllers
 
                 //#endregion TimesheetAdministrative
 
-                #region TimesheetProjectCategory
-
-                if (timesheetViewModel.TimesheetCategoryViewModel != null)
-                {
-                    var project_category_type = new TimesheetProjectCategory
-                    {
-                        id = Guid.NewGuid().ToString(),
-                        //timesheet_id = modal.id,
-                        groupid = modal.groupid,
-                        project_category_id = timesheetViewModel.TimesheetCategoryViewModel.project_category_id,
-                        project_or_comp_id = timesheetViewModel.TimesheetCategoryViewModel.project_or_comp_id,
-                        is_deleted = false,
-                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
-                        createdby = modal.createdby
-                    };
-                    _unitOfWork.TimesheetProjectCategoryRepository.Add(project_category_type);
-                }
-
-                #endregion TimesheetProjectCategory
 
                 #region TimesheetLocation
 

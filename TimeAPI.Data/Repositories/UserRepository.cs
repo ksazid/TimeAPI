@@ -151,7 +151,7 @@ namespace TimeAPI.Data.Repositories
 
 
                 var ResultTimesheetData = GetTimesheetDataModel(item);
-                var ResultTimesheetAdministrativeDataModel = GetTimesheetAdministrativeDataModel(item);
+                //var ResultTimesheetAdministrativeDataModel = GetTimesheetAdministrativeDataModel(item);
                 var ResultProjectCategoryDataModel = GetTimesheetProjectCategoryDataModel(item);
                 var ResultTimesheetTeamDataModel = GetTimesheetTeamDataModel(item);
                 var ResultTimesheetSearchLocationDataModel = GetTimesheetSearchLocationViewModel(item);

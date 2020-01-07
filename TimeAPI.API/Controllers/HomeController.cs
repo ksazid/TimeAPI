@@ -15,6 +15,11 @@ namespace TimeAPI.API.Controllers
 
         public HomeController(ILogger<HomeController> logger)
         {
+
+          //var s4 =  UserHelpers.UrlshortenerServiceAsync("AIzaSyDqzocx5sEPe83MAH_dC6NZqa0aR17RdsE", "https://www.azurefromthetrenches.com/build-elegant-rest-apis-with-azure-functions/");
+            ////http://localhost:7071/api/SendSMS
+
+
             //ReverseGeoLookup.ReverseGeoLoc("25.1899157", "55.2634592", out string Address_ShortName,
             //                                                                      out string Address_country,
             //                                                                      out string Address_administrative_area_level_1,
