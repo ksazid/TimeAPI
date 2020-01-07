@@ -17,7 +17,7 @@ namespace TimeAPI.Domain.Model
     public class RootTimesheetData
     {
         public IEnumerable<TimesheetDataModel> timesheetDataModels { get; set; }
-        public IEnumerable<TimesheetAdministrativeDataModel> TimesheetAdministrativeDataModel { get; set; }
+        //public IEnumerable<TimesheetAdministrativeDataModel> TimesheetAdministrativeDataModel { get; set; }
         public IEnumerable<TimesheetProjectCategoryDataModel> TimesheetProjectCategoryDataModel { get; set; }
         public IEnumerable<TimesheetTeamDataModel> TimesheetTeamDataModel { get; set; }
         public IEnumerable<TimesheetSearchLocationViewModel>  TimesheetSearchLocationViewModel { get; set; }
@@ -72,6 +72,7 @@ namespace TimeAPI.Domain.Model
     {
         public string id { get; set; }
         public string groupid { get; set; }
+        public string manual_address { get; set; }
         public string formatted_address { get; set; }
         public string lat { get; set; }
         public string lang { get; set; }
@@ -82,6 +83,9 @@ namespace TimeAPI.Domain.Model
         public string administrative_area_level_1 { get; set; }
         public string postal_code { get; set; }
         public string country { get; set; }
+        public bool is_office { get; set; }
+        public bool is_manual { get; set; }
+
     }
 
     public class TimesheetCurrentLocationViewModel

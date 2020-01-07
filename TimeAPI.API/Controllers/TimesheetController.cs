@@ -123,26 +123,26 @@ namespace TimeAPI.API.Controllers
 
                 #endregion TimesheetProjectCategory
 
-                #region TimesheetAdministrative
+                //#region TimesheetAdministrative
 
-                if (timesheetViewModel.TimesheetAdministrativeViewModel != null)
-                {
-                    foreach (var item in timesheetViewModel.TimesheetAdministrativeViewModel.administrative_id.Distinct())
-                    {
-                        var project_administrative = new TimesheetAdministrative
-                        {
-                            id = Guid.NewGuid().ToString(),
-                            administrative_id = item,
-                            groupid = modal.groupid,
-                            is_deleted = false,
-                            created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
-                            createdby = modal.createdby
-                        };
-                        _unitOfWork.TimesheetAdministrativeRepository.Add(project_administrative);
-                    }
-                }
+                //if (timesheetViewModel.TimesheetAdministrativeViewModel != null)
+                //{
+                //    foreach (var item in timesheetViewModel.TimesheetAdministrativeViewModel.administrative_id.Distinct())
+                //    {
+                //        var project_administrative = new TimesheetAdministrative
+                //        {
+                //            id = Guid.NewGuid().ToString(),
+                //            administrative_id = item,
+                //            groupid = modal.groupid,
+                //            is_deleted = false,
+                //            created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                //            createdby = modal.createdby
+                //        };
+                //        _unitOfWork.TimesheetAdministrativeRepository.Add(project_administrative);
+                //    }
+                //}
 
-                #endregion TimesheetAdministrative
+                //#endregion TimesheetAdministrative
 
                 #region TimesheetProjectCategory
 
@@ -314,24 +314,24 @@ namespace TimeAPI.API.Controllers
 
                 #endregion TimesheetProjectCategory
 
-                #region TimesheetAdministrative
+                //#region TimesheetAdministrative
 
-                _unitOfWork.TimesheetAdministrativeRepository.RemoveByGroupID(modal.groupid);
-                foreach (var item in timesheetViewModel.TimesheetAdministrativeViewModel.administrative_id.Distinct())
-                {
-                    var project_administrative = new TimesheetAdministrative
-                    {
-                        id = Guid.NewGuid().ToString(),
-                        administrative_id = item,
-                        groupid = modal.groupid,
-                        is_deleted = false,
-                        modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
-                        modifiedby = modal.createdby
-                    };
-                    _unitOfWork.TimesheetAdministrativeRepository.Add(project_administrative);
-                }
+                //_unitOfWork.TimesheetAdministrativeRepository.RemoveByGroupID(modal.groupid);
+                //foreach (var item in timesheetViewModel.TimesheetAdministrativeViewModel.administrative_id.Distinct())
+                //{
+                //    var project_administrative = new TimesheetAdministrative
+                //    {
+                //        id = Guid.NewGuid().ToString(),
+                //        administrative_id = item,
+                //        groupid = modal.groupid,
+                //        is_deleted = false,
+                //        modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                //        modifiedby = modal.createdby
+                //    };
+                //    _unitOfWork.TimesheetAdministrativeRepository.Add(project_administrative);
+                //}
 
-                #endregion TimesheetAdministrative
+                //#endregion TimesheetAdministrative
 
                 #region TimesheetLocation
 
@@ -418,7 +418,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.TimesheetRepository.RemoveByGroupID(Timesheet.groupid);
                 _unitOfWork.TimesheetTeamRepository.RemoveByGroupID(Timesheet.groupid);
                 _unitOfWork.TimesheetProjectCategoryRepository.RemoveByGroupID(Timesheet.groupid);
-                _unitOfWork.TimesheetAdministrativeRepository.RemoveByGroupID(Timesheet.groupid);
+                //_unitOfWork.TimesheetAdministrativeRepository.RemoveByGroupID(Timesheet.groupid);
 
                 _unitOfWork.Commit();
 

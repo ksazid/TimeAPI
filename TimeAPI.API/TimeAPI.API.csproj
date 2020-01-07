@@ -26,6 +26,7 @@
   <ItemGroup>
     <PackageReference Include="ailogica.Azure.Helpers" Version="1.0.1" />
     <PackageReference Include="AutoMapper" Version="9.0.0" />
+    <PackageReference Include="HangFire.Core" Version="1.7.8" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Formatters.Json" Version="2.2.0" />

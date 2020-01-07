@@ -143,7 +143,7 @@ namespace TimeAPI.Data.Repositories
                 RootTimesheetData rootTimesheetData = new RootTimesheetData();
 
                 List<TimesheetDataModel> TimesheetDataModelList = new List<TimesheetDataModel>();
-                List<TimesheetAdministrativeDataModel> TimesheetAdministrativeDataModelList = new List<TimesheetAdministrativeDataModel>();
+                //List<TimesheetAdministrativeDataModel> TimesheetAdministrativeDataModelList = new List<TimesheetAdministrativeDataModel>();
                 List<TimesheetProjectCategoryDataModel> TimesheetProjectCategoryDataModelList = new List<TimesheetProjectCategoryDataModel>();
                 List<TimesheetTeamDataModel> TimesheetTeamDataModelList = new List<TimesheetTeamDataModel>();
                 List<TimesheetSearchLocationViewModel> TimesheetSearchLocationViewModelList = new List<TimesheetSearchLocationViewModel>();
@@ -159,14 +159,14 @@ namespace TimeAPI.Data.Repositories
 
 
                 TimesheetDataModelList.AddRange(ResultTimesheetData);
-                TimesheetAdministrativeDataModelList.AddRange(ResultTimesheetAdministrativeDataModel);
+                //TimesheetAdministrativeDataModelList.AddRange(ResultTimesheetAdministrativeDataModel);
                 TimesheetProjectCategoryDataModelList.AddRange(ResultProjectCategoryDataModel);
                 TimesheetTeamDataModelList.AddRange(ResultTimesheetTeamDataModel);
                 TimesheetSearchLocationViewModelList.AddRange(ResultTimesheetSearchLocationDataModel);
                 TimesheetCurrentLocationViewModelList.AddRange(ResultTimesheetCurrentLocationDataModel);
 
                 rootTimesheetData.timesheetDataModels = TimesheetDataModelList;
-                rootTimesheetData.TimesheetAdministrativeDataModel = TimesheetAdministrativeDataModelList;
+                //rootTimesheetData.TimesheetAdministrativeDataModel = TimesheetAdministrativeDataModelList;
                 rootTimesheetData.TimesheetProjectCategoryDataModel = TimesheetProjectCategoryDataModelList;
                 rootTimesheetData.TimesheetTeamDataModel = TimesheetTeamDataModelList;
                 rootTimesheetData.TimesheetSearchLocationViewModel = TimesheetSearchLocationViewModelList;

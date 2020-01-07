@@ -12,7 +12,7 @@ namespace TimeAPI.API.Models.TimesheetViewModels
         public List<string> teamid { get; set; }
         public string check_in { get; set; }
         public string createdby { get; set; }
-        public TimesheetAdministrativeViewModel TimesheetAdministrativeViewModel { get; set; }
+        //public TimesheetAdministrativeViewModel TimesheetAdministrativeViewModel { get; set; }
         public TimesheetCategoryViewModel TimesheetCategoryViewModel { get; set; }
         public TimesheetSearchLocationViewModel TimesheetSearchLocationViewModel { get; set; }
         public TimesheetCurrentLocationViewModel TimesheetCurrentLocationViewModel { get; set; }
@@ -34,7 +34,7 @@ namespace TimeAPI.API.Models.TimesheetViewModels
         public string modified_date { get; set; }
         public string modifiedby { get; set; }
         public bool is_deleted { get; set; }
-        public TimesheetAdministrativeViewModel TimesheetAdministrativeViewModel { get; set; }
+        //public TimesheetAdministrativeViewModel TimesheetAdministrativeViewModel { get; set; }
         public TimesheetCategoryViewModel TimesheetCategoryViewModel { get; set; }
         public TimesheetSearchLocationViewModel TimesheetSearchLocationViewModel { get; set; }
         public TimesheetCurrentLocationViewModel TimesheetCurrentLocationViewModel { get; set; }
