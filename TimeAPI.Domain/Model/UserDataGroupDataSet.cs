@@ -66,8 +66,6 @@ namespace TimeAPI.Domain.Model
         public string id { get; set; }
         public string teamid { get; set; }
         public string team_name { get; set; }
-        public IEnumerable<TimesheetTeamMembersDataModel> TimesheetTeamMembersDataModel { get; set; }
-
     }
 
     public class TimesheetTeamMembersDataModel
