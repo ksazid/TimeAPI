@@ -133,7 +133,7 @@ namespace TimeAPI.Data.Repositories
         }
 
         #region PrivateMethods
-        
+
         private List<RootTimesheetData> GetTimesheetProperty(IEnumerable<string> resultsTimesheetGrpID)
         {
             List<RootTimesheetData> RootTimesheetDataList = new List<RootTimesheetData>();
@@ -142,6 +142,7 @@ namespace TimeAPI.Data.Repositories
             {
                 RootTimesheetData rootTimesheetData = new RootTimesheetData();
 
+                //lists
                 List<TimesheetDataModel> TimesheetDataModelList = new List<TimesheetDataModel>();
                 //List<TimesheetAdministrativeDataModel> TimesheetAdministrativeDataModelList = new List<TimesheetAdministrativeDataModel>();
                 List<TimesheetProjectCategoryDataModel> TimesheetProjectCategoryDataModelList = new List<TimesheetProjectCategoryDataModel>();
@@ -150,27 +151,19 @@ namespace TimeAPI.Data.Repositories
                 List<TimesheetCurrentLocationViewModel> TimesheetCurrentLocationViewModelList = new List<TimesheetCurrentLocationViewModel>();
 
 
-                var ResultTimesheetData = GetTimesheetDataModel(item);
-                //var ResultTimesheetAdministrativeDataModel = GetTimesheetAdministrativeDataModel(item);
-                var ResultProjectCategoryDataModel = GetTimesheetProjectCategoryDataModel(item);
-                var ResultTimesheetTeamDataModel = GetTimesheetTeamDataModel(item);
-                var ResultTimesheetSearchLocationDataModel = GetTimesheetSearchLocationViewModel(item);
-                var ResultTimesheetCurrentLocationDataModel = GetTimesheetCurrentLocationViewModel(item);
+                TimesheetDataModelList.AddRange(GetTimesheetDataModel(item));
+                TimesheetProjectCategoryDataModelList.AddRange(GetTimesheetProjectCategoryDataModel(item));
+                TimesheetTeamDataModelList.AddRange(GetTimesheetTeamDataModel(item));
+                TimesheetSearchLocationViewModelList.AddRange(GetTimesheetSearchLocationViewModel(item));
+                TimesheetCurrentLocationViewModelList.AddRange(GetTimesheetCurrentLocationViewModel(item));
 
-
-                TimesheetDataModelList.AddRange(ResultTimesheetData);
-                //TimesheetAdministrativeDataModelList.AddRange(ResultTimesheetAdministrativeDataModel);
-                TimesheetProjectCategoryDataModelList.AddRange(ResultProjectCategoryDataModel);
-                TimesheetTeamDataModelList.AddRange(ResultTimesheetTeamDataModel);
-                TimesheetSearchLocationViewModelList.AddRange(ResultTimesheetSearchLocationDataModel);
-                TimesheetCurrentLocationViewModelList.AddRange(ResultTimesheetCurrentLocationDataModel);
-
+                #region
                 rootTimesheetData.timesheetDataModels = TimesheetDataModelList;
-                //rootTimesheetData.TimesheetAdministrativeDataModel = TimesheetAdministrativeDataModelList;
                 rootTimesheetData.TimesheetProjectCategoryDataModel = TimesheetProjectCategoryDataModelList;
                 rootTimesheetData.TimesheetTeamDataModel = TimesheetTeamDataModelList;
                 rootTimesheetData.TimesheetSearchLocationViewModel = TimesheetSearchLocationViewModelList;
                 rootTimesheetData.TimesheetCurrentLocationViewModel = TimesheetCurrentLocationViewModelList;
+                #endregion
 
                 RootTimesheetDataList.Add(rootTimesheetData);
             }
@@ -182,7 +175,7 @@ namespace TimeAPI.Data.Repositories
         {
             var TimesheetDataModel = Query<TimesheetDataModel>(
                 sql: @"SELECT 
-                            timesheet.id, employee.full_name as emp_name, timesheet.groupid, 
+                            timesheet.id, employee.id as emp_id, employee.full_name as emp_name, timesheet.groupid, 
 			                timesheet.ondate, timesheet.check_in, timesheet.check_out, 
                             timesheet.is_checkout, timesheet.total_hrs, timesheet.created_date, 
                             timesheet.createdby, timesheet.modified_date, timesheet.modifiedby, timesheet.is_deleted  
@@ -217,7 +210,7 @@ namespace TimeAPI.Data.Repositories
                         timesheet_x_project_category.id, timesheet_x_project_category.groupid,  
                         timesheet_x_project_category.project_category_id as project_name,
                         timesheet_x_project_category.project_or_comp_id as system_name 
-                    FROM timesheet_x_project_category   WITH (NOLOCK)
+                    FROM timesheet_x_project_category WITH (NOLOCK)
                     WHERE timesheet_x_project_category.groupid = @GroupID;",
                 param: new { GroupID }
             );

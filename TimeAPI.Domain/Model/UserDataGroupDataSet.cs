@@ -27,6 +27,7 @@ namespace TimeAPI.Domain.Model
     public class TimesheetDataModel
     {
         public string id { get; set; }
+        public string emp_id { get; set; }
         public string emp_name { get; set; }
         public string groupid { get; set; }
         public string teamid { get; set; }
@@ -65,7 +66,13 @@ namespace TimeAPI.Domain.Model
         public string id { get; set; }
         public string teamid { get; set; }
         public string team_name { get; set; }
+        public IEnumerable<TimesheetTeamMembersDataModel> TimesheetTeamMembersDataModel { get; set; }
 
+    }
+
+    public class TimesheetTeamMembersDataModel
+    {
+        public string emp_id { get; set; }
     }
 
     public class TimesheetSearchLocationViewModel

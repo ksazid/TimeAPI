@@ -16,6 +16,7 @@ using Google.Apis.Urlshortener.v1;
 using Google.Apis.Urlshortener.v1.Data;
 using System.Text.RegularExpressions;
 using KuttSharp;
+using Newtonsoft.Json.Linq;
 
 namespace TimeAPI.API.Models
 {
@@ -199,67 +200,77 @@ namespace TimeAPI.API.Models
             .Replace("0", "")
             .Substring(0, 8) + "@";
 
-        //public static async Task<string> UrlshortenerServiceAsync(string ApiKey, string longUrl)
-        //{
-        //    var api = new KuttApi("apiKey");
+        public static async Task<string> UrlshortenerServiceAsync(string ApiKey, string longUrl)
+        {
+            try
+            {
+                // Use a self-hosted Kutt server as string or System.Uri
+                var api = new KuttApi("apiKey", "https://timeapi.azurewebsites.net/");
 
-        //    var submitedItem = await api.SubmitAsync(
-        //              target: "https://example.com",
-        //              customUrl: longUrl,
-        //              password: "P@ssw0rd123",
-        //              reuse: true
-        //            ).ConfigureAwait(true);
+                var submitedItem = await api.SubmitAsync(
+                          target: "https://timeapi.azurewebsites.net/",
+                          customUrl: longUrl,
+                          password: "P@ssw0rd123",
+                          reuse: true
+                        ).ConfigureAwait(true);
+            }
+            catch (Exception ex)
+            {
 
-        //    var initializer = new BaseClientService.Initializer
-        //    {
-        //        ApiKey = ApiKey
-        //        //HttpClientFactory = new ProxySupportedHttpClientFactory()
-        //    };
-        //    var service = new UrlshortenerService(initializer);
-        //    var response = service.Url.Insert(new Url { LongUrl = longUrl }).Execute();
-        //    return response.Id;
-        //}
+                throw;
+            }
+           
+
+            var initializer = new BaseClientService.Initializer
+            {
+                ApiKey = ApiKey
+                //HttpClientFactory = new ProxySupportedHttpClientFactory()
+            };
+            var service = new UrlshortenerService(initializer);
+            var response = service.Url.Insert(new Url { LongUrl = longUrl }).Execute();
+            return response.Id;
+        }
 
 
-        //public static string Shorten(string ApiKey, string url)
-        //{
-        //    string post = "{\"longUrl\": \"" + url + "\"}";
-        //    string shortUrl = url;
-        //    HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://www.googleapis.com/urlshortener/v1/url?key=" + ApiKey);
+        public static string GoogleUrlShortener(string key, string longUrl)
+        {
+            string finalURL = "";
+            string post = "{\"longUrl\": \"" + longUrl + "\"}";
+            string shortUrl = longUrl;
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://www.googleapis.com/urlshortener/v1/url?key=" + key);
+            try
+            {
+                request.ServicePoint.Expect100Continue = false;
+                request.Method = "POST";
+                request.ContentLength = post.Length;
+                request.ContentType = "application/json";
+                request.Headers.Add("Cache-Control", "no-cache");
+                using (Stream requestStream = request.GetRequestStream())
+                {
+                    byte[] postBuffer = Encoding.ASCII.GetBytes(post);
+                    requestStream.Write(postBuffer, 0, postBuffer.Length);
+                }
+                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                {
+                    using (Stream responseStream = response.GetResponseStream())
+                    {
+                        using (StreamReader responseReader = new StreamReader(responseStream))
+                        {
+                            string json = responseReader.ReadToEnd();
 
-        //    try
-        //    {
-        //        request.ServicePoint.Expect100Continue = false;
-        //        request.Method = "POST";
-        //        request.ContentLength = post.Length;
-        //        request.ContentType = "application/json";
-        //        request.Headers.Add("Cache-Control", "no-cache");
-
-        //        using (Stream requestStream = request.GetRequestStream())
-        //        {
-        //            byte[] postBuffer = Encoding.ASCII.GetBytes(post);
-        //            requestStream.Write(postBuffer, 0, postBuffer.Length);
-        //        }
-
-        //        using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-        //        {
-        //            using (Stream responseStream = response.GetResponseStream())
-        //            {
-        //                using (StreamReader responseReader = new StreamReader(responseStream))
-        //                {
-        //                    string json = responseReader.ReadToEnd();
-        //                    shortUrl = Regex.Match(json, @"""id"": ?""(?<id>.+)""").Groups["id"].Value;
-        //                }
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // if Google's URL Shortner is down...
-        //        //System.Diagnostics.Debug.WriteLine(ex.Message);
-        //        //System.Diagnostics.Debug.WriteLine(ex.StackTrace);
-        //    }
-        //    return shortUrl;
-        //}
+                            JObject jsonResult = JObject.Parse(json);
+                            finalURL = jsonResult["id"].ToString();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Console.WriteLine(" Success -- > " + ex.StackTrace);
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+                System.Diagnostics.Debug.WriteLine(ex.StackTrace);
+            }
+            return finalURL;
+        }
     }
 }
