@@ -11,17 +11,17 @@ using System.Security.Principal;
 using System.Text;
 using System.Net;
 using System.Threading.Tasks;
-using Google.Apis.Services;
-using Google.Apis.Urlshortener.v1;
-using Google.Apis.Urlshortener.v1.Data;
-using System.Text.RegularExpressions;
-using KuttSharp;
 using Newtonsoft.Json.Linq;
+using System.Web;
+using Twilio;
+using Twilio.Rest.Lookups.V1;
+using System.Text.RegularExpressions;
 
 namespace TimeAPI.API.Models
 {
     public static class UserHelpers
     {
+
         public static string GetUserId(this IPrincipal principal)
         {
             var claimsIdentity = (ClaimsIdentity)principal.Identity;
@@ -200,77 +200,101 @@ namespace TimeAPI.API.Models
             .Replace("0", "")
             .Substring(0, 8) + "@";
 
-        public static async Task<string> UrlshortenerServiceAsync(string ApiKey, string longUrl)
+        public static async Task<string> ShortenAsync(string longUrl, string _bitlyToken)
         {
+            string shortern = string.Empty;
+            var url = string.Format("https://api-ssl.bitly.com/v3/shorten?access_token={0}&longUrl={1}", _bitlyToken, longUrl);
+
+
+            var request = (HttpWebRequest)WebRequest.Create(url);
             try
             {
-                // Use a self-hosted Kutt server as string or System.Uri
-                var api = new KuttApi("apiKey", "https://timeapi.azurewebsites.net/");
+                var response = request.GetResponse();
+                using (var responseStream = response.GetResponseStream())
+                {
+                    var reader = new StreamReader(responseStream, Encoding.UTF8);
+                    var jsonResponse = JObject.Parse(await reader.ReadToEndAsync().ConfigureAwait(true));
+                    var statusCode = jsonResponse["status_code"].Value<int>();
+                    if (statusCode == (int)HttpStatusCode.OK)
+                    {
+                        shortern = jsonResponse["data"]["url"].Value<string>();
+                        return shortern;
+                    }
 
-                var submitedItem = await api.SubmitAsync(
-                          target: "https://timeapi.azurewebsites.net/",
-                          customUrl: longUrl,
-                          password: "P@ssw0rd123",
-                          reuse: true
-                        ).ConfigureAwait(true);
+                    //else some sort of problem
+                    var data = ("Bitly request returned error code {0}, status text '{1}' on longUrl = {2}",
+                        statusCode, jsonResponse["status_txt"].Value<string>(), longUrl);
+                    //What to do if it goes wrong? I return the original long url
+                    return longUrl;
+                }
             }
-            catch (Exception ex)
+            catch (WebException ex)
             {
-
-                throw;
+                var errorResponse = ex.Response;
+                using (var responseStream = errorResponse.GetResponseStream())
+                {
+                    var reader = new StreamReader(responseStream, Encoding.GetEncoding("utf-8"));
+                    var errorText = reader.ReadToEnd();
+                    // log errorText
+                    var data = ("Bitly access threw an exception {0} on url {1}. Content = {2}", ex.Message, url, errorText);
+                }
+                //What to do if it goes wrong? I return the original long url
+                return longUrl;
             }
-           
-
-            var initializer = new BaseClientService.Initializer
-            {
-                ApiKey = ApiKey
-                //HttpClientFactory = new ProxySupportedHttpClientFactory()
-            };
-            var service = new UrlshortenerService(initializer);
-            var response = service.Url.Insert(new Url { LongUrl = longUrl }).Execute();
-            return response.Id;
         }
 
 
-        public static string GoogleUrlShortener(string key, string longUrl)
+        public static string IsPhoneValid(string phone)
         {
-            string finalURL = "";
-            string post = "{\"longUrl\": \"" + longUrl + "\"}";
-            string shortUrl = longUrl;
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://www.googleapis.com/urlshortener/v1/url?key=" + key);
+
+            string _phone = string.Empty;
+            if (phone == "")
+            {
+                return _phone;
+            }
+
+            if (phone.Contains("+"))
+                _phone = phone.Substring(1);
+            else
+                _phone = phone;
+
+            return _phone;
+        }
+
+
+        public static string ValidatePhoneNumber(string args)
+        {
+            if (UserHelpers.ValidateEmailOrPhone(args).Equals("EMAIL"))
+                return "EMAIL";
+
+            const string accountSid = "ACc574d18f169071a8b477170e3b867b1c";
+            const string authToken = "b46ffb4385b38a0502d25f26d6250ee2";
+
+            TwilioClient.Init(accountSid, authToken);
+
             try
             {
-                request.ServicePoint.Expect100Continue = false;
-                request.Method = "POST";
-                request.ContentLength = post.Length;
-                request.ContentType = "application/json";
-                request.Headers.Add("Cache-Control", "no-cache");
-                using (Stream requestStream = request.GetRequestStream())
-                {
-                    byte[] postBuffer = Encoding.ASCII.GetBytes(post);
-                    requestStream.Write(postBuffer, 0, postBuffer.Length);
-                }
-                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-                {
-                    using (Stream responseStream = response.GetResponseStream())
-                    {
-                        using (StreamReader responseReader = new StreamReader(responseStream))
-                        {
-                            string json = responseReader.ReadToEnd();
-
-                            JObject jsonResult = JObject.Parse(json);
-                            finalURL = jsonResult["id"].ToString();
-                        }
-                    }
-                }
+                var phoneNumber = PhoneNumberResource.Fetch(pathPhoneNumber: new Twilio.Types.PhoneNumber(args));
+                string Number = phoneNumber.PhoneNumber.ToString();
+                return "VALID";
             }
             catch (Exception ex)
             {
-                System.Console.WriteLine(" Success -- > " + ex.StackTrace);
-                System.Diagnostics.Debug.WriteLine(ex.Message);
-                System.Diagnostics.Debug.WriteLine(ex.StackTrace);
+                return "INVALID";
             }
-            return finalURL;
+        }
+
+        public static string ValidateEmailOrPhone(string _userName)
+        {
+            string Result = string.Empty;
+            Regex regex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
+            Regex r = new Regex(@"^\+?(\d[\d-]+)?(\([\d-]+\))?[\d-]+\d$");
+            if (r.IsMatch(_userName))
+                Result = "PHONE";
+            else if (regex.IsMatch(_userName))
+                Result = "EMAIL";
+
+            return Result;
         }
     }
 }

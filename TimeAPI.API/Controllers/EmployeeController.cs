@@ -33,18 +33,19 @@ namespace TimeAPI.API.Controllers
     public class EmployeeController : Controller
     {
         private readonly IEmailSender _emailSender;
+        private readonly ISmsSender _smsSender;
         private readonly ILogger _logger;
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
         private IConfiguration _configuration;
-        private static string _userName = "";
-
-        //public IHostingEnvironment _hostingEnvironment;
+        private static string _userName = string.Empty;
         private readonly UserManager<ApplicationUser> _userManager;
-        public EmployeeController(IUnitOfWork unitOfWork, ILogger<EmployeeController> logger, UserManager<ApplicationUser> userManager,
-                                  IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings, IConfiguration configuration)
+        public EmployeeController(IUnitOfWork unitOfWork, ILogger<EmployeeController> logger,
+                                  UserManager<ApplicationUser> userManager, IEmailSender emailSender, ISmsSender smsSender, 
+                                  IOptions<ApplicationSettings> AppSettings, IConfiguration configuration)
         {
             _emailSender = emailSender;
+            _smsSender = smsSender;
             _logger = logger;
             _appSettings = AppSettings.Value;
             _unitOfWork = unitOfWork;
@@ -172,6 +173,7 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
+                
                 var result = _unitOfWork.EmployeeRepository.All();
                 _unitOfWork.Commit();
 
@@ -508,18 +510,17 @@ namespace TimeAPI.API.Controllers
 
         private static string SetUserName(EmployeeViewModel employeeViewModel)
         {
-            if (!string.IsNullOrEmpty(employeeViewModel.workemail)
-                || !string.IsNullOrWhiteSpace(employeeViewModel.workemail) || employeeViewModel.workemail != "")
+            if (!string.IsNullOrEmpty(employeeViewModel.workemail) || !string.IsNullOrWhiteSpace(employeeViewModel.workemail) || employeeViewModel.workemail != "")
             {
                 _userName = employeeViewModel.workemail;
             }
-            else if (!string.IsNullOrEmpty(employeeViewModel.phone)
-                || !string.IsNullOrWhiteSpace(employeeViewModel.phone) || employeeViewModel.phone != "")
+            else if (!string.IsNullOrEmpty(employeeViewModel.phone) || !string.IsNullOrWhiteSpace(employeeViewModel.phone) || employeeViewModel.phone != "") 
             {
-                if (employeeViewModel.phone.Contains("+"))
-                    _userName = employeeViewModel.phone.Substring(1);
-                else
-                    _userName = employeeViewModel.phone;
+                //if (employeeViewModel.phone.Contains("+"))
+                //    _userName = employeeViewModel.phone.Substring(1);
+                //else
+                //    _userName = employeeViewModel.phone;
+                _userName = UserHelpers.IsPhoneValid(employeeViewModel.phone);
             }
 
             return _userName;
@@ -527,6 +528,7 @@ namespace TimeAPI.API.Controllers
 
         private static Employee SetEmployeeProperty(EmployeeViewModel employeeViewModel, ApplicationUser user)
         {
+
             var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeViewModel, Employee>());
             var mapper = config.CreateMapper();
             var modal = mapper.Map<Employee>(employeeViewModel);
@@ -537,6 +539,8 @@ namespace TimeAPI.API.Controllers
             modal.user_id = user.Id;
             modal.is_admin = false;
             modal.is_superadmin = false;
+            modal.mobile = UserHelpers.IsPhoneValid(employeeViewModel.mobile);
+
             return modal;
         }
 
@@ -551,7 +555,12 @@ namespace TimeAPI.API.Controllers
             }
             else
             {
-                // check if its a phone 
+                var ResetCode = await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(true);
+                var xResetCode = Base64UrlEncoder.Encode(ResetCode);
+                var callbackUrl = Url.PasswordLink(user.Id, xResetCode, Request.Scheme);
+
+                await _smsSender.SendSetupPasswordAsync(user.PhoneNumber, callbackUrl).ConfigureAwait(true);
+
             }
         }
 

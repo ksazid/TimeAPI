@@ -80,6 +80,7 @@ namespace TimeAPI.API
             // Add application services.
             services.AddScoped<IUnitOfWork, DapperUnitOfWork>(provider => new DapperUnitOfWork(Configuration.GetConnectionString("DefaultConnection")));
             services.AddTransient<IEmailSender, EmailSender>();
+            services.AddTransient<ISmsSender, SmsSender>();
 
             services.AddSwaggerGen(c =>
             {

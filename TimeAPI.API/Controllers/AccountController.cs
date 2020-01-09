@@ -23,7 +23,7 @@ using System.Web;
 using Microsoft.AspNetCore.DataProtection;
 using System.Security.Cryptography;
 using TimeAPI.API.Extensions;
-
+using System.Text.RegularExpressions;
 
 namespace TimeAPI.API.Controllers
 {
@@ -35,18 +35,20 @@ namespace TimeAPI.API.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
+        private readonly ISmsSender _smsSender;
         private readonly ILogger _logger;
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
-        private string _userName = "";
+        private static string _userName = string.Empty;
 
         public AccountController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager, IEmailSender emailSender,
-            ILogger<AccountController> logger, IOptions<ApplicationSettings> AppSettings)
+                                    SignInManager<ApplicationUser> signInManager, IEmailSender emailSender, ISmsSender smsSender,
+                                    ILogger<AccountController> logger, IOptions<ApplicationSettings> AppSettings)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
+            _smsSender = smsSender;
             _logger = logger;
             _appSettings = AppSettings.Value;
             _unitOfWork = unitOfWork;
@@ -98,19 +100,20 @@ namespace TimeAPI.API.Controllers
         [Route("SignUp")]
         public async Task<object> SignUp([FromBody]RegisterViewModel UserModel)
         {
-            //if (ModelState.IsValid)
-            //{
-            //check if user has input email or phone as user
+            //check if user has input email or phone as user and set global _userName 
             GetUserName(UserModel);
-
-            var user = GetUserProperty(UserModel, _userName);
+            var OutResult = UserHelpers.ValidatePhoneNumber(_userName);
+            if (OutResult.Equals("INVALID"))
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = "Error", Desc = "Please enter a valid phone number." });
+           
+            var user = GetUserProperty(UserModel);
             var result = await _userManager.CreateAsync(user, UserModel.Password).ConfigureAwait(true);
             if (result.Succeeded)
             {
                 await _userManager.AddToRoleAsync(user, user.Role).ConfigureAwait(true);
                 _logger.LogInformation("User created a new account with password.");
 
-               //Employee
+                //Employee
                 var employee = GetEmployeeProperty(user);
                 _unitOfWork.EmployeeRepository.Add(employee);
 
@@ -134,9 +137,9 @@ namespace TimeAPI.API.Controllers
 
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = _Code, Desc = _Description });
             }
-            //}
-            //return BadRequest(new { message = "OOP! Please enter a valid user details." });
         }
+
+
 
         [HttpPost]
         [Route("Logout")]
@@ -166,13 +169,21 @@ namespace TimeAPI.API.Controllers
             var xcode = Base64UrlEncoder.Decode(code);
             IdentityResult identityResult = await _userManager.ConfirmEmailAsync(user, xcode).ConfigureAwait(true);
 
-            if (identityResult.Succeeded)
+            try
             {
-                _unitOfWork.Commit();
-
-                return Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Email Confirmed" });
+                if (identityResult.Succeeded)
+                {
+                    _unitOfWork.Commit();
+                    return Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Congrats! User Verified." });
+                }
+                else { return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = "Error", Desc = "Ops! User Verfication Failed." }); }
             }
-            else { return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = "Error", Desc = "Email Not Confirmed" }); }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = "Error", Desc = ex.Message });
+            }
+
+
 
             #endregion
         }
@@ -270,13 +281,14 @@ namespace TimeAPI.API.Controllers
 
         private void GetUserName(RegisterViewModel UserModel)
         {
-            if (UserModel.Email != null || !string.IsNullOrEmpty(UserModel.Email) || !string.IsNullOrWhiteSpace(UserModel.Email) || UserModel.Email != "")
+            if (!string.IsNullOrEmpty(UserModel.Email) || !string.IsNullOrWhiteSpace(UserModel.Email) || UserModel.Email != "")
             {
                 _userName = UserModel.Email;
             }
-            else if (UserModel.Phone != null || !string.IsNullOrEmpty(UserModel.Phone) || !string.IsNullOrWhiteSpace(UserModel.Phone) || (UserModel.Phone) != "")
+            else if (!string.IsNullOrEmpty(UserModel.Phone) || !string.IsNullOrWhiteSpace(UserModel.Phone) || (UserModel.Phone) != "")
             {
-                _userName = UserModel.Phone.Contains("+") ? UserModel.Phone.Substring(1) : UserModel.Phone;
+
+                _userName = UserHelpers.IsPhoneValid(UserModel.Phone);
             }
         }
 
@@ -289,7 +301,7 @@ namespace TimeAPI.API.Controllers
                 full_name = user.FullName,
                 first_name = user.FirstName,
                 last_name = user.LastName,
-                mobile = user.PhoneNumber,
+                mobile = UserHelpers.IsPhoneValid(user.PhoneNumber),
                 workemail = user.Email,
                 createdby = user.FullName,
                 created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
@@ -300,20 +312,17 @@ namespace TimeAPI.API.Controllers
 
         private async Task UserVerificationCode(ApplicationUser user)
         {
+            var code = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true);
+            var xcode = Base64UrlEncoder.Encode(code);
+            var callbackUrl = Url.EmailConfirmationLink(user.Id, xcode, Request.Scheme);
+
             if (user.Email != "")
-            {
-                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true);
-                var xcode = Base64UrlEncoder.Encode(code);
-                var callbackUrl = Url.EmailConfirmationLink(user.Id, xcode, Request.Scheme);
                 await _emailSender.SendEmailConfirmationAsync(user.Email, callbackUrl).ConfigureAwait(true);
-            }
             else
-            {
-                // check if its a phone 
-            }
+                await _smsSender.SendSmsConfirmationAsync(user.PhoneNumber, callbackUrl).ConfigureAwait(true);
         }
 
-        private static ApplicationUser GetUserProperty(RegisterViewModel UserModel, string _userName)
+        private static ApplicationUser GetUserProperty(RegisterViewModel UserModel)
         {
             return new ApplicationUser()
             {
@@ -323,7 +332,7 @@ namespace TimeAPI.API.Controllers
                 LastName = UserModel.LastName,
                 FullName = UserModel.FullName,
                 Role = "Superadmin",
-                PhoneNumber = UserModel.Phone,
+                PhoneNumber = UserHelpers.IsPhoneValid(UserModel.Phone),
                 isSuperAdmin = true
             };
         }

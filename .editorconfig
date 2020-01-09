@@ -35,3 +35,6 @@ dotnet_diagnostic.CA1307.severity = none
 
 # CA2000: Dispose objects before losing scope
 dotnet_diagnostic.CA2000.severity = silent
+
+# CA2234: Pass system uri objects instead of strings
+dotnet_diagnostic.CA2234.severity = silent
