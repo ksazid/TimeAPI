@@ -314,9 +314,9 @@ namespace TimeAPI.API.Controllers
             }
             else if ((user.PhoneNumber != null) && (!string.IsNullOrEmpty(user.PhoneNumber) || !string.IsNullOrWhiteSpace(user.PhoneNumber) || (user.PhoneNumber) != ""))
             {
-                var ResetCode = await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(true);
+                var ResetCode = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true);
                 var xResetCode = Base64UrlEncoder.Encode(ResetCode);
-                var callbackUrl = Url.PasswordLink(user.Id, xResetCode, Request.Scheme);
+                var callbackUrl = Url.EmailConfirmationLink(user.Id, xResetCode, Request.Scheme);
                 await _smsSender.SendSmsConfirmationAsync(user.PhoneNumber, callbackUrl).ConfigureAwait(true);
             }
 
