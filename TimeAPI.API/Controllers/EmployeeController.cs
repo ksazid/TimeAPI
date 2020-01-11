@@ -510,17 +510,17 @@ namespace TimeAPI.API.Controllers
 
         private static string SetUserName(EmployeeViewModel employeeViewModel)
         {
-            if (!string.IsNullOrEmpty(employeeViewModel.workemail) || !string.IsNullOrWhiteSpace(employeeViewModel.workemail) || employeeViewModel.workemail != "")
+            if (employeeViewModel.workemail == null || string.IsNullOrEmpty(employeeViewModel.workemail)
+                    && string.IsNullOrWhiteSpace(employeeViewModel.workemail) && employeeViewModel.workemail == "")
+            {
+                if (!string.IsNullOrEmpty(employeeViewModel.phone) || !string.IsNullOrWhiteSpace(employeeViewModel.phone) || employeeViewModel.phone != "")
+                {
+                    _userName = UserHelpers.IsPhoneValid(employeeViewModel.phone);
+                }
+            }
+            else
             {
                 _userName = employeeViewModel.workemail;
-            }
-            else if (!string.IsNullOrEmpty(employeeViewModel.phone) || !string.IsNullOrWhiteSpace(employeeViewModel.phone) || employeeViewModel.phone != "") 
-            {
-                //if (employeeViewModel.phone.Contains("+"))
-                //    _userName = employeeViewModel.phone.Substring(1);
-                //else
-                //    _userName = employeeViewModel.phone;
-                _userName = UserHelpers.IsPhoneValid(employeeViewModel.phone);
             }
 
             return _userName;
@@ -546,21 +546,19 @@ namespace TimeAPI.API.Controllers
 
         private async Task UserVerification(ApplicationUser user)
         {
-            if (user.Email != "")
+            if ((user.Email != null) && (!string.IsNullOrEmpty(user.Email) || !string.IsNullOrWhiteSpace(user.Email) || user.Email != ""))
             {
-                var ResetCode = await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(true);
+                var ResetCode = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true);
                 var xResetCode = Base64UrlEncoder.Encode(ResetCode);
-                var callbackUrl = Url.PasswordLink(user.Id, xResetCode, Request.Scheme);
-                await _emailSender.SendSetupPasswordAsync(user.Email, callbackUrl).ConfigureAwait(true);
+                var callbackUrl = Url.EmailConfirmationLink(user.Id, xResetCode, Request.Scheme);
+                await _emailSender.SendEmailConfirmationAsync(user.Email, callbackUrl).ConfigureAwait(true);
             }
-            else
+            else if ((user.PhoneNumber != null) && (!string.IsNullOrEmpty(user.PhoneNumber) || !string.IsNullOrWhiteSpace(user.PhoneNumber) || (user.PhoneNumber) != ""))
             {
-                var ResetCode = await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(true);
+                var ResetCode = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true);
                 var xResetCode = Base64UrlEncoder.Encode(ResetCode);
-                var callbackUrl = Url.PasswordLink(user.Id, xResetCode, Request.Scheme);
-
-                await _smsSender.SendSetupPasswordAsync(user.PhoneNumber, callbackUrl).ConfigureAwait(true);
-
+                var callbackUrl = Url.EmailConfirmationLink(user.Id, xResetCode, Request.Scheme);
+                await _smsSender.SendSmsConfirmationAsync(user.PhoneNumber, callbackUrl).ConfigureAwait(true);
             }
         }
 

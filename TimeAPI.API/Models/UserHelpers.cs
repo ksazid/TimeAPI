@@ -246,8 +246,11 @@ namespace TimeAPI.API.Models
 
         public static string IsPhoneValid(string phone)
         {
-
             string _phone = string.Empty;
+            if (phone == null)
+            {
+                return _phone;
+            }
             if (phone == "")
             {
                 return _phone;

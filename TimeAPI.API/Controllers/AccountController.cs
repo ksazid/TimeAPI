@@ -1,29 +1,21 @@
-﻿using TimeAPI.API.Models.AccountViewModels;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using TimeAPI.API.Models;
-using TimeAPI.API.Services;
-using Microsoft.AspNetCore.Cors;
-using TimeAPI.API.Filters;
-using TimeAPI.Domain;
-using System.Threading;
-using TimeAPI.Domain.Entities;
-using System.Globalization;
-using System.Web;
-using Microsoft.AspNetCore.DataProtection;
-using System.Security.Cryptography;
 using TimeAPI.API.Extensions;
-using System.Text.RegularExpressions;
+using TimeAPI.API.Models;
+using TimeAPI.API.Models.AccountViewModels;
+using TimeAPI.API.Services;
+using TimeAPI.Domain;
+using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.API.Controllers
 {
@@ -105,7 +97,7 @@ namespace TimeAPI.API.Controllers
             var OutResult = UserHelpers.ValidatePhoneNumber(_userName);
             if (OutResult.Equals("INVALID"))
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = "Error", Desc = "Please enter a valid phone number." });
-           
+
             var user = GetUserProperty(UserModel);
             var result = await _userManager.CreateAsync(user, UserModel.Password).ConfigureAwait(true);
             if (result.Succeeded)
@@ -138,8 +130,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = _Code, Desc = _Description });
             }
         }
-
-
 
         [HttpPost]
         [Route("Logout")]
@@ -182,8 +172,6 @@ namespace TimeAPI.API.Controllers
             {
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = "Error", Desc = ex.Message });
             }
-
-
 
             #endregion
         }
@@ -281,15 +269,20 @@ namespace TimeAPI.API.Controllers
 
         private void GetUserName(RegisterViewModel UserModel)
         {
-            if (!string.IsNullOrEmpty(UserModel.Email) || !string.IsNullOrWhiteSpace(UserModel.Email) || UserModel.Email != "")
+            if (UserModel.Email == null || string.IsNullOrEmpty(UserModel.Email)
+                   && string.IsNullOrWhiteSpace(UserModel.Email) && UserModel.Email == "")
+            {
+                if (!string.IsNullOrEmpty(UserModel.Phone) || !string.IsNullOrWhiteSpace(UserModel.Phone) || UserModel.Phone != "")
+                {
+                    _userName = UserHelpers.IsPhoneValid(UserModel.Phone);
+                }
+            }
+            else
             {
                 _userName = UserModel.Email;
             }
-            else if (!string.IsNullOrEmpty(UserModel.Phone) || !string.IsNullOrWhiteSpace(UserModel.Phone) || (UserModel.Phone) != "")
-            {
 
-                _userName = UserHelpers.IsPhoneValid(UserModel.Phone);
-            }
+
         }
 
         private static Employee GetEmployeeProperty(ApplicationUser user)
@@ -310,16 +303,24 @@ namespace TimeAPI.API.Controllers
             };
         }
 
-        private async Task UserVerificationCode(ApplicationUser user)
+        private async Task<Task> UserVerificationCode(ApplicationUser user)
         {
-            var code = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true);
-            var xcode = Base64UrlEncoder.Encode(code);
-            var callbackUrl = Url.EmailConfirmationLink(user.Id, xcode, Request.Scheme);
-
-            if (user.Email != "")
+            if ((user.Email != null) && (!string.IsNullOrEmpty(user.Email) || !string.IsNullOrWhiteSpace(user.Email) || user.Email != ""))
+            {
+                var ResetCode = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(true);
+                var xResetCode = Base64UrlEncoder.Encode(ResetCode);
+                var callbackUrl = Url.EmailConfirmationLink(user.Id, xResetCode, Request.Scheme);
                 await _emailSender.SendEmailConfirmationAsync(user.Email, callbackUrl).ConfigureAwait(true);
-            else
+            }
+            else if ((user.PhoneNumber != null) && (!string.IsNullOrEmpty(user.PhoneNumber) || !string.IsNullOrWhiteSpace(user.PhoneNumber) || (user.PhoneNumber) != ""))
+            {
+                var ResetCode = await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(true);
+                var xResetCode = Base64UrlEncoder.Encode(ResetCode);
+                var callbackUrl = Url.PasswordLink(user.Id, xResetCode, Request.Scheme);
                 await _smsSender.SendSmsConfirmationAsync(user.PhoneNumber, callbackUrl).ConfigureAwait(true);
+            }
+
+            return Task.CompletedTask;
         }
 
         private static ApplicationUser GetUserProperty(RegisterViewModel UserModel)
