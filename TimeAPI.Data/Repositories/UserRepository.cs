@@ -144,25 +144,20 @@ namespace TimeAPI.Data.Repositories
 
                 //lists
                 List<TimesheetDataModel> TimesheetDataModelList = new List<TimesheetDataModel>();
-                //List<TimesheetAdministrativeDataModel> TimesheetAdministrativeDataModelList = new List<TimesheetAdministrativeDataModel>();
-                List<TimesheetProjectCategoryDataModel> TimesheetProjectCategoryDataModelList = new List<TimesheetProjectCategoryDataModel>();
                 List<TimesheetTeamDataModel> TimesheetTeamDataModelList = new List<TimesheetTeamDataModel>();
-                List<TimesheetSearchLocationViewModel> TimesheetSearchLocationViewModelList = new List<TimesheetSearchLocationViewModel>();
                 List<TimesheetCurrentLocationViewModel> TimesheetCurrentLocationViewModelList = new List<TimesheetCurrentLocationViewModel>();
 
 
                 TimesheetDataModelList.AddRange(GetTimesheetDataModel(item));
-                TimesheetProjectCategoryDataModelList.AddRange(GetTimesheetProjectCategoryDataModel(item));
                 TimesheetTeamDataModelList.AddRange(GetTimesheetTeamDataModel(item));
-                TimesheetSearchLocationViewModelList.AddRange(GetTimesheetSearchLocationViewModel(item));
                 TimesheetCurrentLocationViewModelList.AddRange(GetTimesheetCurrentLocationViewModel(item));
 
                 #region
-                rootTimesheetData.timesheetDataModels = TimesheetDataModelList;
-                rootTimesheetData.TimesheetProjectCategoryDataModel = TimesheetProjectCategoryDataModelList;
-                rootTimesheetData.TimesheetTeamDataModel = TimesheetTeamDataModelList;
-                rootTimesheetData.TimesheetSearchLocationViewModel = TimesheetSearchLocationViewModelList;
-                rootTimesheetData.TimesheetCurrentLocationViewModel = TimesheetCurrentLocationViewModelList;
+                rootTimesheetData.TimesheetDataModels = TimesheetDataModelList;
+                rootTimesheetData.TimesheetProjectCategoryDataModel = GetTimesheetProjectCategoryDataModel(item);
+                rootTimesheetData.TimesheetTeamDataModels = TimesheetTeamDataModelList;
+                rootTimesheetData.TimesheetSearchLocationViewModel = GetTimesheetSearchLocationViewModel(item);
+                rootTimesheetData.TimesheetCurrentLocationViewModels = TimesheetCurrentLocationViewModelList;
                 #endregion
 
                 RootTimesheetDataList.Add(rootTimesheetData);
@@ -203,9 +198,9 @@ namespace TimeAPI.Data.Repositories
             return TimesheetAdministrativeDataModel;
         }
 
-        private IEnumerable<TimesheetProjectCategoryDataModel> GetTimesheetProjectCategoryDataModel(string GroupID)
+        private TimesheetProjectCategoryDataModel GetTimesheetProjectCategoryDataModel(string GroupID)
         {
-            var TimesheetAdministrativeDataModel = Query<TimesheetProjectCategoryDataModel>(
+            var TimesheetAdministrativeDataModel = QuerySingleOrDefault<TimesheetProjectCategoryDataModel>(
                 sql: @"SELECT 
                         timesheet_x_project_category.id, timesheet_x_project_category.groupid,  
                         timesheet_x_project_category.project_category_id as project_name,
@@ -232,9 +227,9 @@ namespace TimeAPI.Data.Repositories
             return TimesheetTeamDataModel;
         }
 
-        private IEnumerable<TimesheetSearchLocationViewModel> GetTimesheetSearchLocationViewModel(string GroupID)
+        private TimesheetSearchLocationViewModel GetTimesheetSearchLocationViewModel(string GroupID)
         {
-            var TimesheetSearchLocationViewModel = Query<TimesheetSearchLocationViewModel>(
+            var TimesheetSearchLocationViewModel = QuerySingleOrDefault<TimesheetSearchLocationViewModel>(
                 sql: @"SELECT id, groupid, manual_address, formatted_address, lat, lang, street_number, route, locality, 
                        administrative_area_level_2, administrative_area_level_1, postal_code, country, is_office, is_manual
                     FROM timesheet_location  WITH (NOLOCK) where groupid  = @GroupID;",
@@ -244,7 +239,7 @@ namespace TimeAPI.Data.Repositories
             return TimesheetSearchLocationViewModel;
         }
 
-        private IEnumerable<TimesheetCurrentLocationViewModel> GetTimesheetCurrentLocationViewModel(string GroupID)
+        private IEnumerable<TimesheetCurrentLocationViewModel>  GetTimesheetCurrentLocationViewModel(string GroupID)
         {
             var TimesheetCurrentLocationViewModel = Query<TimesheetCurrentLocationViewModel>(
                sql: @"SELECT id, groupid, formatted_address, lat, lang, street_number, route, locality, 

@@ -16,12 +16,12 @@ namespace TimeAPI.Domain.Model
 
     public class RootTimesheetData
     {
-        public IEnumerable<TimesheetDataModel> timesheetDataModels { get; set; }
+        public IEnumerable<TimesheetDataModel> TimesheetDataModels { get; set; }
+        public IEnumerable<TimesheetTeamDataModel> TimesheetTeamDataModels { get; set; }
         //public IEnumerable<TimesheetAdministrativeDataModel> TimesheetAdministrativeDataModel { get; set; }
-        public IEnumerable<TimesheetProjectCategoryDataModel> TimesheetProjectCategoryDataModel { get; set; }
-        public IEnumerable<TimesheetTeamDataModel> TimesheetTeamDataModel { get; set; }
-        public IEnumerable<TimesheetSearchLocationViewModel>  TimesheetSearchLocationViewModel { get; set; }
-        public IEnumerable<TimesheetCurrentLocationViewModel>  TimesheetCurrentLocationViewModel { get; set; }
+        public TimesheetProjectCategoryDataModel TimesheetProjectCategoryDataModel { get; set; }
+        public TimesheetSearchLocationViewModel TimesheetSearchLocationViewModel { get; set; }
+        public IEnumerable<TimesheetCurrentLocationViewModel>  TimesheetCurrentLocationViewModels { get; set; }
     }
 
     public class TimesheetDataModel
@@ -42,7 +42,7 @@ namespace TimeAPI.Domain.Model
         public string modified_date { get; set; }
         public string modifiedby { get; set; }
         public bool is_deleted { get; set; }
-       
+
     }
 
     public class TimesheetProjectCategoryDataModel
