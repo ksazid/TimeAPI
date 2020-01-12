@@ -162,8 +162,8 @@ namespace TimeAPI.API.Controllers
 
             #region
 
-            //var xcode = Base64UrlEncoder.Decode(code);
-            var xcode = Base64UrlEncoder.Decode(code);
+            var _code = HttpUtility.UrlDecode(code); //.Decode(code);
+            var xcode = Base64UrlEncoder.Decode(_code);
             IdentityResult identityResult = await _userManager.ConfirmEmailAsync(user, xcode).ConfigureAwait(true);
 
             try
