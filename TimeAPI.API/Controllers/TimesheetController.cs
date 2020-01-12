@@ -522,9 +522,12 @@ namespace TimeAPI.API.Controllers
                 if (timesheetActivityViewModel == null)
                     throw new ArgumentNullException(nameof(timesheetActivityViewModel));
 
-                if (timesheetActivityViewModel.groupid == "string" || string.IsNullOrWhiteSpace(timesheetActivityViewModel.groupid) || string.IsNullOrEmpty(timesheetActivityViewModel.groupid))
+                if ((timesheetActivityViewModel.groupid != null) && (timesheetActivityViewModel.groupid == "" 
+                                    || string.IsNullOrWhiteSpace(timesheetActivityViewModel.groupid) 
+                                    || string.IsNullOrEmpty(timesheetActivityViewModel.groupid)))
                     return await Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = "Error", Desc = "Invalid GroupID" }).ConfigureAwait(false);
 
+                timesheetActivityViewModel.id = Guid.NewGuid().ToString();
                 timesheetActivityViewModel.is_deleted = false;
                 timesheetActivityViewModel.ondate = DateTime.Now.ToString(CultureInfo.CurrentCulture);
                 timesheetActivityViewModel.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
