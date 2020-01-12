@@ -23,10 +23,10 @@ namespace TimeAPI.API.Services
         {
             var apikey = _Configuration.GetValue<string>(key: "BitlyAPIKey");
             var Shorten = UserHelpers.ShortenAsync(url, apikey);
-            Execute(phone, message, Shorten.Result).Wait();
+            Execute(phone, message, Shorten.Result);
             return Task.CompletedTask;
         }
-        static async Task Execute(string phone,  string message, string url)
+        static void Execute(string phone, string message, string url)
         {
             phone = "+" + phone;
             const string accountSid = "ACc574d18f169071a8b477170e3b867b1c";
@@ -46,7 +46,7 @@ namespace TimeAPI.API.Services
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
 
         }
