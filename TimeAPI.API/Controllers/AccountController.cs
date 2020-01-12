@@ -61,6 +61,9 @@ namespace TimeAPI.API.Controllers
             string UserName = string.Empty;
             if (UserHelpers.ValidateEmailOrPhone(model.Email).Equals("PHONE"))
                 UserName = UserHelpers.IsPhoneValid(model.Email);
+            else
+                UserName = model.Email;
+
 
             var user = await _userManager.FindByNameAsync(UserName).ConfigureAwait(true);
             if (user != null && await _userManager.CheckPasswordAsync(user, model.Password).ConfigureAwait(true))
