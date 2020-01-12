@@ -9,12 +9,12 @@ namespace TimeAPI.API.Extensions
     {
         public static Task SendSmsConfirmationAsync(this ISmsSender smsSender, string phone, string link)
         {
-            return smsSender.SendSmsAsync(phone, $"Please confirm your accountby clicking this link:", HtmlEncoder.Default.Encode(link));// HtmlEncoder.Default.Encode(link));
+            return smsSender.SendSmsAsync(phone, $"Please confirm your accountby clicking this link:", HttpUtility.UrlEncode(link));// HtmlEncoder.Default.Encode(link));
         }
 
         public static Task SendSetupPasswordAsync(this ISmsSender smsSender, string phone, string link)
         {
-            return smsSender.SendSmsAsync(phone, $"Please setup password your account by clicking this link:", HtmlEncoder.Default.Encode(link));
+            return smsSender.SendSmsAsync(phone, $"Please setup password your account by clicking this link:", HttpUtility.UrlEncode(link));
         }
     }
 }
