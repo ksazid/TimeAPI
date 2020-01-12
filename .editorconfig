@@ -38,3 +38,6 @@ dotnet_diagnostic.CA2000.severity = silent
 
 # CA2234: Pass system uri objects instead of strings
 dotnet_diagnostic.CA2234.severity = silent
+
+# IDE0022: Use block body for methods
+csharp_style_expression_bodied_methods = false:silent

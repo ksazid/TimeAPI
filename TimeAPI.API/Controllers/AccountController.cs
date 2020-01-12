@@ -10,6 +10,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using TimeAPI.API.Extensions;
 using TimeAPI.API.Models;
 using TimeAPI.API.Models.AccountViewModels;
@@ -56,7 +57,12 @@ namespace TimeAPI.API.Controllers
             //ViewData["ReturnUrl"] = returnUrl;
             //if (ModelState.IsValid)
             //{
-            var user = await _userManager.FindByNameAsync(model.Email).ConfigureAwait(true);
+
+            string UserName = string.Empty;
+            if (UserHelpers.ValidateEmailOrPhone(model.Email).Equals("PHONE"))
+                UserName = UserHelpers.IsPhoneValid(model.Email);
+
+            var user = await _userManager.FindByNameAsync(UserName).ConfigureAwait(true);
             if (user != null && await _userManager.CheckPasswordAsync(user, model.Password).ConfigureAwait(true))
             {
                 if (!await _userManager.IsEmailConfirmedAsync(user).ConfigureAwait(false))
@@ -156,6 +162,7 @@ namespace TimeAPI.API.Controllers
 
             #region
 
+            //var xcode = Base64UrlEncoder.Decode(code);
             var xcode = Base64UrlEncoder.Decode(code);
             IdentityResult identityResult = await _userManager.ConfirmEmailAsync(user, xcode).ConfigureAwait(true);
 

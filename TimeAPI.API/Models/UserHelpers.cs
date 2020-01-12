@@ -16,6 +16,7 @@ using System.Web;
 using Twilio;
 using Twilio.Rest.Lookups.V1;
 using System.Text.RegularExpressions;
+using System.Text.Encodings.Web;
 
 namespace TimeAPI.API.Models
 {
@@ -194,7 +195,7 @@ namespace TimeAPI.API.Models
 
         public static string GeneratePassword() => Guid.NewGuid()
             .ToString("N")
-            .ToLower()
+            .ToLower(CultureInfo.CurrentCulture)
             .Replace("1", "")
             .Replace("o", "")
             .Replace("0", "")
@@ -203,8 +204,7 @@ namespace TimeAPI.API.Models
         public static async Task<string> ShortenAsync(string longUrl, string _bitlyToken)
         {
             string shortern = string.Empty;
-            var url = string.Format("https://api-ssl.bitly.com/v3/shorten?access_token={0}&longUrl={1}", _bitlyToken, longUrl);
-
+            var url = string.Format("https://api-ssl.bitly.com/v3/shorten?access_token={0}&longUrl={1}", _bitlyToken, HtmlEncoder.Default.Encode(longUrl));
 
             var request = (HttpWebRequest)WebRequest.Create(url);
             try

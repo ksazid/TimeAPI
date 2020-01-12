@@ -6,8 +6,8 @@ namespace Microsoft.AspNetCore.Mvc
     {
         public static string EmailConfirmationLink(this IUrlHelper urlHelper, string userId, string code, string scheme)
         {
-            return "https://enforce.azurewebsites.net/verification?userId=" + userId + "&code=" + code;
-            //return urlHelper.Action(
+            return "https://enforce.azurewebsites.net/verification?userId=" + userId + "&code="  + code;
+            //return urlHelper.Action(  + "&code=" 
             //    action: nameof(AccountController.ConfirmEmail),
             //    controller: "Account",
             //    values: new { userId, code },
