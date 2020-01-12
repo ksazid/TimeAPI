@@ -508,6 +508,7 @@ namespace TimeAPI.API.Controllers
 
         #endregion Timesheet
 
+
         #region TimesheetActivity
 
         [HttpPost]
@@ -619,6 +620,118 @@ namespace TimeAPI.API.Controllers
         }
 
         #endregion TimesheetActivity
+
+        #region TimesheetAdministraitiveActivity
+
+        [HttpPost]
+        [Route("AddTimesheetAdministrativeActivity")]
+        public async Task<object> AddTimesheetAdministrativeActivity([FromBody] TimesheetAdministrativeActivityViewModel timesheetAdministrativeActivityViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (timesheetAdministrativeActivityViewModel == null)
+                    throw new ArgumentNullException(nameof(timesheetAdministrativeActivityViewModel));
+
+                if ((timesheetAdministrativeActivityViewModel.groupid != null) && (timesheetAdministrativeActivityViewModel.groupid == ""
+                                    || string.IsNullOrWhiteSpace(timesheetAdministrativeActivityViewModel.groupid)
+                                    || string.IsNullOrEmpty(timesheetAdministrativeActivityViewModel.groupid)))
+                    return await Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = "Error", Desc = "Invalid GroupID" }).ConfigureAwait(false);
+
+                timesheetAdministrativeActivityViewModel.id = Guid.NewGuid().ToString();
+                timesheetAdministrativeActivityViewModel.is_deleted = false;
+                timesheetAdministrativeActivityViewModel.ondate = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                timesheetAdministrativeActivityViewModel.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetAdministrativeActivityViewModel, TimesheetAdministrative>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<TimesheetAdministrative>(timesheetAdministrativeActivityViewModel);
+
+                _unitOfWork.TimesheetAdministrativeRepository.Add(modal);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Timesheet Activity added succefully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPatch]
+        [Route("UpdateTimesheetAdministrativeActivity")]
+        public async Task<object> UpdateAddTimesheetAdministrativeActivity([FromBody] TimesheetAdministrativeActivityViewModel timesheetAdministrativeActivityViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (timesheetAdministrativeActivityViewModel == null)
+                    throw new ArgumentNullException(nameof(timesheetAdministrativeActivityViewModel));
+
+                timesheetAdministrativeActivityViewModel.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetAdministrativeActivityViewModel, TimesheetAdministrative>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<TimesheetAdministrative>(timesheetAdministrativeActivityViewModel);
+                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+
+                _unitOfWork.TimesheetAdministrativeRepository.Update(modal);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Timesheet Activity updated succefully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("RemoveTimesheetAdministrativeActivity")]
+        public async Task<object> RemoveTimesheetAdministrativeActivity([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(paramName: nameof(Utils.ID));
+
+                _unitOfWork.TimesheetAdministrativeRepository.Remove(Utils.ID);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Timesheet Activity removed succefully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("GetAllTimesheetAdministrativeActivitys")]
+        public async Task<object> GetAllTimesheetAdministrativeActivitys(CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                var result = _unitOfWork.TimesheetAdministrativeRepository.All();
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        #endregion TimesheetAdministraitiveActivity
 
         #region TimesheetActivityComment
 

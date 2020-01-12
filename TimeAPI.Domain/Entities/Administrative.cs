@@ -7,6 +7,7 @@ namespace TimeAPI.Domain.Entities
     public class Administrative
     {
         public string id { get; set; }
+        public string dept_id { get; set; }
         public string org_id { get; set; }
         public string administrative_name { get; set; }
         public string summary { get; set; }

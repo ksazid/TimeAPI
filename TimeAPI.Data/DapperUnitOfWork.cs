@@ -320,7 +320,7 @@ namespace TimeAPI.Data
             get
             {
                 return _timesheetAdministrativeRepository
-                    ?? (_timesheetAdministrativeRepository = new TimesheetAdministrativeRepository(_transaction));
+                    ?? (_timesheetAdministrativeRepository = new TimesheetAdministrativeActivityRepository(_transaction));
             }
         }
 

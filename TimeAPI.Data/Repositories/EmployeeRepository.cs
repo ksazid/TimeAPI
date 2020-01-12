@@ -198,9 +198,7 @@ namespace TimeAPI.Data.Repositories
                 param: new { OrgID }
             );
         }
-
-
-
+        
         public dynamic FindEmpDepartDesignByTeamID(string key)
         {
             return Query<dynamic>(
@@ -225,9 +223,6 @@ namespace TimeAPI.Data.Repositories
                       param: new { key }
                );
         }
-
-
-
 
     }
 }

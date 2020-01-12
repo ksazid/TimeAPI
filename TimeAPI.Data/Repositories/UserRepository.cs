@@ -184,14 +184,15 @@ namespace TimeAPI.Data.Repositories
             return TimesheetDataModel;
         }
 
+        //currently not in use
         private IEnumerable<TimesheetAdministrativeDataModel> GetTimesheetAdministrativeDataModel(string GroupID)
         {
             var TimesheetAdministrativeDataModel = Query<TimesheetAdministrativeDataModel>(
                 sql: @"SELECT 
-                            timesheet_x_administrative.id, timesheet_x_administrative.administrative_id, administrative.administrative_name
-                        FROM timesheet_x_administrative WITH (NOLOCK)
-                        LEFT JOIN administrative on timesheet_x_administrative.administrative_id = administrative.id
-                        WHERE timesheet_x_administrative.groupid = @GroupID;",
+                            timesheet_administrative_activity.id, timesheet_administrative_activity.administrative_id, administrative.administrative_name
+                        FROM timesheet_administrative_activity WITH (NOLOCK)
+                        LEFT JOIN administrative on timesheet_administrative_activity.administrative_id = administrative.id
+                        WHERE timesheet_administrative_activity.groupid = @GroupID;",
                 param: new { GroupID }
             );
 
