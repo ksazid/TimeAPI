@@ -14,6 +14,8 @@ namespace TimeAPI.Domain.Entities
         public string ondate { get; set; }
         public string start_time { get; set; }
         public string end_time { get; set; }
+        public string total_hrs { get; set; }
+        public bool is_billable { get; set; }
         public string created_date { get; set; }
         public string createdby { get; set; }
         public string modified_date { get; set; }

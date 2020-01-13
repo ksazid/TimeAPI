@@ -8,7 +8,10 @@ namespace TimeAPI.Domain.Repositories
     public interface ITimesheetActivityRepository : IRepository<TimesheetActivity, string>
     {
         //IEnumerable<Team> FindTeamsByOrgID(string OrgID);
-        //dynamic FindByTeamID(string TeamID);
+        void RemoveByGroupID(string GroupID);
+        dynamic GetTop10TimesheetActivityOnTaskID(string TaskID);
+
+
         //IEnumerable<dynamic> FetchAllTeamsByOrgID(string OrgID);
         //IEnumerable<dynamic> FetchAllTeamMembersByTeamID(string key);
         //dynamic GetAllTeamMembersByTeamID(string key);

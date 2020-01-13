@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -122,28 +123,6 @@ namespace TimeAPI.API.Controllers
                 }
 
                 #endregion TimesheetProjectCategory
-
-                //#region TimesheetAdministrative
-
-                //if (timesheetViewModel.TimesheetAdministrativeViewModel != null)
-                //{
-                //    foreach (var item in timesheetViewModel.TimesheetAdministrativeViewModel.administrative_id.Distinct())
-                //    {
-                //        var project_administrative = new TimesheetAdministrative
-                //        {
-                //            id = Guid.NewGuid().ToString(),
-                //            administrative_id = item,
-                //            groupid = modal.groupid,
-                //            is_deleted = false,
-                //            created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
-                //            createdby = modal.createdby
-                //        };
-                //        _unitOfWork.TimesheetAdministrativeRepository.Add(project_administrative);
-                //    }
-                //}
-
-                //#endregion TimesheetAdministrative
-
 
                 #region TimesheetLocation
 
@@ -295,25 +274,6 @@ namespace TimeAPI.API.Controllers
 
                 #endregion TimesheetProjectCategory
 
-                //#region TimesheetAdministrative
-
-                //_unitOfWork.TimesheetAdministrativeRepository.RemoveByGroupID(modal.groupid);
-                //foreach (var item in timesheetViewModel.TimesheetAdministrativeViewModel.administrative_id.Distinct())
-                //{
-                //    var project_administrative = new TimesheetAdministrative
-                //    {
-                //        id = Guid.NewGuid().ToString(),
-                //        administrative_id = item,
-                //        groupid = modal.groupid,
-                //        is_deleted = false,
-                //        modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
-                //        modifiedby = modal.createdby
-                //    };
-                //    _unitOfWork.TimesheetAdministrativeRepository.Add(project_administrative);
-                //}
-
-                //#endregion TimesheetAdministrative
-
                 #region TimesheetLocation
 
                 _unitOfWork.TimesheetLocationRepository.RemoveByGroupID(modal.groupid);
@@ -399,7 +359,8 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.TimesheetRepository.RemoveByGroupID(Timesheet.groupid);
                 _unitOfWork.TimesheetTeamRepository.RemoveByGroupID(Timesheet.groupid);
                 _unitOfWork.TimesheetProjectCategoryRepository.RemoveByGroupID(Timesheet.groupid);
-                //_unitOfWork.TimesheetAdministrativeRepository.RemoveByGroupID(Timesheet.groupid);
+                _unitOfWork.TimesheetActivityRepository.RemoveByGroupID(Timesheet.groupid);
+                _unitOfWork.TimesheetAdministrativeRepository.RemoveByGroupID(Timesheet.groupid);
 
                 _unitOfWork.Commit();
 
@@ -508,7 +469,6 @@ namespace TimeAPI.API.Controllers
 
         #endregion Timesheet
 
-
         #region TimesheetActivity
 
         [HttpPost]
@@ -536,6 +496,10 @@ namespace TimeAPI.API.Controllers
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetActivityViewModel, TimesheetActivity>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<TimesheetActivity>(timesheetActivityViewModel);
+
+                var _TotalMinutes = (Convert.ToDateTime(modal.start_time) - Convert.ToDateTime(modal.end_time)).TotalMinutes;
+                TimeSpan spWorkMin = TimeSpan.FromMinutes(_TotalMinutes);
+                modal.total_hrs = spWorkMin.ToString(FormatTime);
 
                 _unitOfWork.TimesheetActivityRepository.Add(modal);
                 _unitOfWork.Commit();
@@ -619,6 +583,29 @@ namespace TimeAPI.API.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("GetTop10TimesheetActivityOnTaskID")]
+        public async Task<object> GetTop10TimesheetActivityOnTaskID([FromBody] Utils Utils,  CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+               
+                oDataTable _oDataTable = new oDataTable();
+                var result = _unitOfWork.TimesheetActivityRepository.GetTop10TimesheetActivityOnTaskID(Utils.ID);
+                var xResult = _oDataTable.ToDataTable(result);
+
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        
+
         #endregion TimesheetActivity
 
         #region TimesheetAdministraitiveActivity
@@ -648,6 +635,10 @@ namespace TimeAPI.API.Controllers
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetAdministrativeActivityViewModel, TimesheetAdministrative>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<TimesheetAdministrative>(timesheetAdministrativeActivityViewModel);
+
+                var _TotalMinutes = (Convert.ToDateTime(modal.start_time) - Convert.ToDateTime(modal.end_time)).TotalMinutes;
+                TimeSpan spWorkMin = TimeSpan.FromMinutes(_TotalMinutes);
+                modal.total_hrs = spWorkMin.ToString(FormatTime);
 
                 _unitOfWork.TimesheetAdministrativeRepository.Add(modal);
                 _unitOfWork.Commit();
@@ -713,8 +704,8 @@ namespace TimeAPI.API.Controllers
         }
 
         [HttpGet]
-        [Route("GetAllTimesheetAdministrativeActivitys")]
-        public async Task<object> GetAllTimesheetAdministrativeActivitys(CancellationToken cancellationToken)
+        [Route("GetAllTimesheetAdministrativeActivity")]
+        public async Task<object> GetAllTimesheetAdministrativeActivity(CancellationToken cancellationToken)
         {
             try
             {
@@ -724,6 +715,27 @@ namespace TimeAPI.API.Controllers
                 var result = _unitOfWork.TimesheetAdministrativeRepository.All();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("GetTop10TimesheetAdminActivityOnGroupIDAndAdminID")]
+        public async Task<object> GetTop10TimesheetAdminActivityOnGroupIDAndAdminID([FromBody] UtilsGroupID Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                oDataTable _oDataTable = new oDataTable();
+                var result = _unitOfWork.TimesheetAdministrativeRepository.GetTop10TimesheetAdminActivityOnGroupIDAndAdminID(Utils.GroupID, Utils.AdministrativeID);
+                var xResult = _oDataTable.ToDataTable(result);
+
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

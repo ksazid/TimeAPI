@@ -73,4 +73,11 @@ namespace TimeAPI.API.Models
         public string Message { get; set; }
     }
 
+    public class UtilsGroupID
+    {
+        public string GroupID { get; set; }
+        public string AdministrativeID { get; set; }
+    }
+
+
 }
