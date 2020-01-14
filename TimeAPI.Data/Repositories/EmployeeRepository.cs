@@ -32,6 +32,14 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
+        public Employee FindByEmpUserID(string key)
+        {
+            return QuerySingleOrDefault<Employee>(
+                sql: "SELECT * FROM [dbo].[employee] WHERE user_id = @key and is_deleted = 0",
+                param: new { key }
+            );
+        }
+
         public IEnumerable<Employee> All()
         {
             return Query<Employee>(
@@ -65,6 +73,17 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
+        public void SetEmpPasswordResetByUserID(string key)
+        {
+            Execute(
+                sql: @"UPDATE dbo.employee
+                   SET 
+                      is_password_reset = 1
+                    WHERE user_id = @key",
+                param: new { key }
+            );
+        }
+        
         public Employee FindByEmpName(string full_name)
         {
             return QuerySingleOrDefault<Employee>(

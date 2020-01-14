@@ -158,8 +158,6 @@ namespace TimeAPI.API.Controllers
                 throw new ApplicationException($"Unable to load user with ID '{userId}'.");
 
 
-
-
             #region
 
             var xcode = Base64UrlEncoder.Decode(code);
@@ -170,6 +168,13 @@ namespace TimeAPI.API.Controllers
                 if (identityResult.Succeeded)
                 {
                     _unitOfWork.Commit();
+
+                    if (_unitOfWork.EmployeeRepository.FindByEmpUserID(userId).is_password_reset == false)
+                    {
+                        await UserPasswordResetCode(user).ConfigureAwait(true);
+                        return Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Congrats! User Verified. Please setup password for login." });
+                    }
+
                     return Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Congrats! User Verified." });
                 }
                 else { return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = "Error", Desc = "Ops! User Verfication Failed." }); }
@@ -215,17 +220,14 @@ namespace TimeAPI.API.Controllers
             var user = await _userManager.FindByEmailAsync(model.Email).ConfigureAwait(true);
             if (user == null)
             {
-                return Ok(new SuccessViewModel { Code = "201", Status = "Error", Desc = "Please enter a valid email" });
+                return Ok(new SuccessViewModel { Code = "201", Status = "Error", Desc = "User Not Found !" });
             }
             var xcode = Base64UrlEncoder.Decode(model.Code);
             var result = await _userManager.ResetPasswordAsync(user, xcode, model.Password).ConfigureAwait(true);
 
             if (result.Succeeded)
             {
-                //check if the new employee added has email confirmed. if no send email for verification
-                if (!await _userManager.IsEmailConfirmedAsync(user).ConfigureAwait(false))
-                    await UserVerificationCode(user).ConfigureAwait(true);
-
+                _unitOfWork.EmployeeRepository.SetEmpPasswordResetByUserID(user.Id);
                 return Ok(new SuccessViewModel { Code = "200", Status = "Success", Desc = "Password set successful." });
             }
 
@@ -305,7 +307,8 @@ namespace TimeAPI.API.Controllers
                 createdby = user.FullName,
                 created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
                 is_admin = false,
-                is_superadmin = true
+                is_superadmin = true,
+                is_password_reset = true
             };
         }
 
@@ -324,6 +327,26 @@ namespace TimeAPI.API.Controllers
                 var xResetCode = Base64UrlEncoder.Encode(ResetCode);
                 var callbackUrl = Url.EmailConfirmationLink(user.Id, xResetCode, Request.Scheme);
                 await _smsSender.SendSmsConfirmationAsync(user.PhoneNumber, callbackUrl).ConfigureAwait(true);
+            }
+
+            return Task.CompletedTask;
+        }
+
+        private async Task<Task> UserPasswordResetCode(ApplicationUser user)
+        {
+            if ((user.Email != null) && (!string.IsNullOrEmpty(user.Email) || !string.IsNullOrWhiteSpace(user.Email) || user.Email != ""))
+            {
+                var ResetCode = await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(true);
+                var xResetCode = Base64UrlEncoder.Encode(ResetCode);
+                var callbackUrl = Url.ResetPasswordCallbackLink(user.Id, xResetCode, Request.Scheme);
+                await _emailSender.SendSetupPasswordAsync(user.Email, callbackUrl).ConfigureAwait(true);
+            }
+            else if ((user.PhoneNumber != null) && (!string.IsNullOrEmpty(user.PhoneNumber) || !string.IsNullOrWhiteSpace(user.PhoneNumber) || (user.PhoneNumber) != ""))
+            {
+                var ResetCode = await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(true);
+                var xResetCode = Base64UrlEncoder.Encode(ResetCode);
+                var callbackUrl = Url.ResetPasswordCallbackLink(user.Id, xResetCode, Request.Scheme);
+                await _smsSender.SendSetupPasswordAsync(user.PhoneNumber, callbackUrl).ConfigureAwait(true);
             }
 
             return Task.CompletedTask;

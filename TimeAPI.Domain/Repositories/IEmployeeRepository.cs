@@ -9,6 +9,8 @@ namespace TimeAPI.Domain.Repositories
     {
         Employee FindByEmpName(string full_name);
         Employee FindByEmpCode(string emp_code);
+        Employee FindByEmpUserID(string UserID);
+        void SetEmpPasswordResetByUserID(string UserID);
         IEnumerable<Employee> FindByOrgIDCode(string org_id);
         IEnumerable<Employee> FindByRoleName(string role);
         dynamic FetchGridDataEmployeeByOrgID(string org_id);

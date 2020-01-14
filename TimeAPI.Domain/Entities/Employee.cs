@@ -35,7 +35,7 @@ namespace TimeAPI.Domain.Entities
         public bool is_deleted { get; set; }
         public bool is_admin { get; set; }
         public bool is_superadmin { get; set; }
-        
+        public bool is_password_reset { get; set; }
     }
 }
 
