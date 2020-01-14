@@ -41,7 +41,7 @@ namespace TimeAPI.API.Controllers
         private static string _userName = string.Empty;
         private readonly UserManager<ApplicationUser> _userManager;
         public EmployeeController(IUnitOfWork unitOfWork, ILogger<EmployeeController> logger,
-                                  UserManager<ApplicationUser> userManager, IEmailSender emailSender, ISmsSender smsSender, 
+                                  UserManager<ApplicationUser> userManager, IEmailSender emailSender, ISmsSender smsSender,
                                   IOptions<ApplicationSettings> AppSettings, IConfiguration configuration)
         {
             _emailSender = emailSender;
@@ -111,7 +111,6 @@ namespace TimeAPI.API.Controllers
         }
 
 
-
         [HttpPatch]
         [Route("UpdateEmployee")]
         public async Task<object> UpdateEmployee([FromBody] EmployeeViewModel employeeViewModel, CancellationToken cancellationToken)
@@ -133,6 +132,30 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee updated succefully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+
+        [HttpPost]
+        [Route("SetEmployeeInactiveByEmpID")]
+        public async Task<object> SetEmployeeInactiveByEmpID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                _unitOfWork.EmployeeRepository.SetEmployeeInactiveByEmpID(Utils.ID);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee removed succefully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -173,7 +196,7 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                
+
                 var result = _unitOfWork.EmployeeRepository.All();
                 _unitOfWork.Commit();
 

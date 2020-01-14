@@ -224,5 +224,18 @@ namespace TimeAPI.Data.Repositories
                );
         }
 
+        public void SetEmployeeInactiveByEmpID(string key)
+        {
+            Execute(
+                sql: @"UPDATE dbo.employee
+                   SET
+                    is_inactive = 1
+                    WHERE id = @key",
+                param: new { key }
+            );
+        }
+
+        
+
     }
 }
