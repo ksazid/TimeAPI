@@ -257,6 +257,29 @@ namespace TimeAPI.API.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("GetAdministrativeByOrgID")]
+        public async Task<object> GetAdministrativeByOrgID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                var result = _unitOfWork.AdministrativeRepository.GetByOrgID(Utils.ID);
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
         #endregion Administrative
 
         #region Priority
@@ -368,6 +391,29 @@ namespace TimeAPI.API.Controllers
         [HttpPost]
         [Route("FindByPriorityID")]
         public async Task<object> FindByPriorityID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                var result = _unitOfWork.PriorityRepository.Find(Utils.ID);
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("GetPriorityByOrgID")]
+        public async Task<object> GetPriorityByOrgID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
 
             try
@@ -520,6 +566,30 @@ namespace TimeAPI.API.Controllers
             }
         }
 
+
+        [HttpPost]
+        [Route("GetStatusByOrgID")]
+        public async Task<object> GetStatusByOrgID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                var result = _unitOfWork.StatusRepository.GetStatusByOrgID(Utils.ID);
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
         #endregion Status
 
         #region EmployeeType
@@ -640,6 +710,30 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 var result = _unitOfWork.EmployeeTypeRepository.Find(Utils.ID);
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+
+        [HttpPost]
+        [Route("GetEmployeeTypeByOrgID")]
+        public async Task<object> GetEmployeeTypeByOrgID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                var result = _unitOfWork.EmployeeTypeRepository.GetEmployeeTypeByOrgID(Utils.ID);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -770,6 +864,29 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 var result = _unitOfWork.EmployeeStatusRepository.Find(Utils.ID);
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("GetEmployeeStatusByOrgID")]
+        public async Task<object> GetEmployeeStatusByOrgID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                var result = _unitOfWork.EmployeeStatusRepository.GetEmployeeStatusByOrgID(Utils.ID);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }

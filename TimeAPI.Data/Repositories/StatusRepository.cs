@@ -66,5 +66,12 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
+        public IEnumerable<Status> GetStatusByOrgID(string key)
+        {
+            return Query<Status>(
+                sql: "SELECT * FROM dbo.status WHERE is_deleted = 0 and org_id = @key",
+                param: new { key }
+            );
+        }
     }
 }

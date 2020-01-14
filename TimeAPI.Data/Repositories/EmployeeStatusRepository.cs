@@ -15,7 +15,6 @@ namespace TimeAPI.Data.Repositories
 
         public void Add(EmployeeStatus entity)
         {
-
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.employee_status
                                   (id, org_id, employee_status_name, employee_status_desc, created_date, createdby)
@@ -66,5 +65,14 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
+        public IEnumerable<EmployeeStatus> GetEmployeeStatusByOrgID(string key)
+        {
+            return Query<EmployeeStatus>(
+                sql: "SELECT * FROM [dbo].[employee_status] where is_deleted = 0 and org_id =@key ",
+                param: new { key }
+            );
+        }
+
+        
     }
 }

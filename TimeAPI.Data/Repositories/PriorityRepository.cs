@@ -33,7 +33,13 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
-
+        public IEnumerable<Priority> GetPriorityByOrgID(string key)
+        {
+            return Query<Priority>(
+                sql: "SELECT * FROM [dbo].[priority] WHERE org_id = @key and is_deleted = 0",
+                param: new { key }
+            );
+        }
         public IEnumerable<Priority> All()
         {
             return Query<Priority>(
@@ -41,6 +47,7 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
+        
         public void Remove(string key)
         {
             Execute(

@@ -40,6 +40,14 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
+        public IEnumerable<Administrative> GetByOrgID(string key)
+        {
+            return Query<Administrative>(
+                sql: "SELECT * FROM [dbo].[administrative] WHERE  is_deleted = 0 and org_id = @key",
+                param: new { key }
+            );
+        }
+
         public void Remove(string key)
         {
             Execute(
