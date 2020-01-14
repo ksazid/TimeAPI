@@ -109,4 +109,5 @@ namespace TimeAPI.Domain.Model
         public string country { get; set; }
         public bool is_checkout { get; set; }
     }
+
 }

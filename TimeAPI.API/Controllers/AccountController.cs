@@ -153,16 +153,14 @@ namespace TimeAPI.API.Controllers
         [Route("ConfirmEmail")]
         public async Task<object> ConfirmEmail(string userId, string code)
         {
-            if (userId == null || code == null)
-                return Ok(new SuccessViewModel { Code = "201", Status = "Error" });
-
             var user = await _userManager.FindByIdAsync(userId).ConfigureAwait(true);
             if (user == null)
                 throw new ApplicationException($"Unable to load user with ID '{userId}'.");
 
-            #region
 
-            //var _code = HttpUtility.UrlDecode(code);
+
+
+            #region
 
             var xcode = Base64UrlEncoder.Decode(code);
             IdentityResult identityResult = await _userManager.ConfirmEmailAsync(user, xcode).ConfigureAwait(true);

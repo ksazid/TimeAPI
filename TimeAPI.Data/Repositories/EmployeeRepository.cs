@@ -235,7 +235,5 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        
-
     }
 }

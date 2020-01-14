@@ -424,7 +424,7 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.PriorityRepository.Find(Utils.ID);
+                var result = _unitOfWork.PriorityRepository.GetPriorityByOrgID(Utils.ID);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
