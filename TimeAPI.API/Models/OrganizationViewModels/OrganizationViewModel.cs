@@ -27,5 +27,23 @@ namespace TimeAPI.API.Models.OrganizationViewModels
         public string modified_date { get; set; }
         public string modifiedby { get; set; }
         public bool is_deleted { get; set; }
+
+        public EntityLocationViewModel EntityLocationViewModel { get; set; }
+
+    }
+
+
+    public class EntityLocationViewModel
+    {
+        public string formatted_address { get; set; }
+        public string lat { get; set; }
+        public string lang { get; set; }
+        public string street_number { get; set; }
+        public string route { get; set; }
+        public string locality { get; set; }
+        public string administrative_area_level_2 { get; set; }
+        public string administrative_area_level_1 { get; set; }
+        public string postal_code { get; set; }
+        public string country { get; set; }
     }
 }

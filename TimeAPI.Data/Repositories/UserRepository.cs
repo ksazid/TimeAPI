@@ -116,7 +116,7 @@ namespace TimeAPI.Data.Repositories
             var resultsTimesheetGrpID = Query<string>(
                 sql: @"SELECT distinct(groupid) from timesheet WITH (NOLOCK)
                         WHERE empid = @empid
-                        AND FORMAT(cast(timesheet.ondate as date), 'd', 'en-us') = FORMAT(dateadd(hour,11,getdate()), 'd', 'en-us') 
+                        AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') = FORMAT(DATEADD(HOUR,11,GETDATE()), 'd', 'EN-US') 
                         AND timesheet.is_deleted = 0;",
                 param: new { empid = resultsEmployee.id }
             );
@@ -147,7 +147,6 @@ namespace TimeAPI.Data.Repositories
                 List<TimesheetDataModel> TimesheetDataModelList = new List<TimesheetDataModel>();
                 List<TimesheetTeamDataModel> TimesheetTeamDataModelList = new List<TimesheetTeamDataModel>();
                 List<TimesheetCurrentLocationViewModel> TimesheetCurrentLocationViewModelList = new List<TimesheetCurrentLocationViewModel>();
-
 
                 TimesheetDataModelList.AddRange(GetTimesheetDataModel(item));
                 TimesheetTeamDataModelList.AddRange(GetTimesheetTeamDataModel(item));

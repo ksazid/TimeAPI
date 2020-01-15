@@ -6,29 +6,29 @@ using TimeAPI.Domain.Repositories;
 
 namespace TimeAPI.Data.Repositories
 {
-    public class LocationRepository : RepositoryBase, ILocationRepository
+    public class EntityLocationRepository : RepositoryBase, IEntityLocationRepository
     {
-        public LocationRepository(IDbTransaction transaction) : base(transaction)
+        public EntityLocationRepository(IDbTransaction transaction) : base(transaction)
         { }
 
-        public void Add(Location entity)
+        public void Add(EntityLocation entity)
         {
 
             entity.id = ExecuteScalar<string>(
-                    sql: @"INSERT INTO dbo.location
-                                  (id, groupid, formatted_address, lat, lang, street_number, route, locality, administrative_area_level_2, 
+                    sql: @"INSERT INTO dbo.entity_location
+                                  (id, entity_id, formatted_address, lat, lang, street_number, route, locality, administrative_area_level_2, 
                                    administrative_area_level_1, postal_code, country, created_date, createdby, is_checkout)
-                           VALUES (@id, @groupid, @formatted_address, @lat, @lang, @street_number, @route, @locality, @administrative_area_level_2, 
+                           VALUES (@id, @entity_id, @formatted_address, @lat, @lang, @street_number, @route, @locality, @administrative_area_level_2, 
                                    @administrative_area_level_1, @postal_code, @country, @created_date, @createdby, @is_checkout);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
         }
 
-        public Location Find(string key)
+        public EntityLocation Find(string key)
         {
-            return QuerySingleOrDefault<Location>(
-                sql: "SELECT * FROM dbo.location WHERE is_deleted = 0 and id = @key",
+            return QuerySingleOrDefault<EntityLocation>(
+                sql: "SELECT * FROM dbo.entity_location WHERE is_deleted = 0 and id = @key",
                 param: new { key }
             );
         }
@@ -36,18 +36,18 @@ namespace TimeAPI.Data.Repositories
         public void Remove(string key)
         {
             Execute(
-                sql: @"UPDATE dbo.location
+                sql: @"UPDATE dbo.entity_location
                    SET
                        modified_date = GETDATE(), is_deleted = 1
-                    WHERE id = @key",
+                    WHERE entity_id = @key",
                 param: new { key }
             );
         } 
 
-        public void Update(Location entity)
+        public void Update(EntityLocation entity)
         {
             Execute(
-                sql: @"UPDATE dbo.location
+                sql: @"UPDATE dbo.entity_location
                    SET 
                     formatted_address = @formatted_address, 
                     lat = @lat, 
@@ -61,15 +61,15 @@ namespace TimeAPI.Data.Repositories
                     country = @country,
                     modified_date = @modified_date, 
                     modifiedby = @modifiedby
-                    WHERE id = @id",
+                    WHERE entity_id = @entity_id",
                 param: entity
             );
         }
 
-        public IEnumerable<Location> All()
+        public IEnumerable<EntityLocation> All()
         {
-            return Query<Location>(
-                sql: "SELECT * FROM [dbo].[location] where is_deleted = 0"
+            return Query<EntityLocation>(
+                sql: "SELECT * FROM dbo.entity_location WHERE is_deleted = 0"
             );
 
         }

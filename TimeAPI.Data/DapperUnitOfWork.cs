@@ -50,6 +50,7 @@ namespace TimeAPI.Data
         private ITimesheetActivityFileRepository _timesheetActivityFileRepository;
         private ITimesheetLocationRepository _timesheetLocationRepository;
         private ILocationRepository _locationRepository;
+        private IEntityLocationRepository _entityLocationRepository;
 
 
         private bool _disposed;
@@ -378,6 +379,15 @@ namespace TimeAPI.Data
             }
         }
 
+        public IEntityLocationRepository EntityLocationRepository
+        {
+            get
+            {
+                return _entityLocationRepository
+                    ?? (_entityLocationRepository = new EntityLocationRepository(_transaction));
+            }
+        }
+
         public bool Commit()
         {
             bool isSuccess = false;
@@ -474,6 +484,5 @@ namespace TimeAPI.Data
         #endregion
 
     }
-
 }
 

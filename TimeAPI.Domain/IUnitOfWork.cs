@@ -41,6 +41,7 @@ namespace TimeAPI.Domain
         ITimesheetActivityFileRepository TimesheetActivityFileRepository { get; }
         ITimesheetLocationRepository TimesheetLocationRepository { get; }
         ILocationRepository LocationRepository { get; }
+        IEntityLocationRepository EntityLocationRepository { get; }
 
         //commit all after all completes
         bool Commit();

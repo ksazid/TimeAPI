@@ -59,6 +59,13 @@ namespace TimeAPI.API.Controllers
                 modal.is_deleted = false;
 
                 _unitOfWork.OrganizationRepository.Add(modal);
+
+                if (organizationViewModel.EntityLocationViewModel != null)
+                {
+                    var OrgLocation = SetLocationForOrg(organizationViewModel, modal.org_id);
+                    _unitOfWork.EntityLocationRepository.Add(OrgLocation);
+                }
+
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Organization Added succefully." }).ConfigureAwait(false);
@@ -68,7 +75,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
 
         [HttpPatch]
         [Route("UpdateOrganization")]
@@ -88,6 +94,13 @@ namespace TimeAPI.API.Controllers
                 modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
 
                 _unitOfWork.OrganizationRepository.Update(modal);
+
+                if (organizationViewModel.EntityLocationViewModel != null)
+                {
+                    var EntityLocation = SetUpdateOrgAddress(organizationViewModel, modal);
+                    _unitOfWork.EntityLocationRepository.Update(EntityLocation);
+                }
+
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Organization Updated succefully." }).ConfigureAwait(false);
@@ -97,7 +110,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
 
         [HttpPost]
         [Route("RemoveOrganization")]
@@ -112,6 +124,7 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 _unitOfWork.OrganizationRepository.Remove(Utils.ID);
+                _unitOfWork.EntityLocationRepository.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Organization remvoed succefully." }).ConfigureAwait(false);
@@ -203,6 +216,53 @@ namespace TimeAPI.API.Controllers
             {
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
+        }
+
+
+        private EntityLocation SetLocationForOrg(OrganizationViewModel organizationViewModel, string OrgID)
+        {
+            var OrgLocation = organizationViewModel.EntityLocationViewModel;
+            var EntityLocation = new EntityLocation()
+            {
+                id = Guid.NewGuid().ToString(),
+                entity_id = OrgID,
+                formatted_address = OrgLocation.formatted_address,
+                lat = OrgLocation.lat,
+                lang = OrgLocation.lang,
+                street_number = OrgLocation.street_number,
+                route = OrgLocation.route,
+                locality = OrgLocation.locality,
+                administrative_area_level_2 = OrgLocation.administrative_area_level_2,
+                administrative_area_level_1 = OrgLocation.administrative_area_level_1,
+                postal_code = OrgLocation.postal_code,
+                country = OrgLocation.country,
+                created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                createdby = organizationViewModel.createdby,
+                is_deleted = false
+            };
+            return EntityLocation;
+        }
+
+        private static EntityLocation SetUpdateOrgAddress(OrganizationViewModel organizationViewModel, Organization modal)
+        {
+            var OrgLocation = organizationViewModel.EntityLocationViewModel;
+            var EntityLocation = new EntityLocation()
+            {
+                entity_id = modal.org_id,
+                formatted_address = OrgLocation.formatted_address,
+                lat = OrgLocation.lat,
+                lang = OrgLocation.lang,
+                street_number = OrgLocation.street_number,
+                route = OrgLocation.route,
+                locality = OrgLocation.locality,
+                administrative_area_level_2 = OrgLocation.administrative_area_level_2,
+                administrative_area_level_1 = OrgLocation.administrative_area_level_1,
+                postal_code = OrgLocation.postal_code,
+                country = OrgLocation.country,
+                modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                modifiedby = organizationViewModel.createdby
+            };
+            return EntityLocation;
         }
     }
 }
