@@ -56,15 +56,15 @@ namespace TimeAPI.API.Controllers
                 modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
                 modal.is_deleted = false;
 
-                _unitOfWork.OrganizationRepository.Add(modal);
 
                 if (organizationViewModel.EntityLocationViewModel != null)
                 {
-                    var OrgLocation = SetLocationForOrg(organizationViewModel.EntityLocationViewModel, modal.org_id);
+                    var OrgLocation = SetLocationForOrg(organizationViewModel.EntityLocationViewModel, modal.org_id.ToString());
                     OrgLocation.createdby = organizationViewModel.createdby;
                     _unitOfWork.EntityLocationRepository.Add(OrgLocation);
                 }
 
+                _unitOfWork.OrganizationRepository.Add(modal);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Organization Added succefully." }).ConfigureAwait(false);
@@ -236,11 +236,11 @@ namespace TimeAPI.API.Controllers
                 modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
                 modal.is_deleted = false;
 
-                _unitOfWork.OrganizationRepository.Add(modal);
+                
 
                 if (organizationBranchViewModel.EntityLocationViewModel != null)
                 {
-                    var OrgLocation = SetLocationForOrg(organizationBranchViewModel.EntityLocationViewModel, modal.org_id);
+                    var OrgLocation = SetLocationForOrg(organizationBranchViewModel.EntityLocationViewModel, modal.org_id.ToString());
                     OrgLocation.createdby = organizationBranchViewModel.createdby;
                     _unitOfWork.EntityLocationRepository.Add(OrgLocation);
                 }
@@ -254,6 +254,7 @@ namespace TimeAPI.API.Controllers
                     created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
                     is_deleted = false
                 };
+                _unitOfWork.OrganizationRepository.Add(modal);
                 _unitOfWork.OrganizationBranchRepository.Add(OrgBranch);
                 _unitOfWork.Commit();
 
