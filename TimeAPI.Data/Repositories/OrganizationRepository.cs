@@ -84,12 +84,35 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<Organization> FindByUsersID(string user_id)
+        public dynamic FindByUsersID(string user_id)
         {
-            return Query<Organization>(
-                sql: "SELECT * FROM [dbo].[organization] WHERE user_id = @user_id and  is_deleted = 0",
-                param: new { user_id }
-            );
+            var Rest = Query<Organization>(
+                  sql: @"SELECT org_id, user_id, org_name, type, summary, img_url,
+                       img_name, country_id, adr1, adr2, city, primary_cont_name,
+                       primary_cont_type, time_zone_id, created_date, createdby,
+                       modified_date, modifiedby, is_deleted FROM [dbo].[organization] 
+                WHERE user_id = @user_id and  is_deleted = 0",
+                  param: new { user_id }
+              );
+
+            var result = GetOrgAddress(Rest);
+            return result;
+        }
+
+        private List<Organization> GetOrgAddress(IEnumerable<Organization> resultsOrganization)
+        {
+            List<Organization> orgList = (resultsOrganization as List<Organization>);
+            for (int i = 0; i < orgList.Count; i++)
+            {
+                var entityLocation = QuerySingleOrDefault<EntityLocation>(
+                   sql: @"SELECT * from entity_location WITH (NOLOCK) WHERE entity_id = @item and is_deleted = 0;",
+                   param: new { item = orgList[i].org_id }
+                  );
+
+                orgList[i].EntityLocation = entityLocation;
+            }
+
+            return orgList;
         }
     }
 }

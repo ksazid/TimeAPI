@@ -8,6 +8,6 @@ namespace TimeAPI.Domain.Repositories
     public interface IOrganizationRepository : IRepository<Organization, string>
     {
         Organization FindByOrgName(string full_name);
-        IEnumerable<Organization> FindByUsersID(string user_id);
+        dynamic FindByUsersID(string user_id);
     }
 }

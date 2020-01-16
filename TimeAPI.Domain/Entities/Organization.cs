@@ -26,5 +26,6 @@ namespace TimeAPI.Domain.Entities
         public string modifiedby { get; set; }
         public bool is_deleted { get; set; }
 
+        public EntityLocation EntityLocation { get; set; }
     }
 }

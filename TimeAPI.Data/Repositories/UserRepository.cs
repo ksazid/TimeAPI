@@ -121,16 +121,34 @@ namespace TimeAPI.Data.Repositories
                 param: new { empid = resultsEmployee.id }
             );
 
+            List<Organization> orgList = GetOrgAddress(resultsOrganization);
+
             var RootTimesheetDataList = GetTimesheetProperty(resultsTimesheetGrpID);
 
             UserDataGroupDataSet _UserDataGroupDataSet = new UserDataGroupDataSet();
 
             _UserDataGroupDataSet.User = resultsAspNetUsers;
-            _UserDataGroupDataSet.Organization = resultsOrganization;
+            _UserDataGroupDataSet.Organization = orgList;
             _UserDataGroupDataSet.Employee = resultsEmployee;
             _UserDataGroupDataSet.Timesheet = RootTimesheetDataList;
 
             return _UserDataGroupDataSet;
+        }
+
+        private List<Organization> GetOrgAddress(IEnumerable<Organization> resultsOrganization)
+        {
+            List<Organization> orgList = (resultsOrganization as List<Organization>);
+            for (int i = 0; i < orgList.Count; i++)
+            {
+                var entityLocation = QuerySingleOrDefault<EntityLocation>(
+                   sql: @"SELECT * from entity_location WITH (NOLOCK) WHERE entity_id = @item and is_deleted = 0;",
+                   param: new { item = orgList[i].org_id }
+                  );
+
+                orgList[i].EntityLocation = entityLocation;
+            }
+
+            return orgList;
         }
 
         #region PrivateMethods
@@ -240,7 +258,7 @@ namespace TimeAPI.Data.Repositories
             return TimesheetSearchLocationViewModel;
         }
 
-        private IEnumerable<TimesheetCurrentLocationViewModel>  GetTimesheetCurrentLocationViewModel(string GroupID)
+        private IEnumerable<TimesheetCurrentLocationViewModel> GetTimesheetCurrentLocationViewModel(string GroupID)
         {
             var TimesheetCurrentLocationViewModel = Query<TimesheetCurrentLocationViewModel>(
                sql: @"SELECT id, groupid, formatted_address, lat, lang, street_number, route, locality, 

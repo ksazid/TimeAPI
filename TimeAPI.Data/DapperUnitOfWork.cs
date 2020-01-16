@@ -51,6 +51,7 @@ namespace TimeAPI.Data
         private ITimesheetLocationRepository _timesheetLocationRepository;
         private ILocationRepository _locationRepository;
         private IEntityLocationRepository _entityLocationRepository;
+        private IOrganizationBranchRepository _organizationBranchRepository;
 
 
         private bool _disposed;
@@ -385,6 +386,15 @@ namespace TimeAPI.Data
             {
                 return _entityLocationRepository
                     ?? (_entityLocationRepository = new EntityLocationRepository(_transaction));
+            }
+        }
+
+        public IOrganizationBranchRepository OrganizationBranchRepository
+        {
+            get
+            {
+                return _organizationBranchRepository
+                    ?? (_organizationBranchRepository = new OrganizationBranchRepository(_transaction));
             }
         }
 
