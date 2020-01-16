@@ -37,7 +37,6 @@ namespace TimeAPI.API.Controllers
             _unitOfWork = unitOfWork;
         }
 
-
         [HttpPost]
         [Route("AddOrganization")]
         public async Task<object> AddOrganization([FromBody] OrganizationViewModel organizationViewModel, CancellationToken cancellationToken)
@@ -217,7 +216,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
 
         private EntityLocation SetLocationForOrg(OrganizationViewModel organizationViewModel, string OrgID)
         {
