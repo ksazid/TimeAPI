@@ -225,8 +225,6 @@ namespace TimeAPI.API.Controllers
 
 
 
-
-
         [HttpPatch]
         [Route("UpdateTaskStatus")]
         public async Task<object> UpdateTaskStatus([FromBody] TaskUpdateStatusViewModel TaskViewModel, CancellationToken cancellationToken)
@@ -244,8 +242,8 @@ namespace TimeAPI.API.Controllers
                     id = TaskViewModel.id,
                     status_id = TaskViewModel.status_id,
                     modifiedby = TaskViewModel.modifiedby,
-                    modified_date = TaskViewModel.modified_date
-                };
+                    modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture)
+            };
 
 
                 _unitOfWork.TaskRepository.UpdateTaskStatus(modal);
