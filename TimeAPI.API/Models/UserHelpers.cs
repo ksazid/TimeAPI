@@ -264,7 +264,6 @@ namespace TimeAPI.API.Models
             return _phone;
         }
 
-
         public static string ValidatePhoneNumber(string args)
         {
             if (UserHelpers.ValidateEmailOrPhone(args).Equals("EMAIL"))

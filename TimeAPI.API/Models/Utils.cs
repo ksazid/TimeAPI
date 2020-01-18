@@ -80,4 +80,9 @@ namespace TimeAPI.API.Models
     }
 
 
+    public class UtilPhone
+    {
+        public string PhoneNumber { get; set; }
+    }
+
 }

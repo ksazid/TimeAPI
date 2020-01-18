@@ -128,6 +128,36 @@ namespace TimeAPI.API.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("IsPhoneValid")]
+        public async Task<object> IsPhoneValid([FromBody] UtilPhone UtilPhone, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (UtilPhone == null)
+                    throw new ArgumentNullException(nameof(UtilPhone));
+
+
+               string Result =  UserHelpers.ValidatePhoneNumber(UtilPhone.PhoneNumber);
+                if (Result.Equals("VALID"))
+                {
+                    return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "The entered phone no is valid" }).ConfigureAwait(false);
+                }
+                else
+                { 
+                    return await Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = "Error", Desc = "The entered phone no is invalid" }).ConfigureAwait(false); 
+                }
+               
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
         #region Administrative
 
         [HttpPost]

@@ -254,6 +254,7 @@ namespace TimeAPI.API.Controllers
                     created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
                     is_deleted = false
                 };
+
                 _unitOfWork.OrganizationRepository.Add(modal);
                 _unitOfWork.OrganizationBranchRepository.Add(OrgBranch);
                 _unitOfWork.Commit();
