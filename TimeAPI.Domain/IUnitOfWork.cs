@@ -24,6 +24,7 @@ namespace TimeAPI.Domain
         IDesignationRepositiory DesignationRepositiory { get; }
         ITimesheetRepository TimesheetRepository { get; }
         ITaskRepository TaskRepository { get; }
+        ITaskTeamMembersRepository TaskTeamMembersRepository { get; }
         ISetupRepository SetupRepository { get; }
         IPriorityRepository PriorityRepository { get; }
         IStatusRepository StatusRepository { get; }

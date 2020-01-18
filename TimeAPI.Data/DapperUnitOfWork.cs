@@ -32,6 +32,7 @@ namespace TimeAPI.Data
         private IDesignationRepositiory _designationRepositiory;
         private ITimesheetRepository _timesheetRepository;
         private ITaskRepository _taskRepository;
+        private ITaskTeamMembersRepository _taskTeamMembersRepository;
         private ISetupRepository _setupRepository;
         private IAdministrativeRepository _administrativeRepository;
         private IPriorityRepository _priorityRepository;
@@ -398,6 +399,15 @@ namespace TimeAPI.Data
             }
         }
 
+        public ITaskTeamMembersRepository TaskTeamMembersRepository
+        {
+            get
+            {
+                return _taskTeamMembersRepository
+                    ?? (_taskTeamMembersRepository = new TaskTeamMembersRepository(_transaction));
+            }
+        }
+
         public bool Commit()
         {
             bool isSuccess = false;
@@ -464,6 +474,9 @@ namespace TimeAPI.Data
             _timesheetActivityFileRepository = null;
             _timesheetLocationRepository = null;
             _locationRepository = null;
+            _entityLocationRepository = null;
+            _organizationBranchRepository = null;
+            _taskTeamMembersRepository = null;
         }
 
         private void dispose(bool disposing)

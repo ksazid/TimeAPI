@@ -69,6 +69,31 @@ namespace TimeAPI.API.Controllers
                 modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
                 modal.is_deleted = false;
 
+
+                if (TaskViewModel.employees != null)
+                {
+                    foreach (var item in TaskViewModel.employees.empid.Distinct())
+                    {
+
+                        modal.id = Guid.NewGuid().ToString();
+                        modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                        modal.is_deleted = false;
+
+
+                        var TaskTeamMembers = new TaskTeamMember()
+                        {
+                            id = Guid.NewGuid().ToString(),
+                            task_id = modal.id,
+                            empid = item,
+                            createdby = modal.createdby,
+                            created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                            is_deleted = false
+
+                        };
+                        _unitOfWork.TaskTeamMembersRepository.Add(TaskTeamMembers);
+                    }
+                }
+
                 _unitOfWork.TaskRepository.Add(modal);
                 _unitOfWork.Commit();
 
@@ -199,7 +224,7 @@ namespace TimeAPI.API.Controllers
         }
 
 
-        
+
 
 
     }
