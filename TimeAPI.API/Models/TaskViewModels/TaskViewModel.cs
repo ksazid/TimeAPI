@@ -29,4 +29,14 @@ namespace TimeAPI.API.Models.TaskViewModels
     {
         public IEnumerable<string> empid { get; set; }
     }
+
+
+    public class TaskUpdateStatusViewModel
+    {
+        public string id { get; set; }
+        public string status_id { get; set; }
+        public string modified_date { get; set; }
+        public string modifiedby { get; set; }
+
+    }
 }

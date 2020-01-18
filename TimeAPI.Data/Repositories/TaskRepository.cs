@@ -90,5 +90,18 @@ namespace TimeAPI.Data.Repositories
                );
         }
 
+        public void UpdateTaskStatus(Tasks entity)
+        {
+            Execute(
+                sql: @"UPDATE dbo.task
+                   SET 
+                    status_id = @status_id, 
+                    modified_date = @modified_date, 
+                    modifiedby = @modifiedby
+                    WHERE id =  @id",
+                param: entity
+            );
+        }
+
     }
 }

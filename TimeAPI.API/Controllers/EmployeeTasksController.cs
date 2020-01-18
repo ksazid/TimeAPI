@@ -227,5 +227,39 @@ namespace TimeAPI.API.Controllers
 
 
 
+        [HttpPatch]
+        [Route("UpdateTaskStatus")]
+        public async Task<object> UpdateTaskStatus([FromBody] TaskUpdateStatusViewModel TaskViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (TaskViewModel == null)
+                    throw new ArgumentNullException(nameof(TaskViewModel));
+
+                var modal = new Domain.Entities.Tasks()
+                {
+                    id = TaskViewModel.id,
+                    status_id = TaskViewModel.status_id,
+                    modifiedby = TaskViewModel.modifiedby,
+                    modified_date = TaskViewModel.modified_date
+                };
+
+
+                _unitOfWork.TaskRepository.UpdateTaskStatus(modal);
+                _unitOfWork.Commit();
+
+                return await System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Task updated succefully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+
+
     }
 }
