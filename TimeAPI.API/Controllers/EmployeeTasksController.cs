@@ -40,8 +40,7 @@ namespace TimeAPI.API.Controllers
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
         public EmployeeTasksController(IUnitOfWork unitOfWork, ILogger<EmployeeTasksController> logger,
-            IEmailSender emailSender,
-            IOptions<ApplicationSettings> AppSettings)
+                IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings)
         {
             _emailSender = emailSender;
             _logger = logger;
@@ -121,7 +120,6 @@ namespace TimeAPI.API.Controllers
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Domain.Entities.Tasks>(TaskViewModel);
                 modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
-
 
                 _unitOfWork.TaskRepository.Update(modal);
                 _unitOfWork.Commit();
@@ -223,8 +221,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
-
         [HttpPatch]
         [Route("UpdateTaskStatus")]
         public async Task<object> UpdateTaskStatus([FromBody] TaskUpdateStatusViewModel TaskViewModel, CancellationToken cancellationToken)
@@ -243,8 +239,7 @@ namespace TimeAPI.API.Controllers
                     status_id = TaskViewModel.status_id,
                     modifiedby = TaskViewModel.modifiedby,
                     modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture)
-            };
-
+                };
 
                 _unitOfWork.TaskRepository.UpdateTaskStatus(modal);
                 _unitOfWork.Commit();
@@ -257,7 +252,18 @@ namespace TimeAPI.API.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("GetAllTaskByEmpID")]
+        public Task<object> GetAllTaskByEmpID([FromBody] Utils UserID, CancellationToken cancellationToken)
+        {
+            if (cancellationToken != null)
+                cancellationToken.ThrowIfCancellationRequested();
 
+            if (string.IsNullOrWhiteSpace(UserID.ID))
+                throw new ArgumentNullException(nameof(UserID.ID));
 
+            var Result = _unitOfWork.TaskRepository.GetAllTaskByEmpID(UserID.ID);
+            return Task.FromResult<object>(Result);
+        }
     }
 }

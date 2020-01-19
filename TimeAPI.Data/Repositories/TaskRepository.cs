@@ -103,5 +103,55 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
+        public RootEmployeeTask GetAllTaskByEmpID(string key)
+        {
+            RootEmployeeTask rootEmployeeTask = new RootEmployeeTask();
+
+            List<EmployeeTasks> employeeTasks = new List<EmployeeTasks>();
+            List<EmployeeTasks> employeeAssignedTasks = new List<EmployeeTasks>();
+
+            var _employeeTasks = Query<EmployeeTasks>(
+                     sql: @"SELECT 
+                            task.id,
+	                        employee.id as empid,
+	                        task.task_name,
+	                        task.task_desc,
+	                        priority.priority_name as priority,
+	                        status.status_name as status,
+	                        employee.full_name as assigned_to,
+	                        task.due_date, 
+	                        task.created_date
+	                        FROM[dbo].[task]
+	                        inner join priority on task.priority_id = priority.id
+	                        inner join employee on task.assigned_empid = employee.id
+	                        inner join status on status.id = task.status_id
+                        WHERE task.is_deleted = 0 and task.empid =@key",
+                        param: new { key }
+                 );
+
+            var _employeeAssignedTasks = Query<EmployeeTasks>(
+                   sql: @"SELECT 
+                            task.id,
+	                        employee.id as empid,
+	                        task.task_name,
+	                        task.task_desc,
+	                        priority.priority_name as priority,
+	                        status.status_name as status,
+	                        employee.full_name as assigned_to,
+	                        task.due_date, 
+	                        task.created_date
+	                        FROM[dbo].[task]
+	                        inner join priority on task.priority_id = priority.id
+	                        inner join employee on task.assigned_empid = employee.id
+	                        inner join status on status.id = task.status_id
+                        WHERE task.is_deleted = 0 and task.assigned_empid =@key",
+                      param: new { key }
+               );
+
+            rootEmployeeTask.EmployeeTasks = _employeeTasks;
+            rootEmployeeTask.AssignedEmployeeTasks = _employeeAssignedTasks;
+
+            return rootEmployeeTask;
+        }
     }
 }
