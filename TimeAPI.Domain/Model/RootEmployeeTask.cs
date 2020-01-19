@@ -8,6 +8,7 @@ namespace TimeAPI.Domain.Model
     {
         public IEnumerable<EmployeeTasks> EmployeeTasks { get; set; }
         public IEnumerable<EmployeeTasks> AssignedEmployeeTasks { get; set; }
+
     }
 
     public class EmployeeTasks

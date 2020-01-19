@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using System.Dynamic;
+using System.Linq;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Model;
 using TimeAPI.Domain.Repositories;
@@ -108,7 +109,6 @@ namespace TimeAPI.Data.Repositories
             RootEmployeeTask rootEmployeeTask = new RootEmployeeTask();
 
             List<EmployeeTasks> employeeTasks = new List<EmployeeTasks>();
-            List<EmployeeTasks> employeeAssignedTasks = new List<EmployeeTasks>();
 
             var _employeeTasks = Query<EmployeeTasks>(
                      sql: @"SELECT 
@@ -148,7 +148,11 @@ namespace TimeAPI.Data.Repositories
                       param: new { key }
                );
 
-            rootEmployeeTask.EmployeeTasks = _employeeTasks;
+            employeeTasks.AddRange(_employeeTasks);
+            employeeTasks.AddRange(_employeeAssignedTasks);
+
+            List<EmployeeTasks> distinct = employeeTasks.Distinct().ToList();
+            rootEmployeeTask.EmployeeTasks = distinct;
             rootEmployeeTask.AssignedEmployeeTasks = _employeeAssignedTasks;
 
             return rootEmployeeTask;
