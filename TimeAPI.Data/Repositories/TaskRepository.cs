@@ -148,11 +148,11 @@ namespace TimeAPI.Data.Repositories
                       param: new { key }
                );
 
-            employeeTasks.AddRange(_employeeTasks);
-            employeeTasks.AddRange(_employeeAssignedTasks);
 
-            List<EmployeeTasks> distinct = employeeTasks.Distinct().ToList();
-            rootEmployeeTask.EmployeeTasks = distinct;
+            var result = _employeeTasks.Except(_employeeAssignedTasks);
+            employeeTasks.AddRange(result);
+
+            rootEmployeeTask.EmployeeTasks = employeeTasks;
             rootEmployeeTask.AssignedEmployeeTasks = _employeeAssignedTasks;
 
             return rootEmployeeTask;
