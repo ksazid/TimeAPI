@@ -562,6 +562,7 @@ namespace TimeAPI.API.Controllers
             modal.user_id = user.Id;
             modal.is_admin = false;
             modal.is_superadmin = false;
+            modal.is_password_reset = false;
             modal.mobile = UserHelpers.IsPhoneValid(employeeViewModel.mobile);
 
             return modal;

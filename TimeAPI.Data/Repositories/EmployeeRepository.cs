@@ -16,9 +16,9 @@ namespace TimeAPI.Data.Repositories
             entity.id = ExecuteScalar<string>(
                         sql: @"
                     INSERT INTO [dbo].[employee] (id, org_id, user_id, deptid, full_name, first_name,last_name, alias, gender, emp_status_id, emp_type_id, imgurl_id, workemail, 
-                                   emp_code, role_id, designation_id, dob, joined_date, phone, mobile, email, summary, created_date, createdby, is_admin, is_superadmin)
+                                   emp_code, role_id, designation_id, dob, joined_date, phone, mobile, email, summary, created_date, createdby, is_admin, is_superadmin, is_password_reset)
                     VALUES (@id, @org_id, @user_id, @deptid, @full_name, @first_name, @last_name, @alias,  @gender, @emp_status_id, @emp_type_id, @imgurl_id, @workemail, @emp_code,
-                                  @role_id, @designation_id, @dob, @joined_date, @phone, @mobile, @email, @summary, @created_date, @createdby, @is_admin, @is_superadmin);
+                                  @role_id, @designation_id, @dob, @joined_date, @phone, @mobile, @email, @summary, @created_date, @createdby, @is_admin, @is_superadmin, @is_password_reset);
                     SELECT SCOPE_IDENTITY()",
                         param: entity
                     );
