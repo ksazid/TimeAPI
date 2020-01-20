@@ -20,26 +20,19 @@ namespace TimeAPI.API.Models.TaskViewModels
         public string modified_date { get; set; }
         public string modifiedby { get; set; }
         public bool is_deleted { get; set; }
-
+        public bool is_approver { get; set; }
         public Employees employees { get; set; }
-
     }
 
     public class Employees
     {
         public IEnumerable<string> empid { get; set; }
     }
-
-
     public class TaskUpdateStatusViewModel
     {
         public string id { get; set; }
         public string status_id { get; set; }
         public string modified_date { get; set; }
         public string modifiedby { get; set; }
-
     }
-
-
-
 }

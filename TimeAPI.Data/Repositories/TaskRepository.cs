@@ -16,11 +16,10 @@ namespace TimeAPI.Data.Repositories
 
         public void Add(Tasks entity)
         {
-
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.task
-                                  (id, empid, task_name, task_desc, priority_id, status_id, assigned_empid, due_date, created_date, createdby)
-                           VALUES (@id, @empid, @task_name, @task_desc, @priority_id, @status_id, @assigned_empid, @due_date, @created_date, @createdby);
+                                  (id, empid, task_name, task_desc, priority_id, status_id, assigned_empid, due_date, created_date, createdby, is_approver)
+                           VALUES (@id, @empid, @task_name, @task_desc, @priority_id, @status_id, @assigned_empid, @due_date, @created_date, @createdby, @is_approver);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -58,7 +57,8 @@ namespace TimeAPI.Data.Repositories
                     assigned_empid = @assigned_empid, 
                     due_date = @due_date,
                     modified_date = @modified_date, 
-                    modifiedby = @modifiedby
+                    modifiedby = @modifiedby,
+                    is_approver = @is_approver
                     WHERE id =  @id",
                 param: entity
             );
