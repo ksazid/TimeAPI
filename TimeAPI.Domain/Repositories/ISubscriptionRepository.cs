@@ -8,6 +8,6 @@ namespace TimeAPI.Domain.Repositories
     public interface ISubscriptionRepository : IRepository<Subscription, string>
     {
         IEnumerable<Subscription> FindByApiKeyByUserID(string user_id);
-        Subscription FindByApiKeyOrgID(string org_id);
+        //Subscription FindByApiKeyOrgID(string org_id);
     }
 }

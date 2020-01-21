@@ -54,9 +54,18 @@ namespace TimeAPI.Data
         private IEntityLocationRepository _entityLocationRepository;
         private IOrganizationBranchRepository _organizationBranchRepository;
 
+        #region systemadmin
+
+        private IPlanRepository _planRepository;
+        private IPlanFeatureRepository _planFeatureRepository; 
+        private IPlanPriceRepository _planPriceRepository;
+        #endregion systemadmin
+
 
         private bool _disposed;
         #endregion
+
+
 
         public DapperUnitOfWork(string connectionString)
         {
@@ -407,6 +416,39 @@ namespace TimeAPI.Data
                     ?? (_taskTeamMembersRepository = new TaskTeamMembersRepository(_transaction));
             }
         }
+
+
+
+
+        public IPlanRepository PlanRepository
+        {
+            get
+            {
+                return _planRepository
+                    ?? (_planRepository = new PlanRepository(_transaction));
+            }
+        }
+
+
+        public IPlanFeatureRepository PlanFeatureRepository
+        {
+            get
+            {
+                return _planFeatureRepository
+                    ?? (_planFeatureRepository = new PlanFeatureRepository(_transaction));
+            }
+        }
+
+
+        public IPlanPriceRepository PlanPriceRepository
+        {
+            get
+            {
+                return _planPriceRepository
+                    ?? (_planPriceRepository = new PlanPriceRepository(_transaction));
+            }
+        }
+
 
         public bool Commit()
         {

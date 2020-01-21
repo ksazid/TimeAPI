@@ -45,6 +45,14 @@ namespace TimeAPI.Domain
         IEntityLocationRepository EntityLocationRepository { get; }
         IOrganizationBranchRepository OrganizationBranchRepository { get; }
 
+
+        #region systemadmin
+        IPlanRepository PlanRepository { get; }
+        IPlanFeatureRepository PlanFeatureRepository { get; }
+        IPlanPriceRepository PlanPriceRepository { get; }
+
+        #endregion systemadmin
+
         //commit all after all completes
         bool Commit();
     }

@@ -15,15 +15,18 @@ namespace TimeAPI.Data.Repositories
 
         public void Add(Subscription entity)
         {
+//            user_id, api_key, current_plan_id, subscription_start_date, subscription_end_date
+//on_date_subscribed, offer_id, offer_start_date, offer_end_date, is_trial
+//is_subscibe_after_trial, is_active,
 
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO [dbo].[subscription]
-                                   (id, user_id, org_id, api_key, subscription_start_date, subscription_end_date, on_date_subscribed,
-		                            current_plan_id, offer_id, offer_start_date, offer_end_date, is_trial, is_subscibe_after_trial,
-			                        is_active, created_date, createdby)
-                           VALUES (@id, @user_id, @org_id, @api_key, @subscription_start_date, @subscription_end_date, @on_date_subscribed,
-		                           @current_plan_id, @offer_id, @offer_start_date, @offer_end_date, @is_trial, @is_subscibe_after_trial,
-			                       @is_active, @created_date, @createdby);
+                                   (id, user_id, api_key, current_plan_id, subscription_start_date, subscription_end_date,
+                                    on_date_subscribed, offer_id, offer_start_date, offer_end_date, is_trial,
+                                    is_subscibe_after_trial, is_active, created_date, createdby)
+                           VALUES (@id, @user_id, @api_key, @current_plan_id, @subscription_start_date, @subscription_end_date,
+                                    @on_date_subscribed, @offer_id, @offer_start_date, @offer_end_date, @is_trial,
+                                    @is_subscibe_after_trial, @is_active, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -53,12 +56,16 @@ namespace TimeAPI.Data.Repositories
             Execute(
                 sql: @"UPDATE dbo.subscription
                    SET 
-                        id = @id, 
-                        user_id = @user_id, 
-                        img_name = @img_name, 
-                        img_url = @img_url, 
-                        created_date = @created_date, 
-                        createdby = @createdby, 
+                        current_plan_id = @current_plan_id, 
+                        subscription_start_date = @subscription_start_date, 
+                        subscription_end_date = @subscription_end_date, 
+                        on_date_subscribed = @on_date_subscribed, 
+                        offer_id = @offer_id, 
+                        offer_start_date = @offer_start_date, 
+                        offer_end_date = @offer_end_date, 
+                        is_trial  = @is_trial, 
+                        is_subscibe_after_trial = @is_subscibe_after_trial, 
+                        is_active = @is_active,
                         modified_date = @modified_date, 
                         modifiedby = @modifiedby
                     WHERE id = @id",
@@ -81,12 +88,12 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public Subscription FindByApiKeyOrgID(string org_id)
-        {
-            return QuerySingleOrDefault<Subscription>(
-                sql: "SELECT * FROM dbo.subscription WHERE org_id = @org_id and is_deleted = 0",
-                param: new { org_id }
-            );
-        }
+        //public Subscription FindByApiKeyOrgID(string org_id)
+        //{
+        //    return QuerySingleOrDefault<Subscription>(
+        //        sql: "SELECT * FROM dbo.subscription WHERE org_id = @org_id and is_deleted = 0",
+        //        param: new { org_id }
+        //    );
+        //}
     }
 }
