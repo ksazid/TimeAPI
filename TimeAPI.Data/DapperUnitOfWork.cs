@@ -27,7 +27,6 @@ namespace TimeAPI.Data
         private IDepartmentRepository _departmentRepository;
         private IProfileImageRepository _profileImageRepository;
         private ISocialRepository _socialRepository;
-        private ISubscriptionRepository _subscriptionRepository;
         private IReportingRepository _reportingRepository;
         private IDesignationRepositiory _designationRepositiory;
         private ITimesheetRepository _timesheetRepository;
@@ -59,6 +58,8 @@ namespace TimeAPI.Data
         private IPlanRepository _planRepository;
         private IPlanFeatureRepository _planFeatureRepository; 
         private IPlanPriceRepository _planPriceRepository;
+        private ISubscriptionRepository _subscriptionRepository;
+        private IBillingRepository _billingRepository;
         #endregion systemadmin
 
 
@@ -417,9 +418,6 @@ namespace TimeAPI.Data
             }
         }
 
-
-
-
         public IPlanRepository PlanRepository
         {
             get
@@ -446,6 +444,15 @@ namespace TimeAPI.Data
             {
                 return _planPriceRepository
                     ?? (_planPriceRepository = new PlanPriceRepository(_transaction));
+            }
+        }
+
+        public IBillingRepository BillingRepository
+        {
+            get
+            {
+                return _billingRepository
+                    ?? (_billingRepository = new BillingRepository(_transaction));
             }
         }
 

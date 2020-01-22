@@ -10,8 +10,8 @@ namespace TimeAPI.API.Models.PlanPriceViewModels
     {
         public string id { get; set; }
         public string plan_id { get; set; }
-        public string feature_name { get; set; }
-        public string feature_desc { get; set; }
+        public string price_amount { get; set; }
+        public string billing_cycle { get; set; }
         public string created_date { get; set; }
         public string createdby { get; set; }
         public string modified_date { get; set; }

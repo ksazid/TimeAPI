@@ -20,7 +20,6 @@ namespace TimeAPI.Domain
         IReportingRepository ReportingRepository { get; }
         ISocialRepository SocialRepository { get; }
         IAdministrativeRepository AdministrativeRepository { get; }
-        ISubscriptionRepository SubscriptionRepository { get; }
         IDesignationRepositiory DesignationRepositiory { get; }
         ITimesheetRepository TimesheetRepository { get; }
         ITaskRepository TaskRepository { get; }
@@ -45,11 +44,12 @@ namespace TimeAPI.Domain
         IEntityLocationRepository EntityLocationRepository { get; }
         IOrganizationBranchRepository OrganizationBranchRepository { get; }
 
-
         #region systemadmin
         IPlanRepository PlanRepository { get; }
         IPlanFeatureRepository PlanFeatureRepository { get; }
         IPlanPriceRepository PlanPriceRepository { get; }
+        ISubscriptionRepository SubscriptionRepository { get; }
+        IBillingRepository BillingRepository { get; }
 
         #endregion systemadmin
 

@@ -24,6 +24,7 @@ using System.Globalization;
 using TimeAPI.API.Models.PlanViewModels;
 using TimeAPI.API.Models.PlanFeatureViewModels;
 using TimeAPI.API.Models.PlanPriceViewModels;
+using TimeAPI.API.Models.BillingViewModels;
 
 namespace TimeAPI.API.Controllers
 {
@@ -51,19 +52,19 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("AddPlan")]
-        public async Task<object> AddPlan([FromBody] PlanViewModel subscriptionViewModel, CancellationToken cancellationToken)
+        public async Task<object> AddPlan([FromBody] PlanViewModel planViewModel, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (subscriptionViewModel == null)
-                    throw new ArgumentNullException(nameof(subscriptionViewModel));
+                if (planViewModel == null)
+                    throw new ArgumentNullException(nameof(planViewModel));
 
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<PlanViewModel, Plan>());
                 var mapper = config.CreateMapper();
-                var modal = mapper.Map<Plan>(subscriptionViewModel);
+                var modal = mapper.Map<Plan>(planViewModel);
 
                 modal.id = Guid.NewGuid().ToString();
                 modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
@@ -82,19 +83,19 @@ namespace TimeAPI.API.Controllers
 
         [HttpPatch]
         [Route("UpdatePlan")]
-        public async Task<object> UpdatePlan([FromBody] PlanViewModel subscriptionViewModel, CancellationToken cancellationToken)
+        public async Task<object> UpdatePlan([FromBody] PlanViewModel planViewModel, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (subscriptionViewModel == null)
-                    throw new ArgumentNullException(nameof(subscriptionViewModel));
+                if (planViewModel == null)
+                    throw new ArgumentNullException(nameof(planViewModel));
 
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<PlanViewModel, Plan>());
                 var mapper = config.CreateMapper();
-                var modal = mapper.Map<Plan>(subscriptionViewModel);
+                var modal = mapper.Map<Plan>(planViewModel);
                 modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
 
                 _unitOfWork.PlanRepository.Update(modal);
@@ -181,19 +182,19 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("AddPlanFeature")]
-        public async Task<object> AddPlanFeature([FromBody] PlanFeatureViewModel subscriptionViewModel, CancellationToken cancellationToken)
+        public async Task<object> AddPlanFeature([FromBody] PlanFeatureViewModel featureViewModel, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (subscriptionViewModel == null)
-                    throw new ArgumentNullException(nameof(subscriptionViewModel));
+                if (featureViewModel == null)
+                    throw new ArgumentNullException(nameof(featureViewModel));
 
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<PlanFeatureViewModel, PlanFeature>());
                 var mapper = config.CreateMapper();
-                var modal = mapper.Map<PlanFeature>(subscriptionViewModel);
+                var modal = mapper.Map<PlanFeature>(featureViewModel);
 
                 modal.id = Guid.NewGuid().ToString();
                 modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
@@ -212,19 +213,19 @@ namespace TimeAPI.API.Controllers
 
         [HttpPatch]
         [Route("UpdatePlanFeature")]
-        public async Task<object> UpdatePlanFeature([FromBody] PlanFeatureViewModel subscriptionViewModel, CancellationToken cancellationToken)
+        public async Task<object> UpdatePlanFeature([FromBody] PlanFeatureViewModel featureViewModel, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (subscriptionViewModel == null)
-                    throw new ArgumentNullException(nameof(subscriptionViewModel));
+                if (featureViewModel == null)
+                    throw new ArgumentNullException(nameof(featureViewModel));
 
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<PlanFeatureViewModel, PlanFeature>());
                 var mapper = config.CreateMapper();
-                var modal = mapper.Map<PlanFeature>(subscriptionViewModel);
+                var modal = mapper.Map<PlanFeature>(featureViewModel);
                 modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
 
                 _unitOfWork.PlanFeatureRepository.Update(modal);
@@ -311,19 +312,19 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("AddPlanPrice")]
-        public async Task<object> AddPlanPrice([FromBody] PlanPriceViewModel subscriptionViewModel, CancellationToken cancellationToken)
+        public async Task<object> AddPlanPrice([FromBody] PlanPriceViewModel priceViewModel, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (subscriptionViewModel == null)
-                    throw new ArgumentNullException(nameof(subscriptionViewModel));
+                if (priceViewModel == null)
+                    throw new ArgumentNullException(nameof(priceViewModel));
 
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<PlanPriceViewModel, PlanPrice>());
                 var mapper = config.CreateMapper();
-                var modal = mapper.Map<PlanPrice>(subscriptionViewModel);
+                var modal = mapper.Map<PlanPrice>(priceViewModel);
 
                 modal.id = Guid.NewGuid().ToString();
                 modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
@@ -342,19 +343,19 @@ namespace TimeAPI.API.Controllers
 
         [HttpPatch]
         [Route("UpdatePlanPrice")]
-        public async Task<object> UpdatePlanPrice([FromBody] PlanPriceViewModel subscriptionViewModel, CancellationToken cancellationToken)
+        public async Task<object> UpdatePlanPrice([FromBody] PlanPriceViewModel priceViewModel, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (subscriptionViewModel == null)
-                    throw new ArgumentNullException(nameof(subscriptionViewModel));
+                if (priceViewModel == null)
+                    throw new ArgumentNullException(nameof(priceViewModel));
 
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<PlanPriceViewModel, PlanPrice>());
                 var mapper = config.CreateMapper();
-                var modal = mapper.Map<PlanPrice>(subscriptionViewModel);
+                var modal = mapper.Map<PlanPrice>(priceViewModel);
                 modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
 
                 _unitOfWork.PlanPriceRepository.Update(modal);
@@ -434,11 +435,9 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         #endregion PlanPrice
 
         #region subscription
-
 
         [HttpPost]
         [Route("AddSubscription")]
@@ -612,5 +611,112 @@ namespace TimeAPI.API.Controllers
         //}
 
         #endregion subscription
+
+        #region billing
+
+        [HttpPost]
+        [Route("AddBilling")]
+        public async Task<object> AddBilling([FromBody] BillingViewModel billingViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (billingViewModel == null)
+                    throw new ArgumentNullException(nameof(billingViewModel));
+
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<BillingViewModel, Billing>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<Billing>(billingViewModel);
+
+                modal.id = Guid.NewGuid().ToString();
+                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.is_deleted = false;
+
+                _unitOfWork.BillingRepository.Add(modal);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Billing registered succefully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPatch]
+        [Route("UpdateBilling")]
+        public async Task<object> UpdateBilling([FromBody] BillingViewModel billingViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (billingViewModel == null)
+                    throw new ArgumentNullException(nameof(billingViewModel));
+
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<BillingViewModel, Billing>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<Billing>(billingViewModel);
+                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+
+                _unitOfWork.BillingRepository.Update(modal);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Billing updated succefully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("RemoveBilling")]
+        public async Task<object> RemoveBilling([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                _unitOfWork.BillingRepository.Remove(Utils.ID);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee removed succefully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("GetAllBilling")]
+        public async Task<object> GetAllBilling(CancellationToken cancellationToken)
+        {
+
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                var result = _unitOfWork.BillingRepository.All();
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        #endregion billing
+
     }
 }
