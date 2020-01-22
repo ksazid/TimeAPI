@@ -18,8 +18,8 @@ namespace TimeAPI.Data.Repositories
         {
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.saas_plan_price
-                                  (id, plan_id, price_amount, unit, created_date, createdby)
-                           VALUES (@id, @plan_id, @price_amount, @unit, @created_date, @createdby);
+                                  (id, plan_id, price_amount, billing_cycle, created_date, createdby)
+                           VALUES (@id, @plan_id, @price_amount, @billing_cycle, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -51,10 +51,9 @@ namespace TimeAPI.Data.Repositories
                    SET 
                     plan_id = @plan_id, 
                     price_amount = @, 
-                    unit = @unit,
+                    billing_cycle = @billing_cycle,
                     modified_date = @modified_date, 
-                    modifiedby = @modifiedby,
-                    is_approver = @is_approver
+                    modifiedby = @modifiedby
                     WHERE id =  @id",
                 param: entity
             );
