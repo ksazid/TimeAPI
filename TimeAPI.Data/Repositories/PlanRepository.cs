@@ -61,7 +61,7 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<Plan> All()
         {
             return Query<Plan>(
-                sql: "SELECT * FROM [dbo.saas_plan] where is_deleted = 0"
+                sql: "SELECT * FROM dbo.saas_plan where is_deleted = 0"
             );
         }
     }
