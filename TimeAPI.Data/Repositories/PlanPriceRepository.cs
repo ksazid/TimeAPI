@@ -50,7 +50,7 @@ namespace TimeAPI.Data.Repositories
                 sql: @"UPDATE dbo.saas_plan_price
                    SET 
                     plan_id = @plan_id, 
-                    price_amount = @, 
+                    price_amount = @price_amount, 
                     billing_cycle = @billing_cycle,
                     modified_date = @modified_date, 
                     modifiedby = @modifiedby
