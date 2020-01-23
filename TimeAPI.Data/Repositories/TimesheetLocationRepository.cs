@@ -16,9 +16,9 @@ namespace TimeAPI.Data.Repositories
 
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.timesheet_location
-                                  (id,  groupid, manual_address, formatted_address, lat, lang, street_number, route, locality, administrative_area_level_2, 
+                                  (id,  groupid, manual_address, geo_address, formatted_address, lat, lang, street_number, route, locality, administrative_area_level_2, 
                                    administrative_area_level_1, postal_code, country, is_office, is_manual, created_date, createdby)
-                           VALUES (@id, @groupid, @manual_address, @formatted_address, @lat, @lang, @street_number, @route, @locality, @administrative_area_level_2, 
+                           VALUES (@id, @groupid, @manual_address, @geo_address, @formatted_address, @lat, @lang, @street_number, @route, @locality, @administrative_area_level_2, 
                                    @administrative_area_level_1, @postal_code, @country, @is_office, @is_manual, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
@@ -62,6 +62,7 @@ namespace TimeAPI.Data.Repositories
                    SET 
                     groupid = @groupid,
                     manual_address = @manual_address,
+                    geo_address = @geo_address,
                     formatted_address = @formatted_address, 
                     lat = @lat, 
                     lang = @lang, 

@@ -55,6 +55,7 @@ namespace TimeAPI.API.Models.TimesheetViewModels
     public class TimesheetSearchLocationViewModel
     {
         public string manual_address { get; set; }
+        public string geo_address { get; set; }
         public string formatted_address { get; set; }
         public string lat { get; set; }
         public string lang { get; set; }
@@ -71,6 +72,7 @@ namespace TimeAPI.API.Models.TimesheetViewModels
 
     public class TimesheetCurrentLocationViewModel
     {
+        public string geo_address { get; set; }
         public string formatted_address { get; set; }
         public string lat { get; set; }
         public string lang { get; set; }

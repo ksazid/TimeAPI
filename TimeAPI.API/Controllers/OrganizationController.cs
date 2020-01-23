@@ -60,6 +60,9 @@ namespace TimeAPI.API.Controllers
                 if (organizationViewModel.EntityLocationViewModel != null)
                 {
                     var OrgLocation = SetLocationForOrg(organizationViewModel.EntityLocationViewModel, modal.org_id.ToString());
+                    OrgLocation.id = Guid.NewGuid().ToString();
+                    OrgLocation.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                    OrgLocation.is_deleted = false;
                     OrgLocation.createdby = organizationViewModel.createdby;
                     _unitOfWork.EntityLocationRepository.Add(OrgLocation);
                 }
@@ -96,7 +99,11 @@ namespace TimeAPI.API.Controllers
 
                 if (organizationViewModel.EntityLocationViewModel != null)
                 {
-                    var EntityLocation = SetUpdateOrgAddress(organizationViewModel, modal);
+                    //var EntityLocation = SetUpdateOrgAddress(organizationViewModel, modal);
+                    var EntityLocation = SetLocationForOrg(organizationViewModel.EntityLocationViewModel, modal.org_id.ToString());
+                    EntityLocation.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                    EntityLocation.modifiedby = organizationViewModel.createdby;
+
                     _unitOfWork.EntityLocationRepository.Update(EntityLocation);
                 }
 
@@ -236,7 +243,7 @@ namespace TimeAPI.API.Controllers
                 modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
                 modal.is_deleted = false;
 
-                
+
 
                 if (organizationBranchViewModel.EntityLocationViewModel != null)
                 {
@@ -271,8 +278,8 @@ namespace TimeAPI.API.Controllers
         {
             var EntityLocation = new EntityLocation()
             {
-                id = Guid.NewGuid().ToString(),
                 entity_id = OrgID,
+                geo_address = OrgLocation.geo_address,
                 formatted_address = OrgLocation.formatted_address,
                 lat = OrgLocation.lat,
                 lang = OrgLocation.lang,
@@ -282,35 +289,10 @@ namespace TimeAPI.API.Controllers
                 administrative_area_level_2 = OrgLocation.administrative_area_level_2,
                 administrative_area_level_1 = OrgLocation.administrative_area_level_1,
                 postal_code = OrgLocation.postal_code,
-                country = OrgLocation.country,
-                created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
-                is_deleted = false
+                country = OrgLocation.country
             };
             return EntityLocation;
         }
-
-        private static EntityLocation SetUpdateOrgAddress(OrganizationViewModel organizationViewModel, Organization modal)
-        {
-            var OrgLocation = organizationViewModel.EntityLocationViewModel;
-            var EntityLocation = new EntityLocation()
-            {
-                entity_id = modal.org_id,
-                formatted_address = OrgLocation.formatted_address,
-                lat = OrgLocation.lat,
-                lang = OrgLocation.lang,
-                street_number = OrgLocation.street_number,
-                route = OrgLocation.route,
-                locality = OrgLocation.locality,
-                administrative_area_level_2 = OrgLocation.administrative_area_level_2,
-                administrative_area_level_1 = OrgLocation.administrative_area_level_1,
-                postal_code = OrgLocation.postal_code,
-                country = OrgLocation.country,
-                modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
-                modifiedby = organizationViewModel.createdby
-            };
-            return EntityLocation;
-        }
-
     }
 }
 

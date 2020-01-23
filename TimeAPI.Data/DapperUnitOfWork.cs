@@ -54,7 +54,6 @@ namespace TimeAPI.Data
         private IOrganizationBranchRepository _organizationBranchRepository;
 
         #region systemadmin
-
         private IPlanRepository _planRepository;
         private IPlanFeatureRepository _planFeatureRepository; 
         private IPlanPriceRepository _planPriceRepository;
@@ -62,11 +61,8 @@ namespace TimeAPI.Data
         private IBillingRepository _billingRepository;
         #endregion systemadmin
 
-
         private bool _disposed;
         #endregion
-
-
 
         public DapperUnitOfWork(string connectionString)
         {
@@ -427,7 +423,6 @@ namespace TimeAPI.Data
             }
         }
 
-
         public IPlanFeatureRepository PlanFeatureRepository
         {
             get
@@ -436,7 +431,6 @@ namespace TimeAPI.Data
                     ?? (_planFeatureRepository = new PlanFeatureRepository(_transaction));
             }
         }
-
 
         public IPlanPriceRepository PlanPriceRepository
         {
@@ -455,7 +449,6 @@ namespace TimeAPI.Data
                     ?? (_billingRepository = new BillingRepository(_transaction));
             }
         }
-
 
         public bool Commit()
         {

@@ -8,6 +8,7 @@ namespace TimeAPI.Domain.Entities
     {
         public string id { get; set; }
         public string groupid { get; set; }
+        public string geo_address { get; set; }
         public string formatted_address { get; set; }
         public string lat { get; set; }
         public string lang { get; set; }

@@ -16,9 +16,10 @@ namespace TimeAPI.Data.Repositories
 
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.location
-                                  (id, groupid, formatted_address, lat, lang, street_number, route, locality, administrative_area_level_2, 
+        
+                                  (id, groupid, geo_address, formatted_address, lat, lang, street_number, route, locality, administrative_area_level_2, 
                                    administrative_area_level_1, postal_code, country, created_date, createdby, is_checkout)
-                           VALUES (@id, @groupid, @formatted_address, @lat, @lang, @street_number, @route, @locality, @administrative_area_level_2, 
+                           VALUES (@id, @groupid, @geo_address, @formatted_address, @lat, @lang, @street_number, @route, @locality, @administrative_area_level_2, 
                                    @administrative_area_level_1, @postal_code, @country, @created_date, @createdby, @is_checkout);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
@@ -49,6 +50,7 @@ namespace TimeAPI.Data.Repositories
             Execute(
                 sql: @"UPDATE dbo.location
                    SET 
+                    geo_address = @geo_address,
                     formatted_address = @formatted_address, 
                     lat = @lat, 
                     lang = @lang, 

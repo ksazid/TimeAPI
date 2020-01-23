@@ -35,6 +35,7 @@ namespace TimeAPI.API.Models.OrganizationViewModels
 
     public class EntityLocationViewModel
     {
+        public string geo_address { get; set; }
         public string formatted_address { get; set; }
         public string lat { get; set; }
         public string lang { get; set; }

@@ -60,127 +60,22 @@ namespace TimeAPI.API.Controllers
 
                 var _groupid = Guid.NewGuid().ToString();
 
-                #region TimesheetWithTeamMembers
+                modal.groupid = _groupid;
 
-                if (timesheetViewModel.team_member_empid != null)
-                {
-                    foreach (var item in timesheetViewModel.team_member_empid.Distinct())
-                    {
-                        modal.id = Guid.NewGuid().ToString();
-                        modal.empid = item;
-                        modal.ondate = DateTime.Now.ToString(CultureInfo.CurrentCulture);
-                        modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
-                        modal.is_deleted = false;
-                        modal.groupid = _groupid;
-                        modal.is_deleted = false;
-                        modal.is_checkout = false;
-                        modal.check_out = null;
-                        modal.total_hrs = null;
+                //Adding Multiple Timesheet
+                AddTimesheetWithTeamMembers(timesheetViewModel, modal);
 
-                        _unitOfWork.TimesheetRepository.Add(modal);
-                    }
-                }
+                //Adding Timesheet Teams
+                AddTeamsTimesheet(timesheetViewModel, modal);
 
-                #endregion TimesheetWithTeamMembers
+                //Adding Timehseet Job/Case Checkin
+                AddProjectCategoryTimesheet(timesheetViewModel, modal);
 
-                #region Teams
+                //Adding Timesheet Location Checkin
+                AddTimesheetLocation(timesheetViewModel, modal);
 
-                if (timesheetViewModel.teamid != null)
-                {
-                    foreach (var item in timesheetViewModel.teamid.Distinct())
-                    {
-                        var timesheet_team = new TimesheetTeam
-                        {
-                            id = Guid.NewGuid().ToString(),
-                            teamid = item,
-                            groupid = modal.groupid,
-                            is_deleted = false,
-                            created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
-                            createdby = modal.createdby
-                        };
-                        _unitOfWork.TimesheetTeamRepository.Add(timesheet_team);
-                    }
-                }
-
-                #endregion Teams
-
-                #region TimesheetProjectCategory
-
-                if (timesheetViewModel.TimesheetCategoryViewModel != null)
-                {
-                    var project_category_type = new TimesheetProjectCategory
-                    {
-                        id = Guid.NewGuid().ToString(),
-                        //timesheet_id = modal.id,
-                        groupid = modal.groupid,
-                        project_category_id = timesheetViewModel.TimesheetCategoryViewModel.project_category_id,
-                        project_or_comp_id = timesheetViewModel.TimesheetCategoryViewModel.project_or_comp_id,
-                        is_deleted = false,
-                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
-                        createdby = modal.createdby
-                    };
-                    _unitOfWork.TimesheetProjectCategoryRepository.Add(project_category_type);
-                }
-
-                #endregion TimesheetProjectCategory
-
-                #region TimesheetLocation
-
-                if (timesheetViewModel.TimesheetSearchLocationViewModel != null)
-                {
-                    var TimesheetLocation = new TimesheetLocation
-                    {
-                        id = Guid.NewGuid().ToString(),
-                        groupid = modal.groupid,
-                        manual_address = timesheetViewModel.TimesheetSearchLocationViewModel.manual_address,
-                        formatted_address = timesheetViewModel.TimesheetSearchLocationViewModel.formatted_address,
-                        lat = timesheetViewModel.TimesheetSearchLocationViewModel.lat,
-                        lang = timesheetViewModel.TimesheetSearchLocationViewModel.lang,
-                        street_number = timesheetViewModel.TimesheetSearchLocationViewModel.street_number,
-                        route = timesheetViewModel.TimesheetSearchLocationViewModel.route,
-                        locality = timesheetViewModel.TimesheetSearchLocationViewModel.locality,
-                        administrative_area_level_2 = timesheetViewModel.TimesheetSearchLocationViewModel.administrative_area_level_2,
-                        administrative_area_level_1 = timesheetViewModel.TimesheetSearchLocationViewModel.administrative_area_level_1,
-                        postal_code = timesheetViewModel.TimesheetSearchLocationViewModel.postal_code,
-                        country = timesheetViewModel.TimesheetSearchLocationViewModel.country,
-                        is_deleted = false,
-                        is_office = timesheetViewModel.TimesheetSearchLocationViewModel.is_office,
-                        is_manual = timesheetViewModel.TimesheetSearchLocationViewModel.is_manual,
-                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
-                        createdby = modal.createdby
-                    };
-                    _unitOfWork.TimesheetLocationRepository.Add(TimesheetLocation);
-                }
-
-                #endregion TimesheetLocation
-
-                #region CurrentLocation
-
-                if (timesheetViewModel.TimesheetCurrentLocationViewModel != null)
-                {
-                    var Location = new Location
-                    {
-                        id = Guid.NewGuid().ToString(),
-                        groupid = modal.groupid,
-                        formatted_address = timesheetViewModel.TimesheetCurrentLocationViewModel.formatted_address,
-                        lat = timesheetViewModel.TimesheetCurrentLocationViewModel.lat,
-                        lang = timesheetViewModel.TimesheetCurrentLocationViewModel.lang,
-                        street_number = timesheetViewModel.TimesheetCurrentLocationViewModel.street_number,
-                        route = timesheetViewModel.TimesheetCurrentLocationViewModel.route,
-                        locality = timesheetViewModel.TimesheetCurrentLocationViewModel.locality,
-                        administrative_area_level_2 = timesheetViewModel.TimesheetCurrentLocationViewModel.administrative_area_level_2,
-                        administrative_area_level_1 = timesheetViewModel.TimesheetCurrentLocationViewModel.administrative_area_level_1,
-                        postal_code = timesheetViewModel.TimesheetCurrentLocationViewModel.postal_code,
-                        country = timesheetViewModel.TimesheetCurrentLocationViewModel.country,
-                        is_deleted = false,
-                        is_checkout = false,
-                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
-                        createdby = modal.createdby
-                    };
-                    _unitOfWork.LocationRepository.Add(Location);
-                }
-
-                #endregion CurrentLocation
+                //Default User Location At the time of checkin
+                AddTimesheetCurrentLocation(timesheetViewModel, modal);
 
                 _unitOfWork.Commit();
 
@@ -191,6 +86,8 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
+
+    
 
         [HttpPatch]
         [Route("UpdateTimesheet")]
@@ -956,5 +853,145 @@ namespace TimeAPI.API.Controllers
         }
 
         #endregion TimesheetActivityFile
+
+
+        #region Private
+        private void AddTimesheetWithTeamMembers(TimesheetPostViewModel timesheetViewModel, Timesheet modal)
+        {
+            #region TimesheetWithTeamMembers
+
+            if (timesheetViewModel.team_member_empid != null)
+            {
+                foreach (var item in timesheetViewModel.team_member_empid.Distinct())
+                {
+                    modal.id = Guid.NewGuid().ToString();
+                    modal.empid = item;
+                    modal.ondate = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                    modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                    modal.is_deleted = false;
+                    modal.is_deleted = false;
+                    modal.is_checkout = false;
+                    modal.check_out = null;
+                    modal.total_hrs = null;
+
+                    _unitOfWork.TimesheetRepository.Add(modal);
+                }
+            }
+
+            #endregion TimesheetWithTeamMembers
+        }
+
+        private void AddTeamsTimesheet(TimesheetPostViewModel timesheetViewModel, Timesheet modal)
+        {
+            #region Teams
+
+            if (timesheetViewModel.teamid != null)
+            {
+                foreach (var item in timesheetViewModel.teamid.Distinct())
+                {
+                    var timesheet_team = new TimesheetTeam
+                    {
+                        id = Guid.NewGuid().ToString(),
+                        teamid = item,
+                        groupid = modal.groupid,
+                        is_deleted = false,
+                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        createdby = modal.createdby
+                    };
+                    _unitOfWork.TimesheetTeamRepository.Add(timesheet_team);
+                }
+            }
+
+            #endregion Teams
+        }
+
+        private void AddProjectCategoryTimesheet(TimesheetPostViewModel timesheetViewModel, Timesheet modal)
+        {
+            #region TimesheetProjectCategory
+
+            if (timesheetViewModel.TimesheetCategoryViewModel != null)
+            {
+                var project_category_type = new TimesheetProjectCategory
+                {
+                    id = Guid.NewGuid().ToString(),
+                    //timesheet_id = modal.id,
+                    groupid = modal.groupid,
+                    project_category_id = timesheetViewModel.TimesheetCategoryViewModel.project_category_id,
+                    project_or_comp_id = timesheetViewModel.TimesheetCategoryViewModel.project_or_comp_id,
+                    is_deleted = false,
+                    created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                    createdby = modal.createdby
+                };
+                _unitOfWork.TimesheetProjectCategoryRepository.Add(project_category_type);
+            }
+
+            #endregion TimesheetProjectCategory
+        }
+
+        private void AddTimesheetLocation(TimesheetPostViewModel timesheetViewModel, Timesheet modal)
+        {
+            #region TimesheetLocation
+
+            if (timesheetViewModel.TimesheetSearchLocationViewModel != null)
+            {
+                var TimesheetLocation = new TimesheetLocation
+                {
+                    id = Guid.NewGuid().ToString(),
+                    groupid = modal.groupid,
+                    manual_address = timesheetViewModel.TimesheetSearchLocationViewModel.manual_address,
+                    geo_address = timesheetViewModel.TimesheetSearchLocationViewModel.geo_address,
+                    formatted_address = timesheetViewModel.TimesheetSearchLocationViewModel.formatted_address,
+                    lat = timesheetViewModel.TimesheetSearchLocationViewModel.lat,
+                    lang = timesheetViewModel.TimesheetSearchLocationViewModel.lang,
+                    street_number = timesheetViewModel.TimesheetSearchLocationViewModel.street_number,
+                    route = timesheetViewModel.TimesheetSearchLocationViewModel.route,
+                    locality = timesheetViewModel.TimesheetSearchLocationViewModel.locality,
+                    administrative_area_level_2 = timesheetViewModel.TimesheetSearchLocationViewModel.administrative_area_level_2,
+                    administrative_area_level_1 = timesheetViewModel.TimesheetSearchLocationViewModel.administrative_area_level_1,
+                    postal_code = timesheetViewModel.TimesheetSearchLocationViewModel.postal_code,
+                    country = timesheetViewModel.TimesheetSearchLocationViewModel.country,
+                    is_deleted = false,
+                    is_office = timesheetViewModel.TimesheetSearchLocationViewModel.is_office,
+                    is_manual = timesheetViewModel.TimesheetSearchLocationViewModel.is_manual,
+                    created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                    createdby = modal.createdby
+                };
+                _unitOfWork.TimesheetLocationRepository.Add(TimesheetLocation);
+            }
+
+            #endregion TimesheetLocation
+        }
+
+        private void AddTimesheetCurrentLocation(TimesheetPostViewModel timesheetViewModel, Timesheet modal)
+        {
+            #region CurrentLocation
+            if (timesheetViewModel.TimesheetCurrentLocationViewModel != null)
+            {
+                var Location = new Location
+                {
+                    id = Guid.NewGuid().ToString(),
+                    groupid = modal.groupid,
+                    geo_address = timesheetViewModel.TimesheetCurrentLocationViewModel.geo_address,
+                    formatted_address = timesheetViewModel.TimesheetCurrentLocationViewModel.formatted_address,
+                    lat = timesheetViewModel.TimesheetCurrentLocationViewModel.lat,
+                    lang = timesheetViewModel.TimesheetCurrentLocationViewModel.lang,
+                    street_number = timesheetViewModel.TimesheetCurrentLocationViewModel.street_number,
+                    route = timesheetViewModel.TimesheetCurrentLocationViewModel.route,
+                    locality = timesheetViewModel.TimesheetCurrentLocationViewModel.locality,
+                    administrative_area_level_2 = timesheetViewModel.TimesheetCurrentLocationViewModel.administrative_area_level_2,
+                    administrative_area_level_1 = timesheetViewModel.TimesheetCurrentLocationViewModel.administrative_area_level_1,
+                    postal_code = timesheetViewModel.TimesheetCurrentLocationViewModel.postal_code,
+                    country = timesheetViewModel.TimesheetCurrentLocationViewModel.country,
+                    is_deleted = false,
+                    is_checkout = false,
+                    created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                    createdby = modal.createdby
+                };
+                _unitOfWork.LocationRepository.Add(Location);
+            }
+            #endregion CurrentLocation
+        }
+
+        #endregion Private
     }
 }
