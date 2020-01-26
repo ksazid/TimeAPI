@@ -55,7 +55,8 @@ namespace TimeAPI.Data
         private IProjectRepository _projectRepository;
         private IProjectStatusRepository _projectStatusRepository;
         private IEntityContactRepository _entityContactRepository;
-        
+        private IProjectActivityRepository _projectActivityRepository;
+
 
         #region systemadmin
         private IPlanRepository _planRepository;
@@ -482,6 +483,16 @@ namespace TimeAPI.Data
         }
 
 
+        public IProjectActivityRepository ProjectActivityRepository
+        {
+            get
+            {
+                return _projectActivityRepository
+                    ?? (_projectActivityRepository = new ProjectActivityRepository(_transaction));
+            }
+        }
+
+
         public bool Commit()
         {
             bool isSuccess = false;
@@ -554,6 +565,7 @@ namespace TimeAPI.Data
             _projectRepository = null;
             _projectStatusRepository = null;
             _entityContactRepository = null;
+            _projectActivityRepository = null;
         }
 
         private void dispose(bool disposing)
