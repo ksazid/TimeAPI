@@ -53,7 +53,9 @@ namespace TimeAPI.Data
         private IEntityLocationRepository _entityLocationRepository;
         private IOrganizationBranchRepository _organizationBranchRepository;
         private IProjectRepository _projectRepository;
-        private IProjectStatusRepository _rojectStatusRepository;
+        private IProjectStatusRepository _projectStatusRepository;
+        private IEntityContactRepository _entityContactRepository;
+        
 
         #region systemadmin
         private IPlanRepository _planRepository;
@@ -465,8 +467,17 @@ namespace TimeAPI.Data
         {
             get
             {
-                return _rojectStatusRepository
-                    ?? (_rojectStatusRepository = new ProjectStatusRepository(_transaction));
+                return _projectStatusRepository
+                    ?? (_projectStatusRepository = new ProjectStatusRepository(_transaction));
+            }
+        }
+
+        public IEntityContactRepository EntityContactRepository
+        {
+            get
+            {
+                return _entityContactRepository
+                    ?? (_entityContactRepository = new EntityContactRepository(_transaction));
             }
         }
 
@@ -541,7 +552,8 @@ namespace TimeAPI.Data
             _organizationBranchRepository = null;
             _taskTeamMembersRepository = null;
             _projectRepository = null;
-            _rojectStatusRepository = null;
+            _projectStatusRepository = null;
+            _entityContactRepository = null;
         }
 
         private void dispose(bool disposing)

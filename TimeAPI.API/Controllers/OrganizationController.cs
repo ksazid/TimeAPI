@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using TimeAPI.API.Filters;
 using TimeAPI.API.Models;
+using TimeAPI.API.Models.EntityLocationViewModels;
 using TimeAPI.API.Models.OrganizationViewModels;
 using TimeAPI.API.Services;
 using TimeAPI.Domain;

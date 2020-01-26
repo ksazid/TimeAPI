@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace TimeAPI.Domain.Entities
+namespace TimeAPI.API.Models.EntityLocationViewModels
 {
-    public class EntityLocation
+    public class EntityLocationViewModel
     {
         public string id { get; set; }
         public string entity_id { get; set; }
@@ -21,8 +22,7 @@ namespace TimeAPI.Domain.Entities
         public string country { get; set; }
         public string created_date { get; set; }
         public string createdby { get; set; }
-        public string modified_date { get; set; }
-        public string modifiedby { get; set; }
-        public bool is_deleted { get; set; }
+    
     }
 }
+    
