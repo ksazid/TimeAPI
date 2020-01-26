@@ -15,8 +15,8 @@ namespace TimeAPI.Data.Repositories
         {
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.project
-                                  (id, user_id, org_id, project_name, project_desc, start_date, end_date, completed_date, project_status, is_private, is_public, created_date, createdby)
-                           VALUES (@id, @user_id, @org_id, @project_name, @project_desc, @start_date, @end_date, @completed_date, @project_status, @is_private, @is_public, @created_date, @createdby);
+                                  (id, user_id, org_id, project_name, project_desc, project_prefix, start_date, end_date, completed_date, project_status, is_private, is_public, created_date, createdby)
+                           VALUES (@id, @user_id, @org_id, @project_name, @project_desc, @project_prefix, @start_date, @end_date, @completed_date, @project_status, @is_private, @is_public, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -47,6 +47,7 @@ namespace TimeAPI.Data.Repositories
                     org_id = @org_id,
                     project_name = @project_name, 
                     project_desc = @project_desc, 
+                    project_prefix = @project_prefix,
                     start_date = @start_date, 
                     end_date = @end_date, 
                     completed_date = @completed_date, 
