@@ -1055,6 +1055,8 @@ namespace TimeAPI.API.Controllers
         }
 
         #endregion IndustryType
+
+
         
     }
 }

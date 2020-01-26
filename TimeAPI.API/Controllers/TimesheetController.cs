@@ -87,8 +87,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-    
-
         [HttpPatch]
         [Route("UpdateTimesheet")]
         public async Task<object> UpdateAddTimesheet([FromBody] TimesheetViewModel timesheetViewModel, CancellationToken cancellationToken)
@@ -853,7 +851,6 @@ namespace TimeAPI.API.Controllers
         }
 
         #endregion TimesheetActivityFile
-
 
         #region Private
         private void AddTimesheetWithTeamMembers(TimesheetPostViewModel timesheetViewModel, Timesheet modal)

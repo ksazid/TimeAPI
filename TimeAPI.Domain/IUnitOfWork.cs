@@ -43,6 +43,8 @@ namespace TimeAPI.Domain
         ILocationRepository LocationRepository { get; }
         IEntityLocationRepository EntityLocationRepository { get; }
         IOrganizationBranchRepository OrganizationBranchRepository { get; }
+        IProjectRepository ProjectRepository { get; }
+        IProjectStatusRepository ProjectStatusRepository { get; }
 
         #region systemadmin
         IPlanRepository PlanRepository { get; }

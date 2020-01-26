@@ -52,10 +52,12 @@ namespace TimeAPI.Data
         private ILocationRepository _locationRepository;
         private IEntityLocationRepository _entityLocationRepository;
         private IOrganizationBranchRepository _organizationBranchRepository;
+        private IProjectRepository _projectRepository;
+        private IProjectStatusRepository _rojectStatusRepository;
 
         #region systemadmin
         private IPlanRepository _planRepository;
-        private IPlanFeatureRepository _planFeatureRepository; 
+        private IPlanFeatureRepository _planFeatureRepository;
         private IPlanPriceRepository _planPriceRepository;
         private ISubscriptionRepository _subscriptionRepository;
         private IBillingRepository _billingRepository;
@@ -450,6 +452,25 @@ namespace TimeAPI.Data
             }
         }
 
+        public IProjectRepository ProjectRepository
+        {
+            get
+            {
+                return _projectRepository
+                    ?? (_projectRepository = new ProjectRepository(_transaction));
+            }
+        }
+
+        public IProjectStatusRepository ProjectStatusRepository
+        {
+            get
+            {
+                return _rojectStatusRepository
+                    ?? (_rojectStatusRepository = new ProjectStatusRepository(_transaction));
+            }
+        }
+
+
         public bool Commit()
         {
             bool isSuccess = false;
@@ -519,6 +540,8 @@ namespace TimeAPI.Data
             _entityLocationRepository = null;
             _organizationBranchRepository = null;
             _taskTeamMembersRepository = null;
+            _projectRepository = null;
+            _rojectStatusRepository = null;
         }
 
         private void dispose(bool disposing)
