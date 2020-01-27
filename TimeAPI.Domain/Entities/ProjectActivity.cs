@@ -12,8 +12,8 @@ namespace TimeAPI.Domain.Entities
         public string activity_desc { get; set; }
         public string unit { get; set; }
         public string qty { get; set; }
-        public string start_time { get; set; }
-        public string end_time { get; set; }
+        public string start_date { get; set; }
+        public string end_date { get; set; }
         public bool is_approve_req { get; set; }
         public string approved_id { get; set; }
         public bool is_approved { get; set; }
