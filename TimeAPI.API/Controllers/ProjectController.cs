@@ -788,6 +788,37 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
+
+        [HttpPatch]
+        [Route("UpdateProjectActivityStatusByActivityID")]
+        public async Task<object> UpdateProjectActivityStatusByActivityID([FromBody] ProjectActivityStatusUpdateViewModel statusingViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (statusingViewModel == null)
+                    throw new ArgumentNullException(nameof(statusingViewModel));
+
+
+                statusingViewModel.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<ProjectActivityViewModel, ProjectActivity>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<ProjectActivity>(statusingViewModel);
+
+                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+
+                _unitOfWork.ProjectActivityRepository.UpdateProjectActivityStatusByActivityID(modal);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "ProjectActivity updated succefully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
         #endregion ProjectActivity
     }
 }

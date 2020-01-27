@@ -12,6 +12,7 @@ namespace TimeAPI.Domain.Repositories
         //IEnumerable<dynamic> FetchAllTeamsByOrgID(string OrgID);
         //IEnumerable<dynamic> FetchAllTeamMembersByTeamID(string key);
         IEnumerable<ProjectActivity> GetProjectActivityByProjectID(string ProjectID);
+        void UpdateProjectActivityStatusByActivityID(ProjectActivity entity);
         //IEnumerable<ProjectActivity> GetProjectActivityByProjectID(string ProjectID);
 
     }

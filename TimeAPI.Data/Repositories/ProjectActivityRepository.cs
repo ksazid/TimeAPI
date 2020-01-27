@@ -15,8 +15,8 @@ namespace TimeAPI.Data.Repositories
         {
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.project_activity
-                                  (id, project_id, activity_name, activity_desc, unit, qty, is_approve_req, approved_id, is_approved, created_date, createdby)
-                           VALUES (@id, @project_id, @activity_name, @activity_desc, @unit, @qty, @is_approve_req, @approved_id, @is_approved, @created_date, @createdby);
+                                  (id, project_id, activity_name, activity_desc, unit, qty, is_approve_req, approved_id, is_approved, status_id, created_date, createdby)
+                           VALUES (@id, @project_id, @activity_name, @activity_desc, @unit, @qty, @is_approve_req, @approved_id, @is_approved, @status_id, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -50,6 +50,8 @@ namespace TimeAPI.Data.Repositories
                     qty = @qty, 
                     is_approve_req = @is_approve_req, 
                     approved_id = @approved_id, 
+                    status_id =@status_id,
+                    modified_date = @modified_date, 
                     modifiedby = @modifiedby
                     WHERE id = @id",
                 param: entity
@@ -69,5 +71,20 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
+
+        public void UpdateProjectActivityStatusByActivityID(ProjectActivity entity)
+        {
+            Execute(
+                sql: @"UPDATE dbo.project_activity
+                   SET 
+                    status_id =@status_id,
+                    modified_date = @modified_date, 
+                    modifiedby = @modifiedby
+                    WHERE project_id = @project_id",
+                param: entity
+            );
+        }
+
+        
     }
 }
