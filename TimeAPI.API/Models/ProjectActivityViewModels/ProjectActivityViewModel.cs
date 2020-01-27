@@ -16,7 +16,7 @@ namespace TimeAPI.API.Models.ProjectActivityViewModels
         public string start_time { get; set; }
         public string end_time { get; set; }
         public bool is_approve_req { get; set; }
-        public bool approved_id { get; set; }
+        public string approved_id { get; set; }
         public bool is_approved { get; set; }
         public string status_id { get; set; }
         public string created_date { get; set; }
