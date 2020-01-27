@@ -661,7 +661,7 @@ namespace TimeAPI.API.Controllroers
                 _unitOfWork.ProjectActivityRepository.Add(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "ProjectActivity registered succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Project Activity registered succefully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -692,7 +692,7 @@ namespace TimeAPI.API.Controllroers
                 _unitOfWork.ProjectActivityRepository.Update(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "ProjectActivity updated succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Project Activity updated succefully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -715,7 +715,7 @@ namespace TimeAPI.API.Controllroers
                 _unitOfWork.ProjectActivityRepository.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "ProjectActivity removed succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Project Activity removed succefully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -812,7 +812,7 @@ namespace TimeAPI.API.Controllroers
                 _unitOfWork.ProjectActivityRepository.UpdateProjectActivityStatusByActivityID(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "ProjectActivity updated succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Project Activity updated succefully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
