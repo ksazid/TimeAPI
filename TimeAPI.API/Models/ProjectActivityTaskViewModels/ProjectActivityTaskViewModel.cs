@@ -19,5 +19,6 @@ namespace TimeAPI.API.Models.TaskViewModels
         public string due_date { get; set; }
         public string createdby { get; set; }
         public bool is_approver { get; set; }
+        public Employees employees { get; set; }
     }
 }
