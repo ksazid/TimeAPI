@@ -121,6 +121,32 @@ namespace TimeAPI.API.Controllers
                 var modal = mapper.Map<Domain.Entities.Tasks>(TaskViewModel);
                 modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
 
+                _unitOfWork.TaskTeamMembersRepository.RemoveByTaskID(modal.id);
+
+                if (TaskViewModel.employees != null)
+                {
+                    foreach (var item in TaskViewModel.employees.empid.Distinct())
+                    {
+
+                        modal.id = Guid.NewGuid().ToString();
+                        modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                        modal.is_deleted = false;
+
+
+                        var TaskTeamMembers = new TaskTeamMember()
+                        {
+                            id = Guid.NewGuid().ToString(),
+                            task_id = modal.id,
+                            empid = item,
+                            createdby = modal.createdby,
+                            created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                            is_deleted = false
+
+                        };
+                        _unitOfWork.TaskTeamMembersRepository.Add(TaskTeamMembers);
+                    }
+                }
+
                 _unitOfWork.TaskRepository.Update(modal);
                 _unitOfWork.Commit();
 

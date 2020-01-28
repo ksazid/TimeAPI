@@ -65,8 +65,15 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        
+        public void RemoveByTaskID(string key)
+        {
+            Execute(
+                sql: @"UPDATE dbo.task_team_members
+                   SET
+                       modified_date = GETDATE(), is_deleted = 1
+                    WHERE task_id = @key",
+                param: new { key }
+            );
+        }
     }
-
-
 }
