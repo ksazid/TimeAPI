@@ -47,6 +47,7 @@ namespace TimeAPI.Domain
         IProjectStatusRepository ProjectStatusRepository { get; }
         IEntityContactRepository EntityContactRepository { get; }
         IProjectActivityRepository ProjectActivityRepository { get; }
+        IProjectActivityTaskRepository ProjectActivityTaskRepository { get; }
 
         #region systemadmin
         IPlanRepository PlanRepository { get; }

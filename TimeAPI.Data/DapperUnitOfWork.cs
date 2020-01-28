@@ -56,6 +56,7 @@ namespace TimeAPI.Data
         private IProjectStatusRepository _projectStatusRepository;
         private IEntityContactRepository _entityContactRepository;
         private IProjectActivityRepository _projectActivityRepository;
+        private IProjectActivityTaskRepository _projectActivityTaskRepository;
 
 
         #region systemadmin
@@ -482,13 +483,21 @@ namespace TimeAPI.Data
             }
         }
 
-
         public IProjectActivityRepository ProjectActivityRepository
         {
             get
             {
                 return _projectActivityRepository
                     ?? (_projectActivityRepository = new ProjectActivityRepository(_transaction));
+            }
+        }
+
+        public IProjectActivityTaskRepository ProjectActivityTaskRepository
+        {
+            get
+            {
+                return _projectActivityTaskRepository
+                    ?? (_projectActivityTaskRepository = new ProjectActivityTaskRepository(_transaction));
             }
         }
 
