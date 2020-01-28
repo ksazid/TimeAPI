@@ -37,9 +37,9 @@ namespace TimeAPI.API.Controllroers
     //[Authorize(Roles = "superadmin")]
     public class ProjectController : Controller
     {
+        private readonly ApplicationSettings _appSettings;
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
-        private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
         public ProjectController(IUnitOfWork unitOfWork, ILogger<ProjectController> logger,
             IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings)
@@ -83,45 +83,23 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
-        [HttpPatch]
-        [Route("UpdateProject")]
-        public async Task<object> UpdateProject([FromBody] ProjectViewModel projectViewModel, CancellationToken cancellationToken)
+        [HttpPost]
+        [Route("FetchAllProjectByOrgID")]
+        public async Task<object> FetchAllProjectByOrgID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (projectViewModel == null)
-                    throw new ArgumentNullException(nameof(projectViewModel));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<ProjectViewModel, Project>());
-                var mapper = config.CreateMapper();
-                var modal = mapper.Map<Project>(projectViewModel);
-                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                oDataTable _oDataTable = new oDataTable();
+                var results = _unitOfWork.ProjectRepository.FetchAllProjectByOrgID(Utils.ID);
+                var xResult = _oDataTable.ToDataTable(results);
 
-                _unitOfWork.ProjectRepository.Update(modal);
-                _unitOfWork.Commit();
-
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Project updated succefully." }).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-            }
-        }
-
-        [HttpGet]
-        [Route("GetAllProject")]
-        public async Task<object> GetAllProject(CancellationToken cancellationToken)
-        {
-            try
-            {
-                if (cancellationToken != null)
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                var result = _unitOfWork.ProjectRepository.All();
-                return await Task.FromResult<object>(result).ConfigureAwait(false);
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -151,6 +129,24 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
+        [HttpGet]
+        [Route("GetAllProject")]
+        public async Task<object> GetAllProject(CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                var result = _unitOfWork.ProjectRepository.All();
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
         [HttpPost]
         [Route("RemoveProjectByID")]
         public async Task<object> RemoveProjectByID([FromBody] Utils Utils, CancellationToken cancellationToken)
@@ -164,6 +160,9 @@ namespace TimeAPI.API.Controllroers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 _unitOfWork.ProjectRepository.Remove(Utils.ID);
+                _unitOfWork.EntityContactRepository.RemoveByEntityID(Utils.ID);
+                _unitOfWork.EntityLocationRepository.RemoveByEntityID(Utils.ID);
+                _unitOfWork.ProjectActivityTaskRepository.RemoveByProjectID(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Project removed succefully." }).ConfigureAwait(false);
@@ -174,6 +173,33 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
+        [HttpPatch]
+        [Route("UpdateProject")]
+        public async Task<object> UpdateProject([FromBody] ProjectViewModel projectViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (projectViewModel == null)
+                    throw new ArgumentNullException(nameof(projectViewModel));
+
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<ProjectViewModel, Project>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<Project>(projectViewModel);
+                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+
+                _unitOfWork.ProjectRepository.Update(modal);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Project updated succefully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
         [HttpPost]
         [Route("UpdateProjectStatusByID")]
         public async Task<object> UpdateProjectStatusByID([FromBody] ProjectStatusModel projectViewModel, CancellationToken cancellationToken)
@@ -204,31 +230,6 @@ namespace TimeAPI.API.Controllroers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
-        [HttpPost]
-        [Route("FetchAllProjectByOrgID")]
-        public async Task<object> FetchAllProjectByOrgID([FromBody] Utils Utils, CancellationToken cancellationToken)
-        {
-            try
-            {
-                if (cancellationToken != null)
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                if (Utils == null)
-                    throw new ArgumentNullException(nameof(Utils.ID));
-
-                oDataTable _oDataTable = new oDataTable();
-                var results = _unitOfWork.ProjectRepository.FetchAllProjectByOrgID(Utils.ID);
-                var xResult = _oDataTable.ToDataTable(results);
-
-                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-            }
-        }
-
         #endregion Projects
 
         #region EntityLocation
@@ -264,27 +265,21 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
-        [HttpPatch]
-        [Route("UpdateEntityLocation")]
-        public async Task<object> UpdateEntityLocation([FromBody] EntityLocationViewModel projectViewModel, CancellationToken cancellationToken)
+        [HttpPost]
+        [Route("FindByEntityLocationID")]
+        public async Task<object> FindByEntityLocationID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (projectViewModel == null)
-                    throw new ArgumentNullException(nameof(projectViewModel));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EntityLocationViewModel, EntityLocation>());
-                var mapper = config.CreateMapper();
-                var modal = mapper.Map<EntityLocation>(projectViewModel);
-                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                var results = _unitOfWork.EntityLocationRepository.Find(Utils.ID);
 
-                _unitOfWork.EntityLocationRepository.Update(modal);
-                _unitOfWork.Commit();
-
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Entity Location updated succefully." }).ConfigureAwait(false);
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(results, Formatting.Indented)).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -303,28 +298,6 @@ namespace TimeAPI.API.Controllroers
 
                 var result = _unitOfWork.EntityLocationRepository.All();
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-            }
-        }
-
-        [HttpPost]
-        [Route("FindByEntityLocationID")]
-        public async Task<object> FindByEntityLocationID([FromBody] Utils Utils, CancellationToken cancellationToken)
-        {
-            try
-            {
-                if (cancellationToken != null)
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                if (Utils == null)
-                    throw new ArgumentNullException(nameof(Utils.ID));
-
-                var results = _unitOfWork.EntityLocationRepository.Find(Utils.ID);
-
-                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(results, Formatting.Indented)).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -355,6 +328,33 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
+        [HttpPatch]
+        [Route("UpdateEntityLocation")]
+        public async Task<object> UpdateEntityLocation([FromBody] EntityLocationViewModel projectViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (projectViewModel == null)
+                    throw new ArgumentNullException(nameof(projectViewModel));
+
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EntityLocationViewModel, EntityLocation>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<EntityLocation>(projectViewModel);
+                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+
+                _unitOfWork.EntityLocationRepository.Update(modal);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Entity Location updated succefully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
         #endregion EntityLocation
 
         #region EntityContact
@@ -390,27 +390,21 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
-        [HttpPatch]
-        [Route("UpdateEntityContact")]
-        public async Task<object> UpdateEntityContact([FromBody] EntityContactViewModel projectViewModel, CancellationToken cancellationToken)
+        [HttpPost]
+        [Route("FindByEntityContactID")]
+        public async Task<object> FindByEntityContactID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (projectViewModel == null)
-                    throw new ArgumentNullException(nameof(projectViewModel));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EntityContactViewModel, EntityContact>());
-                var mapper = config.CreateMapper();
-                var modal = mapper.Map<EntityContact>(projectViewModel);
-                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                var results = _unitOfWork.EntityContactRepository.Find(Utils.ID);
 
-                _unitOfWork.EntityContactRepository.Update(modal);
-                _unitOfWork.Commit();
-
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Entity Location updated succefully." }).ConfigureAwait(false);
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(results, Formatting.Indented)).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -429,28 +423,6 @@ namespace TimeAPI.API.Controllroers
 
                 var result = _unitOfWork.EntityContactRepository.All();
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-            }
-        }
-
-        [HttpPost]
-        [Route("FindByEntityContactID")]
-        public async Task<object> FindByEntityContactID([FromBody] Utils Utils, CancellationToken cancellationToken)
-        {
-            try
-            {
-                if (cancellationToken != null)
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                if (Utils == null)
-                    throw new ArgumentNullException(nameof(Utils.ID));
-
-                var results = _unitOfWork.EntityContactRepository.Find(Utils.ID);
-
-                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(results, Formatting.Indented)).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -481,6 +453,33 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
+        [HttpPatch]
+        [Route("UpdateEntityContact")]
+        public async Task<object> UpdateEntityContact([FromBody] EntityContactViewModel projectViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (projectViewModel == null)
+                    throw new ArgumentNullException(nameof(projectViewModel));
+
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EntityContactViewModel, EntityContact>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<EntityContact>(projectViewModel);
+                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+
+                _unitOfWork.EntityContactRepository.Update(modal);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Entity Location updated succefully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
         #endregion EntityContact
 
         #region ProjectStatus
@@ -509,6 +508,94 @@ namespace TimeAPI.API.Controllroers
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "ProjectStatus registered succefully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("FindByProjectStatusID")]
+        public async Task<object> FindByProjectStatusID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                var result = _unitOfWork.ProjectStatusRepository.Find(Utils.ID);
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("GetAllProjectStatus")]
+        public async Task<object> GetAllProjectStatus(CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                var result = _unitOfWork.ProjectStatusRepository.All();
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("GetProjectStatusByOrgID")]
+        public async Task<object> GetProjectStatusByOrgID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                var result = _unitOfWork.ProjectStatusRepository.GetProjectStatusByOrgID(Utils.ID);
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("RemoveProjectStatus")]
+        public async Task<object> RemoveProjectStatus([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                _unitOfWork.ProjectStatusRepository.Remove(Utils.ID);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "ProjectStatus removed succefully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -546,95 +633,6 @@ namespace TimeAPI.API.Controllroers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
-        [HttpPost]
-        [Route("RemoveProjectStatus")]
-        public async Task<object> RemoveProjectStatus([FromBody] Utils Utils, CancellationToken cancellationToken)
-        {
-            try
-            {
-                if (cancellationToken != null)
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                if (Utils == null)
-                    throw new ArgumentNullException(nameof(Utils.ID));
-
-                _unitOfWork.ProjectStatusRepository.Remove(Utils.ID);
-                _unitOfWork.Commit();
-
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "ProjectStatus removed succefully." }).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-            }
-        }
-
-        [HttpGet]
-        [Route("GetAllProjectStatus")]
-        public async Task<object> GetAllProjectStatus(CancellationToken cancellationToken)
-        {
-            try
-            {
-                if (cancellationToken != null)
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                var result = _unitOfWork.ProjectStatusRepository.All();
-
-                return await Task.FromResult<object>(result).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-            }
-        }
-
-        [HttpPost]
-        [Route("FindByProjectStatusID")]
-        public async Task<object> FindByProjectStatusID([FromBody] Utils Utils, CancellationToken cancellationToken)
-        {
-
-            try
-            {
-                if (cancellationToken != null)
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                if (Utils == null)
-                    throw new ArgumentNullException(nameof(Utils.ID));
-
-                var result = _unitOfWork.ProjectStatusRepository.Find(Utils.ID);
-
-                return await Task.FromResult<object>(result).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-            }
-        }
-
-        [HttpPost]
-        [Route("GetProjectStatusByOrgID")]
-        public async Task<object> GetProjectStatusByOrgID([FromBody] Utils Utils, CancellationToken cancellationToken)
-        {
-
-            try
-            {
-                if (cancellationToken != null)
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                if (Utils == null)
-                    throw new ArgumentNullException(nameof(Utils.ID));
-
-                var result = _unitOfWork.ProjectStatusRepository.GetProjectStatusByOrgID(Utils.ID);
-
-                return await Task.FromResult<object>(result).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-            }
-        }
-
         #endregion ProjectStatus
 
         #region ProjectActivity
@@ -663,6 +661,95 @@ namespace TimeAPI.API.Controllroers
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Project Activity registered succefully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("FindByProjectActivityID")]
+        public async Task<object> FindByProjectActivityID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                var result = _unitOfWork.ProjectActivityRepository.Find(Utils.ID);
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("GetAllProjectActivity")]
+        public async Task<object> GetAllProjectActivity(CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                var result = _unitOfWork.ProjectActivityRepository.All();
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("GetProjectActivityByProjectID")]
+        public async Task<object> GetProjectActivityByProjectID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                var result = _unitOfWork.ProjectActivityRepository.GetProjectActivityByProjectID(Utils.ID);
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("RemoveProjectActivity")]
+        public async Task<object> RemoveProjectActivity([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                _unitOfWork.ProjectActivityRepository.Remove(Utils.ID);
+                _unitOfWork.ProjectActivityTaskRepository.RemoveByProjectActivityID(Utils.ID);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Project Activity Removed succefully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -700,96 +787,6 @@ namespace TimeAPI.API.Controllroers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
-        [HttpPost]
-        [Route("RemoveProjectActivity")]
-        public async Task<object> RemoveProjectActivity([FromBody] Utils Utils, CancellationToken cancellationToken)
-        {
-            try
-            {
-                if (cancellationToken != null)
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                if (Utils == null)
-                    throw new ArgumentNullException(nameof(Utils.ID));
-
-                _unitOfWork.ProjectActivityRepository.Remove(Utils.ID);
-                _unitOfWork.Commit();
-
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Project Activity removed succefully." }).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-            }
-        }
-
-        [HttpGet]
-        [Route("GetAllProjectActivity")]
-        public async Task<object> GetAllProjectActivity(CancellationToken cancellationToken)
-        {
-            try
-            {
-                if (cancellationToken != null)
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                var result = _unitOfWork.ProjectActivityRepository.All();
-
-                return await Task.FromResult<object>(result).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-            }
-        }
-
-        [HttpPost]
-        [Route("FindByProjectActivityID")]
-        public async Task<object> FindByProjectActivityID([FromBody] Utils Utils, CancellationToken cancellationToken)
-        {
-
-            try
-            {
-                if (cancellationToken != null)
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                if (Utils == null)
-                    throw new ArgumentNullException(nameof(Utils.ID));
-
-                var result = _unitOfWork.ProjectActivityRepository.Find(Utils.ID);
-
-                return await Task.FromResult<object>(result).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-            }
-        }
-
-        [HttpPost]
-        [Route("GetProjectActivityByProjectID")]
-        public async Task<object> GetProjectActivityByProjectID([FromBody] Utils Utils, CancellationToken cancellationToken)
-        {
-
-            try
-            {
-                if (cancellationToken != null)
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                if (Utils == null)
-                    throw new ArgumentNullException(nameof(Utils.ID));
-
-                var result = _unitOfWork.ProjectActivityRepository.GetProjectActivityByProjectID(Utils.ID);
-
-                return await Task.FromResult<object>(result).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-            }
-        }
-
-
         [HttpPatch]
         [Route("UpdateProjectActivityStatusByActivityID")]
         public async Task<object> UpdateProjectActivityStatusByActivityID([FromBody] ProjectActivityStatusUpdateViewModel statusingViewModel, CancellationToken cancellationToken)
@@ -822,9 +819,7 @@ namespace TimeAPI.API.Controllroers
         }
         #endregion ProjectActivity
 
-
         #region ProjectActivityTask
-
 
         [HttpPost]
         [Route("AddTask")]
@@ -869,27 +864,41 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
-        [HttpPatch]
-        [Route("UpdateTask")]
-        public async Task<object> UpdateAddTask([FromBody] ProjectActivityTaskViewModel TaskViewModel, CancellationToken cancellationToken)
+        [HttpPost]
+        [Route("FindByTasksId")]
+        public async Task<object> FindByTasksID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (TaskViewModel == null)
-                    throw new ArgumentNullException(nameof(TaskViewModel));
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
 
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<ProjectActivityTaskViewModel, Domain.Entities.Tasks>());
-                var mapper = config.CreateMapper();
-                var modal = mapper.Map<Domain.Entities.Tasks>(TaskViewModel);
-                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                var results = _unitOfWork.TaskRepository.Find(Utils.ID);
 
-                _unitOfWork.TaskRepository.Update(modal);
-                _unitOfWork.Commit();
+                return await System.Threading.Tasks.Task.FromResult<object>(results).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
 
-                return await System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Task updated succefully." }).ConfigureAwait(false);
+        [HttpGet]
+        [Route("GetAllTasks")]
+        public async Task<object> GetAllTasks(CancellationToken cancellationToken)
+        {
+
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                var result = _unitOfWork.TaskRepository.All();
+
+                return await System.Threading.Tasks.Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -921,48 +930,33 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
-        [HttpGet]
-        [Route("GetAllTasks")]
-        public async Task<object> GetAllTasks(CancellationToken cancellationToken)
-        {
-
-            try
-            {
-                if (cancellationToken != null)
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                var result = _unitOfWork.TaskRepository.All();
-
-                return await System.Threading.Tasks.Task.FromResult<object>(result).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                return System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-            }
-        }
-
-        [HttpPost]
-        [Route("FindByTasksId")]
-        public async Task<object> FindByTasksID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        [HttpPatch]
+        [Route("UpdateTask")]
+        public async Task<object> UpdateAddTask([FromBody] ProjectActivityTaskViewModel TaskViewModel, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (Utils == null)
-                    throw new ArgumentNullException(nameof(Utils.ID));
+                if (TaskViewModel == null)
+                    throw new ArgumentNullException(nameof(TaskViewModel));
 
-                var results = _unitOfWork.TaskRepository.Find(Utils.ID);
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<ProjectActivityTaskViewModel, Domain.Entities.Tasks>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<Domain.Entities.Tasks>(TaskViewModel);
+                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
 
-                return await System.Threading.Tasks.Task.FromResult<object>(results).ConfigureAwait(false);
+                _unitOfWork.TaskRepository.Update(modal);
+                _unitOfWork.Commit();
+
+                return await System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Task updated succefully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 return System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
         #endregion ProjectActivityTask
     }
 }

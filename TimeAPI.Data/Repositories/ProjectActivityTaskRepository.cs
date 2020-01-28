@@ -52,10 +52,33 @@ namespace TimeAPI.Data.Repositories
                 param: entity
             );
         }
+
         public IEnumerable<ProjectActivityTask> All()
         {
             return Query<ProjectActivityTask>(
                 sql: "SELECT * FROM [dbo].[project_activity_x_task] where is_deleted = 0"
+            );
+        }
+
+        public void RemoveByProjectActivityID(string key)
+        {
+            Execute(
+                sql: @"UPDATE dbo.project_activity_x_task
+                   SET
+                       modified_date = GETDATE(), is_deleted = 1
+                    WHERE activity_id = @key",
+                param: new { key }
+            );
+        }
+
+        public void RemoveByProjectID(string key)
+        {
+            Execute(
+                sql: @"UPDATE dbo.project_activity_x_task
+                   SET
+                       modified_date = GETDATE(), is_deleted = 1
+                    WHERE project_id = @key",
+                param: new { key }
             );
         }
     }

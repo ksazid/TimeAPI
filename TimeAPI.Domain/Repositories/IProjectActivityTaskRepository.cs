@@ -7,13 +7,9 @@ namespace TimeAPI.Domain.Repositories
 {
     public interface IProjectActivityTaskRepository : IRepository<ProjectActivityTask, string>
     {
-        //IEnumerable<Team> FindTeamsByOrgID(string OrgID);
-        //dynamic FindByTeamID(string TeamID);
-        //IEnumerable<dynamic> FetchAllTeamsByOrgID(string OrgID);
-        //IEnumerable<dynamic> FetchAllTeamMembersByTeamID(string key);
-        //IEnumerable<ProjectActivity> GetProjectActivityByProjectID(string ProjectID);
-        //void UpdateProjectActivityStatusByActivityID(ProjectActivity entity);
-        //IEnumerable<ProjectActivity> GetProjectActivityByProjectID(string ProjectID);
+        void RemoveByProjectActivityID(string ProjectActivityID);
+        void RemoveByProjectID(string ProjectID);
 
+        
     }
 }

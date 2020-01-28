@@ -59,5 +59,16 @@ namespace TimeAPI.Data.Repositories
                 sql: "SELECT * FROM [dbo].[entity_contact] where is_deleted = 0"
             );
         }
+
+        public void RemoveByEntityID(string key)
+        {
+            Execute(
+                sql: @"UPDATE entity_contact
+                   SET
+                       modified_date = GETDATE(), is_deleted = 1
+                    WHERE entity_id = @key",
+                param: new { key }
+            );
+        }
     }
 }

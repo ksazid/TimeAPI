@@ -39,7 +39,7 @@ namespace TimeAPI.Data.Repositories
                 sql: @"UPDATE dbo.entity_location
                    SET
                        modified_date = GETDATE(), is_deleted = 1
-                    WHERE entity_id = @key",
+                    WHERE id = @key",
                 param: new { key }
             );
         } 
@@ -74,6 +74,18 @@ namespace TimeAPI.Data.Repositories
             );
 
         }
+        public void RemoveByEntityID(string key)
+        {
+            Execute(
+                sql: @"UPDATE dbo.entity_location
+                   SET
+                       modified_date = GETDATE(), is_deleted = 1
+                    WHERE entity_id = @key",
+                param: new { key }
+            );
+        }
+
+
 
     }
 }
