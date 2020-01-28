@@ -14,7 +14,7 @@ namespace TimeAPI.Data.Repositories
         public void Add(ProjectActivityTask entity)
         {
             entity.id = ExecuteScalar<string>(
-                    sql: @"INSERT INTO dbo.project_activity_x_task_x_task
+                    sql: @"INSERT INTO dbo.project_activity_x_task
                                   (id, project_id, activity_id, task_id, created_date, createdby)
                            VALUES (@id, @project_id, @activity_id, @task_id, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
