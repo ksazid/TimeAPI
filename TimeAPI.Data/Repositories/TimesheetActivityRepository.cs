@@ -93,16 +93,15 @@ namespace TimeAPI.Data.Repositories
             return Query<dynamic>(
                 sql: @"SELECT TOP 10 
                         timesheet_activity.id, 
-                        task.task_name, 
-                        timesheet_activity.task_name AS subtask_name, 
+                        timesheet_activity.task_name AS task_name, 
                         FORMAT(CAST(timesheet_activity.start_time AS DATETIME2), N'hh:mm tt') AS start_time, 
                         FORMAT(CAST(timesheet_activity.end_time AS DATETIME2), N'hh:mm tt') AS end_time, 
                         timesheet_activity.total_hrs,
                         timesheet_activity.is_billable,
-                        FORMAT( timesheet_activity.ondate, 'dd/MM/yyyy', 'en-US' ) AS ondate
+                        FORMAT(timesheet_activity.ondate, 'dd/MM/yyyy', 'en-US') AS ondate
                 FROM 
                     [dbo].[timesheet_activity] WITH (NOLOCK)
-                        INNER JOIN task on timesheet_activity.task_id = task.id
+                    INNER JOIN task on timesheet_activity.task_id = task.id
                     WHERE task.id = @TaskID
                     ORDER BY timesheet_activity.ondate DESC",
                 param: new { TaskID }
