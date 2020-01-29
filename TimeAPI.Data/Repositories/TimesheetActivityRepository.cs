@@ -16,8 +16,8 @@ namespace TimeAPI.Data.Repositories
 
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.timesheet_activity
-                                  (id, groupid, task_id, subtask_id, remarks, ondate, start_time, end_time, is_billable, created_date, createdby)
-                           VALUES (@id, @groupid, @task_id, @subtask_id, @remarks, @ondate, @start_time, @end_time, @is_billable, @created_date, @createdby);
+                                  (id, groupid, task_id, task_name, remarks, ondate, start_time, end_time, is_billable, created_date, createdby)
+                           VALUES (@id, @groupid, @task_id, @task_name, @remarks, @ondate, @start_time, @end_time, @is_billable, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -68,7 +68,7 @@ namespace TimeAPI.Data.Repositories
                    SET 
                     groupid = @groupid, 
                     task_id = @task_id, 
-                    subtask_id = @subtask_id, 
+                    task_name = @task_name, 
                     remarks = @remarks, 
                     ondate = @ondate, 
                     start_time = @start_time, 
@@ -94,7 +94,7 @@ namespace TimeAPI.Data.Repositories
                 sql: @"SELECT TOP 10 
                         timesheet_activity.id, 
                         task.task_name, 
-                        timesheet_activity.subtask_id AS subtask_name, 
+                        timesheet_activity.task_name AS subtask_name, 
                         FORMAT(CAST(timesheet_activity.start_time AS DATETIME2), N'hh:mm tt') AS start_time, 
                         FORMAT(CAST(timesheet_activity.end_time AS DATETIME2), N'hh:mm tt') AS end_time, 
                         timesheet_activity.total_hrs,

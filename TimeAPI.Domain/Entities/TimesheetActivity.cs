@@ -9,7 +9,7 @@ namespace TimeAPI.Domain.Entities
         public string id { get; set; } 
         public string groupid { get; set; }
         public string task_id { get; set; }
-        public string subtask_id { get; set; }
+        public string task_name { get; set; }
         public string remarks { get; set; }
         public string ondate { get; set; }
         public string start_time { get; set; }

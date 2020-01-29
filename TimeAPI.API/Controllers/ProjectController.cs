@@ -1008,7 +1008,6 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
-
         [HttpPost]
         [Route("GetAllTaskByActivityID")]
         public async Task<object> GetAllTaskByActivityID([FromBody] Utils Utils, CancellationToken cancellationToken)
