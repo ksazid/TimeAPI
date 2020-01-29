@@ -221,10 +221,13 @@ namespace TimeAPI.Data.Repositories
         {
             var TimesheetAdministrativeDataModel = QuerySingleOrDefault<TimesheetProjectCategoryDataModel>(
                 sql: @"SELECT 
-                        timesheet_x_project_category.id, timesheet_x_project_category.groupid,  
-                        timesheet_x_project_category.project_category_id as project_name,
-                        timesheet_x_project_category.project_or_comp_id as system_name 
-                    FROM timesheet_x_project_category WITH (NOLOCK)
+                        timesheet_x_project_category.id as category_id, 
+                        timesheet_x_project_category.groupid as groupid,  
+                        timesheet_x_project_category.project_category_type as project_type,
+                        timesheet_x_project_category.project_or_comp_id as project_or_comp_id,
+                        timesheet_x_project_category.project_or_comp_name as project_or_comp_name,
+                        timesheet_x_project_category.project_or_comp_type as project_or_comp_type
+                        FROM timesheet_x_project_category WITH (NOLOCK)
                     WHERE timesheet_x_project_category.groupid = @GroupID;",
                 param: new { GroupID }
             );

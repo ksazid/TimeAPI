@@ -158,8 +158,10 @@ namespace TimeAPI.API.Controllers
                         id = Guid.NewGuid().ToString(),
                         //timesheet_id = modal.id,
                         groupid = modal.groupid,
-                        project_category_id = timesheetViewModel.TimesheetCategoryViewModel.project_category_id,
+                        project_category_type = timesheetViewModel.TimesheetCategoryViewModel.project_category_type,
                         project_or_comp_id = timesheetViewModel.TimesheetCategoryViewModel.project_or_comp_id,
+                        project_or_comp_name = timesheetViewModel.TimesheetCategoryViewModel.project_or_comp_name,
+                        project_or_comp_type = timesheetViewModel.TimesheetCategoryViewModel.project_or_comp_type,
                         is_deleted = false,
                         modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
                         modifiedby = modal.createdby
@@ -913,8 +915,10 @@ namespace TimeAPI.API.Controllers
                     id = Guid.NewGuid().ToString(),
                     //timesheet_id = modal.id,
                     groupid = modal.groupid,
-                    project_category_id = timesheetViewModel.TimesheetCategoryViewModel.project_category_id,
+                    project_category_type = timesheetViewModel.TimesheetCategoryViewModel.project_category_type,
                     project_or_comp_id = timesheetViewModel.TimesheetCategoryViewModel.project_or_comp_id,
+                    project_or_comp_name = timesheetViewModel.TimesheetCategoryViewModel.project_or_comp_name,
+                    project_or_comp_type = timesheetViewModel.TimesheetCategoryViewModel.project_or_comp_type,
                     is_deleted = false,
                     created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
                     createdby = modal.createdby

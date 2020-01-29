@@ -48,8 +48,10 @@ namespace TimeAPI.API.Models.TimesheetViewModels
 
     public class TimesheetCategoryViewModel
     {
-        public string project_category_id { get; set; }
+        public string project_category_type { get; set; }
         public string project_or_comp_id { get; set; }
+        public string project_or_comp_name { get; set; }
+        public string project_or_comp_type { get; set; }
     }
 
     public class TimesheetSearchLocationViewModel
