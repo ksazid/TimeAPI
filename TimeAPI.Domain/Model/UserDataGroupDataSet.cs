@@ -47,10 +47,12 @@ namespace TimeAPI.Domain.Model
 
     public class TimesheetProjectCategoryDataModel
     {
-        public string id { get; set; }
+        public string category_id { get; set; }
         public string groupid { get; set; }
-        public string project_name { get; set; }
-        public string system_name { get; set; }
+        public string project_type { get; set; }
+        public string project_or_comp_id { get; set; }
+        public string project_or_comp_name { get; set; }
+        public string project_or_comp_type { get; set; }
     }
 
     public class TimesheetAdministrativeDataModel
