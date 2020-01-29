@@ -20,7 +20,7 @@ namespace TimeAPI.Data.Repositories
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
-        }   
+        }
         public ProjectActivityTask Find(string key)
         {
             return QuerySingleOrDefault<ProjectActivityTask>(
@@ -80,6 +80,22 @@ namespace TimeAPI.Data.Repositories
                     WHERE project_id = @key",
                 param: new { key }
             );
+        }
+
+
+        public IEnumerable<dynamic> GetAllTaskByActivityID(string key)
+        {
+            return Query<dynamic>(
+                   sql: @"SELECT 
+                            dbo.task.id, 
+                            dbo.task.task_desc  
+                        FROM dbo.task WITH(NOLOCK)
+                        INNER JOIN  dbo.project_activity_x_task on task.id = dbo.project_activity_x_task.task_id
+                        WHERE dbo.project_activity_x_task.activity_id = @key
+                        AND dbo.task.is_deleted = 0
+                        ORDER BY dbo.task.task_name DESC",
+                      param: new { key }
+               );
         }
     }
 }
