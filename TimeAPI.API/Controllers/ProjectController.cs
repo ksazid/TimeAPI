@@ -69,6 +69,12 @@ namespace TimeAPI.API.Controllroers
                 var modal = mapper.Map<Project>(projectViewModel);
 
                 modal.id = Guid.NewGuid().ToString();
+
+                modal.project_status_id = _unitOfWork.ProjectStatusRepository.GetProjectStatusByOrgID("")
+                                            .Where(s => s.project_status_name.Equals("Active"))
+                                            .Select(s => s.id)
+                                            .FirstOrDefault();
+
                 modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
                 modal.is_deleted = false;
 
@@ -838,6 +844,10 @@ namespace TimeAPI.API.Controllroers
                 var modal = mapper.Map<Domain.Entities.Tasks>(TaskViewModel);
 
                 modal.id = Guid.NewGuid().ToString();
+                modal.status_id = _unitOfWork.StatusRepository.GetStatusByOrgID("")
+                            .Where(s => s.status_name.Equals("Open"))
+                            .Select(s => s.id)
+                            .FirstOrDefault();
                 modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
                 modal.is_deleted = false;
 

@@ -36,7 +36,7 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<Priority> GetPriorityByOrgID(string key)
         {
             return Query<Priority>(
-                sql: "SELECT * FROM [dbo].[priority] WHERE org_id = @key and is_deleted = 0",
+                sql: "SELECT * FROM [dbo].[priority] WHERE org_id is null AND org_id= @key OR is_deleted = 0",
                 param: new { key }
             );
         }
