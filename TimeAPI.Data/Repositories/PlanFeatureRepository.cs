@@ -64,5 +64,20 @@ namespace TimeAPI.Data.Repositories
                 sql: "SELECT * FROM dbo.saas_plan_features where is_deleted = 0"
             );
         }
+
+        public dynamic GetAllPlanFeatures()
+        {
+            return Query<dynamic>(
+                   sql: @"SELECT 
+		                    saas_plan_features.id, 
+		                    dbo.saas_plan.plan_name, 
+		                    saas_plan_features.feature_name, 
+		                    saas_plan_features.feature_desc,
+		                    saas_plan_features.is_active
+                      FROM dbo.saas_plan_features WITH(NOLOCK)
+                      INNER JOIN dbo.saas_plan on dbo.saas_plan_features.plan_id = dbo.saas_plan.id
+                      WHERE dbo.saas_plan_features.is_deleted = 0"
+               );
+        }
     }
 }

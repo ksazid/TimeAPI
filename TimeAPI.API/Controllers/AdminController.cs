@@ -25,6 +25,7 @@ using TimeAPI.API.Models.PlanViewModels;
 using TimeAPI.API.Models.PlanFeatureViewModels;
 using TimeAPI.API.Models.PlanPriceViewModels;
 using TimeAPI.API.Models.BillingViewModels;
+using Newtonsoft.Json;
 
 namespace TimeAPI.API.Controllers
 {
@@ -305,6 +306,26 @@ namespace TimeAPI.API.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("FetchAllPlanFeatures")]
+        public async Task<object> FetchAllPlanFeatures(CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                oDataTable _oDataTable = new oDataTable();
+                var results = _unitOfWork.PlanFeatureRepository.GetAllPlanFeatures();
+                var xResult = _oDataTable.ToDataTable(results);
+
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
 
         #endregion PlanFeature
 
@@ -435,6 +456,27 @@ namespace TimeAPI.API.Controllers
             }
         }
 
+
+        [HttpGet]
+        [Route("FetchAllPlanPrice")]
+        public async Task<object> FetchAllPlanPrice(CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                oDataTable _oDataTable = new oDataTable();
+                var results = _unitOfWork.PlanPriceRepository.GetAllPlanPrice();
+                var xResult = _oDataTable.ToDataTable(results);
+
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
         #endregion PlanPrice
 
         #region subscription
@@ -541,7 +583,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        
+
         [HttpPost]
         [Route("FindBySubscriptionID")]
         public async Task<object> FindBySubscriptionID([FromBody] Utils Utils, CancellationToken cancellationToken)
@@ -597,10 +639,9 @@ namespace TimeAPI.API.Controllers
         //        if (cancellationToken != null)
         //            cancellationToken.ThrowIfCancellationRequested();
 
-        //        if (Utils == null)
-        //            throw new ArgumentNullException(nameof(Utils.ID));
+        // if (Utils == null) throw new ArgumentNullException(nameof(Utils.ID));
 
-        //        var result = _unitOfWork.SubscriptionRepository.FindByApiKeyOrgID(Utils.ID);
+        // var result = _unitOfWork.SubscriptionRepository.FindByApiKeyOrgID(Utils.ID);
 
         //        return await Task.FromResult<object>(result).ConfigureAwait(false);
         //    }

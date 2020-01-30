@@ -65,5 +65,20 @@ namespace TimeAPI.Data.Repositories
                 sql: "SELECT * FROM dbo.saas_plan_price where is_deleted = 0"
             );
         }
+
+        public dynamic GetAllPlanPrice()
+        {
+            return Query<dynamic>(
+                   sql: @"SELECT 
+		                    dbo.saas_plan_price.id, 
+		                    dbo.saas_plan.plan_name, 
+		                    dbo.saas_plan_price.price_amount, 
+		                    dbo.saas_plan_price.billing_cycle,
+		                    dbo.saas_plan_price.is_active
+                      FROM dbo.saas_plan_price WITH(NOLOCK)
+                      INNER JOIN dbo.saas_plan on dbo.saas_plan_price.plan_id = dbo.saas_plan.id
+                      WHERE dbo.saas_plan_price.is_deleted = 0"
+               );
+        }
     }
 }

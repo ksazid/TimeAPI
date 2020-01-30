@@ -7,6 +7,6 @@ namespace TimeAPI.Domain.Repositories
 {
     public interface IPlanFeatureRepository : IRepository<PlanFeature, string>
     {
-
+        dynamic GetAllPlanFeatures();
     }
 }

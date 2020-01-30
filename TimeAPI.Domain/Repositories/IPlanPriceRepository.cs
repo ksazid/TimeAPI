@@ -7,6 +7,6 @@ namespace TimeAPI.Domain.Repositories
 {
     public interface IPlanPriceRepository : IRepository<PlanPrice, string>
     {
-
+        dynamic GetAllPlanPrice();
     }
 }
