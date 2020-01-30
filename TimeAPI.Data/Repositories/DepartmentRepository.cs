@@ -147,7 +147,17 @@ namespace TimeAPI.Data.Repositories
                                 department.alias
                             FROM department WITH (NOLOCK)
                             LEFT JOIN employee on department.depart_lead_empid = employee.id
-                            WHERE department.org_id = @key AND department.is_deleted = 0
+							UNION ALL
+							SELECT 
+                                department.id as department_id,
+                                department.dep_name,
+	                            employee.id as employee_id,
+                                employee.full_name as lead_name,
+                                employee.workemail,
+                                department.alias
+                            FROM department WITH (NOLOCK)
+                            LEFT JOIN employee on department.depart_lead_empid = employee.id
+                            WHERE department.org_id =@key AND department.is_deleted = 0
                             ORDER BY department.dep_name ASC",
                       param: new { key }
                );
@@ -171,8 +181,6 @@ namespace TimeAPI.Data.Repositories
                 param: new { DepID }
             );
         }
-
-        
 
     }
 }
