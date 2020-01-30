@@ -1,31 +1,20 @@
-﻿using TimeAPI.API.Models.AccountViewModels;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
+using System.Globalization;
+using System.Threading;
 using System.Threading.Tasks;
 using TimeAPI.API.Models;
-using TimeAPI.API.Services;
-using Microsoft.AspNetCore.Cors;
-using TimeAPI.API.Filters;
-using TimeAPI.Domain;
-using TimeAPI.API.Models.OrganizationViewModels;
+using TimeAPI.API.Models.BillingViewModels;
 using TimeAPI.API.Models.OrganizationViewModel;
-using System.Threading;
-using TimeAPI.Domain.Entities;
-using System.Globalization;
-using TimeAPI.API.Models.PlanViewModels;
 using TimeAPI.API.Models.PlanFeatureViewModels;
 using TimeAPI.API.Models.PlanPriceViewModels;
-using TimeAPI.API.Models.BillingViewModels;
-using Newtonsoft.Json;
+using TimeAPI.API.Models.PlanViewModels;
+using TimeAPI.API.Services;
+using TimeAPI.Domain;
+using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.API.Controllers
 {
@@ -47,7 +36,6 @@ namespace TimeAPI.API.Controllers
             _appSettings = AppSettings.Value;
             _unitOfWork = unitOfWork;
         }
-
 
         #region Plan
 
@@ -479,7 +467,7 @@ namespace TimeAPI.API.Controllers
         }
         #endregion PlanPrice
 
-        #region subscription
+        #region Subscription
 
         [HttpPost]
         [Route("AddSubscription")]
@@ -630,30 +618,11 @@ namespace TimeAPI.API.Controllers
         }
 
 
-        //[HttpPost]
-        //[Route("FindByApiKeyOrgID")]
-        //public async Task<object> FindByApiKeyOrgID([FromBody] Utils Utils, CancellationToken cancellationToken)
-        //{
-        //    try
-        //    {
-        //        if (cancellationToken != null)
-        //            cancellationToken.ThrowIfCancellationRequested();
 
-        // if (Utils == null) throw new ArgumentNullException(nameof(Utils.ID));
 
-        // var result = _unitOfWork.SubscriptionRepository.FindByApiKeyOrgID(Utils.ID);
+        #endregion Subscription
 
-        //        return await Task.FromResult<object>(result).ConfigureAwait(false);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-        //    }
-        //}
-
-        #endregion subscription
-
-        #region billing
+        #region Billing
 
         [HttpPost]
         [Route("AddBilling")]
@@ -757,7 +726,27 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        #endregion billing
+        #endregion Billing
 
+        //[HttpPost]
+        //[Route("FindByApiKeyOrgID")]
+        //public async Task<object> FindByApiKeyOrgID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        //{
+        //    try
+        //    {
+        //        if (cancellationToken != null)
+        //            cancellationToken.ThrowIfCancellationRequested();
+
+        // if (Utils == null) throw new ArgumentNullException(nameof(Utils.ID));
+
+        // var result = _unitOfWork.SubscriptionRepository.FindByApiKeyOrgID(Utils.ID);
+
+        //        return await Task.FromResult<object>(result).ConfigureAwait(false);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+        //    }
+        //}
     }
 }

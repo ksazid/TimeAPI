@@ -62,9 +62,8 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<IndustryType> All()
         {
             return Query<IndustryType>(
-                sql: "SELECT * FROM [dbo].[industry_type] where is_deleted = 0"
+                sql: "SELECT * FROM [dbo].[industry_type] WHERE is_deleted = 0 ORDER BY created_date ASC"
             );
         }
-
     }
 }
