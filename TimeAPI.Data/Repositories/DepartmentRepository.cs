@@ -147,6 +147,7 @@ namespace TimeAPI.Data.Repositories
                                 department.alias
                             FROM department WITH (NOLOCK)
                             LEFT JOIN employee on department.depart_lead_empid = employee.id
+                            WHERE department.is_deleted = 0
 							UNION ALL
 							SELECT 
                                 department.id as department_id,

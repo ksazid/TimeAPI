@@ -62,7 +62,11 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<ProjectStatus> GetProjectStatusByOrgID(string key)
         {
             return Query<ProjectStatus>(
-                sql: "SELECT * FROM dbo.project_status WHERE is_deleted = 0 and org_id = @key",
+                sql: @"SELECT * FROM [dbo].[project_status] 
+                        WHERE is_deleted = 0 AND org_id IS NULL
+                        UNION ALL
+                      SELECT * FROM[dbo].[project_status]
+                        WHERE is_deleted = 0 and org_id = @key",
                 param: new { key }
             );
         }
