@@ -62,7 +62,7 @@ namespace TimeAPI.API.Models
             }
             return dt;
         }
-     
+
     }
 
 
@@ -85,4 +85,27 @@ namespace TimeAPI.API.Models
         public string PhoneNumber { get; set; }
     }
 
+
+
+    public class UtilDepartmentChecked
+    {
+        public string org_id { get; set; }
+        public string createdby { get; set; }
+        public bool is_accounts { get; set; }
+        public bool is_administrative { get; set; }
+        public bool is_advertisement_marketing { get; set; }
+        public bool is_construction { get; set; }
+        public bool is_customer_service { get; set; }
+        public bool is_design { get; set; }
+        public bool is_engineering { get; set; }
+        public bool is_facilities { get; set; }
+        public bool is_finance { get; set; }
+        public bool is_human_resources { get; set; }
+        public bool is_it_and_development { get; set; }
+        public bool is_legal { get; set; }
+        public bool is_logistics { get; set; }
+        public bool is_operation_and_production { get; set; }
+        public bool is_real_estate { get; set; }
+        public bool is_sales { get; set; }
+    }
 }
