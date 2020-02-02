@@ -7,7 +7,6 @@ namespace TimeAPI.Data.Repositories
 {
     public class DesignationRepository : RepositoryBase, IDesignationRepositiory
     {
-
         public DesignationRepository(IDbTransaction transaction) : base(transaction)
         { }
 
@@ -101,15 +100,6 @@ namespace TimeAPI.Data.Repositories
         {
             return Query<dynamic>(
                    sql: @"SELECT 
-	                        designation.id,
-	                        department.dep_name,
-	                        designation.designation_name,
-	                        designation.alias
-                        FROM designation WITH (NOLOCK)
-                        INNER JOIN department on designation.dep_id = department.id
-                        WHERE designation.is_deleted = 0
-                        UNION ALL
-                        SELECT 
 	                        designation.id,
 	                        designation.alias,
 	                        department.dep_name,
