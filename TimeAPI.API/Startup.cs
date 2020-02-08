@@ -39,6 +39,8 @@ namespace TimeAPI.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            services.AddHealthChecks();
             ////Cross Platform Enabled
             services.AddCors(options =>
             {
@@ -63,7 +65,7 @@ namespace TimeAPI.API
             });
 
             services.AddAuthentication();
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+            //services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
             services.AddMvc().AddNewtonsoftJson(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
 
             services.AddControllers().AddNewtonsoftJson();
@@ -163,10 +165,16 @@ namespace TimeAPI.API
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapHealthChecks("/health");
+            });
+
+            app.UseEndpoints(endpoints =>
+            {
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             }).UseAuthorization();
+
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>

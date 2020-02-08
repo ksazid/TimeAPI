@@ -283,6 +283,25 @@ namespace TimeAPI.API.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("GetAllPreDefinedDepartment")]
+        public async Task<object> GetAllPreDefinedDepartment(CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                var result = PreDefined.GetDepartment();
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
 
         #region SetUp 
 
