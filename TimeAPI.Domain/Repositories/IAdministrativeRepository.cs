@@ -7,6 +7,6 @@ namespace TimeAPI.Domain.Repositories
 {
     public interface IAdministrativeRepository : IRepository<Administrative, string>
     {
-        public IEnumerable<Administrative> GetByOrgID(string OrgID);
+        dynamic GetByOrgID(string OrgID);
     }
 }

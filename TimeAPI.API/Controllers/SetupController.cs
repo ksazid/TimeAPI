@@ -28,6 +28,7 @@ using TimeAPI.API.Models.EmployeeStatusViewModels;
 using TimeAPI.API.Models.EmployeeRoleViewModels;
 using System.Globalization;
 using TimeAPI.API.Models.AdministrativeViewModels;
+using Newtonsoft.Json;
 
 namespace TimeAPI.API.Controllers
 {
@@ -300,9 +301,13 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.AdministrativeRepository.GetByOrgID(Utils.ID);
+                oDataTable _oDataTable = new oDataTable();
+                var results = _unitOfWork.AdministrativeRepository.GetByOrgID(Utils.ID);
+                var xResult = _oDataTable.ToDataTable(results);
 
-                return await Task.FromResult<object>(result).ConfigureAwait(false);
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
+
+
             }
             catch (Exception ex)
             {
