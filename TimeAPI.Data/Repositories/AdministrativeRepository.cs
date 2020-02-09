@@ -40,7 +40,6 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-
         public RootObject GetByOrgID(string key)
         {
             RootObject rootObject = new RootObject();
@@ -57,10 +56,10 @@ namespace TimeAPI.Data.Repositories
             foreach (var item in dep)
             {
                 RootDepartmentObject rootDepartmentObject = new RootDepartmentObject();
-                List<Administrative> administrativesList = new List<Administrative>();
+                List<AdministrativeDropDown> administrativesList = new List<AdministrativeDropDown>();
                 rootDepartmentObject.id = item.id;
                 rootDepartmentObject.dept_name = item.dep_name;
-                var result = GetDepartmentObject(item.id) as List<Administrative>;
+                var result = GetDepartmentObject(item.id) as List<AdministrativeDropDown>;
 
                 if (result.Count > 0)
                     administrativesList.AddRange(result);
@@ -85,13 +84,12 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        private IEnumerable<Administrative> GetDepartmentObject(string key)
+        private IEnumerable<AdministrativeDropDown> GetDepartmentObject(string key)
         {
-            return Query<Administrative>(
+            return Query<AdministrativeDropDown>(
               sql: @"SELECT 
-                    id, org_id, dept_id, administrative_name,
-                    summary, created_date, createdby, 
-                    modified_date , modifiedby, is_deleted
+                    id, 
+                    administrative_name as text
             FROM[dbo].[administrative]
                 WHERE[dbo].[administrative].is_deleted = 0
                 AND[dbo].[administrative].dept_id = @key

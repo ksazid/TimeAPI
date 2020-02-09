@@ -27,8 +27,13 @@ namespace TimeAPI.Domain.Entities
     {
         public string id { get; set; }
         public string dept_name { get; set; }
-        public List<Administrative> administratives { get; set; }
+        public List<AdministrativeDropDown> administratives { get; set; }
     }
 
 
+    public class AdministrativeDropDown
+    {
+        public string id { get; set; }
+        public string text { get; set; }
+    }
 }
