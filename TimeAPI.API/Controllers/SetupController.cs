@@ -301,13 +301,8 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                oDataTable _oDataTable = new oDataTable();
                 var results = _unitOfWork.AdministrativeRepository.GetByOrgID(Utils.ID);
-                var xResult = _oDataTable.ToDataTable(results);
-
-                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
-
-
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(results, Formatting.Indented)).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

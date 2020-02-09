@@ -41,24 +41,37 @@ namespace TimeAPI.Data.Repositories
         }
 
 
-        public dynamic GetByOrgID(string key)
+        public RootObject GetByOrgID(string key)
         {
-            return Query<dynamic>(
-                   sql: @"SELECT 
-                            department.id as department_id,
-                            department.dep_name as dep_name,
-                            administrative.administrative_name as administrative_name,
-                            administrative.summary as summary
-                            FROM [dbo].[administrative] 
-                            INNER JOIN [dbo].[department] on [dbo].[administrative].dept_id = [dbo].[department].id
-                            WHERE  [dbo].[administrative].is_deleted = 0 
-                            AND [dbo].[administrative].org_id = @key
-                            ORDER BY [dbo].[administrative].administrative_name ASC",
-                      param: new { key }
+            RootObject rootObject = new RootObject();
+            List<RootDepartmentObject> rootDepartmentObjectsList = new List<RootDepartmentObject>();
+
+            var dep = Query<Department>(
+                   sql: @"SELECT DISTINCT(department.id),
+                        department.dep_name 
+                            FROM [dbo].[department] WHERE is_deleted = 0 
+                            AND org_id =@key",
+                    param: new { key }
                );
+
+            foreach (var item in dep)
+            {
+                RootDepartmentObject rootDepartmentObject = new RootDepartmentObject();
+                List<Administrative> administrativesList = new List<Administrative>();
+                rootDepartmentObject.id = item.id;
+                rootDepartmentObject.dept_name = item.dep_name;
+                var result = GetDepartmentObject(item.id) as List<Administrative>;
+
+                if (result.Count > 0)
+                    administrativesList.AddRange(result);
+
+                rootDepartmentObject.administratives = administrativesList;
+                rootDepartmentObjectsList.Add(rootDepartmentObject);
+                rootObject.rootDepartmentObjects = (rootDepartmentObjectsList);
+            }
+
+            return rootObject;
         }
-
-
 
 
         public void Remove(string key)
@@ -70,6 +83,21 @@ namespace TimeAPI.Data.Repositories
                     WHERE id = @key",
                 param: new { key }
             );
+        }
+
+        private IEnumerable<Administrative> GetDepartmentObject(string key)
+        {
+            return Query<Administrative>(
+              sql: @"SELECT 
+                    id, org_id, dept_id, administrative_name,
+                    summary, created_date, createdby, 
+                    modified_date , modifiedby, is_deleted
+            FROM[dbo].[administrative]
+                WHERE[dbo].[administrative].is_deleted = 0
+                AND[dbo].[administrative].dept_id = @key
+                ORDER BY[dbo].[administrative].administrative_name ASC",
+              param: new { key }
+          );
         }
 
         public void Update(Administrative entity)
