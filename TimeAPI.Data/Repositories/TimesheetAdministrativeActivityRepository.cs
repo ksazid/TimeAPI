@@ -91,7 +91,7 @@ namespace TimeAPI.Data.Repositories
                                 FORMAT(CAST(timesheet_administrative_activity.end_time AS DATETIME2), N'hh:mm tt') AS end_time, 
                                 timesheet_administrative_activity.total_hrs,
                                 timesheet_administrative_activity.is_billable,
-                            FORMAT( timesheet_administrative_activity.ondate, 'dd/MM/yyyy', 'en-US' ) AS ondate
+                            FORMAT(timesheet_administrative_activity.ondate, 'dd/MM/yyyy', 'en-US' ) AS ondate
                             FROM 
                                 [dbo].[timesheet_administrative_activity] WITH (NOLOCK)
                             INNER JOIN administrative on timesheet_administrative_activity.administrative_id = administrative.id

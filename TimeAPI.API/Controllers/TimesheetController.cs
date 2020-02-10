@@ -394,7 +394,7 @@ namespace TimeAPI.API.Controllers
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<TimesheetActivity>(timesheetActivityViewModel);
 
-                var _TotalMinutes = (Convert.ToDateTime(modal.start_time) - Convert.ToDateTime(modal.end_time)).TotalMinutes;
+                var _TotalMinutes = (Convert.ToDateTime(modal.end_time) - Convert.ToDateTime(modal.start_time)).TotalMinutes;
                 TimeSpan spWorkMin = TimeSpan.FromMinutes(_TotalMinutes);
                 modal.total_hrs = spWorkMin.ToString(FormatTime);
 

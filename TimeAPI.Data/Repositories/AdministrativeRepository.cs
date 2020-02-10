@@ -72,7 +72,6 @@ namespace TimeAPI.Data.Repositories
             return rootObject;
         }
 
-
         public void Remove(string key)
         {
             Execute(
