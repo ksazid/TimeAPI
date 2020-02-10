@@ -13,7 +13,6 @@ namespace TimeAPI.Data.Repositories
 
         public void Add(Timesheet entity)
         {
-
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.timesheet
                                   (id, empid, ondate, check_in, check_out, is_checkout, groupid, created_date, createdby)

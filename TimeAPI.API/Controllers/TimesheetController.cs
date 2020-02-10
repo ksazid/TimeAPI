@@ -313,7 +313,10 @@ namespace TimeAPI.API.Controllers
                         return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = "Not a valid employee", Desc = modal.empid });
                     }
 
-                    var _TotalMinutes = (Convert.ToDateTime(modal.check_out) - Convert.ToDateTime(Timesheet.check_in)).TotalMinutes;
+                    var _TotalMinutes = (Convert.ToDateTime(modal.check_out.ToString(CultureInfo.CurrentCulture))
+                                        .Subtract(Convert.ToDateTime(Timesheet.check_in.ToString(CultureInfo.CurrentCulture))))
+                                        .TotalMinutes;
+
                     TimeSpan spWorkMin = TimeSpan.FromMinutes(_TotalMinutes);
 
                     modal.total_hrs = spWorkMin.ToString(FormatTime);
