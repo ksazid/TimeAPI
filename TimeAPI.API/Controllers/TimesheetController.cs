@@ -313,13 +313,15 @@ namespace TimeAPI.API.Controllers
                         return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = "Not a valid employee", Desc = modal.empid });
                     }
 
-                    var _TotalMinutes = (Convert.ToDateTime(modal.check_out.ToString(CultureInfo.CurrentCulture))
-                                        .Subtract(Convert.ToDateTime(Timesheet.check_in.ToString(CultureInfo.CurrentCulture))))
-                                        .TotalMinutes;
+                    DateTime check_out = new DateTime(Convert.ToDateTime(modal.check_out).Year, Convert.ToDateTime(modal.check_out).Month, Convert.ToDateTime(modal.check_out).Day, Convert.ToDateTime(modal.check_out).Hour, Convert.ToDateTime(modal.check_out).Minute, Convert.ToDateTime(modal.check_out).Second);
+                    DateTime check_in = new DateTime(Convert.ToDateTime(modal.check_in).Year, Convert.ToDateTime(modal.check_in).Month, Convert.ToDateTime(modal.check_in).Day, Convert.ToDateTime(modal.check_in).Hour, Convert.ToDateTime(modal.check_in).Minute, Convert.ToDateTime(modal.check_in).Second);
 
-                    TimeSpan spWorkMin = TimeSpan.FromMinutes(_TotalMinutes);
+                    TimeSpan span = check_out.Subtract(check_in);
 
-                    modal.total_hrs = spWorkMin.ToString(FormatTime);
+                    //var _TotalMinutes = (Convert.ToDateTime(modal.check_out) - Convert.ToDateTime(modal.check_in)).TotalMinutes;
+                    //TimeSpan spWorkMin = TimeSpan.FromMinutes(_TotalMinutes);
+
+                    modal.total_hrs = span.ToString(FormatTime);
                     modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
                     modal.is_checkout = true;
                     modal.is_deleted = false;
@@ -383,8 +385,8 @@ namespace TimeAPI.API.Controllers
                 if (timesheetActivityViewModel == null)
                     throw new ArgumentNullException(nameof(timesheetActivityViewModel));
 
-                if ((timesheetActivityViewModel.groupid != null) && (timesheetActivityViewModel.groupid == "" 
-                                    || string.IsNullOrWhiteSpace(timesheetActivityViewModel.groupid) 
+                if ((timesheetActivityViewModel.groupid != null) && (timesheetActivityViewModel.groupid == ""
+                                    || string.IsNullOrWhiteSpace(timesheetActivityViewModel.groupid)
                                     || string.IsNullOrEmpty(timesheetActivityViewModel.groupid)))
                     return await Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = "Error", Desc = "Invalid GroupID" }).ConfigureAwait(false);
 
@@ -485,13 +487,13 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("GetTop10TimesheetActivityOnTaskID")]
-        public async Task<object> GetTop10TimesheetActivityOnTaskID([FromBody] Utils Utils,  CancellationToken cancellationToken)
+        public async Task<object> GetTop10TimesheetActivityOnTaskID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
-               
+
                 oDataTable _oDataTable = new oDataTable();
                 var result = _unitOfWork.TimesheetActivityRepository.GetTop10TimesheetActivityOnTaskID(Utils.ID);
                 var xResult = _oDataTable.ToDataTable(result);
@@ -504,7 +506,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        
+
 
         #endregion TimesheetActivity
 
