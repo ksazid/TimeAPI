@@ -316,7 +316,11 @@ namespace TimeAPI.API.Controllers
                     var _TotalMinutes = (Convert.ToDateTime(modal.check_out) - Convert.ToDateTime(Timesheet.check_in)).TotalMinutes;
                     TimeSpan spWorkMin = TimeSpan.FromMinutes(_TotalMinutes);
 
-                    modal.total_hrs = spWorkMin.ToString(FormatTime);
+                    TimeSpan duration = DateTime.Parse(modal.check_out).Subtract(DateTime.Parse(Timesheet.check_in));
+
+
+
+                    modal.total_hrs = duration.ToString(FormatTime);
                     modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
                     modal.is_checkout = true;
                     modal.is_deleted = false;
