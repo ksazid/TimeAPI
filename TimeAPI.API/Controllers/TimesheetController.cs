@@ -251,9 +251,8 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(paramName: nameof(Utils.ID));
 
-                _unitOfWork.TimesheetRepository.Remove(Utils.ID);
                 var Timesheet = _unitOfWork.TimesheetRepository.Find(Utils.ID);
-
+                _unitOfWork.TimesheetRepository.Remove(Utils.ID);
                 _unitOfWork.TimesheetRepository.RemoveByGroupID(Timesheet.groupid);
                 _unitOfWork.TimesheetTeamRepository.RemoveByGroupID(Timesheet.groupid);
                 _unitOfWork.TimesheetProjectCategoryRepository.RemoveByGroupID(Timesheet.groupid);

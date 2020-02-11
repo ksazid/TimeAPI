@@ -303,11 +303,7 @@ namespace TimeAPI
     {
         public static DateTimeOffset? GetCurrentTimeFromTimeZone()
         {
-            DateTime dateTime = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month,
-                                    DateTime.UtcNow.Day, DateTime.UtcNow.Hour, DateTime.UtcNow.Minute,
-                                    DateTime.UtcNow.Second, DateTimeKind.Utc);
-
-            DateTime eastern = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(dateTime, "Arabian Standard Time");
+            DateTime eastern = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, "Arabian Standard Time");
             return eastern;
         }
     }
