@@ -27,6 +27,8 @@ namespace TimeAPI.API.Controllers
         private readonly ILogger _logger;
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly DateTime _dateTime;
+        
         public EmployeeTasksController(IUnitOfWork unitOfWork, ILogger<EmployeeTasksController> logger,
                 IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings)
         {
@@ -34,6 +36,7 @@ namespace TimeAPI.API.Controllers
             _logger = logger;
             _appSettings = AppSettings.Value;
             _unitOfWork = unitOfWork;
+            _dateTime = InternetTime.GetCurrentTimeFromTimeZone().Value.DateTime;
         }
 
         [HttpPost]
@@ -58,7 +61,7 @@ namespace TimeAPI.API.Controllers
                                                .Select(s => s.id)
                                                .FirstOrDefault();
 
-                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
 
@@ -68,7 +71,7 @@ namespace TimeAPI.API.Controllers
                     {
 
                         modal.id = Guid.NewGuid().ToString();
-                        modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                        modal.created_date = _dateTime.ToString();
                         modal.is_deleted = false;
 
 
@@ -78,7 +81,7 @@ namespace TimeAPI.API.Controllers
                             task_id = modal.id,
                             empid = item,
                             createdby = modal.createdby,
-                            created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                            created_date = _dateTime.ToString(),
                             is_deleted = false
 
                         };
@@ -112,7 +115,7 @@ namespace TimeAPI.API.Controllers
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TaskViewModel, Domain.Entities.Tasks>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Domain.Entities.Tasks>(TaskViewModel);
-                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.modified_date = _dateTime.ToString();
 
                 _unitOfWork.TaskTeamMembersRepository.RemoveByTaskID(modal.id);
 
@@ -122,7 +125,7 @@ namespace TimeAPI.API.Controllers
                     {
 
                         modal.id = Guid.NewGuid().ToString();
-                        modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                        modal.created_date = _dateTime.ToString();
                         modal.is_deleted = false;
 
 
@@ -132,7 +135,7 @@ namespace TimeAPI.API.Controllers
                             task_id = modal.id,
                             empid = item,
                             createdby = modal.createdby,
-                            created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                            created_date = _dateTime.ToString(),
                             is_deleted = false
 
                         };
@@ -257,7 +260,7 @@ namespace TimeAPI.API.Controllers
                     id = TaskViewModel.id,
                     status_id = TaskViewModel.status_id,
                     modifiedby = TaskViewModel.modifiedby,
-                    modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture)
+                    modified_date = _dateTime.ToString()
                 };
 
                 _unitOfWork.TaskRepository.UpdateTaskStatus(modal);

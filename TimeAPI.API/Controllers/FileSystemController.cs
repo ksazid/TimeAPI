@@ -38,6 +38,8 @@ namespace TimeAPI.API.Controllers
         private readonly IUnitOfWork _unitOfWork;
         private IConfiguration _configuration;
         private StorageSettings _storageSettings;
+        private readonly DateTime _dateTime;
+        
         public FileSystemController(IUnitOfWork unitOfWork, ILogger<FileSystemController> logger, UserManager<ApplicationUser> userManager,
             IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings, IConfiguration configuration, IOptions<StorageSettings> StorageSettings)
         {
@@ -46,6 +48,7 @@ namespace TimeAPI.API.Controllers
             _appSettings = AppSettings.Value;
             _unitOfWork = unitOfWork;
             _storageSettings = StorageSettings.Value;
+            _dateTime = InternetTime.GetCurrentTimeFromTimeZone().Value.DateTime;
         }
 
 
@@ -104,7 +107,7 @@ namespace TimeAPI.API.Controllers
                 var modal = mapper.Map<Image>(employeeProfileViewModel);
 
                 modal.id = Guid.NewGuid().ToString();
-                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
                 _unitOfWork.ProfileImageRepository.Add(modal);

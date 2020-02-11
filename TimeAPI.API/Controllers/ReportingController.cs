@@ -33,6 +33,8 @@ namespace TimeAPI.API.Controllers
         private readonly ILogger _logger;
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly DateTime _dateTime;
+        
         public ReportingController(IUnitOfWork unitOfWork, ILogger<ReportingController> logger,
             IEmailSender emailSender,
             IOptions<ApplicationSettings> AppSettings)
@@ -41,6 +43,7 @@ namespace TimeAPI.API.Controllers
             _logger = logger;
             _appSettings = AppSettings.Value;
             _unitOfWork = unitOfWork;
+            _dateTime = InternetTime.GetCurrentTimeFromTimeZone().Value.DateTime;
         }
         
         [HttpPost]
@@ -60,7 +63,7 @@ namespace TimeAPI.API.Controllers
                 var modal = mapper.Map<Reporting>(reportingViewModel);
 
                 modal.id = Guid.NewGuid().ToString();
-                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
                 _unitOfWork.ReportingRepository.Add(modal);
@@ -90,7 +93,7 @@ namespace TimeAPI.API.Controllers
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<ReportingViewModel, Reporting>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Reporting>(reportingViewModel);
-                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.modified_date = _dateTime.ToString();
 
                 _unitOfWork.ReportingRepository.Update(modal);
                 _unitOfWork.Commit();

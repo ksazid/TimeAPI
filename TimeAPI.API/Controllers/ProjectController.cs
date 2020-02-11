@@ -41,6 +41,8 @@ namespace TimeAPI.API.Controllroers
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly DateTime _dateTime;
+        
         public ProjectController(IUnitOfWork unitOfWork, ILogger<ProjectController> logger,
             IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings)
         {
@@ -48,6 +50,7 @@ namespace TimeAPI.API.Controllroers
             _logger = logger;
             _appSettings = AppSettings.Value;
             _unitOfWork = unitOfWork;
+            _dateTime = InternetTime.GetCurrentTimeFromTimeZone().Value.DateTime;
         }
 
         #region Projects
@@ -75,7 +78,7 @@ namespace TimeAPI.API.Controllroers
                                             .Select(s => s.id)
                                             .FirstOrDefault();
 
-                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
                 _unitOfWork.ProjectRepository.Add(modal);
@@ -194,7 +197,7 @@ namespace TimeAPI.API.Controllroers
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<ProjectViewModel, Project>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Project>(projectViewModel);
-                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.modified_date = _dateTime.ToString();
 
                 _unitOfWork.ProjectRepository.Update(modal);
                 _unitOfWork.Commit();
@@ -223,7 +226,7 @@ namespace TimeAPI.API.Controllroers
                 var modal = mapper.Map<Project>(projectViewModel);
 
                 modal.id = Guid.NewGuid().ToString();
-                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.modified_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
                 _unitOfWork.ProjectRepository.UpdateProjectStatusByID(modal);
@@ -257,7 +260,7 @@ namespace TimeAPI.API.Controllroers
                 var modal = mapper.Map<EntityLocation>(projectViewModel);
 
                 modal.id = Guid.NewGuid().ToString();
-                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
                 _unitOfWork.EntityLocationRepository.Add(modal);
@@ -349,7 +352,7 @@ namespace TimeAPI.API.Controllroers
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EntityLocationViewModel, EntityLocation>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<EntityLocation>(projectViewModel);
-                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.modified_date = _dateTime.ToString();
 
                 _unitOfWork.EntityLocationRepository.Update(modal);
                 _unitOfWork.Commit();
@@ -382,7 +385,7 @@ namespace TimeAPI.API.Controllroers
                 var modal = mapper.Map<EntityContact>(projectViewModel);
 
                 modal.id = Guid.NewGuid().ToString();
-                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
                 _unitOfWork.EntityContactRepository.Add(modal);
@@ -474,7 +477,7 @@ namespace TimeAPI.API.Controllroers
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EntityContactViewModel, EntityContact>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<EntityContact>(projectViewModel);
-                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.modified_date = _dateTime.ToString();
 
                 _unitOfWork.EntityContactRepository.Update(modal);
                 _unitOfWork.Commit();
@@ -507,7 +510,7 @@ namespace TimeAPI.API.Controllroers
                 var modal = mapper.Map<ProjectStatus>(statusingViewModel);
 
                 modal.id = Guid.NewGuid().ToString();
-                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
                 _unitOfWork.ProjectStatusRepository.Add(modal);
@@ -622,12 +625,12 @@ namespace TimeAPI.API.Controllroers
                     throw new ArgumentNullException(nameof(statusingViewModel));
 
 
-                statusingViewModel.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                statusingViewModel.modified_date = _dateTime.ToString();
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<ProjectStatusViewModel, ProjectStatus>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<ProjectStatus>(statusingViewModel);
 
-                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.modified_date = _dateTime.ToString();
 
                 _unitOfWork.ProjectStatusRepository.Update(modal);
                 _unitOfWork.Commit();
@@ -660,7 +663,7 @@ namespace TimeAPI.API.Controllroers
                 var modal = mapper.Map<ProjectActivity>(statusingViewModel);
 
                 modal.id = Guid.NewGuid().ToString();
-                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
                 _unitOfWork.ProjectActivityRepository.Add(modal);
@@ -776,12 +779,12 @@ namespace TimeAPI.API.Controllroers
                     throw new ArgumentNullException(nameof(statusingViewModel));
 
 
-                statusingViewModel.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                statusingViewModel.modified_date = _dateTime.ToString();
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<ProjectActivityViewModel, ProjectActivity>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<ProjectActivity>(statusingViewModel);
 
-                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.modified_date = _dateTime.ToString();
 
                 _unitOfWork.ProjectActivityRepository.Update(modal);
                 _unitOfWork.Commit();
@@ -806,12 +809,12 @@ namespace TimeAPI.API.Controllroers
                     throw new ArgumentNullException(nameof(statusingViewModel));
 
 
-                statusingViewModel.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                statusingViewModel.modified_date = _dateTime.ToString();
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<ProjectActivityViewModel, ProjectActivity>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<ProjectActivity>(statusingViewModel);
 
-                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.modified_date = _dateTime.ToString();
 
                 _unitOfWork.ProjectActivityRepository.UpdateProjectActivityStatusByActivityID(modal);
                 _unitOfWork.Commit();
@@ -848,7 +851,7 @@ namespace TimeAPI.API.Controllroers
                             .Where(s => s.status_name.Equals("Open"))
                             .Select(s => s.id)
                             .FirstOrDefault();
-                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
 
@@ -858,7 +861,7 @@ namespace TimeAPI.API.Controllroers
                     {
 
                         modal.id = Guid.NewGuid().ToString();
-                        modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                        modal.created_date = _dateTime.ToString();
                         modal.is_deleted = false;
 
 
@@ -868,7 +871,7 @@ namespace TimeAPI.API.Controllroers
                             task_id = modal.id,
                             empid = item,
                             createdby = modal.createdby,
-                            created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                            created_date = _dateTime.ToString(),
                             is_deleted = false
 
                         };
@@ -882,7 +885,7 @@ namespace TimeAPI.API.Controllroers
                     project_id = TaskViewModel.project_id,
                     activity_id = TaskViewModel.activtity_id,
                     task_id = modal.id,
-                    created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                    created_date = _dateTime.ToString(),
                     createdby = TaskViewModel.createdby,
                     is_deleted = false
                 };
@@ -980,7 +983,7 @@ namespace TimeAPI.API.Controllroers
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<ProjectActivityTaskViewModel, Domain.Entities.Tasks>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Domain.Entities.Tasks>(TaskViewModel);
-                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.modified_date = _dateTime.ToString();
 
                 _unitOfWork.TaskTeamMembersRepository.RemoveByTaskID(modal.id);
 
@@ -990,7 +993,7 @@ namespace TimeAPI.API.Controllroers
                     {
 
                         modal.id = Guid.NewGuid().ToString();
-                        modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                        modal.created_date = _dateTime.ToString();
                         modal.is_deleted = false;
 
                         var TaskTeamMembers = new TaskTeamMember()
@@ -999,7 +1002,7 @@ namespace TimeAPI.API.Controllroers
                             task_id = modal.id,
                             empid = item,
                             createdby = modal.createdby,
-                            created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                            created_date = _dateTime.ToString(),
                             is_deleted = false
 
                         };

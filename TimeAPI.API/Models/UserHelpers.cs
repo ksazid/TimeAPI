@@ -17,12 +17,12 @@ using Twilio;
 using Twilio.Rest.Lookups.V1;
 using System.Text.RegularExpressions;
 using System.Text.Encodings.Web;
+using System.Net.Http;
 
-namespace TimeAPI.API.Models
+namespace TimeAPI
 {
     public static class UserHelpers
     {
-
         public static string GetUserId(this IPrincipal principal)
         {
             var claimsIdentity = (ClaimsIdentity)principal.Identity;
@@ -243,7 +243,6 @@ namespace TimeAPI.API.Models
             }
         }
 
-
         public static string IsPhoneValid(string phone)
         {
             string _phone = string.Empty;
@@ -297,6 +296,19 @@ namespace TimeAPI.API.Models
                 Result = "EMAIL";
 
             return Result;
+        }
+    }
+
+    public static class InternetTime
+    {
+        public static DateTimeOffset? GetCurrentTimeFromTimeZone()
+        {
+            DateTime dateTime = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month,
+                                    DateTime.UtcNow.Day, DateTime.UtcNow.Hour, DateTime.UtcNow.Minute,
+                                    DateTime.UtcNow.Second, DateTimeKind.Utc);
+
+            DateTime eastern = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(dateTime, "Arabian Standard Time");
+            return eastern;
         }
     }
 }

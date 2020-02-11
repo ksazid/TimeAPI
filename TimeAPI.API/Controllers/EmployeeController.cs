@@ -40,6 +40,7 @@ namespace TimeAPI.API.Controllers
         private IConfiguration _configuration;
         private static string _userName = string.Empty;
         private readonly UserManager<ApplicationUser> _userManager;
+        private static DateTime _dateTime;
         public EmployeeController(IUnitOfWork unitOfWork, ILogger<EmployeeController> logger,
                                   UserManager<ApplicationUser> userManager, IEmailSender emailSender, ISmsSender smsSender,
                                   IOptions<ApplicationSettings> AppSettings, IConfiguration configuration)
@@ -51,6 +52,7 @@ namespace TimeAPI.API.Controllers
             _unitOfWork = unitOfWork;
             _configuration = configuration;
             _userManager = userManager;
+            _dateTime = InternetTime.GetCurrentTimeFromTimeZone().Value.DateTime;
         }
 
         [HttpPost]
@@ -126,7 +128,7 @@ namespace TimeAPI.API.Controllers
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeViewModel, Employee>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Employee>(employeeViewModel);
-                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.modified_date = _dateTime.ToString();
 
                 _unitOfWork.EmployeeRepository.Update(modal);
                 _unitOfWork.Commit();
@@ -557,7 +559,7 @@ namespace TimeAPI.API.Controllers
             var modal = mapper.Map<Employee>(employeeViewModel);
 
             modal.id = Guid.NewGuid().ToString();
-            modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+            modal.created_date = _dateTime.ToString();
             modal.is_deleted = false;
             modal.user_id = user.Id;
             modal.is_admin = false;

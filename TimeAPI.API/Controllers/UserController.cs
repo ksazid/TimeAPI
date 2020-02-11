@@ -25,6 +25,8 @@ namespace TimeAPI.API.Controllers
         private readonly ILogger _logger;
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly DateTime _dateTime;
+        
         public UserController(IUnitOfWork unitOfWork, ILogger<EmployeeController> logger,
             IEmailSender emailSender,
            IOptions<ApplicationSettings> AppSettings)
@@ -33,6 +35,7 @@ namespace TimeAPI.API.Controllers
             _logger = logger;
             _appSettings = AppSettings.Value;
             _unitOfWork = unitOfWork;
+            _dateTime = InternetTime.GetCurrentTimeFromTimeZone().Value.DateTime;
         }
 
         [HttpPost]

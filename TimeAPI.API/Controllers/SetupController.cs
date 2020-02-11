@@ -42,6 +42,8 @@ namespace TimeAPI.API.Controllers
         private readonly ILogger _logger;
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly DateTime _dateTime;
+       
         public SetupController(IUnitOfWork unitOfWork, ILogger<SetupController> logger,
                         IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings)
         {
@@ -49,6 +51,7 @@ namespace TimeAPI.API.Controllers
             _logger = logger;
             _appSettings = AppSettings.Value;
             _unitOfWork = unitOfWork;
+            _dateTime = InternetTime.GetCurrentTimeFromTimeZone().Value.DateTime;
         }
 
         [HttpGet]
@@ -179,7 +182,7 @@ namespace TimeAPI.API.Controllers
                 var modal = mapper.Map<Administrative>(administrativeViewModel);
 
                 modal.id = Guid.NewGuid().ToString();
-                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
                 _unitOfWork.AdministrativeRepository.Add(modal);
@@ -209,7 +212,7 @@ namespace TimeAPI.API.Controllers
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Administrative>(administrativeViewModel);
 
-                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.modified_date = _dateTime.ToString();
 
 
                 _unitOfWork.AdministrativeRepository.Update(modal);
@@ -332,7 +335,7 @@ namespace TimeAPI.API.Controllers
                 var modal = mapper.Map<Priority>(administrativeViewModel);
 
                 modal.id = Guid.NewGuid().ToString();
-                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
                 _unitOfWork.PriorityRepository.Add(modal);
@@ -362,7 +365,7 @@ namespace TimeAPI.API.Controllers
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Priority>(administrativeViewModel);
 
-                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.modified_date = _dateTime.ToString();
 
 
                 _unitOfWork.PriorityRepository.Update(modal);
@@ -485,7 +488,7 @@ namespace TimeAPI.API.Controllers
                 var modal = mapper.Map<Status>(statusingViewModel);
 
                 modal.id = Guid.NewGuid().ToString();
-                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
                 _unitOfWork.StatusRepository.Add(modal);
@@ -512,12 +515,12 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(statusingViewModel));
 
 
-                statusingViewModel.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                statusingViewModel.modified_date = _dateTime.ToString();
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<StatusViewModel, Status>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Status>(statusingViewModel);
 
-                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.modified_date = _dateTime.ToString();
 
 
                 _unitOfWork.StatusRepository.Update(modal);
@@ -641,7 +644,7 @@ namespace TimeAPI.API.Controllers
                 var modal = mapper.Map<EmployeeType>(employeetypeingViewModel);
 
                 modal.id = Guid.NewGuid().ToString();
-                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
                 _unitOfWork.EmployeeTypeRepository.Add(modal);
@@ -670,7 +673,7 @@ namespace TimeAPI.API.Controllers
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeTypeViewModel, EmployeeType>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<EmployeeType>(employeetypeingViewModel);
-                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.modified_date = _dateTime.ToString();
 
 
                 _unitOfWork.EmployeeTypeRepository.Update(modal);
@@ -795,7 +798,7 @@ namespace TimeAPI.API.Controllers
                 var modal = mapper.Map<EmployeeStatus>(employeestatusViewModel);
 
                 modal.id = Guid.NewGuid().ToString();
-                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
                 _unitOfWork.EmployeeStatusRepository.Add(modal);
@@ -824,7 +827,7 @@ namespace TimeAPI.API.Controllers
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeStatusViewModel, EmployeeStatus>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<EmployeeStatus>(employeestatusViewModel);
-                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.modified_date = _dateTime.ToString();
 
 
                 _unitOfWork.EmployeeStatusRepository.Update(modal);
@@ -947,7 +950,7 @@ namespace TimeAPI.API.Controllers
                 var modal = mapper.Map<IndustryType>(industrytypeViewModel);
 
                 modal.id = Guid.NewGuid().ToString();
-                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
                 _unitOfWork.IndustryTypeRepository.Add(modal);
@@ -976,7 +979,7 @@ namespace TimeAPI.API.Controllers
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<IndustryTypeViewModel, IndustryType>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<IndustryType>(industrytypeViewModel);
-                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.modified_date = _dateTime.ToString();
 
                 _unitOfWork.IndustryTypeRepository.Update(modal);
                 _unitOfWork.Commit();

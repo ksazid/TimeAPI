@@ -28,6 +28,7 @@ namespace TimeAPI.API.Controllers
         private readonly ILogger _logger;
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
+        private static DateTime _dateTime;
         public AdminController(IUnitOfWork unitOfWork, ILogger<AdminController> logger,
             IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings)
         {
@@ -35,6 +36,7 @@ namespace TimeAPI.API.Controllers
             _logger = logger;
             _appSettings = AppSettings.Value;
             _unitOfWork = unitOfWork;
+            _dateTime = InternetTime.GetCurrentTimeFromTimeZone().Value.DateTime;
         }
 
         #region Plan
@@ -56,7 +58,7 @@ namespace TimeAPI.API.Controllers
                 var modal = mapper.Map<Plan>(planViewModel);
 
                 modal.id = Guid.NewGuid().ToString();
-                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
                 _unitOfWork.PlanRepository.Add(modal);
@@ -85,7 +87,7 @@ namespace TimeAPI.API.Controllers
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<PlanViewModel, Plan>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Plan>(planViewModel);
-                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.modified_date = _dateTime.ToString();
 
                 _unitOfWork.PlanRepository.Update(modal);
                 _unitOfWork.Commit();
@@ -186,7 +188,7 @@ namespace TimeAPI.API.Controllers
                 var modal = mapper.Map<PlanFeature>(featureViewModel);
 
                 modal.id = Guid.NewGuid().ToString();
-                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
                 _unitOfWork.PlanFeatureRepository.Add(modal);
@@ -215,7 +217,7 @@ namespace TimeAPI.API.Controllers
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<PlanFeatureViewModel, PlanFeature>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<PlanFeature>(featureViewModel);
-                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.modified_date = _dateTime.ToString();
 
                 _unitOfWork.PlanFeatureRepository.Update(modal);
                 _unitOfWork.Commit();
@@ -336,7 +338,7 @@ namespace TimeAPI.API.Controllers
                 var modal = mapper.Map<PlanPrice>(priceViewModel);
 
                 modal.id = Guid.NewGuid().ToString();
-                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
                 _unitOfWork.PlanPriceRepository.Add(modal);
@@ -365,7 +367,7 @@ namespace TimeAPI.API.Controllers
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<PlanPriceViewModel, PlanPrice>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<PlanPrice>(priceViewModel);
-                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.modified_date = _dateTime.ToString();
 
                 _unitOfWork.PlanPriceRepository.Update(modal);
                 _unitOfWork.Commit();
@@ -486,7 +488,7 @@ namespace TimeAPI.API.Controllers
                 var modal = mapper.Map<Subscription>(subscriptionViewModel);
 
                 modal.id = Guid.NewGuid().ToString();
-                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
                 _unitOfWork.SubscriptionRepository.Add(modal);
@@ -515,7 +517,7 @@ namespace TimeAPI.API.Controllers
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<SubscriptionViewModel, Subscription>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Subscription>(subscriptionViewModel);
-                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.modified_date = _dateTime.ToString();
 
                 _unitOfWork.SubscriptionRepository.Update(modal);
                 _unitOfWork.Commit();
@@ -641,7 +643,7 @@ namespace TimeAPI.API.Controllers
                 var modal = mapper.Map<Billing>(billingViewModel);
 
                 modal.id = Guid.NewGuid().ToString();
-                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
                 _unitOfWork.BillingRepository.Add(modal);
@@ -670,7 +672,7 @@ namespace TimeAPI.API.Controllers
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<BillingViewModel, Billing>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Billing>(billingViewModel);
-                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.modified_date = _dateTime.ToString();
 
                 _unitOfWork.BillingRepository.Update(modal);
                 _unitOfWork.Commit();

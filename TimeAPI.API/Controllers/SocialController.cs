@@ -33,6 +33,7 @@ namespace TimeAPI.API.Controllroers
         private readonly ILogger _logger;
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly DateTime _dateTime;
         public SocialController(IUnitOfWork unitOfWork, ILogger<SocialController> logger,
             IEmailSender emailSender,
             IOptions<ApplicationSettings> AppSettings)
@@ -41,6 +42,7 @@ namespace TimeAPI.API.Controllroers
             _logger = logger;
             _appSettings = AppSettings.Value;
             _unitOfWork = unitOfWork;
+            _dateTime = InternetTime.GetCurrentTimeFromTimeZone().Value.DateTime;
         }
 
 
@@ -62,7 +64,7 @@ namespace TimeAPI.API.Controllroers
                 var modal = mapper.Map<Social>(socialViewModel);
 
                 modal.id = Guid.NewGuid().ToString();
-                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
                 _unitOfWork.SocialRepository.Add(modal);
@@ -91,7 +93,7 @@ namespace TimeAPI.API.Controllroers
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<SocialViewModel, Social>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Social>(socialViewModel);
-                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.modified_date = _dateTime.ToString();
 
                 _unitOfWork.SocialRepository.Update(modal);
                 _unitOfWork.Commit();

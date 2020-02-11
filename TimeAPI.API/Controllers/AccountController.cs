@@ -33,6 +33,7 @@ namespace TimeAPI.API.Controllers
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
         private static string _userName = string.Empty;
+        private static DateTime _dateTime;
 
         public AccountController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager,
                                     SignInManager<ApplicationUser> signInManager, IEmailSender emailSender, ISmsSender smsSender,
@@ -45,6 +46,7 @@ namespace TimeAPI.API.Controllers
             _logger = logger;
             _appSettings = AppSettings.Value;
             _unitOfWork = unitOfWork;
+            _dateTime = InternetTime.GetCurrentTimeFromTimeZone().Value.DateTime;
         }
 
         [TempData]
@@ -308,7 +310,7 @@ namespace TimeAPI.API.Controllers
                 mobile = UserHelpers.IsPhoneValid(user.PhoneNumber),
                 workemail = user.Email,
                 createdby = user.FullName,
-                created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                created_date = _dateTime.ToString(),
                 is_admin = false,
                 is_superadmin = true,
                 is_password_reset = true

@@ -28,6 +28,8 @@ namespace TimeAPI.API.Controllers
         private readonly ILogger _logger;
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly DateTime _dateTime;
+        
         public OrganizationController(IUnitOfWork unitOfWork, ILogger<EmployeeController> logger,
             IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings)
         {
@@ -35,6 +37,7 @@ namespace TimeAPI.API.Controllers
             _logger = logger;
             _appSettings = AppSettings.Value;
             _unitOfWork = unitOfWork;
+            _dateTime = InternetTime.GetCurrentTimeFromTimeZone().Value.DateTime;
         }
 
         [HttpPost]
@@ -54,7 +57,7 @@ namespace TimeAPI.API.Controllers
                 var modal = mapper.Map<Organization>(organizationViewModel);
 
                 modal.org_id = Guid.NewGuid().ToString();
-                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
 
@@ -62,7 +65,7 @@ namespace TimeAPI.API.Controllers
                 {
                     var OrgLocation = SetLocationForOrg(organizationViewModel.EntityLocationViewModel, modal.org_id.ToString());
                     OrgLocation.id = Guid.NewGuid().ToString();
-                    OrgLocation.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                    OrgLocation.created_date = _dateTime.ToString();
                     OrgLocation.is_deleted = false;
                     OrgLocation.createdby = organizationViewModel.createdby;
                     _unitOfWork.EntityLocationRepository.Add(OrgLocation);
@@ -94,7 +97,7 @@ namespace TimeAPI.API.Controllers
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationViewModel, Organization>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Organization>(organizationViewModel);
-                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.modified_date = _dateTime.ToString();
 
                 _unitOfWork.OrganizationRepository.Update(modal);
 
@@ -102,7 +105,7 @@ namespace TimeAPI.API.Controllers
                 {
                     //var EntityLocation = SetUpdateOrgAddress(organizationViewModel, modal);
                     var EntityLocation = SetLocationForOrg(organizationViewModel.EntityLocationViewModel, modal.org_id.ToString());
-                    EntityLocation.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                    EntityLocation.modified_date = _dateTime.ToString();
                     EntityLocation.modifiedby = organizationViewModel.createdby;
 
                     _unitOfWork.EntityLocationRepository.Update(EntityLocation);
@@ -241,7 +244,7 @@ namespace TimeAPI.API.Controllers
                 var modal = mapper.Map<Organization>(organizationBranchViewModel);
 
                 modal.org_id = Guid.NewGuid().ToString();
-                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
 
@@ -259,7 +262,7 @@ namespace TimeAPI.API.Controllers
                     parent_org_id = organizationBranchViewModel.parent_org_id,
                     org_id = modal.org_id,
                     createdby = organizationBranchViewModel.createdby,
-                    created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                    created_date = _dateTime.ToString(),
                     is_deleted = false
                 };
 

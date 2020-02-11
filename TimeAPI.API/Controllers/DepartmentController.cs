@@ -33,6 +33,7 @@ namespace TimeAPI.API.Controllers
         private readonly ILogger _logger;
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly DateTime _dateTime;
         public DepartmentController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager, ILogger<DepartmentController> logger, IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings)
         {
             _emailSender = emailSender;
@@ -40,6 +41,7 @@ namespace TimeAPI.API.Controllers
             _appSettings = AppSettings.Value;
             _unitOfWork = unitOfWork;
             _userManager = userManager;
+            _dateTime = InternetTime.GetCurrentTimeFromTimeZone().Value.DateTime;
         }
 
         [HttpPost]
@@ -59,7 +61,7 @@ namespace TimeAPI.API.Controllers
                 var modal = mapper.Map<Department>(departmentViewModels);
 
                 modal.id = Guid.NewGuid().ToString();
-                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
                 _unitOfWork.DepartmentRepository.Add(modal);
@@ -90,7 +92,7 @@ namespace TimeAPI.API.Controllers
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Department>(departmentViewModels);
 
-                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.modified_date = _dateTime.ToString();
 
                 _unitOfWork.DepartmentRepository.Update(modal);
                 _unitOfWork.Commit();
@@ -342,7 +344,7 @@ namespace TimeAPI.API.Controllers
                     dep_name = Result["1"].ToString(),
                     alias = Result["1"].ToString().ToLower(),
                     createdby = utilDepartmentChecked.createdby,
-                    created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                    created_date = _dateTime.ToString(),
                     is_deleted = false
                 };
                 string DeptID = Department.id;
@@ -359,7 +361,7 @@ namespace TimeAPI.API.Controllers
                         designation_name = Accounts[i].ToString(),
                         alias = Accounts[i].ToString().ToLower(),
                         createdby = utilDepartmentChecked.createdby,
-                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        created_date = _dateTime.ToString(),
                         is_deleted = false
                     };
                     _unitOfWork.DesignationRepositiory.Add(Designation);
@@ -375,7 +377,7 @@ namespace TimeAPI.API.Controllers
                     dep_name = Result["2"].ToString(),
                     alias = Result["2"].ToString().ToLower(),
                     createdby = utilDepartmentChecked.createdby,
-                    created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                    created_date = _dateTime.ToString(),
                     is_deleted = false
                 };
                 string DeptID = Department.id;
@@ -392,7 +394,7 @@ namespace TimeAPI.API.Controllers
                         designation_name = Accounts[i].ToString(),
                         alias = Accounts[i].ToString().ToLower(),
                         createdby = utilDepartmentChecked.createdby,
-                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        created_date = _dateTime.ToString(),
                         is_deleted = false
                     };
                     _unitOfWork.DesignationRepositiory.Add(Designation);
@@ -409,7 +411,7 @@ namespace TimeAPI.API.Controllers
                     dep_name = Result["3"].ToString(),
                     alias = Result["3"].ToString().ToLower(),
                     createdby = utilDepartmentChecked.createdby,
-                    created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                    created_date = _dateTime.ToString(),
                     is_deleted = false
                 };
                 string DeptID = Department.id;
@@ -426,7 +428,7 @@ namespace TimeAPI.API.Controllers
                         designation_name = Accounts[i].ToString(),
                         alias = Accounts[i].ToString().ToLower(),
                         createdby = utilDepartmentChecked.createdby,
-                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        created_date = _dateTime.ToString(),
                         is_deleted = false
                     };
                     _unitOfWork.DesignationRepositiory.Add(Designation);
@@ -443,7 +445,7 @@ namespace TimeAPI.API.Controllers
                     dep_name = Result["4"].ToString(),
                     alias = Result["4"].ToString().ToLower(),
                     createdby = utilDepartmentChecked.createdby,
-                    created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                    created_date = _dateTime.ToString(),
                     is_deleted = false
                 };
                 string DeptID = Department.id;
@@ -460,7 +462,7 @@ namespace TimeAPI.API.Controllers
                         designation_name = Accounts[i].ToString(),
                         alias = Accounts[i].ToString().ToLower(),
                         createdby = utilDepartmentChecked.createdby,
-                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        created_date = _dateTime.ToString(),
                         is_deleted = false
                     };
                     _unitOfWork.DesignationRepositiory.Add(Designation);
@@ -477,7 +479,7 @@ namespace TimeAPI.API.Controllers
                     dep_name = Result["5"].ToString(),
                     alias = Result["5"].ToString().ToLower(),
                     createdby = utilDepartmentChecked.createdby,
-                    created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                    created_date = _dateTime.ToString(),
                     is_deleted = false
                 };
                 string DeptID = Department.id;
@@ -494,7 +496,7 @@ namespace TimeAPI.API.Controllers
                         designation_name = Accounts[i].ToString(),
                         alias = Accounts[i].ToString().ToLower(),
                         createdby = utilDepartmentChecked.createdby,
-                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        created_date = _dateTime.ToString(),
                         is_deleted = false
                     };
                     _unitOfWork.DesignationRepositiory.Add(Designation);
@@ -510,7 +512,7 @@ namespace TimeAPI.API.Controllers
                     dep_name = Result["6"].ToString(),
                     alias = Result["6"].ToString().ToLower(),
                     createdby = utilDepartmentChecked.createdby,
-                    created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                    created_date = _dateTime.ToString(),
                     is_deleted = false
                 };
                 string DeptID = Department.id;
@@ -527,7 +529,7 @@ namespace TimeAPI.API.Controllers
                         designation_name = Accounts[i].ToString(),
                         alias = Accounts[i].ToString().ToLower(),
                         createdby = utilDepartmentChecked.createdby,
-                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        created_date = _dateTime.ToString(),
                         is_deleted = false
                     };
                     _unitOfWork.DesignationRepositiory.Add(Designation);
@@ -543,7 +545,7 @@ namespace TimeAPI.API.Controllers
                     dep_name = Result["7"].ToString(),
                     alias = Result["7"].ToString().ToLower(),
                     createdby = utilDepartmentChecked.createdby,
-                    created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                    created_date = _dateTime.ToString(),
                     is_deleted = false
                 };
                 string DeptID = Department.id;
@@ -560,7 +562,7 @@ namespace TimeAPI.API.Controllers
                         designation_name = Accounts[i].ToString(),
                         alias = Accounts[i].ToString().ToLower(),
                         createdby = utilDepartmentChecked.createdby,
-                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        created_date = _dateTime.ToString(),
                         is_deleted = false
                     };
                     _unitOfWork.DesignationRepositiory.Add(Designation);
@@ -576,7 +578,7 @@ namespace TimeAPI.API.Controllers
                     dep_name = Result["8"].ToString(),
                     alias = Result["8"].ToString().ToLower(),
                     createdby = utilDepartmentChecked.createdby,
-                    created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                    created_date = _dateTime.ToString(),
                     is_deleted = false
                 };
                 string DeptID = Department.id;
@@ -593,7 +595,7 @@ namespace TimeAPI.API.Controllers
                         designation_name = Accounts[i].ToString(),
                         alias = Accounts[i].ToString().ToLower(),
                         createdby = utilDepartmentChecked.createdby,
-                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        created_date = _dateTime.ToString(),
                         is_deleted = false
                     };
                     _unitOfWork.DesignationRepositiory.Add(Designation);
@@ -609,7 +611,7 @@ namespace TimeAPI.API.Controllers
                     dep_name = Result["9"].ToString(),
                     alias = Result["9"].ToString().ToLower(),
                     createdby = utilDepartmentChecked.createdby,
-                    created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                    created_date = _dateTime.ToString(),
                     is_deleted = false
                 };
                 string DeptID = Department.id;
@@ -626,7 +628,7 @@ namespace TimeAPI.API.Controllers
                         designation_name = Accounts[i].ToString(),
                         alias = Accounts[i].ToString().ToLower(),
                         createdby = utilDepartmentChecked.createdby,
-                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        created_date = _dateTime.ToString(),
                         is_deleted = false
                     };
                     _unitOfWork.DesignationRepositiory.Add(Designation);
@@ -642,7 +644,7 @@ namespace TimeAPI.API.Controllers
                     dep_name = Result["10"].ToString(),
                     alias = Result["10"].ToString().ToLower(),
                     createdby = utilDepartmentChecked.createdby,
-                    created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                    created_date = _dateTime.ToString(),
                     is_deleted = false
                 };
                 string DeptID = Department.id;
@@ -659,7 +661,7 @@ namespace TimeAPI.API.Controllers
                         designation_name = Accounts[i].ToString(),
                         alias = Accounts[i].ToString().ToLower(),
                         createdby = utilDepartmentChecked.createdby,
-                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        created_date = _dateTime.ToString(),
                         is_deleted = false
                     };
                     _unitOfWork.DesignationRepositiory.Add(Designation);
@@ -675,7 +677,7 @@ namespace TimeAPI.API.Controllers
                     dep_name = Result["11"].ToString(),
                     alias = Result["11"].ToString().ToLower(),
                     createdby = utilDepartmentChecked.createdby,
-                    created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                    created_date = _dateTime.ToString(),
                     is_deleted = false
                 };
                 string DeptID = Department.id;
@@ -692,7 +694,7 @@ namespace TimeAPI.API.Controllers
                         designation_name = Accounts[i].ToString(),
                         alias = Accounts[i].ToString().ToLower(),
                         createdby = utilDepartmentChecked.createdby,
-                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        created_date = _dateTime.ToString(),
                         is_deleted = false
                     };
                     _unitOfWork.DesignationRepositiory.Add(Designation);
@@ -709,7 +711,7 @@ namespace TimeAPI.API.Controllers
                     dep_name = Result["12"].ToString(),
                     alias = Result["12"].ToString().ToLower(),
                     createdby = utilDepartmentChecked.createdby,
-                    created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                    created_date = _dateTime.ToString(),
                     is_deleted = false
                 };
                 string DeptID = Department.id;
@@ -726,7 +728,7 @@ namespace TimeAPI.API.Controllers
                         designation_name = Accounts[i].ToString(),
                         alias = Accounts[i].ToString().ToLower(),
                         createdby = utilDepartmentChecked.createdby,
-                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        created_date = _dateTime.ToString(),
                         is_deleted = false
                     };
                     _unitOfWork.DesignationRepositiory.Add(Designation);
@@ -743,7 +745,7 @@ namespace TimeAPI.API.Controllers
                     dep_name = Result["13"].ToString(),
                     alias = Result["13"].ToString().ToLower(),
                     createdby = utilDepartmentChecked.createdby,
-                    created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                    created_date = _dateTime.ToString(),
                     is_deleted = false
                 };
                 string DeptID = Department.id;
@@ -760,7 +762,7 @@ namespace TimeAPI.API.Controllers
                         designation_name = Accounts[i].ToString(),
                         alias = Accounts[i].ToString().ToLower(),
                         createdby = utilDepartmentChecked.createdby,
-                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        created_date = _dateTime.ToString(),
                         is_deleted = false
                     };
                     _unitOfWork.DesignationRepositiory.Add(Designation);
@@ -777,7 +779,7 @@ namespace TimeAPI.API.Controllers
                     dep_name = Result["14"].ToString(),
                     alias = Result["14"].ToString().ToLower(),
                     createdby = utilDepartmentChecked.createdby,
-                    created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                    created_date = _dateTime.ToString(),
                     is_deleted = false
                 };
                 string DeptID = Department.id;
@@ -794,7 +796,7 @@ namespace TimeAPI.API.Controllers
                         designation_name = Accounts[i].ToString(),
                         alias = Accounts[i].ToString().ToLower(),
                         createdby = utilDepartmentChecked.createdby,
-                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        created_date = _dateTime.ToString(),
                         is_deleted = false
                     };
                     _unitOfWork.DesignationRepositiory.Add(Designation);
@@ -811,7 +813,7 @@ namespace TimeAPI.API.Controllers
                     dep_name = Result["15"].ToString(),
                     alias = Result["15"].ToString().ToLower(),
                     createdby = utilDepartmentChecked.createdby,
-                    created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                    created_date = _dateTime.ToString(),
                     is_deleted = false
                 };
                 string DeptID = Department.id;
@@ -828,7 +830,7 @@ namespace TimeAPI.API.Controllers
                         designation_name = Accounts[i].ToString(),
                         alias = Accounts[i].ToString().ToLower(),
                         createdby = utilDepartmentChecked.createdby,
-                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        created_date = _dateTime.ToString(),
                         is_deleted = false
                     };
                     _unitOfWork.DesignationRepositiory.Add(Designation);
@@ -845,7 +847,7 @@ namespace TimeAPI.API.Controllers
                     dep_name = Result["16"].ToString(),
                     alias = Result["16"].ToString().ToLower(),
                     createdby = utilDepartmentChecked.createdby,
-                    created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                    created_date = _dateTime.ToString(),
                     is_deleted = false
                 };
                 string DeptID = Department.id;
@@ -862,7 +864,7 @@ namespace TimeAPI.API.Controllers
                         designation_name = Accounts[i].ToString(),
                         alias = Accounts[i].ToString().ToLower(),
                         createdby = utilDepartmentChecked.createdby,
-                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        created_date = _dateTime.ToString(),
                         is_deleted = false
                     };
                     _unitOfWork.DesignationRepositiory.Add(Designation);

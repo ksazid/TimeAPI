@@ -30,6 +30,7 @@ namespace TimeAPI.API.Controllers
         private readonly ILogger _logger;
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly DateTime _dateTime;
 
         public TimesheetController(IUnitOfWork unitOfWork, ILogger<TimesheetController> logger,
             IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings)
@@ -38,6 +39,7 @@ namespace TimeAPI.API.Controllers
             _logger = logger;
             _appSettings = AppSettings.Value;
             _unitOfWork = unitOfWork;
+            _dateTime = InternetTime.GetCurrentTimeFromTimeZone().Value.DateTime;
         }
 
         #region Timesheet
@@ -99,11 +101,11 @@ namespace TimeAPI.API.Controllers
                 if (timesheetViewModel == null)
                     throw new ArgumentNullException(nameof(timesheetViewModel));
 
-                timesheetViewModel.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                timesheetViewModel.modified_date = _dateTime.ToString();
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetViewModel, Timesheet>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Timesheet>(timesheetViewModel);
-                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.modified_date = _dateTime.ToString();
 
                 #region TimesheetWithTeamMembers
 
@@ -114,11 +116,11 @@ namespace TimeAPI.API.Controllers
                 {
                     modal.id = Guid.NewGuid().ToString();
                     modal.empid = item;
-                    modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                    modal.created_date = _dateTime.ToString();
                     modal.is_deleted = false;
                     modal.groupid = timesheetViewModel.groupid;
 
-                    modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                    modal.modified_date = _dateTime.ToString();
                     modal.modifiedby = modal.createdby;
 
                     _unitOfWork.TimesheetRepository.Add(modal);
@@ -139,7 +141,7 @@ namespace TimeAPI.API.Controllers
                         teamid = item,
                         groupid = modal.groupid,
                         is_deleted = false,
-                        modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        modified_date = _dateTime.ToString(),
                         modifiedby = modal.createdby
                     };
                     _unitOfWork.TimesheetTeamRepository.Add(timesheet_team);
@@ -163,7 +165,7 @@ namespace TimeAPI.API.Controllers
                         project_or_comp_name = timesheetViewModel.TimesheetCategoryViewModel.project_or_comp_name,
                         project_or_comp_type = timesheetViewModel.TimesheetCategoryViewModel.project_or_comp_type,
                         is_deleted = false,
-                        modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        modified_date = _dateTime.ToString(),
                         modifiedby = modal.createdby
                     };
                     _unitOfWork.TimesheetProjectCategoryRepository.Add(project_category_type);
@@ -194,7 +196,7 @@ namespace TimeAPI.API.Controllers
                         country = timesheetViewModel.TimesheetSearchLocationViewModel.country,
                         is_office = timesheetViewModel.TimesheetSearchLocationViewModel.is_office,
                         is_manual = timesheetViewModel.TimesheetSearchLocationViewModel.is_manual,
-                        modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        modified_date = _dateTime.ToString(),
                         modifiedby = modal.createdby
                     };
                     _unitOfWork.TimesheetLocationRepository.Add(TimesheetLocation);
@@ -220,7 +222,7 @@ namespace TimeAPI.API.Controllers
                         administrative_area_level_1 = timesheetViewModel.TimesheetCurrentLocationViewModel.administrative_area_level_1,
                         postal_code = timesheetViewModel.TimesheetCurrentLocationViewModel.postal_code,
                         country = timesheetViewModel.TimesheetCurrentLocationViewModel.country,
-                        modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        modified_date = _dateTime.ToString(),
                         modifiedby = modal.createdby
                     };
                     _unitOfWork.LocationRepository.Add(Location);
@@ -313,20 +315,24 @@ namespace TimeAPI.API.Controllers
                         return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = "Not a valid employee", Desc = modal.empid });
                     }
 
-                    DateTime check_out = new DateTime(Convert.ToDateTime(modal.check_out).Year, Convert.ToDateTime(modal.check_out).Month, Convert.ToDateTime(modal.check_out).Day, Convert.ToDateTime(modal.check_out).Hour, Convert.ToDateTime(modal.check_out).Minute, Convert.ToDateTime(modal.check_out).Second);
-                    DateTime check_in = new DateTime(Convert.ToDateTime(modal.check_in).Year, Convert.ToDateTime(modal.check_in).Month, Convert.ToDateTime(modal.check_in).Day, Convert.ToDateTime(modal.check_in).Hour, Convert.ToDateTime(modal.check_in).Minute, Convert.ToDateTime(modal.check_in).Second);
-
-                    var _TotalMinutes = check_out.Subtract(check_in).TotalMinutes;
-
-                    //var _TotalMinutes = (Convert.ToDateTime(modal.check_out) - Convert.ToDateTime(modal.check_in)).TotalMinutes;
-                    TimeSpan spWorkMin = TimeSpan.FromMinutes(_TotalMinutes);
-
-                    modal.total_hrs = spWorkMin.ToString(FormatTime);
-                    modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
-                    modal.is_checkout = true;
+                    modal.check_out = _dateTime.ToString();
                     modal.is_deleted = false;
-                    modal.check_out = timesheetViewModel.check_out;
-                    modal.modifiedby = timesheetViewModel.modifiedby;
+
+                    var _TotalMinutes = (Convert.ToDateTime(modal.check_out) - Convert.ToDateTime(Timesheet.check_in)).Ticks;
+                    TimeSpan elapsedSpan = new TimeSpan(_TotalMinutes);
+
+                    string TotalHours = "";
+                    if (elapsedSpan.TotalHours.ToString().Split('.')[0].Length == 1)
+                        TotalHours = "0" + elapsedSpan.TotalHours.ToString().Split('.')[0].ToString();
+                    else
+                        TotalHours = elapsedSpan.TotalHours.ToString().Split('.')[0].ToString();
+
+                    modal.total_hrs = string.Format(@"{0}:{1}", TotalHours, elapsedSpan.Minutes); // elapsedSpan.ToString(string.Format(@"{0}:{1}", elapsedSpan.TotalHours.ToString().Split('.')[0], elapsedSpan.Minutes)); 
+
+                    modal.modified_date = _dateTime.ToString();
+                    modal.is_checkout = true;
+                    modal.check_out = _dateTime.ToString();
+                    modal.modifiedby = _dateTime.ToString();
 
                     _unitOfWork.TimesheetRepository.CheckOutByEmpID(modal);
                 }
@@ -350,7 +356,7 @@ namespace TimeAPI.API.Controllers
                         postal_code = timesheetViewModel.TimesheetCurrentLocationViewModel.postal_code,
                         country = timesheetViewModel.TimesheetCurrentLocationViewModel.country,
                         is_checkout = true,
-                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        created_date = _dateTime.ToString(),
                         createdby = timesheetViewModel.modifiedby
                     };
 
@@ -392,8 +398,8 @@ namespace TimeAPI.API.Controllers
 
                 timesheetActivityViewModel.id = Guid.NewGuid().ToString();
                 timesheetActivityViewModel.is_deleted = false;
-                timesheetActivityViewModel.ondate = DateTime.Now.ToString(CultureInfo.CurrentCulture);
-                timesheetActivityViewModel.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                timesheetActivityViewModel.ondate = _dateTime.ToString();
+                timesheetActivityViewModel.created_date = _dateTime.ToString();
 
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetActivityViewModel, TimesheetActivity>());
                 var mapper = config.CreateMapper();
@@ -426,11 +432,11 @@ namespace TimeAPI.API.Controllers
                 if (timesheetActivityViewModel == null)
                     throw new ArgumentNullException(nameof(timesheetActivityViewModel));
 
-                timesheetActivityViewModel.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                timesheetActivityViewModel.modified_date = _dateTime.ToString();
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetActivityViewModel, TimesheetActivity>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<TimesheetActivity>(timesheetActivityViewModel);
-                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.modified_date = _dateTime.ToString();
 
                 _unitOfWork.TimesheetActivityRepository.Update(modal);
                 _unitOfWork.Commit();
@@ -531,8 +537,8 @@ namespace TimeAPI.API.Controllers
 
                 timesheetAdministrativeActivityViewModel.id = Guid.NewGuid().ToString();
                 timesheetAdministrativeActivityViewModel.is_deleted = false;
-                timesheetAdministrativeActivityViewModel.ondate = DateTime.Now.ToString(CultureInfo.CurrentCulture);
-                timesheetAdministrativeActivityViewModel.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                timesheetAdministrativeActivityViewModel.ondate = _dateTime.ToString();
+                timesheetAdministrativeActivityViewModel.created_date = _dateTime.ToString();
 
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetAdministrativeActivityViewModel, TimesheetAdministrative>());
                 var mapper = config.CreateMapper();
@@ -565,11 +571,11 @@ namespace TimeAPI.API.Controllers
                 if (timesheetAdministrativeActivityViewModel == null)
                     throw new ArgumentNullException(nameof(timesheetAdministrativeActivityViewModel));
 
-                timesheetAdministrativeActivityViewModel.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                timesheetAdministrativeActivityViewModel.modified_date = _dateTime.ToString();
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetAdministrativeActivityViewModel, TimesheetAdministrative>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<TimesheetAdministrative>(timesheetAdministrativeActivityViewModel);
-                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.modified_date = _dateTime.ToString();
 
                 _unitOfWork.TimesheetAdministrativeRepository.Update(modal);
                 _unitOfWork.Commit();
@@ -662,8 +668,8 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(timesheetActivityCommentViewModel));
 
                 timesheetActivityCommentViewModel.is_deleted = false;
-                timesheetActivityCommentViewModel.ondate = DateTime.Now.ToString(CultureInfo.CurrentCulture);
-                timesheetActivityCommentViewModel.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                timesheetActivityCommentViewModel.ondate = _dateTime.ToString();
+                timesheetActivityCommentViewModel.created_date = _dateTime.ToString();
 
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetActivityCommentViewModel, TimesheetActivityComment>());
                 var mapper = config.CreateMapper();
@@ -692,11 +698,11 @@ namespace TimeAPI.API.Controllers
                 if (timesheetActivityCommentViewModel == null)
                     throw new ArgumentNullException(nameof(timesheetActivityCommentViewModel));
 
-                timesheetActivityCommentViewModel.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                timesheetActivityCommentViewModel.modified_date = _dateTime.ToString();
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetActivityCommentViewModel, TimesheetActivityComment>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<TimesheetActivityComment>(timesheetActivityCommentViewModel);
-                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.modified_date = _dateTime.ToString();
 
                 _unitOfWork.TimesheetActivityCommentRepository.Update(modal);
                 _unitOfWork.Commit();
@@ -768,8 +774,8 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(timesheetActivityFileViewModel));
 
                 timesheetActivityFileViewModel.is_deleted = false;
-                timesheetActivityFileViewModel.ondate = DateTime.Now.ToString(CultureInfo.CurrentCulture);
-                timesheetActivityFileViewModel.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                timesheetActivityFileViewModel.ondate = _dateTime.ToString();
+                timesheetActivityFileViewModel.created_date = _dateTime.ToString();
 
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetActivityFileViewModel, TimesheetActivityFile>());
                 var mapper = config.CreateMapper();
@@ -798,11 +804,11 @@ namespace TimeAPI.API.Controllers
                 if (timesheetActivityFileViewModel == null)
                     throw new ArgumentNullException(nameof(timesheetActivityFileViewModel));
 
-                timesheetActivityFileViewModel.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                timesheetActivityFileViewModel.modified_date = _dateTime.ToString();
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetActivityFileViewModel, TimesheetActivityFile>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<TimesheetActivityFile>(timesheetActivityFileViewModel);
-                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.modified_date = _dateTime.ToString();
 
                 _unitOfWork.TimesheetActivityFileRepository.Update(modal);
                 _unitOfWork.Commit();
@@ -870,9 +876,9 @@ namespace TimeAPI.API.Controllers
                 {
                     modal.id = Guid.NewGuid().ToString();
                     modal.empid = item;
-                    modal.ondate = DateTime.Now.ToString(CultureInfo.CurrentCulture);
-                    modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
-                    modal.is_deleted = false;
+                    modal.ondate = _dateTime.ToString();
+                    modal.created_date = _dateTime.ToString();
+                    modal.check_in = _dateTime.ToString();
                     modal.is_deleted = false;
                     modal.is_checkout = false;
                     modal.check_out = null;
@@ -899,7 +905,7 @@ namespace TimeAPI.API.Controllers
                         teamid = item,
                         groupid = modal.groupid,
                         is_deleted = false,
-                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        created_date = _dateTime.ToString(),
                         createdby = modal.createdby
                     };
                     _unitOfWork.TimesheetTeamRepository.Add(timesheet_team);
@@ -925,7 +931,7 @@ namespace TimeAPI.API.Controllers
                     project_or_comp_name = timesheetViewModel.TimesheetCategoryViewModel.project_or_comp_name,
                     project_or_comp_type = timesheetViewModel.TimesheetCategoryViewModel.project_or_comp_type,
                     is_deleted = false,
-                    created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                    created_date = _dateTime.ToString(),
                     createdby = modal.createdby
                 };
                 _unitOfWork.TimesheetProjectCategoryRepository.Add(project_category_type);
@@ -959,7 +965,7 @@ namespace TimeAPI.API.Controllers
                     is_deleted = false,
                     is_office = timesheetViewModel.TimesheetSearchLocationViewModel.is_office,
                     is_manual = timesheetViewModel.TimesheetSearchLocationViewModel.is_manual,
-                    created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                    created_date = _dateTime.ToString(),
                     createdby = modal.createdby
                 };
                 _unitOfWork.TimesheetLocationRepository.Add(TimesheetLocation);
@@ -990,7 +996,7 @@ namespace TimeAPI.API.Controllers
                     country = timesheetViewModel.TimesheetCurrentLocationViewModel.country,
                     is_deleted = false,
                     is_checkout = false,
-                    created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                    created_date = _dateTime.ToString(),
                     createdby = modal.createdby
                 };
                 _unitOfWork.LocationRepository.Add(Location);

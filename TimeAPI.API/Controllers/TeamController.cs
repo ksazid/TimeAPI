@@ -35,6 +35,8 @@ namespace TimeAPI.API.Controllroers
         private readonly ILogger _logger;
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly DateTime _dateTime;
+       
         public TeamController(IUnitOfWork unitOfWork, ILogger<TeamController> logger,
             IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings)
         {
@@ -42,6 +44,7 @@ namespace TimeAPI.API.Controllroers
             _logger = logger;
             _appSettings = AppSettings.Value;
             _unitOfWork = unitOfWork;
+            _dateTime = InternetTime.GetCurrentTimeFromTimeZone().Value.DateTime;
         }
 
         [HttpPost]
@@ -61,10 +64,8 @@ namespace TimeAPI.API.Controllroers
                 var modal = mapper.Map<Team>(teamViewModel);
 
                 modal.id = Guid.NewGuid().ToString();
-                modal.created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
-
-        
 
                 List<string> TeamMembersList = teamViewModel.teammember_empids.Cast<string>().ToList();
 
@@ -85,7 +86,7 @@ namespace TimeAPI.API.Controllroers
                         id = Guid.NewGuid().ToString(),
                         team_id = modal.id,
                         emp_id = item,
-                        created_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        created_date = _dateTime.ToString(),
                         createdby = teamViewModel.createdby,
                         is_deleted = false,
                         is_teamlead = isTeamLead
@@ -118,7 +119,7 @@ namespace TimeAPI.API.Controllroers
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TeamViewModel, Team>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Team>(teamViewModel);
-                modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                modal.modified_date = _dateTime.ToString();
 
                 _unitOfWork.TeamRepository.Update(modal);
 
@@ -129,7 +130,7 @@ namespace TimeAPI.API.Controllroers
                     TeamMembers teamMembers = new TeamMembers
                     {
                         emp_id = Employee.id,
-                        modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                        modified_date = _dateTime.ToString(),
                         modifiedby = teamViewModel.createdby,
                         is_deleted = false
                     };
