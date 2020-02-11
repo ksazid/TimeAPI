@@ -9,8 +9,10 @@ namespace TimeAPI.Domain.Repositories
     {
         //IEnumerable<Team> FindTeamsByOrgID(string OrgID);
         void RemoveByGroupID(string GroupID);
+
         dynamic GetTop10TimesheetActivityOnTaskID(string TaskID);
 
+        dynamic GetTimesheetActivityByGroupAndProjectID(string GroupID, string ProjectID);
 
         //IEnumerable<dynamic> FetchAllTeamsByOrgID(string OrgID);
         //IEnumerable<dynamic> FetchAllTeamMembersByTeamID(string key);

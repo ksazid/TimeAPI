@@ -521,6 +521,29 @@ namespace TimeAPI.API.Controllers
             }
         }
 
+
+        [HttpPost]
+        [Route("GetTimesheetActivityByGroupAndProjectID")]
+        public async Task<object> GetTimesheetActivityByGroupAndProjectID([FromBody] UtilsGroupIDAndProjectID Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                oDataTable _oDataTable = new oDataTable();
+                var result = _unitOfWork.TimesheetActivityRepository.GetTimesheetActivityByGroupAndProjectID(Utils.GroupID, Utils.ProjectID);
+                var xResult = _oDataTable.ToDataTable(result);
+
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+
         #endregion TimesheetActivity
 
         #region TimesheetAdministraitiveActivity

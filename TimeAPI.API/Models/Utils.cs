@@ -79,6 +79,12 @@ namespace TimeAPI.API.Models
         public string AdministrativeID { get; set; }
     }
 
+    public class UtilsGroupIDAndProjectID
+    {
+        public string GroupID { get; set; }
+        public string ProjectID { get; set; }
+    }
+
 
     public class UtilPhone
     {
