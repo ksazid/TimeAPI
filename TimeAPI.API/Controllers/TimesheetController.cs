@@ -316,12 +316,12 @@ namespace TimeAPI.API.Controllers
                     DateTime check_out = new DateTime(Convert.ToDateTime(modal.check_out).Year, Convert.ToDateTime(modal.check_out).Month, Convert.ToDateTime(modal.check_out).Day, Convert.ToDateTime(modal.check_out).Hour, Convert.ToDateTime(modal.check_out).Minute, Convert.ToDateTime(modal.check_out).Second);
                     DateTime check_in = new DateTime(Convert.ToDateTime(modal.check_in).Year, Convert.ToDateTime(modal.check_in).Month, Convert.ToDateTime(modal.check_in).Day, Convert.ToDateTime(modal.check_in).Hour, Convert.ToDateTime(modal.check_in).Minute, Convert.ToDateTime(modal.check_in).Second);
 
-                    TimeSpan span = check_out.Subtract(check_in);
+                    var _TotalMinutes = check_out.Subtract(check_in).TotalMinutes;
 
                     //var _TotalMinutes = (Convert.ToDateTime(modal.check_out) - Convert.ToDateTime(modal.check_in)).TotalMinutes;
-                    //TimeSpan spWorkMin = TimeSpan.FromMinutes(_TotalMinutes);
+                    TimeSpan spWorkMin = TimeSpan.FromMinutes(_TotalMinutes);
 
-                    modal.total_hrs = span.ToString(FormatTime);
+                    modal.total_hrs = spWorkMin.ToString(FormatTime);
                     modal.modified_date = DateTime.Now.ToString(CultureInfo.CurrentCulture);
                     modal.is_checkout = true;
                     modal.is_deleted = false;
