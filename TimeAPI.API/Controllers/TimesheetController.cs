@@ -4,7 +4,6 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -321,14 +320,11 @@ namespace TimeAPI.API.Controllers
                     var _TotalMinutes = (Convert.ToDateTime(modal.check_out) - Convert.ToDateTime(Timesheet.check_in)).Ticks;
                     TimeSpan elapsedSpan = new TimeSpan(_TotalMinutes);
 
-                    string TotalHours = "";
-                    if (elapsedSpan.TotalHours.ToString().Split('.')[0].Length == 1)
-                        TotalHours = "0" + elapsedSpan.TotalHours.ToString().Split('.')[0].ToString();
-                    else
-                        TotalHours = elapsedSpan.TotalHours.ToString().Split('.')[0].ToString();
+                    string TotalHours;
+                    string TotalMinutes;
+                    ConvertHoursAndMinutes(elapsedSpan, out TotalHours, out TotalMinutes);
 
-                    modal.total_hrs = string.Format(@"{0}:{1}", TotalHours, elapsedSpan.Minutes); // elapsedSpan.ToString(string.Format(@"{0}:{1}", elapsedSpan.TotalHours.ToString().Split('.')[0], elapsedSpan.Minutes)); 
-
+                    modal.total_hrs = string.Format(@"{0}:{1}", TotalHours, TotalMinutes);
                     modal.modified_date = _dateTime.ToString();
                     modal.is_checkout = true;
                     modal.check_out = _dateTime.ToString();
@@ -373,6 +369,20 @@ namespace TimeAPI.API.Controllers
             {
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
+        }
+
+        private static void ConvertHoursAndMinutes(TimeSpan elapsedSpan, out string TotalHours, out string TotalMinutes)
+        {
+            if (elapsedSpan.TotalHours.ToString().Split('.')[0].Length == 1)
+                TotalHours = "0" + elapsedSpan.TotalHours.ToString().Split('.')[0].ToString();
+            else
+                TotalHours = elapsedSpan.TotalHours.ToString().Split('.')[0].ToString();
+
+
+            if (elapsedSpan.Minutes.ToString().Split('.')[0].Length == 1)
+                TotalMinutes = "0" + elapsedSpan.Minutes.ToString().Split('.')[0].ToString();
+            else
+                TotalMinutes = elapsedSpan.Minutes.ToString().Split('.')[0].ToString();
         }
 
         #endregion Timesheet
@@ -511,8 +521,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
-
 
         #endregion TimesheetActivity
 
@@ -866,6 +874,7 @@ namespace TimeAPI.API.Controllers
         #endregion TimesheetActivityFile
 
         #region Private
+
         private void AddTimesheetWithTeamMembers(TimesheetPostViewModel timesheetViewModel, Timesheet modal)
         {
             #region TimesheetWithTeamMembers
@@ -977,6 +986,7 @@ namespace TimeAPI.API.Controllers
         private void AddTimesheetCurrentLocation(TimesheetPostViewModel timesheetViewModel, Timesheet modal)
         {
             #region CurrentLocation
+
             if (timesheetViewModel.TimesheetCurrentLocationViewModel != null)
             {
                 var Location = new Location
@@ -1001,6 +1011,7 @@ namespace TimeAPI.API.Controllers
                 };
                 _unitOfWork.LocationRepository.Add(Location);
             }
+
             #endregion CurrentLocation
         }
 

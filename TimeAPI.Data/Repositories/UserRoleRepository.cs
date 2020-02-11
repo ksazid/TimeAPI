@@ -55,11 +55,9 @@ namespace TimeAPI.Data.Repositories
                     DELETE ur
                     FROM AspNetUserRoles ur INNER JOIN
                         AspNetRoles r ON ur.RoleId = r.Id
-                    WHERE r.NormalizedName = @roleName
-                ",
+                    WHERE r.NormalizedName = @roleName",
                 param: new { userId, roleName }
             );
         }
-
     }
 }

@@ -7,7 +7,7 @@ namespace TimeAPI.Data.Repositories
 {
     internal class UserLoginRepository : RepositoryBase, IUserLoginRepository
     {
-        public UserLoginRepository(IDbTransaction transaction): base(transaction)
+        public UserLoginRepository(IDbTransaction transaction) : base(transaction)
         { }
 
         public void Add(UserLogin entity)

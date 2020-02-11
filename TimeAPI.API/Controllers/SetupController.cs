@@ -1,34 +1,19 @@
-﻿using TimeAPI.API.Models.AccountViewModels;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using TimeAPI.API.Models;
-using TimeAPI.API.Services;
-using Microsoft.AspNetCore.Cors;
-using TimeAPI.API.Filters;
-using TimeAPI.Domain;
-using System.Threading;
-using TimeAPI.Domain.Entities;
-using TimeAPI.API.Models.DesignationViewModels;
-using TimeAPI.API.Models.TaskViewModels;
-using System.Collections.Generic;
+using TimeAPI.API.Models.AdministrativeViewModels;
+using TimeAPI.API.Models.EmployeeStatusViewModels;
+using TimeAPI.API.Models.EmployeeTypeViewModels;
 using TimeAPI.API.Models.PriorityViewModels;
 using TimeAPI.API.Models.StatusViewModels;
-using TimeAPI.API.Models.EmployeeTypeViewModels;
-using TimeAPI.API.Models.EmployeeStatusViewModels;
-using TimeAPI.API.Models.EmployeeRoleViewModels;
-using System.Globalization;
-using TimeAPI.API.Models.AdministrativeViewModels;
-using Newtonsoft.Json;
+using TimeAPI.API.Services;
+using TimeAPI.Domain;
+using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.API.Controllers
 {
@@ -43,7 +28,7 @@ namespace TimeAPI.API.Controllers
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
         private readonly DateTime _dateTime;
-       
+
         public SetupController(IUnitOfWork unitOfWork, ILogger<SetupController> logger,
                         IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings)
         {
@@ -58,7 +43,6 @@ namespace TimeAPI.API.Controllers
         [Route("GetAllCountries")]
         public async Task<object> GetAllCountries(CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -78,7 +62,6 @@ namespace TimeAPI.API.Controllers
         [Route("GetAllTimeZones")]
         public async Task<object> GetAllTimeZones(CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -144,17 +127,15 @@ namespace TimeAPI.API.Controllers
                 if (UtilPhone == null)
                     throw new ArgumentNullException(nameof(UtilPhone));
 
-
-               string Result =  UserHelpers.ValidatePhoneNumber(UtilPhone.PhoneNumber);
+                string Result = UserHelpers.ValidatePhoneNumber(UtilPhone.PhoneNumber);
                 if (Result.Equals("VALID"))
                 {
                     return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "The entered phone no is valid" }).ConfigureAwait(false);
                 }
                 else
-                { 
-                    return await Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = "Error", Desc = "The entered phone no is invalid" }).ConfigureAwait(false); 
+                {
+                    return await Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = "Error", Desc = "The entered phone no is invalid" }).ConfigureAwait(false);
                 }
-               
             }
             catch (Exception ex)
             {
@@ -175,7 +156,6 @@ namespace TimeAPI.API.Controllers
 
                 if (administrativeViewModel == null)
                     throw new ArgumentNullException(nameof(administrativeViewModel));
-
 
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<AdministrativeViewModel, Administrative>());
                 var mapper = config.CreateMapper();
@@ -213,7 +193,6 @@ namespace TimeAPI.API.Controllers
                 var modal = mapper.Map<Administrative>(administrativeViewModel);
 
                 modal.modified_date = _dateTime.ToString();
-
 
                 _unitOfWork.AdministrativeRepository.Update(modal);
                 _unitOfWork.Commit();
@@ -272,7 +251,6 @@ namespace TimeAPI.API.Controllers
         [Route("FindByAdministrativeID")]
         public async Task<object> FindByAdministrativeID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -295,7 +273,6 @@ namespace TimeAPI.API.Controllers
         [Route("GetAdministrativeByOrgID")]
         public async Task<object> GetAdministrativeByOrgID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -328,7 +305,6 @@ namespace TimeAPI.API.Controllers
 
                 if (administrativeViewModel == null)
                     throw new ArgumentNullException(nameof(administrativeViewModel));
-
 
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<ProfileImageViewModel, Priority>());
                 var mapper = config.CreateMapper();
@@ -366,7 +342,6 @@ namespace TimeAPI.API.Controllers
                 var modal = mapper.Map<Priority>(administrativeViewModel);
 
                 modal.modified_date = _dateTime.ToString();
-
 
                 _unitOfWork.PriorityRepository.Update(modal);
                 _unitOfWork.Commit();
@@ -425,7 +400,6 @@ namespace TimeAPI.API.Controllers
         [Route("FindByPriorityID")]
         public async Task<object> FindByPriorityID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -448,7 +422,6 @@ namespace TimeAPI.API.Controllers
         [Route("GetPriorityByOrgID")]
         public async Task<object> GetPriorityByOrgID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -514,14 +487,12 @@ namespace TimeAPI.API.Controllers
                 if (statusingViewModel == null)
                     throw new ArgumentNullException(nameof(statusingViewModel));
 
-
                 statusingViewModel.modified_date = _dateTime.ToString();
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<StatusViewModel, Status>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Status>(statusingViewModel);
 
                 modal.modified_date = _dateTime.ToString();
-
 
                 _unitOfWork.StatusRepository.Update(modal);
                 _unitOfWork.Commit();
@@ -580,7 +551,6 @@ namespace TimeAPI.API.Controllers
         [Route("FindByTaskStatusID")]
         public async Task<object> FindByTaskStatusID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -599,12 +569,10 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpPost]
         [Route("GetStatusByOrgID")]
         public async Task<object> GetStatusByOrgID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -675,7 +643,6 @@ namespace TimeAPI.API.Controllers
                 var modal = mapper.Map<EmployeeType>(employeetypeingViewModel);
                 modal.modified_date = _dateTime.ToString();
 
-
                 _unitOfWork.EmployeeTypeRepository.Update(modal);
                 _unitOfWork.Commit();
 
@@ -733,7 +700,6 @@ namespace TimeAPI.API.Controllers
         [Route("FindByEmployeeTypeID")]
         public async Task<object> FindByEmployeeTypeID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -752,12 +718,10 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpPost]
         [Route("GetEmployeeTypeByOrgID")]
         public async Task<object> GetEmployeeTypeByOrgID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -791,7 +755,6 @@ namespace TimeAPI.API.Controllers
 
                 if (employeestatusViewModel == null)
                     throw new ArgumentNullException(nameof(employeestatusViewModel));
-
 
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeStatusViewModel, EmployeeStatus>());
                 var mapper = config.CreateMapper();
@@ -828,7 +791,6 @@ namespace TimeAPI.API.Controllers
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<EmployeeStatus>(employeestatusViewModel);
                 modal.modified_date = _dateTime.ToString();
-
 
                 _unitOfWork.EmployeeStatusRepository.Update(modal);
                 _unitOfWork.Commit();
@@ -887,7 +849,6 @@ namespace TimeAPI.API.Controllers
         [Route("FindByEmployeeStatusID")]
         public async Task<object> FindByEmployeeStatusID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -910,7 +871,6 @@ namespace TimeAPI.API.Controllers
         [Route("GetEmployeeStatusByOrgID")]
         public async Task<object> GetEmployeeStatusByOrgID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -1038,7 +998,6 @@ namespace TimeAPI.API.Controllers
         [Route("FindByIndustryTypeID")]
         public async Task<object> FindByIndustryTypeID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -1060,6 +1019,3 @@ namespace TimeAPI.API.Controllers
         #endregion IndustryType
     }
 }
-
-
-

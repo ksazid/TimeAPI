@@ -1,27 +1,17 @@
-﻿using TimeAPI.API.Models.AccountViewModels;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using System;
-using System.IdentityModel.Tokens.Jwt;
+using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using TimeAPI.API.Models;
-using TimeAPI.API.Services;
-using Microsoft.AspNetCore.Cors;
-using TimeAPI.API.Filters;
-using TimeAPI.Domain;
-using System.Threading;
-using TimeAPI.Domain.Entities;
 using TimeAPI.API.Models.TeamViewModels;
-using System.Globalization;
-using System.Collections.Generic;
-using Newtonsoft.Json;
+using TimeAPI.API.Services;
+using TimeAPI.Domain;
+using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.API.Controllroers
 {
@@ -36,7 +26,7 @@ namespace TimeAPI.API.Controllroers
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
         private readonly DateTime _dateTime;
-       
+
         public TeamController(IUnitOfWork unitOfWork, ILogger<TeamController> logger,
             IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings)
         {
@@ -176,7 +166,6 @@ namespace TimeAPI.API.Controllroers
         [Route("GetAllTeam")]
         public async Task<object> GetAllTeam(CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -331,9 +320,5 @@ namespace TimeAPI.API.Controllroers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
-
-
-        
     }
 }

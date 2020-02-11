@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
-using System.Text;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -11,6 +9,7 @@ namespace TimeAPI.Data.Repositories
     {
         public ProjectActivityTaskRepository(IDbTransaction transaction) : base(transaction)
         { }
+
         public void Add(ProjectActivityTask entity)
         {
             entity.id = ExecuteScalar<string>(
@@ -21,6 +20,7 @@ namespace TimeAPI.Data.Repositories
                     param: entity
                 );
         }
+
         public ProjectActivityTask Find(string key)
         {
             return QuerySingleOrDefault<ProjectActivityTask>(
@@ -28,6 +28,7 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
+
         public void Remove(string key)
         {
             Execute(
@@ -38,15 +39,16 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
+
         public void Update(ProjectActivityTask entity)
         {
             Execute(
                 sql: @"UPDATE dbo.project_activity_x_task
-                   SET 
-                    project_id = @project_id, 
-                    activity_id = @activity_id, 
+                   SET
+                    project_id = @project_id,
+                    activity_id = @activity_id,
                     task_id = @task_id,
-                    modified_date = @modified_date, 
+                    modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE id = @id",
                 param: entity
@@ -82,13 +84,12 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-
         public IEnumerable<dynamic> GetAllTaskByActivityID(string key)
         {
             return Query<dynamic>(
-                   sql: @"SELECT 
-                            dbo.task.id, 
-                            dbo.task.task_desc  
+                   sql: @"SELECT
+                            dbo.task.id,
+                            dbo.task.task_desc
                         FROM dbo.task WITH(NOLOCK)
                         INNER JOIN  dbo.project_activity_x_task on task.id = dbo.project_activity_x_task.task_id
                         WHERE dbo.project_activity_x_task.activity_id = @key

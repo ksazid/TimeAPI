@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
-using System.Text;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -11,6 +9,7 @@ namespace TimeAPI.Data.Repositories
     {
         public ProjectRepository(IDbTransaction transaction) : base(transaction)
         { }
+
         public void Add(Project entity)
         {
             entity.id = ExecuteScalar<string>(
@@ -21,6 +20,7 @@ namespace TimeAPI.Data.Repositories
                     param: entity
                 );
         }
+
         public Project Find(string key)
         {
             return QuerySingleOrDefault<Project>(
@@ -28,6 +28,7 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
+
         public void Remove(string key)
         {
             Execute(
@@ -38,38 +39,41 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
+
         public void Update(Project entity)
         {
             Execute(
                 sql: @"UPDATE dbo.project
-                   SET 
-                    user_id = @user_id, 
+                   SET
+                    user_id = @user_id,
                     org_id = @org_id,
-                    project_name = @project_name, 
-                    project_desc = @project_desc, 
+                    project_name = @project_name,
+                    project_desc = @project_desc,
                     project_prefix = @project_prefix,
-                    start_date = @start_date, 
-                    end_date = @end_date, 
-                    completed_date = @completed_date, 
-                    project_status_id = @project_status_id, 
-                    is_private = @is_private, 
+                    start_date = @start_date,
+                    end_date = @end_date,
+                    completed_date = @completed_date,
+                    project_status_id = @project_status_id,
+                    is_private = @is_private,
                     is_public = @is_public,
-                    modified_date = @modified_date, 
+                    modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE id = @id",
                 param: entity
             );
         }
+
         public IEnumerable<Project> All()
         {
             return Query<Project>(
                 sql: "SELECT * FROM [dbo].[project] where is_deleted = 0"
             );
         }
+
         public IEnumerable<dynamic> FetchAllProjectByOrgID(string key)
         {
             return Query<dynamic>(
-                   sql: @"SELECT 
+                   sql: @"SELECT
                             project.id as project_id,
                             project.project_name,
                             project.project_prefix,
@@ -88,13 +92,14 @@ namespace TimeAPI.Data.Repositories
                       param: new { key }
                );
         }
+
         public void UpdateProjectStatusByID(Project entity)
         {
             Execute(
                sql: @"UPDATE dbo.project
-                   SET 
-                    project_status_id = @project_status_id, 
-                    modified_date = @modified_date, 
+                   SET
+                    project_status_id = @project_status_id,
+                    modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE id = @id",
                param: entity

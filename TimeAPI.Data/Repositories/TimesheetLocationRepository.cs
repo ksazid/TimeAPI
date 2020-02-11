@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using TimeAPI.Domain.Entities;
-using TimeAPI.Domain.Model;
 using TimeAPI.Domain.Repositories;
 
 namespace TimeAPI.Data.Repositories
@@ -13,12 +12,11 @@ namespace TimeAPI.Data.Repositories
 
         public void Add(TimesheetLocation entity)
         {
-
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.timesheet_location
-                                  (id,  groupid, manual_address, geo_address, formatted_address, lat, lang, street_number, route, locality, administrative_area_level_2, 
+                                  (id,  groupid, manual_address, geo_address, formatted_address, lat, lang, street_number, route, locality, administrative_area_level_2,
                                    administrative_area_level_1, postal_code, country, is_office, is_manual, created_date, createdby)
-                           VALUES (@id, @groupid, @manual_address, @geo_address, @formatted_address, @lat, @lang, @street_number, @route, @locality, @administrative_area_level_2, 
+                           VALUES (@id, @groupid, @manual_address, @geo_address, @formatted_address, @lat, @lang, @street_number, @route, @locality, @administrative_area_level_2,
                                    @administrative_area_level_1, @postal_code, @country, @is_office, @is_manual, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
@@ -42,7 +40,7 @@ namespace TimeAPI.Data.Repositories
                     WHERE id = @key",
                 param: new { key }
             );
-        } 
+        }
 
         public void RemoveByGroupID(string GroupID)
         {
@@ -59,23 +57,23 @@ namespace TimeAPI.Data.Repositories
         {
             Execute(
                 sql: @"UPDATE dbo.timesheet_location
-                   SET 
+                   SET
                     groupid = @groupid,
                     manual_address = @manual_address,
                     geo_address = @geo_address,
-                    formatted_address = @formatted_address, 
-                    lat = @lat, 
-                    lang = @lang, 
-                    street_number = @street_number, 
-                    route = @route, 
-                    locality = @locality, 
-                    administrative_area_level_2 = @administrative_area_level_2, 
+                    formatted_address = @formatted_address,
+                    lat = @lat,
+                    lang = @lang,
+                    street_number = @street_number,
+                    route = @route,
+                    locality = @locality,
+                    administrative_area_level_2 = @administrative_area_level_2,
                     administrative_area_level_1 = @administrative_area_level_1,
-                    postal_code = @postal_code, 
+                    postal_code = @postal_code,
                     country = @country,
                     is_office = @is_office,
                     is_manual = @is_manual,
-                    modified_date = @modified_date, 
+                    modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE id = @id",
                 param: entity
@@ -88,6 +86,5 @@ namespace TimeAPI.Data.Repositories
                 sql: "SELECT * FROM [dbo].[timesheet_location] where is_deleted = 0"
             );
         }
-
     }
 }

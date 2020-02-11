@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using TimeAPI.Domain.Entities;
-using TimeAPI.Domain.Model;
 using TimeAPI.Domain.Repositories;
 
 namespace TimeAPI.Data.Repositories
@@ -13,13 +12,12 @@ namespace TimeAPI.Data.Repositories
 
         public void Add(Location entity)
         {
-
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.location
-        
-                                  (id, groupid, geo_address, formatted_address, lat, lang, street_number, route, locality, administrative_area_level_2, 
+
+                                  (id, groupid, geo_address, formatted_address, lat, lang, street_number, route, locality, administrative_area_level_2,
                                    administrative_area_level_1, postal_code, country, created_date, createdby, is_checkout)
-                           VALUES (@id, @groupid, @geo_address, @formatted_address, @lat, @lang, @street_number, @route, @locality, @administrative_area_level_2, 
+                           VALUES (@id, @groupid, @geo_address, @formatted_address, @lat, @lang, @street_number, @route, @locality, @administrative_area_level_2,
                                    @administrative_area_level_1, @postal_code, @country, @created_date, @createdby, @is_checkout);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
@@ -43,25 +41,25 @@ namespace TimeAPI.Data.Repositories
                     WHERE id = @key",
                 param: new { key }
             );
-        } 
+        }
 
         public void Update(Location entity)
         {
             Execute(
                 sql: @"UPDATE dbo.location
-                   SET 
+                   SET
                     geo_address = @geo_address,
-                    formatted_address = @formatted_address, 
-                    lat = @lat, 
-                    lang = @lang, 
-                    street_number = @street_number, 
-                    route = @route, 
-                    locality = @locality, 
-                    administrative_area_level_2 = @administrative_area_level_2, 
+                    formatted_address = @formatted_address,
+                    lat = @lat,
+                    lang = @lang,
+                    street_number = @street_number,
+                    route = @route,
+                    locality = @locality,
+                    administrative_area_level_2 = @administrative_area_level_2,
                     administrative_area_level_1 = @administrative_area_level_1,
-                    postal_code = @postal_code, 
+                    postal_code = @postal_code,
                     country = @country,
-                    modified_date = @modified_date, 
+                    modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE id = @id",
                 param: entity
@@ -73,8 +71,6 @@ namespace TimeAPI.Data.Repositories
             return Query<Location>(
                 sql: "SELECT * FROM [dbo].[location] where is_deleted = 0"
             );
-
         }
-
     }
 }

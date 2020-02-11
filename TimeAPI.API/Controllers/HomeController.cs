@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Diagnostics;
-using TimeAPI.API.Filters;
 using TimeAPI.API.Models;
 
 namespace TimeAPI.API.Controllers
@@ -15,11 +14,8 @@ namespace TimeAPI.API.Controllers
 
         public HomeController(ILogger<HomeController> logger)
         {
-
-           
             _logger = logger;
         }
-
 
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()

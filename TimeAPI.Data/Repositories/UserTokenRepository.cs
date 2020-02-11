@@ -19,7 +19,6 @@ namespace TimeAPI.Data.Repositories
                     VALUES(@UserId, @LoginProvider, @Name, @Value)",
                 param: entity
             );
-
         }
 
         public IEnumerable<UserToken> All()

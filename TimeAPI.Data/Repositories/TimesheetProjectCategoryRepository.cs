@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using TimeAPI.Domain.Entities;
-using TimeAPI.Domain.Model;
 using TimeAPI.Domain.Repositories;
 
 namespace TimeAPI.Data.Repositories
@@ -13,7 +12,6 @@ namespace TimeAPI.Data.Repositories
 
         public void Add(TimesheetProjectCategory entity)
         {
-
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.timesheet_x_project_category
                                   (id,  groupid, project_category_type, project_or_comp_id, project_or_comp_name, project_or_comp_type, created_date, createdby)
@@ -57,13 +55,13 @@ namespace TimeAPI.Data.Repositories
         {
             Execute(
                 sql: @"UPDATE dbo.timesheet_x_project_category
-                   SET 
+                   SET
                     groupid = @groupid,
-                    project_category_type = @project_category_type,  
-                    project_or_comp_id = @project_or_comp_id,  
-                    project_or_comp_name = @project_or_comp_name, 
+                    project_category_type = @project_category_type,
+                    project_or_comp_id = @project_or_comp_id,
+                    project_or_comp_name = @project_or_comp_name,
                     project_or_comp_type = @project_or_comp_type,
-                    modified_date = @modified_date, 
+                    modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE id = @id",
                 param: entity
@@ -76,6 +74,5 @@ namespace TimeAPI.Data.Repositories
                 sql: "SELECT * FROM [dbo].[timesheet_x_project_category] where is_deleted = 0"
             );
         }
-     
     }
 }

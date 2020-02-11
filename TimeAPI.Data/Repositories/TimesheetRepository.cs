@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using TimeAPI.Domain.Entities;
-using TimeAPI.Domain.Model;
 using TimeAPI.Domain.Repositories;
 
 namespace TimeAPI.Data.Repositories
@@ -64,14 +63,14 @@ namespace TimeAPI.Data.Repositories
         {
             Execute(
                 sql: @"UPDATE dbo.timesheet
-                   SET 
+                   SET
                     empid = @empid,
                     ondate = @ondate,
                     check_in = @check_in,
                     check_out = @check_out,
                     is_checkout = @is_checkout,
                     groupid = @groupid,
-                    modified_date = @modified_date, 
+                    modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE id = @id",
                 param: entity
@@ -84,20 +83,20 @@ namespace TimeAPI.Data.Repositories
                 sql: "SELECT * FROM [dbo].[timesheet] where is_deleted = 0"
             );
         }
+
         public void CheckOutByEmpID(Timesheet entity)
         {
             Execute(
                  sql: @"UPDATE dbo.timesheet
-                   SET 
+                   SET
                     check_out = @check_out,
                     is_checkout = @is_checkout,
                     total_hrs = @total_hrs,
-                    modified_date = @modified_date, 
+                    modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE empid = @empid and groupid = @groupid",
-                 param: entity 
+                 param: entity
              );
         }
-
     }
 }

@@ -1,9 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
-using System.Dynamic;
-using System.Linq;
 using TimeAPI.Domain.Entities;
-using TimeAPI.Domain.Model;
 using TimeAPI.Domain.Repositories;
 
 namespace TimeAPI.Data.Repositories
@@ -47,11 +44,11 @@ namespace TimeAPI.Data.Repositories
         {
             Execute(
                 sql: @"UPDATE dbo.saas_plan_features
-                   SET 
-                    plan_id = @plan_id, 
-                    feature_name = @feature_name,  
+                   SET
+                    plan_id = @plan_id,
+                    feature_name = @feature_name,
                     feature_desc =@feature_desc,
-                    modified_date = @modified_date, 
+                    modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE id =  @id",
                 param: entity
@@ -68,10 +65,10 @@ namespace TimeAPI.Data.Repositories
         public dynamic GetAllPlanFeatures()
         {
             return Query<dynamic>(
-                   sql: @"SELECT 
-		                    saas_plan_features.id, 
-		                    dbo.saas_plan.plan_name, 
-		                    saas_plan_features.feature_name, 
+                   sql: @"SELECT
+		                    saas_plan_features.id,
+		                    dbo.saas_plan.plan_name,
+		                    saas_plan_features.feature_name,
 		                    saas_plan_features.feature_desc,
 		                    saas_plan_features.is_active
                       FROM dbo.saas_plan_features WITH(NOLOCK)

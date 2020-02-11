@@ -12,7 +12,6 @@ namespace TimeAPI.Data.Repositories
 
         public void Add(Designation entity)
         {
-
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.designation
                                   (id, dep_id, designation_name, alias, created_date, createdby)
@@ -46,12 +45,12 @@ namespace TimeAPI.Data.Repositories
         {
             Execute(
                 sql: @"UPDATE dbo.designation
-                   SET 
-                    id = @id, 
+                   SET
+                    id = @id,
                     dep_id = @dep_id,
-                    designation_name = @designation_name, 
-                    alias = @alias, 
-                    modified_date = @modified_date, 
+                    designation_name = @designation_name,
+                    alias = @alias,
+                    modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE id = @id",
                 param: entity
@@ -61,8 +60,8 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<Designation> All()
         {
             return Query<Designation>(
-                sql: @"SELECT * FROM [dbo].[designation] WITH (NOLOCK) 
-                            WHERE is_deleted = 0         
+                sql: @"SELECT * FROM [dbo].[designation] WITH (NOLOCK)
+                            WHERE is_deleted = 0
                             ORDER BY designation.designation_name ASC"
             );
         }
@@ -70,7 +69,7 @@ namespace TimeAPI.Data.Repositories
         public Designation FindByDesignationName(string dep_name)
         {
             return QuerySingleOrDefault<Designation>(
-                sql: @"SELECT * FROM [dbo].[designation] WITH (NOLOCK) 
+                sql: @"SELECT * FROM [dbo].[designation] WITH (NOLOCK)
                         WHERE designation_name = @designation_name and is_deleted = 0",
                 param: new { dep_name }
             );
@@ -79,8 +78,8 @@ namespace TimeAPI.Data.Repositories
         public Designation FindByDesignationAlias(string alias)
         {
             return QuerySingleOrDefault<Designation>(
-                sql: @"SELECT * FROM [dbo].[designation] WITH (NOLOCK) 
-                                WHERE alias = @alias and is_deleted = 0  
+                sql: @"SELECT * FROM [dbo].[designation] WITH (NOLOCK)
+                                WHERE alias = @alias and is_deleted = 0
                                 ORDER BY designation.designation_name ASC",
                 param: new { alias }
             );
@@ -89,8 +88,8 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<Designation> FindDesignationByDeptID(string dep_id)
         {
             return Query<Designation>(
-                sql: @"SELECT * FROM [dbo].[designation] WITH (NOLOCK) 
-                            WHERE dep_id = @dep_id and is_deleted = 0  
+                sql: @"SELECT * FROM [dbo].[designation] WITH (NOLOCK)
+                            WHERE dep_id = @dep_id and is_deleted = 0
                             ORDER BY designation.designation_name ASC",
                 param: new { dep_id }
             );
@@ -99,7 +98,7 @@ namespace TimeAPI.Data.Repositories
         public dynamic FetchGridDataByDesignationByDeptOrgID(string key)
         {
             return Query<dynamic>(
-                   sql: @"SELECT 
+                   sql: @"SELECT
 	                        designation.id,
 	                        designation.alias,
 	                        department.dep_name,
@@ -115,7 +114,7 @@ namespace TimeAPI.Data.Repositories
         public dynamic GetAllDesignationByOrgID(string key)
         {
             return Query<dynamic>(
-                   sql: @"SELECT 
+                   sql: @"SELECT
 	                        designation.id,
                             department.dep_name,
 	                        designation.designation_name
@@ -126,6 +125,5 @@ namespace TimeAPI.Data.Repositories
                       param: new { key }
                );
         }
-
     }
 }

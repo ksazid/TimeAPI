@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
-using System.Text;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -9,7 +7,6 @@ namespace TimeAPI.Data.Repositories
 {
     public class EmployeeStatusRepository : RepositoryBase, IEmployeeStatusRepository
     {
-
         public EmployeeStatusRepository(IDbTransaction transaction) : base(transaction)
         { }
 
@@ -47,11 +44,11 @@ namespace TimeAPI.Data.Repositories
         {
             Execute(
                 sql: @"UPDATE dbo.employee_status
-                   SET 
+                   SET
                     org_id =@org_id,
-                    employee_status_name = @employee_status_name, 
-                    employee_status_desc = @employee_status_desc, 
-                    modified_date = @modified_date, 
+                    employee_status_name = @employee_status_name,
+                    employee_status_desc = @employee_status_desc,
+                    modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE id = @id",
                 param: entity
@@ -68,7 +65,7 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<EmployeeStatus> GetEmployeeStatusByOrgID(string key)
         {
             return Query<EmployeeStatus>(
-                sql: @"SELECT * FROM [dbo].[employee_status] 
+                sql: @"SELECT * FROM [dbo].[employee_status]
                         WHERE is_deleted = 0 AND org_id IS NULL
                         UNION ALL
                         SELECT * FROM[dbo].[employee_status]

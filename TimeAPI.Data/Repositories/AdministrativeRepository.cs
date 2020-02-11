@@ -7,22 +7,27 @@ namespace TimeAPI.Data.Repositories
 {
     public class AdministrativeRepository : RepositoryBase, IAdministrativeRepository
     {
-
         public AdministrativeRepository(IDbTransaction transaction) : base(transaction)
         {
-
         }
 
         public void Add(Administrative entity)
         {
             entity.id = ExecuteScalar<string>(
                     sql: @"
-                    INSERT INTO [dbo].[administrative]  
+                    INSERT INTO [dbo].[administrative]
                            (id, dept_id, org_id, administrative_name, summary, created_date, createdby)
                     VALUES (@id, @dept_id, @org_id, @administrative_name,  @summary, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
+        }
+
+        public IEnumerable<Administrative> All()
+        {
+            return Query<Administrative>(
+                sql: "SELECT * FROM [dbo].[administrative] WHERE  is_deleted = 0"
+            );
         }
 
         public Administrative Find(string key)
@@ -33,13 +38,6 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<Administrative> All()
-        {
-            return Query<Administrative>(
-                sql: "SELECT * FROM [dbo].[administrative] WHERE  is_deleted = 0"
-            );
-        }
-
         public RootObject GetByOrgID(string key)
         {
             RootObject rootObject = new RootObject();
@@ -47,8 +45,8 @@ namespace TimeAPI.Data.Repositories
 
             var dep = Query<Department>(
                    sql: @"SELECT DISTINCT(department.id),
-                        department.dep_name 
-                            FROM [dbo].[department] WHERE is_deleted = 0 
+                        department.dep_name
+                            FROM [dbo].[department] WHERE is_deleted = 0
                             AND org_id =@key",
                     param: new { key }
                );
@@ -83,11 +81,27 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
+        public void Update(Administrative entity)
+        {
+            Execute(
+                sql: @"UPDATE dbo.administrative
+                   SET
+                       dept_id = @dept_id,
+                       administrative_name = @administrative_name,
+                       org_id  = @org_id,
+                       summary = @summary,
+                       modified_date = @modified_date,
+                       modifiedby = @modifiedby
+                    WHERE id = @id",
+                param: entity
+            );
+        }
+
         private IEnumerable<AdministrativeDropDown> GetDepartmentObject(string key)
         {
             return Query<AdministrativeDropDown>(
-              sql: @"SELECT 
-                    id, 
+              sql: @"SELECT
+                    id,
                     administrative_name as text
             FROM[dbo].[administrative]
                 WHERE[dbo].[administrative].is_deleted = 0
@@ -95,22 +109,6 @@ namespace TimeAPI.Data.Repositories
                 ORDER BY[dbo].[administrative].administrative_name ASC",
               param: new { key }
           );
-        }
-
-        public void Update(Administrative entity)
-        {
-            Execute(
-                sql: @"UPDATE dbo.administrative
-                   SET 
-                       dept_id = @dept_id,
-                       administrative_name = @administrative_name, 
-                       org_id  = @org_id,
-                       summary = @summary,
-                       modified_date = @modified_date, 
-                       modifiedby = @modifiedby
-                    WHERE id = @id",
-                param: entity
-            );
         }
     }
 }

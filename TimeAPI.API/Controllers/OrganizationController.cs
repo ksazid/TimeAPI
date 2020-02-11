@@ -1,13 +1,9 @@
-﻿using System;
-using System.Globalization;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using TimeAPI.API.Filters;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using TimeAPI.API.Models;
 using TimeAPI.API.Models.EntityLocationViewModels;
 using TimeAPI.API.Models.OrganizationViewModels;
@@ -29,7 +25,7 @@ namespace TimeAPI.API.Controllers
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
         private readonly DateTime _dateTime;
-        
+
         public OrganizationController(IUnitOfWork unitOfWork, ILogger<EmployeeController> logger,
             IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings)
         {
@@ -59,7 +55,6 @@ namespace TimeAPI.API.Controllers
                 modal.org_id = Guid.NewGuid().ToString();
                 modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
-
 
                 if (organizationViewModel.EntityLocationViewModel != null)
                 {
@@ -247,8 +242,6 @@ namespace TimeAPI.API.Controllers
                 modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
-
-
                 if (organizationBranchViewModel.EntityLocationViewModel != null)
                 {
                     var OrgLocation = SetLocationForOrg(organizationBranchViewModel.EntityLocationViewModel, modal.org_id.ToString());
@@ -299,4 +292,3 @@ namespace TimeAPI.API.Controllers
         }
     }
 }
-

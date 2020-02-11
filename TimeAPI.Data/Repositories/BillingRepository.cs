@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
-using System.Text;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -11,6 +9,7 @@ namespace TimeAPI.Data.Repositories
     {
         public BillingRepository(IDbTransaction transaction) : base(transaction)
         { }
+
         public void Add(Billing entity)
         {
             entity.id = ExecuteScalar<string>(
@@ -20,7 +19,8 @@ namespace TimeAPI.Data.Repositories
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
-        }   
+        }
+
         public Billing Find(string key)
         {
             return QuerySingleOrDefault<Billing>(
@@ -28,6 +28,7 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
+
         public void Remove(string key)
         {
             Execute(
@@ -38,29 +39,32 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
+
         public void Update(Billing entity)
         {
             Execute(
                 sql: @"UPDATE dbo.team
-                   SET 
+                   SET
                     org_id = @org_id,
-                    team_name = @team_name, 
-                    team_desc = @team_desc, 
-                    team_by = @team_by, 
-                    team_department_id = @team_department_id, 
+                    team_name = @team_name,
+                    team_desc = @team_desc,
+                    team_by = @team_by,
+                    team_department_id = @team_department_id,
                     team_lead_empid = @team_lead_empid,
-                    modified_date = @modified_date, 
+                    modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE id = @id",
                 param: entity
             );
         }
+
         public IEnumerable<Billing> All()
         {
             return Query<Billing>(
                 sql: "SELECT * FROM [dbo].[team] where is_deleted = 0"
             );
         }
+
         public IEnumerable<Billing> FindBillingsByOrgID(string key)
         {
             return Query<Billing>(

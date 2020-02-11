@@ -4,13 +4,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web;
 using TimeAPI.API.Extensions;
 using TimeAPI.API.Models;
 using TimeAPI.API.Models.AccountViewModels;
@@ -59,13 +57,11 @@ namespace TimeAPI.API.Controllers
             //ViewData["ReturnUrl"] = returnUrl;
             //if (ModelState.IsValid)
             //{
-
             string UserName = string.Empty;
             if (UserHelpers.ValidateEmailOrPhone(model.Email).Equals("PHONE"))
                 UserName = UserHelpers.IsPhoneValid(model.Email);
             else
                 UserName = model.Email;
-
 
             var user = await _userManager.FindByNameAsync(UserName).ConfigureAwait(true);
             if (user != null && await _userManager.CheckPasswordAsync(user, model.Password).ConfigureAwait(true))
@@ -80,7 +76,6 @@ namespace TimeAPI.API.Controllers
                 var tokenDescriptor = new SecurityTokenDescriptor()
                 {
                     Subject = new ClaimsIdentity(new Claim[] {
-
                         new Claim("UserID", user.Id.ToString()),
                         new Claim(options.ClaimsIdentity.RoleClaimType, role.FirstOrDefault())
                     }),
@@ -97,16 +92,13 @@ namespace TimeAPI.API.Controllers
                 return Ok(new SuccessViewModel { Code = "201", Status = "Error", Desc = "Please enter a valid user and password." });
             //}
             //return BadRequest(new { message = "OOP! Please enter a valid user and password." });
-
-
-
         }
 
         [HttpPost]
         [Route("SignUp")]
         public async Task<object> SignUp([FromBody]RegisterViewModel UserModel)
         {
-            //check if user has input email or phone as user and set global _userName 
+            //check if user has input email or phone as user and set global _userName
             GetUserName(UserModel);
             var OutResult = UserHelpers.ValidatePhoneNumber(_userName);
             if (OutResult.Equals("INVALID"))
@@ -161,7 +153,6 @@ namespace TimeAPI.API.Controllers
             var user = await _userManager.FindByIdAsync(userId).ConfigureAwait(true);
             if (user == null)
                 throw new ApplicationException($"Unable to load user with ID '{userId}'.");
-
 
             #region
 
@@ -250,6 +241,7 @@ namespace TimeAPI.API.Controllers
         }
 
         #region Helpers
+
         private void AddErrors(IdentityResult result)
         {
             foreach (var error in result.Errors)
@@ -294,8 +286,6 @@ namespace TimeAPI.API.Controllers
             {
                 _userName = UserModel.Email;
             }
-
-
         }
 
         private static Employee GetEmployeeProperty(ApplicationUser user)
@@ -375,9 +365,3 @@ namespace TimeAPI.API.Controllers
         #endregion
     }
 }
-
-
-
-
-
-

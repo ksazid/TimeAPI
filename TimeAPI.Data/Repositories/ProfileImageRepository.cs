@@ -3,7 +3,6 @@ using System.Data;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
-
 namespace TimeAPI.Data.Repositories
 {
     public class ProfileImageRepository : RepositoryBase, IProfileImageRepository
@@ -14,7 +13,6 @@ namespace TimeAPI.Data.Repositories
 
         public void Add(Image entity)
         {
-
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.image
                                    (id, user_id, img_name, img_url, created_date, createdby)
@@ -47,11 +45,11 @@ namespace TimeAPI.Data.Repositories
         {
             Execute(
                 sql: @"UPDATE dbo.image
-                   SET 
-                        user_id = @user_id, 
-                        img_name = @img_name, 
-                        img_url = @img_url, 
-                        modified_date = @modified_date, 
+                   SET
+                        user_id = @user_id,
+                        img_name = @img_name,
+                        img_url = @img_url,
+                        modified_date = @modified_date,
                         modifiedby = @modifiedby
                     WHERE id = @id",
                 param: entity
@@ -72,6 +70,5 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
-
     }
 }

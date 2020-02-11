@@ -1,21 +1,13 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using TimeAPI.API.Models;
 using TimeAPI.API.Models.DepartmentViewModels;
-using TimeAPI.API.Models.EmployeeViewModels;
 using TimeAPI.API.Pre_Defined;
 using TimeAPI.API.Services;
 using TimeAPI.Domain;
@@ -34,6 +26,7 @@ namespace TimeAPI.API.Controllers
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
         private readonly DateTime _dateTime;
+
         public DepartmentController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager, ILogger<DepartmentController> logger, IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings)
         {
             _emailSender = emailSender;
@@ -74,7 +67,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
 
         [HttpPatch]
         [Route("UpdateDepartment")]
@@ -151,7 +143,6 @@ namespace TimeAPI.API.Controllers
         [Route("FindByDepartmentName")]
         public async Task<object> FindByDepartmentName([FromBody] UtilsName UtilsName, CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -174,7 +165,6 @@ namespace TimeAPI.API.Controllers
         [Route("FindByDepartmentAlias")]
         public async Task<object> FindByDepartmentAlias([FromBody] UtilsAlias UtilsAlias, CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -197,7 +187,6 @@ namespace TimeAPI.API.Controllers
         [Route("FindDepartmentByOrgID")]
         public async Task<object> FindDepartmentByOrgID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -220,7 +209,6 @@ namespace TimeAPI.API.Controllers
         [Route("FindByDepartmentID")]
         public async Task<object> FindByDepartmentID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -304,8 +292,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
-        #region SetUp 
+        #region SetUp
 
         [HttpPost]
         [Route("SetupPreDefinedDepartment")]
@@ -324,7 +311,6 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.Commit();
 
                 return System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Successful", Desc = "Department Added Successfully" });
-
             }
             catch (Exception ex)
             {
@@ -399,7 +385,6 @@ namespace TimeAPI.API.Controllers
                     };
                     _unitOfWork.DesignationRepositiory.Add(Designation);
                 }
-
             }
             if (utilDepartmentChecked.is_advertisement_marketing)
             {
@@ -433,7 +418,6 @@ namespace TimeAPI.API.Controllers
                     };
                     _unitOfWork.DesignationRepositiory.Add(Designation);
                 }
-
             }
             if (utilDepartmentChecked.is_construction)
             {
@@ -467,7 +451,6 @@ namespace TimeAPI.API.Controllers
                     };
                     _unitOfWork.DesignationRepositiory.Add(Designation);
                 }
-
             }
             if (utilDepartmentChecked.is_customer_service)
             {
@@ -699,7 +682,6 @@ namespace TimeAPI.API.Controllers
                     };
                     _unitOfWork.DesignationRepositiory.Add(Designation);
                 }
-
             }
             if (utilDepartmentChecked.is_legal)
             {
@@ -733,7 +715,6 @@ namespace TimeAPI.API.Controllers
                     };
                     _unitOfWork.DesignationRepositiory.Add(Designation);
                 }
-
             }
             if (utilDepartmentChecked.is_logistics)
             {
@@ -767,7 +748,6 @@ namespace TimeAPI.API.Controllers
                     };
                     _unitOfWork.DesignationRepositiory.Add(Designation);
                 }
-
             }
             if (utilDepartmentChecked.is_operation_and_production)
             {
@@ -801,7 +781,6 @@ namespace TimeAPI.API.Controllers
                     };
                     _unitOfWork.DesignationRepositiory.Add(Designation);
                 }
-
             }
             if (utilDepartmentChecked.is_real_estate)
             {
@@ -835,7 +814,6 @@ namespace TimeAPI.API.Controllers
                     };
                     _unitOfWork.DesignationRepositiory.Add(Designation);
                 }
-
             }
             if (utilDepartmentChecked.is_sales)
             {
@@ -872,7 +850,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        #endregion SetUp 
+        #endregion SetUp
 
     }
 }

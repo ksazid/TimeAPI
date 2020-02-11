@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
-using System.Text;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -9,13 +7,11 @@ namespace TimeAPI.Data.Repositories
 {
     public class EmployeeTypeRepository : RepositoryBase, IEmployeeTypeRepository
     {
-
         public EmployeeTypeRepository(IDbTransaction transaction) : base(transaction)
         { }
 
         public void Add(EmployeeType entity)
         {
-
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.employee_type
                                   (id, org_id, employee_type_name, employee_type_desc, created_date, createdby)
@@ -48,11 +44,11 @@ namespace TimeAPI.Data.Repositories
         {
             Execute(
                 sql: @"UPDATE dbo.employee_type
-                   SET 
+                   SET
                     org_id = @org_id,
-                    employee_type_name = @employee_type_name, 
-                    employee_type_desc = @employee_type_desc, 
-                    modified_date = @modified_date, 
+                    employee_type_name = @employee_type_name,
+                    employee_type_desc = @employee_type_desc,
+                    modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE id = @id",
                 param: entity
@@ -73,6 +69,5 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
-        
     }
 }

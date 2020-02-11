@@ -1,25 +1,14 @@
-﻿using TimeAPI.API.Models.AccountViewModels;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using TimeAPI.API.Models;
-using TimeAPI.API.Services;
-using Microsoft.AspNetCore.Cors;
-using TimeAPI.API.Filters;
-using TimeAPI.Domain;
-using System.Threading;
-using TimeAPI.Domain.Entities;
 using TimeAPI.API.Models.SocialViewModels;
-using System.Globalization;
+using TimeAPI.API.Services;
+using TimeAPI.Domain;
+using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.API.Controllroers
 {
@@ -34,6 +23,7 @@ namespace TimeAPI.API.Controllroers
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
         private readonly DateTime _dateTime;
+
         public SocialController(IUnitOfWork unitOfWork, ILogger<SocialController> logger,
             IEmailSender emailSender,
             IOptions<ApplicationSettings> AppSettings)
@@ -45,8 +35,6 @@ namespace TimeAPI.API.Controllroers
             _dateTime = InternetTime.GetCurrentTimeFromTimeZone().Value.DateTime;
         }
 
-
-        
         [HttpPost]
         [Route("AddSocial")]
         public async Task<object> AddSocial([FromBody] SocialViewModel socialViewModel, CancellationToken cancellationToken)
@@ -58,7 +46,7 @@ namespace TimeAPI.API.Controllroers
 
                 if (socialViewModel == null)
                     throw new ArgumentNullException(nameof(socialViewModel));
- 
+
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<SocialViewModel, Social>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Social>(socialViewModel);
@@ -191,6 +179,5 @@ namespace TimeAPI.API.Controllroers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-    
     }
 }

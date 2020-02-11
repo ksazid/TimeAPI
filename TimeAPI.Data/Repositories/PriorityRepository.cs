@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
-using System.Text;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -15,10 +13,9 @@ namespace TimeAPI.Data.Repositories
 
         public void Add(Priority entity)
         {
-
             entity.id = ExecuteScalar<string>(
                     sql: @"
-                    INSERT INTO dbo.priority 
+                    INSERT INTO dbo.priority
                             (id, org_id, priority_name, priority_desc, created_date, createdby)
                     VALUES (@id, @org_id, @priority_name, @priority_desc, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
@@ -33,6 +30,7 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
+
         public IEnumerable<Priority> GetPriorityByOrgID(string key)
         {
             return Query<Priority>(
@@ -40,6 +38,7 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
+
         public IEnumerable<Priority> All()
         {
             return Query<Priority>(
@@ -47,7 +46,6 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        
         public void Remove(string key)
         {
             Execute(
@@ -68,6 +66,5 @@ namespace TimeAPI.Data.Repositories
                 param: entity
             );
         }
-
     }
 }

@@ -1,21 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Data;
-using System.Dynamic;
 using TimeAPI.Domain.Entities;
-using TimeAPI.Domain.Model;
 using TimeAPI.Domain.Repositories;
 
 namespace TimeAPI.Data.Repositories
 {
     public class TaskTeamMembersRepository : RepositoryBase, ITaskTeamMembersRepository
     {
-
         public TaskTeamMembersRepository(IDbTransaction transaction) : base(transaction)
         { }
 
         public void Add(TaskTeamMember entity)
         {
-
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.task_team_members
                                   (id, task_id, empid, created_date, createdby)
@@ -48,10 +44,10 @@ namespace TimeAPI.Data.Repositories
         {
             Execute(
                 sql: @"UPDATE dbo.task_team_members
-                   SET 
+                   SET
                     task_id = @task_id,
                     empid = @empid,
-                    modified_date = @modified_date, 
+                    modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE id =  @id",
                 param: entity

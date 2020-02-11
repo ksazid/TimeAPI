@@ -1,25 +1,14 @@
-﻿using TimeAPI.API.Models.AccountViewModels;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using TimeAPI.API.Models;
-using TimeAPI.API.Services;
-using Microsoft.AspNetCore.Cors;
-using TimeAPI.API.Filters;
-using TimeAPI.Domain;
 using TimeAPI.API.Models.ReportingViewModels;
-using System.Threading;
+using TimeAPI.API.Services;
+using TimeAPI.Domain;
 using TimeAPI.Domain.Entities;
-using System.Globalization;
 
 namespace TimeAPI.API.Controllers
 {
@@ -34,7 +23,7 @@ namespace TimeAPI.API.Controllers
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
         private readonly DateTime _dateTime;
-        
+
         public ReportingController(IUnitOfWork unitOfWork, ILogger<ReportingController> logger,
             IEmailSender emailSender,
             IOptions<ApplicationSettings> AppSettings)
@@ -45,7 +34,7 @@ namespace TimeAPI.API.Controllers
             _unitOfWork = unitOfWork;
             _dateTime = InternetTime.GetCurrentTimeFromTimeZone().Value.DateTime;
         }
-        
+
         [HttpPost]
         [Route("AddReporting")]
         public async Task<object> AddReporting([FromBody] ReportingViewModel reportingViewModel, CancellationToken cancellationToken)
@@ -77,7 +66,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        
         [HttpPatch]
         [Route("UpdateReporting")]
         public async Task<object> UpdateReporting([FromBody] ReportingViewModel reportingViewModel, CancellationToken cancellationToken)
@@ -106,7 +94,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        
         [HttpPost]
         [Route("RemoveReporting")]
         public async Task<object> RemoveReporting([FromBody] Utils Utils, CancellationToken cancellationToken)
@@ -130,7 +117,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        
         [HttpGet]
         [Route("GetAllReporting")]
         public async Task<object> GetAllReporting(CancellationToken cancellationToken)
@@ -154,7 +140,6 @@ namespace TimeAPI.API.Controllers
         [Route("FindByReportEmpID")]
         public async Task<object> FindByReportEmpID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -173,7 +158,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        
         [HttpPost]
         [Route("FindReportingHeadByEmpID")]
         public async Task<object> FindReportingHeadByEmpID([FromBody] Utils Utils, CancellationToken cancellationToken)
@@ -195,6 +179,5 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
     }
 }

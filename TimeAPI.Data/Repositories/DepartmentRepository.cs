@@ -1,21 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using TimeAPI.Domain.Entities;
-using TimeAPI.Domain.Model;
 using TimeAPI.Domain.Repositories;
-
 
 namespace TimeAPI.Data.Repositories
 {
     public class DepartmentRepository : RepositoryBase, IDepartmentRepository
     {
-
         public DepartmentRepository(IDbTransaction transaction) : base(transaction)
         { }
 
         public void Add(Department entity)
         {
-
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.department
                                   (id, org_id, depart_lead_empid, dep_name, alias, created_date, createdby)
@@ -25,7 +21,7 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public Department Find(string key)  
+        public Department Find(string key)
         {
             return QuerySingleOrDefault<Department>(
                 sql: "SELECT * FROM dbo.department WHERE is_deleted = 0 and id = @key ORDER BY department.dep_name ASC",
@@ -44,18 +40,18 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
-        
+
         public void Update(Department entity)
         {
             Execute(
                 sql: @"UPDATE dbo.department
-                   SET 
-                    id = @id, 
+                   SET
+                    id = @id,
                     org_id = @org_id,
-                    depart_lead_empid = @depart_lead_empid, 
-                    dep_name = @dep_name, 
-                    alias = @alias, 
-                    modified_date = @modified_date, 
+                    depart_lead_empid = @depart_lead_empid,
+                    dep_name = @dep_name,
+                    alias = @alias,
+                    modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE id = @id",
                 param: entity
@@ -73,7 +69,7 @@ namespace TimeAPI.Data.Repositories
         {
             return QuerySingleOrDefault<Department>(
                 sql: @"SELECT * FROM [dbo].[department] WITH (NOLOCK)
-                        WHERE dep_name = @dep_name and is_deleted = 0 
+                        WHERE dep_name = @dep_name and is_deleted = 0
                         ORDER BY department.dep_name ASC",
                 param: new { dep_name }
             );
@@ -83,7 +79,7 @@ namespace TimeAPI.Data.Repositories
         {
             return QuerySingleOrDefault<Department>(
                 sql: @"SELECT * FROM [dbo].[department] WITH (NOLOCK)
-                        WHERE alias = @alias and is_deleted = 0     
+                        WHERE alias = @alias and is_deleted = 0
                         ORDER BY department.dep_name ASC",
                 param: new { alias }
             );
@@ -93,7 +89,7 @@ namespace TimeAPI.Data.Repositories
         {
             return Query<Department>(
                 sql: @"SELECT * FROM [dbo].[department] WITH (NOLOCK)
-                       WHERE org_id = @org_id and is_deleted = 0 
+                       WHERE org_id = @org_id and is_deleted = 0
                        ORDER BY department.dep_name ASC",
                 param: new { org_id }
             );
@@ -102,7 +98,7 @@ namespace TimeAPI.Data.Repositories
         public dynamic FindAllDepLeadByOrgID(string org_id)
         {
             return Query<dynamic>(
-                sql: @"SELECT 
+                sql: @"SELECT
 	                    employee.full_name,
 	                    employee.workemail,
 	                    designation.designation_name,
@@ -110,7 +106,7 @@ namespace TimeAPI.Data.Repositories
                     FROM department WITH (NOLOCK)
                     LEFT JOIN employee ON department.depart_lead_empid = employee.id
                     LEFT JOIN designation ON department.id = designation.dep_id
-                    WHERE department.org_id= @org_id and department.is_deleted = 0 
+                    WHERE department.org_id= @org_id and department.is_deleted = 0
                     ORDER BY employee.full_name ASC",
                 param: new { org_id }
             );
@@ -119,7 +115,7 @@ namespace TimeAPI.Data.Repositories
         public dynamic FindDepLeadByDepID(string DepID)
         {
             return QuerySingleOrDefault<dynamic>(
-                sql: @"SELECT 
+                sql: @"SELECT
                             designation.id as department_id,
                             department.dep_name,
 	                        employee.id as employee_id,
@@ -129,7 +125,7 @@ namespace TimeAPI.Data.Repositories
                         FROM department WITH (NOLOCK)
                         LEFT JOIN employee ON department.depart_lead_empid = employee.id
                         LEFT JOIN designation ON department.id = designation.dep_id
-                        WHERE department.id= @DepID and department.is_deleted = 0 
+                        WHERE department.id= @DepID and department.is_deleted = 0
                         ORDER BY employee.full_name ASC",
                 param: new { DepID }
             );
@@ -138,7 +134,7 @@ namespace TimeAPI.Data.Repositories
         public dynamic FetchGridDataByDepOrgID(string key)
         {
             return Query<dynamic>(
-                   sql: @"SELECT 
+                   sql: @"SELECT
                                 department.id as department_id,
                                 department.dep_name,
 	                            employee.id as employee_id,
@@ -156,7 +152,7 @@ namespace TimeAPI.Data.Repositories
         public dynamic FindAllDepMembersByDepID(string DepID)
         {
             return Query<dynamic>(
-                sql: @"SELECT 
+                sql: @"SELECT
                             department.id as department_id,
                             department.dep_name,
 	                        employee.id as employee_id,
@@ -166,11 +162,10 @@ namespace TimeAPI.Data.Repositories
                         FROM department WITH (NOLOCK)
                         LEFT JOIN employee ON department.depart_lead_empid = employee.id
                         LEFT JOIN designation ON department.id = designation.dep_id
-                        WHERE department.id= @DepID and department.is_deleted = 0 
+                        WHERE department.id= @DepID and department.is_deleted = 0
                         ORDER BY employee.full_name ASC",
                 param: new { DepID }
             );
         }
-
     }
 }

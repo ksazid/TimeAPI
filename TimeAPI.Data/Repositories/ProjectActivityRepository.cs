@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
-using System.Text;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -11,6 +9,7 @@ namespace TimeAPI.Data.Repositories
     {
         public ProjectActivityRepository(IDbTransaction transaction) : base(transaction)
         { }
+
         public void Add(ProjectActivity entity)
         {
             entity.id = ExecuteScalar<string>(
@@ -20,7 +19,8 @@ namespace TimeAPI.Data.Repositories
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
-        }   
+        }
+
         public ProjectActivity Find(string key)
         {
             return QuerySingleOrDefault<ProjectActivity>(
@@ -28,6 +28,7 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
+
         public void Remove(string key)
         {
             Execute(
@@ -38,27 +39,29 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
+
         public void Update(ProjectActivity entity)
         {
             Execute(
                 sql: @"UPDATE dbo.project_activity
-                   SET 
-                    project_id = @project_id, 
-                    activity_name = @activity_name, 
-                    activity_desc = @activity_desc, 
-                    start_date  = @start_date, 
+                   SET
+                    project_id = @project_id,
+                    activity_name = @activity_name,
+                    activity_desc = @activity_desc,
+                    start_date  = @start_date,
                     end_date = @end_date,
-                    unit = @unit, 
-                    qty = @qty, 
-                    is_approve_req = @is_approve_req, 
-                    approved_id = @approved_id, 
+                    unit = @unit,
+                    qty = @qty,
+                    is_approve_req = @is_approve_req,
+                    approved_id = @approved_id,
                     status_id =@status_id,
-                    modified_date = @modified_date, 
+                    modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE id = @id",
                 param: entity
             );
         }
+
         public IEnumerable<ProjectActivity> All()
         {
             return Query<ProjectActivity>(
@@ -78,15 +81,13 @@ namespace TimeAPI.Data.Repositories
         {
             Execute(
                 sql: @"UPDATE dbo.project_activity
-                   SET 
+                   SET
                     status_id =@status_id,
-                    modified_date = @modified_date, 
+                    modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE project_id = @project_id",
                 param: entity
             );
         }
-
-        
     }
 }

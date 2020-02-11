@@ -1,27 +1,15 @@
-﻿using TimeAPI.API.Models.AccountViewModels;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using TimeAPI.API.Models;
-using TimeAPI.API.Services;
-using Microsoft.AspNetCore.Cors;
-using TimeAPI.API.Filters;
-using TimeAPI.Domain;
-using System.Threading;
-using TimeAPI.Domain.Entities;
 using TimeAPI.API.Models.DesignationViewModels;
-using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Globalization;
+using TimeAPI.API.Services;
+using TimeAPI.Domain;
+using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.API.Controllers
 {
@@ -135,7 +123,6 @@ namespace TimeAPI.API.Controllers
         [Route("GetAllDesignation")]
         public async Task<object> GetAllDesignation(CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -287,6 +274,5 @@ namespace TimeAPI.API.Controllers
                 return System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
     }
 }

@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using TimeAPI.API.Models;
 using TimeAPI.API.Services;
 using TimeAPI.Domain;
-using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.API.Controllers
 {
@@ -26,7 +20,7 @@ namespace TimeAPI.API.Controllers
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
         private readonly DateTime _dateTime;
-        
+
         public UserController(IUnitOfWork unitOfWork, ILogger<EmployeeController> logger,
             IEmailSender emailSender,
            IOptions<ApplicationSettings> AppSettings)

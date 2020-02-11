@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
-using System.Text;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -9,13 +7,11 @@ namespace TimeAPI.Data.Repositories
 {
     public class TeamMemberRepository : RepositoryBase, ITeamMemberRepository
     {
-
         public TeamMemberRepository(IDbTransaction transaction) : base(transaction)
         { }
 
         public void Add(TeamMembers entity)
         {
-
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.team_members
                                   (id, team_id, emp_id, is_teamlead, created_date, createdby, is_deleted)
@@ -59,11 +55,11 @@ namespace TimeAPI.Data.Repositories
         {
             Execute(
                 sql: @"UPDATE dbo.team_members
-                   SET 
+                   SET
                         team_id = @team_id,
                         emp_id = @emp_id,
                         is_teamlead = @is_teamlead,
-                        modified_date = @modified_date, 
+                        modified_date = @modified_date,
                         modifiedby = @modifiedby
                     WHERE id = @id",
                 param: entity
@@ -76,8 +72,5 @@ namespace TimeAPI.Data.Repositories
                 sql: "SELECT * FROM [dbo].[team_members] where is_deleted = 0"
             );
         }
-
-
-
     }
 }

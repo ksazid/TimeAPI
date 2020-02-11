@@ -3,14 +3,12 @@ using System.Data;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
-
 namespace TimeAPI.Data.Repositories
 {
     public class ReportingRepository : RepositoryBase, IReportingRepository
     {
         public ReportingRepository(IDbTransaction transaction) : base(transaction)
         {
-
         }
 
         public void Add(Reporting entity)
@@ -47,12 +45,12 @@ namespace TimeAPI.Data.Repositories
         {
             Execute(
                 sql: @"UPDATE dbo.image
-                   SET 
-                        id = @id, 
-                        user_id = @user_id, 
-                        img_name = @img_name, 
-                        img_url = @img_url, 
-                        modified_date = @modified_date, 
+                   SET
+                        id = @id,
+                        user_id = @user_id,
+                        img_name = @img_name,
+                        img_url = @img_url,
+                        modified_date = @modified_date,
                         modifiedby = @modifiedby
                     WHERE id = @id",
                 param: entity

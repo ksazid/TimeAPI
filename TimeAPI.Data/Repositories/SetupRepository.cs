@@ -1,15 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using TimeAPI.Domain.Entities;
-using TimeAPI.Domain.Model;
 using TimeAPI.Domain.Repositories;
-
 
 namespace TimeAPI.Data.Repositories
 {
     public class SetupRepository : RepositoryBase, ISetupRepository
     {
-
         public SetupRepository(IDbTransaction transaction) : base(transaction)
         { }
 
@@ -33,6 +30,5 @@ namespace TimeAPI.Data.Repositories
                 sql: "SELECT * FROM countries"
             );
         }
-        
     }
 }

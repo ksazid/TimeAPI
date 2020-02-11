@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
-using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using TimeAPI.API.Models;
@@ -29,6 +28,7 @@ namespace TimeAPI.API.Controllers
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
         private static DateTime _dateTime;
+
         public AdminController(IUnitOfWork unitOfWork, ILogger<AdminController> logger,
             IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings)
         {
@@ -127,7 +127,6 @@ namespace TimeAPI.API.Controllers
         [Route("GetAllPlan")]
         public async Task<object> GetAllPlan(CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -142,7 +141,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
 
         [HttpPost]
         [Route("FindByPlanID")]
@@ -165,7 +163,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
 
         #endregion Plan
 
@@ -257,7 +254,6 @@ namespace TimeAPI.API.Controllers
         [Route("GetAllPlanFeature")]
         public async Task<object> GetAllPlanFeature(CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -272,7 +268,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
 
         [HttpPost]
         [Route("FindByPlanFeatureID")]
@@ -407,7 +402,6 @@ namespace TimeAPI.API.Controllers
         [Route("GetAllPlanPrice")]
         public async Task<object> GetAllPlanPrice(CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -422,7 +416,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
 
         [HttpPost]
         [Route("FindByPlanPriceID")]
@@ -446,7 +439,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpGet]
         [Route("FetchAllPlanPrice")]
         public async Task<object> FetchAllPlanPrice(CancellationToken cancellationToken)
@@ -467,6 +459,7 @@ namespace TimeAPI.API.Controllers
                 return System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
+
         #endregion PlanPrice
 
         #region Subscription
@@ -557,7 +550,6 @@ namespace TimeAPI.API.Controllers
         [Route("GetAllSubscription")]
         public async Task<object> GetAllSubscription(CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -572,7 +564,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
 
         [HttpPost]
         [Route("FindBySubscriptionID")]
@@ -596,7 +587,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpPost]
         [Route("FindByApiKeyByUserID")]
         public async Task<object> FindByApiKeyByUserID([FromBody] Utils Utils, CancellationToken cancellationToken)
@@ -618,9 +608,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
-
-
 
         #endregion Subscription
 
@@ -712,7 +699,6 @@ namespace TimeAPI.API.Controllers
         [Route("GetAllBilling")]
         public async Task<object> GetAllBilling(CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)

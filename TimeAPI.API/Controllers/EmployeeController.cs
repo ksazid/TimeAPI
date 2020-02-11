@@ -1,29 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Security.Claims;
-using System.Threading;
-using System.Threading.Tasks;
-using ailogica.Azure.Helpers;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using TimeAPI.API.Extensions;
 using TimeAPI.API.Models;
 using TimeAPI.API.Models.EmployeeViewModels;
 using TimeAPI.API.Services;
 using TimeAPI.Domain;
 using TimeAPI.Domain.Entities;
-using Microsoft.IdentityModel.Tokens;
 
 namespace TimeAPI.API.Controllers
 {
@@ -41,6 +31,7 @@ namespace TimeAPI.API.Controllers
         private static string _userName = string.Empty;
         private readonly UserManager<ApplicationUser> _userManager;
         private static DateTime _dateTime;
+
         public EmployeeController(IUnitOfWork unitOfWork, ILogger<EmployeeController> logger,
                                   UserManager<ApplicationUser> userManager, IEmailSender emailSender, ISmsSender smsSender,
                                   IOptions<ApplicationSettings> AppSettings, IConfiguration configuration)
@@ -112,7 +103,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpPatch]
         [Route("UpdateEmployee")]
         public async Task<object> UpdateEmployee([FromBody] EmployeeViewModel employeeViewModel, CancellationToken cancellationToken)
@@ -140,7 +130,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
 
         [HttpPost]
         [Route("SetEmployeeInactiveByEmpID")]
@@ -192,12 +181,10 @@ namespace TimeAPI.API.Controllers
         [Route("GetAllEmployees")]
         public async Task<object> GetAllEmployees(CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
-
 
                 var result = _unitOfWork.EmployeeRepository.All();
                 _unitOfWork.Commit();
@@ -236,7 +223,6 @@ namespace TimeAPI.API.Controllers
         [Route("FindByEmpName")]
         public async Task<object> FindByEmpName([FromBody] UtilsName UtilsName, CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -281,7 +267,6 @@ namespace TimeAPI.API.Controllers
         [Route("FindByEmpCode")]
         public async Task<object> FindByEmpCode([FromBody] UtilsCode _EmpCode, CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -304,7 +289,6 @@ namespace TimeAPI.API.Controllers
         [Route("FindByRoleName")]
         public async Task<object> FindByRoleName([FromBody] UtilsRole UtilsRole, CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -352,7 +336,6 @@ namespace TimeAPI.API.Controllers
         [Route("FindEmployeeListByDesignationID")]
         public async Task<object> FindEmployeeListByDesignationID([FromBody] Utils utils, CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -377,7 +360,6 @@ namespace TimeAPI.API.Controllers
         [Route("FindEmployeeListByDepartmentID")]
         public async Task<object> FindEmployeeListByDepartmentID([FromBody] Utils utils, CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -471,7 +453,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpPost]
         [Route("FindEmpDepartDesignByTeamID")]
         public async Task<object> FindEmpDepartDesignByTeamID([FromBody] Utils Utils, CancellationToken cancellationToken)
@@ -496,8 +477,8 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         #region Helpers
+
         private void AddErrors(IdentityResult result)
         {
             foreach (var error in result.Errors)
@@ -553,7 +534,6 @@ namespace TimeAPI.API.Controllers
 
         private static Employee SetEmployeeProperty(EmployeeViewModel employeeViewModel, ApplicationUser user)
         {
-
             var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeViewModel, Employee>());
             var mapper = config.CreateMapper();
             var modal = mapper.Map<Employee>(employeeViewModel);
@@ -588,6 +568,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        #endregion
+        #endregion Helpers
     }
 }

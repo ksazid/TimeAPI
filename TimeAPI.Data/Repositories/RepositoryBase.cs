@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using System;
 using System.Collections.Generic;
 using System.Data;
 
@@ -39,7 +38,5 @@ namespace TimeAPI.Data.Repositories
         {
             return Connection.QuerySingle(sql, param, _transaction);
         }
-
-        
     }
 }

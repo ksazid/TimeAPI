@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
-using System.Text;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -9,13 +7,11 @@ namespace TimeAPI.Data.Repositories
 {
     public class StatusRepository : RepositoryBase, IStatusRepository
     {
-
         public StatusRepository(IDbTransaction transaction) : base(transaction)
         { }
 
         public void Add(Status entity)
         {
-
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.status
                                   (id, org_id, status_name, status_desc, created_date, createdby)
@@ -48,11 +44,11 @@ namespace TimeAPI.Data.Repositories
         {
             Execute(
                 sql: @"UPDATE dbo.status
-                   SET 
+                   SET
                     org_id = @org_id,
-                    status_name = @status_name, 
-                    status_desc = @status_desc, 
-                    modified_date = @modified_date, 
+                    status_name = @status_name,
+                    status_desc = @status_desc,
+                    modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE id = @id",
                 param: entity
@@ -69,13 +65,13 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<Status> GetStatusByOrgID(string key)
         {
             return Query<Status>(
-                sql: @"SELECT * 
-                        FROM dbo.status 
+                sql: @"SELECT *
+                        FROM dbo.status
                     WHERE is_deleted = 0 AND org_id IS NULL
                     UNION ALL
-                    SELECT * 
-                    FROM dbo.status 
-                    WHERE is_deleted = 0 
+                    SELECT *
+                    FROM dbo.status
+                    WHERE is_deleted = 0
                     AND org_id = @key",
                 param: new { key }
             );

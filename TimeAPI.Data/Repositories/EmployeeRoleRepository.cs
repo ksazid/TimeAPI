@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
-using System.Text;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -9,13 +7,11 @@ namespace TimeAPI.Data.Repositories
 {
     public class EmployeeRoleRepository : RepositoryBase, IEmployeeRoleRepository
     {
-
         public EmployeeRoleRepository(IDbTransaction transaction) : base(transaction)
         { }
 
         //public void Add(EmployeeRole entity)
         //{
-
         //    entity.id = ExecuteScalar<string>(
         //            sql: @"INSERT INTO dbo.role
         //                          (id, org_id, role_name, role_desc, created_date, createdby)
@@ -48,11 +44,11 @@ namespace TimeAPI.Data.Repositories
         //{
         //    Execute(
         //        sql: @"UPDATE dbo.role
-        //           SET 
+        //           SET
         //            org_id =@org_id,
-        //            role_name = @role_name, 
-        //            role_desc = @role_desc, 
-        //            modified_date = @modified_date, 
+        //            role_name = @role_name,
+        //            role_desc = @role_desc,
+        //            modified_date = @modified_date,
         //            modifiedby = @modifiedby
         //            WHERE id = @id",
         //        param: entity
@@ -65,6 +61,5 @@ namespace TimeAPI.Data.Repositories
                 sql: "SELECT * FROM [dbo].[AspNetRoles]"
             );
         }
-
     }
 }

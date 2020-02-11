@@ -87,7 +87,7 @@ namespace TimeAPI.Data.Repositories
         //{
         //    Execute(
         //        sql: @"
-        //            UPDATE AspNetUsers SET 
+        //            UPDATE AspNetUsers SET
         //                EmailConfirmed = 1
         //            WHERE Id = @UserID",
         //      param: new { UserID }
@@ -116,7 +116,7 @@ namespace TimeAPI.Data.Repositories
             var resultsTimesheetGrpID = Query<string>(
                 sql: @"SELECT distinct(groupid) from timesheet WITH (NOLOCK)
                         WHERE empid = @empid
-                        AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') = FORMAT(DATEADD(HOUR,11,GETDATE()), 'd', 'EN-US') 
+                        AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') = FORMAT(DATEADD(HOUR,11,GETDATE()), 'd', 'EN-US')
                         AND timesheet.is_deleted = 0;",
                 param: new { empid = resultsEmployee.id }
             );
@@ -176,7 +176,7 @@ namespace TimeAPI.Data.Repositories
                 rootTimesheetData.TimesheetTeamDataModels = TimesheetTeamDataModelList;
                 rootTimesheetData.TimesheetSearchLocationViewModel = GetTimesheetSearchLocationViewModel(item);
                 rootTimesheetData.TimesheetCurrentLocationViewModels = TimesheetCurrentLocationViewModelList;
-                #endregion
+                #endregion PrivateMethods
 
                 RootTimesheetDataList.Add(rootTimesheetData);
             }
@@ -187,14 +187,14 @@ namespace TimeAPI.Data.Repositories
         private IEnumerable<TimesheetDataModel> GetTimesheetDataModel(string GroupID)
         {
             var TimesheetDataModel = Query<TimesheetDataModel>(
-                sql: @"SELECT 
-                            timesheet.id, employee.id as emp_id, employee.full_name as emp_name, timesheet.groupid, 
-			                timesheet.ondate, timesheet.check_in, timesheet.check_out, 
-                            timesheet.is_checkout, timesheet.total_hrs, timesheet.created_date, 
-                            timesheet.createdby, timesheet.modified_date, timesheet.modifiedby, timesheet.is_deleted  
+                sql: @"SELECT
+                            timesheet.id, employee.id as emp_id, employee.full_name as emp_name, timesheet.groupid,
+			                timesheet.ondate, timesheet.check_in, timesheet.check_out,
+                            timesheet.is_checkout, timesheet.total_hrs, timesheet.created_date,
+                            timesheet.createdby, timesheet.modified_date, timesheet.modifiedby, timesheet.is_deleted
                 FROM timesheet WITH (NOLOCK)
                     LEFT JOIN employee on timesheet.empid = Employee.id
-                    WHERE timesheet.groupid = @GroupID 			
+                    WHERE timesheet.groupid = @GroupID
                     ORDER BY timesheet.ondate asc;",
                 param: new { GroupID }
             );
@@ -206,7 +206,7 @@ namespace TimeAPI.Data.Repositories
         private IEnumerable<TimesheetAdministrativeDataModel> GetTimesheetAdministrativeDataModel(string GroupID)
         {
             var TimesheetAdministrativeDataModel = Query<TimesheetAdministrativeDataModel>(
-                sql: @"SELECT 
+                sql: @"SELECT
                             timesheet_administrative_activity.id, timesheet_administrative_activity.administrative_id, administrative.administrative_name
                         FROM timesheet_administrative_activity WITH (NOLOCK)
                         LEFT JOIN administrative on timesheet_administrative_activity.administrative_id = administrative.id
@@ -220,9 +220,9 @@ namespace TimeAPI.Data.Repositories
         private TimesheetProjectCategoryDataModel GetTimesheetProjectCategoryDataModel(string GroupID)
         {
             var TimesheetAdministrativeDataModel = QuerySingleOrDefault<TimesheetProjectCategoryDataModel>(
-                sql: @"SELECT 
-                        timesheet_x_project_category.id as category_id, 
-                        timesheet_x_project_category.groupid as groupid,  
+                sql: @"SELECT
+                        timesheet_x_project_category.id as category_id,
+                        timesheet_x_project_category.groupid as groupid,
                         timesheet_x_project_category.project_category_type as project_type,
                         timesheet_x_project_category.project_or_comp_id as project_or_comp_id,
                         timesheet_x_project_category.project_or_comp_name as project_or_comp_name,
@@ -238,7 +238,7 @@ namespace TimeAPI.Data.Repositories
         private IEnumerable<TimesheetTeamDataModel> GetTimesheetTeamDataModel(string GroupID)
         {
             var TimesheetTeamDataModel = Query<TimesheetTeamDataModel>(
-                sql: @"SELECT 
+                sql: @"SELECT
                         timesheet_x_team.id, timesheet_x_team.teamid, team.team_name
                     FROM timesheet_x_team   WITH (NOLOCK)
                     LEFT JOIN team on timesheet_x_team.teamid = team.id
@@ -252,7 +252,7 @@ namespace TimeAPI.Data.Repositories
         private TimesheetSearchLocationViewModel GetTimesheetSearchLocationViewModel(string GroupID)
         {
             var TimesheetSearchLocationViewModel = QuerySingleOrDefault<TimesheetSearchLocationViewModel>(
-                sql: @"SELECT id, groupid, manual_address, formatted_address, lat, lang, street_number, route, locality, 
+                sql: @"SELECT id, groupid, manual_address, formatted_address, lat, lang, street_number, route, locality,
                        administrative_area_level_2, administrative_area_level_1, postal_code, country, is_office, is_manual
                     FROM timesheet_location  WITH (NOLOCK) where groupid  = @GroupID;",
                 param: new { GroupID }
@@ -264,7 +264,7 @@ namespace TimeAPI.Data.Repositories
         private IEnumerable<TimesheetCurrentLocationViewModel> GetTimesheetCurrentLocationViewModel(string GroupID)
         {
             var TimesheetCurrentLocationViewModel = Query<TimesheetCurrentLocationViewModel>(
-               sql: @"SELECT id, groupid, formatted_address, lat, lang, street_number, route, locality, 
+               sql: @"SELECT id, groupid, formatted_address, lat, lang, street_number, route, locality,
                        administrative_area_level_2, administrative_area_level_1, postal_code, country, is_checkout
                 FROM location  WITH (NOLOCK) where groupid  = @GroupID;",
                 param: new { GroupID }

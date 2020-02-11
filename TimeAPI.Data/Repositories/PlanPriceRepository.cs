@@ -1,16 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Data;
-using System.Dynamic;
-using System.Linq;
 using TimeAPI.Domain.Entities;
-using TimeAPI.Domain.Model;
 using TimeAPI.Domain.Repositories;
 
 namespace TimeAPI.Data.Repositories
 {
     public class PlanPriceRepository : RepositoryBase, IPlanPriceRepository
     {
-
         public PlanPriceRepository(IDbTransaction transaction) : base(transaction)
         { }
 
@@ -48,11 +44,11 @@ namespace TimeAPI.Data.Repositories
         {
             Execute(
                 sql: @"UPDATE dbo.saas_plan_price
-                   SET 
-                    plan_id = @plan_id, 
-                    price_amount = @price_amount, 
+                   SET
+                    plan_id = @plan_id,
+                    price_amount = @price_amount,
                     billing_cycle = @billing_cycle,
-                    modified_date = @modified_date, 
+                    modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE id =  @id",
                 param: entity
@@ -69,10 +65,10 @@ namespace TimeAPI.Data.Repositories
         public dynamic GetAllPlanPrice()
         {
             return Query<dynamic>(
-                   sql: @"SELECT 
-		                    dbo.saas_plan_price.id, 
-		                    dbo.saas_plan.plan_name, 
-		                    dbo.saas_plan_price.price_amount, 
+                   sql: @"SELECT
+		                    dbo.saas_plan_price.id,
+		                    dbo.saas_plan.plan_name,
+		                    dbo.saas_plan_price.price_amount,
 		                    dbo.saas_plan_price.billing_cycle,
 		                    dbo.saas_plan_price.is_active
                       FROM dbo.saas_plan_price WITH(NOLOCK)

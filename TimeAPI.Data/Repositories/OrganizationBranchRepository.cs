@@ -13,9 +13,8 @@ namespace TimeAPI.Data.Repositories
 
         public void Add(OrganizationBranch entity)
         {
-
             entity.org_id = ExecuteScalar<string>(
-                    sql: @"INSERT INTO dbo.organization_branch 
+                    sql: @"INSERT INTO dbo.organization_branch
                             (id, parent_org_id, org_id, created_date, createdby)
                     VALUES (@id, @parent_org_id, @org_id, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
@@ -53,9 +52,9 @@ namespace TimeAPI.Data.Repositories
         {
             Execute(
                 sql: @"UPDATE dbo.organization_branch
-                           SET  parent_org_id = @parent_org_id, 
+                           SET  parent_org_id = @parent_org_id,
                                 org_id = @org_id,
-                                modified_date = @modified_date, 
+                                modified_date = @modified_date,
                                 modifiedby = @modifiedby
                          WHERE org_id = @org_id",
                 param: entity

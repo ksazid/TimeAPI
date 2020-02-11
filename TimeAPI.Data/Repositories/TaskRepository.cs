@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Data;
-using System.Dynamic;
 using System.Linq;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Model;
@@ -10,7 +9,6 @@ namespace TimeAPI.Data.Repositories
 {
     public class TaskRepository : RepositoryBase, ITaskRepository
     {
-
         public TaskRepository(IDbTransaction transaction) : base(transaction)
         { }
 
@@ -48,15 +46,15 @@ namespace TimeAPI.Data.Repositories
         {
             Execute(
                 sql: @"UPDATE dbo.task
-                   SET 
+                   SET
                     empid = @empid,
-                    task_name = @task_name, 
-                    task_desc = @task_desc, 
+                    task_name = @task_name,
+                    task_desc = @task_desc,
                     priority_id = @priority_id,
-                    status_id = @status_id, 
-                    assigned_empid = @assigned_empid, 
+                    status_id = @status_id,
+                    assigned_empid = @assigned_empid,
                     due_date = @due_date,
-                    modified_date = @modified_date, 
+                    modified_date = @modified_date,
                     modifiedby = @modifiedby,
                     is_approver = @is_approver
                     WHERE id =  @id",
@@ -74,7 +72,7 @@ namespace TimeAPI.Data.Repositories
         public dynamic FindByTaskDetailsByEmpID(string key)
         {
             return Query<dynamic>(
-                   sql: @"	SELECT 
+                   sql: @"	SELECT
                             task.id,
 		                    task.task_name,
 		                    task.task_desc,
@@ -95,9 +93,9 @@ namespace TimeAPI.Data.Repositories
         {
             Execute(
                 sql: @"UPDATE dbo.task
-                   SET 
-                    status_id = @status_id, 
-                    modified_date = @modified_date, 
+                   SET
+                    status_id = @status_id,
+                    modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE id =  @id",
                 param: entity
@@ -111,7 +109,7 @@ namespace TimeAPI.Data.Repositories
             List<EmployeeTasks> employeeTasks = new List<EmployeeTasks>();
 
             var _employeeTasks = Query<EmployeeTasks>(
-                     sql: @"SELECT 
+                     sql: @"SELECT
                             task.id,
 	                        employee.id as empid,
 	                        task.task_name,
@@ -119,7 +117,7 @@ namespace TimeAPI.Data.Repositories
 	                        priority.priority_name as priority,
 	                        status.status_name as status,
 	                        employee.full_name as assigned_to,
-	                        task.due_date, 
+	                        task.due_date,
 	                        task.created_date
 	                        FROM[dbo].[task]
 	                        inner join priority on task.priority_id = priority.id
@@ -130,7 +128,7 @@ namespace TimeAPI.Data.Repositories
                  );
 
             var _employeeAssignedTasks = Query<EmployeeTasks>(
-                   sql: @"SELECT 
+                   sql: @"SELECT
                             task.id,
 	                        employee.id as empid,
 	                        task.task_name,
@@ -138,7 +136,7 @@ namespace TimeAPI.Data.Repositories
 	                        priority.priority_name as priority,
 	                        status.status_name as status,
 	                        employee.full_name as assigned_to,
-	                        task.due_date, 
+	                        task.due_date,
 	                        task.created_date
 	                        FROM[dbo].[task]
 	                        inner join priority on task.priority_id = priority.id
@@ -147,7 +145,6 @@ namespace TimeAPI.Data.Repositories
                         WHERE task.is_deleted = 0 and task.assigned_empid =@key",
                       param: new { key }
                );
-
 
             var result = _employeeTasks.Except(_employeeAssignedTasks);
             employeeTasks.AddRange(result);

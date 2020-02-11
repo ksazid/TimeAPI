@@ -5,7 +5,6 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,7 +27,7 @@ namespace TimeAPI.API.Controllers
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
         private readonly DateTime _dateTime;
-        
+
         public EmployeeTasksController(IUnitOfWork unitOfWork, ILogger<EmployeeTasksController> logger,
                 IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings)
         {
@@ -64,16 +63,13 @@ namespace TimeAPI.API.Controllers
                 modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
-
                 if (TaskViewModel.employees != null)
                 {
                     foreach (var item in TaskViewModel.employees.empid.Distinct())
                     {
-
                         modal.id = Guid.NewGuid().ToString();
                         modal.created_date = _dateTime.ToString();
                         modal.is_deleted = false;
-
 
                         var TaskTeamMembers = new TaskTeamMember()
                         {
@@ -83,7 +79,6 @@ namespace TimeAPI.API.Controllers
                             createdby = modal.createdby,
                             created_date = _dateTime.ToString(),
                             is_deleted = false
-
                         };
                         _unitOfWork.TaskTeamMembersRepository.Add(TaskTeamMembers);
                     }
@@ -123,11 +118,9 @@ namespace TimeAPI.API.Controllers
                 {
                     foreach (var item in TaskViewModel.employees.empid.Distinct())
                     {
-
                         modal.id = Guid.NewGuid().ToString();
                         modal.created_date = _dateTime.ToString();
                         modal.is_deleted = false;
-
 
                         var TaskTeamMembers = new TaskTeamMember()
                         {
@@ -137,7 +130,6 @@ namespace TimeAPI.API.Controllers
                             createdby = modal.createdby,
                             created_date = _dateTime.ToString(),
                             is_deleted = false
-
                         };
                         _unitOfWork.TaskTeamMembersRepository.Add(TaskTeamMembers);
                     }
@@ -181,7 +173,6 @@ namespace TimeAPI.API.Controllers
         [Route("GetAllTasks")]
         public async Task<object> GetAllTasks(CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)

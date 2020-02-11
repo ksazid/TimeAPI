@@ -3,22 +3,16 @@ using System.Data;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
-
 namespace TimeAPI.Data.Repositories
 {
-    class SubscriptionRepository : RepositoryBase, ISubscriptionRepository
+    internal class SubscriptionRepository : RepositoryBase, ISubscriptionRepository
     {
         public SubscriptionRepository(IDbTransaction transaction) : base(transaction)
         {
-
         }
 
         public void Add(Subscription entity)
         {
-//            user_id, api_key, current_plan_id, subscription_start_date, subscription_end_date
-//on_date_subscribed, offer_id, offer_start_date, offer_end_date, is_trial
-//is_subscibe_after_trial, is_active,
-
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO [dbo].[subscription]
                                    (id, user_id, api_key, current_plan_id, subscription_start_date, subscription_end_date,
@@ -55,18 +49,18 @@ namespace TimeAPI.Data.Repositories
         {
             Execute(
                 sql: @"UPDATE dbo.subscription
-                   SET 
-                        current_plan_id = @current_plan_id, 
-                        subscription_start_date = @subscription_start_date, 
-                        subscription_end_date = @subscription_end_date, 
-                        on_date_subscribed = @on_date_subscribed, 
-                        offer_id = @offer_id, 
-                        offer_start_date = @offer_start_date, 
-                        offer_end_date = @offer_end_date, 
-                        is_trial  = @is_trial, 
-                        is_subscibe_after_trial = @is_subscibe_after_trial, 
+                   SET
+                        current_plan_id = @current_plan_id,
+                        subscription_start_date = @subscription_start_date,
+                        subscription_end_date = @subscription_end_date,
+                        on_date_subscribed = @on_date_subscribed,
+                        offer_id = @offer_id,
+                        offer_start_date = @offer_start_date,
+                        offer_end_date = @offer_end_date,
+                        is_trial  = @is_trial,
+                        is_subscibe_after_trial = @is_subscibe_after_trial,
                         is_active = @is_active,
-                        modified_date = @modified_date, 
+                        modified_date = @modified_date,
                         modifiedby = @modifiedby
                     WHERE id = @id",
                 param: entity

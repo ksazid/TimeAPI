@@ -1,17 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Security.Claims;
-using System.Threading;
-using System.Threading.Tasks;
-using ailogica.Azure.Helpers;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -19,10 +6,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
-using Newtonsoft.Json;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using TimeAPI.API.Models;
 using TimeAPI.API.Models.EmployeeProfileViewModels;
-using TimeAPI.API.Models.EmployeeViewModels;
 using TimeAPI.API.Services;
 using TimeAPI.Domain;
 using TimeAPI.Domain.Entities;
@@ -39,7 +27,7 @@ namespace TimeAPI.API.Controllers
         private IConfiguration _configuration;
         private StorageSettings _storageSettings;
         private readonly DateTime _dateTime;
-        
+
         public FileSystemController(IUnitOfWork unitOfWork, ILogger<FileSystemController> logger, UserManager<ApplicationUser> userManager,
             IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings, IConfiguration configuration, IOptions<StorageSettings> StorageSettings)
         {
@@ -50,7 +38,6 @@ namespace TimeAPI.API.Controllers
             _storageSettings = StorageSettings.Value;
             _dateTime = InternetTime.GetCurrentTimeFromTimeZone().Value.DateTime;
         }
-
 
         [HttpPost]
         [Route("AddUploadProfile")]
@@ -96,11 +83,9 @@ namespace TimeAPI.API.Controllers
                     return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = et.Message, Desc = et.Message });
                 }
 
-
                 employeeProfileViewModel.user_id = UserID;
                 employeeProfileViewModel.img_name = FormFile.FileName;
                 employeeProfileViewModel.createdby = CreatedBy;
-
 
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeProfileViewModel, Image>());
                 var mapper = config.CreateMapper();
@@ -119,7 +104,6 @@ namespace TimeAPI.API.Controllers
             }
             catch (Exception ex)
             {
-
                 //return new OkResult();
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }

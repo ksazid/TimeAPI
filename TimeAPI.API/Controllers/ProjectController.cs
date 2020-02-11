@@ -1,33 +1,21 @@
-﻿using TimeAPI.API.Models.AccountViewModels;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using System;
-using System.IdentityModel.Tokens.Jwt;
+using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using TimeAPI.API.Models;
-using TimeAPI.API.Services;
-using Microsoft.AspNetCore.Cors;
-using TimeAPI.API.Filters;
-using TimeAPI.Domain;
-using System.Threading;
-using TimeAPI.Domain.Entities;
-using TimeAPI.API.Models.ProjectViewModels;
-using System.Globalization;
-using System.Collections.Generic;
-using Newtonsoft.Json;
-using TimeAPI.API.Models.TeamViewModels;
-using TimeAPI.API.Models.StatusViewModels;
-using TimeAPI.API.Models.OrganizationViewModels;
 using TimeAPI.API.Models.EntityLocationViewModels;
 using TimeAPI.API.Models.ProjectActivityViewModels;
+using TimeAPI.API.Models.ProjectViewModels;
+using TimeAPI.API.Models.StatusViewModels;
 using TimeAPI.API.Models.TaskViewModels;
+using TimeAPI.API.Services;
+using TimeAPI.Domain;
+using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.API.Controllroers
 {
@@ -42,7 +30,7 @@ namespace TimeAPI.API.Controllroers
         private readonly ILogger _logger;
         private readonly IUnitOfWork _unitOfWork;
         private readonly DateTime _dateTime;
-        
+
         public ProjectController(IUnitOfWork unitOfWork, ILogger<ProjectController> logger,
             IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings)
         {
@@ -209,6 +197,7 @@ namespace TimeAPI.API.Controllroers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
+
         [HttpPost]
         [Route("UpdateProjectStatusByID")]
         public async Task<object> UpdateProjectStatusByID([FromBody] ProjectStatusModel projectViewModel, CancellationToken cancellationToken)
@@ -239,6 +228,7 @@ namespace TimeAPI.API.Controllroers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
+
         #endregion Projects
 
         #region EntityLocation
@@ -364,6 +354,7 @@ namespace TimeAPI.API.Controllroers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
+
         #endregion EntityLocation
 
         #region EntityContact
@@ -489,6 +480,7 @@ namespace TimeAPI.API.Controllroers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
+
         #endregion EntityContact
 
         #region ProjectStatus
@@ -528,7 +520,6 @@ namespace TimeAPI.API.Controllroers
         [Route("FindByProjectStatusID")]
         public async Task<object> FindByProjectStatusID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -570,7 +561,6 @@ namespace TimeAPI.API.Controllroers
         [Route("GetProjectStatusByOrgID")]
         public async Task<object> GetProjectStatusByOrgID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -624,7 +614,6 @@ namespace TimeAPI.API.Controllroers
                 if (statusingViewModel == null)
                     throw new ArgumentNullException(nameof(statusingViewModel));
 
-
                 statusingViewModel.modified_date = _dateTime.ToString();
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<ProjectStatusViewModel, ProjectStatus>());
                 var mapper = config.CreateMapper();
@@ -642,6 +631,7 @@ namespace TimeAPI.API.Controllroers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
+
         #endregion ProjectStatus
 
         #region ProjectActivity
@@ -681,7 +671,6 @@ namespace TimeAPI.API.Controllroers
         [Route("FindByProjectActivityID")]
         public async Task<object> FindByProjectActivityID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -723,7 +712,6 @@ namespace TimeAPI.API.Controllroers
         [Route("GetProjectActivityByProjectID")]
         public async Task<object> GetProjectActivityByProjectID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -778,7 +766,6 @@ namespace TimeAPI.API.Controllroers
                 if (statusingViewModel == null)
                     throw new ArgumentNullException(nameof(statusingViewModel));
 
-
                 statusingViewModel.modified_date = _dateTime.ToString();
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<ProjectActivityViewModel, ProjectActivity>());
                 var mapper = config.CreateMapper();
@@ -796,6 +783,7 @@ namespace TimeAPI.API.Controllroers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
+
         [HttpPatch]
         [Route("UpdateProjectActivityStatusByActivityID")]
         public async Task<object> UpdateProjectActivityStatusByActivityID([FromBody] ProjectActivityStatusUpdateViewModel statusingViewModel, CancellationToken cancellationToken)
@@ -807,7 +795,6 @@ namespace TimeAPI.API.Controllroers
 
                 if (statusingViewModel == null)
                     throw new ArgumentNullException(nameof(statusingViewModel));
-
 
                 statusingViewModel.modified_date = _dateTime.ToString();
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<ProjectActivityViewModel, ProjectActivity>());
@@ -826,6 +813,7 @@ namespace TimeAPI.API.Controllroers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
+
         #endregion ProjectActivity
 
         #region ProjectActivityTask
@@ -854,16 +842,13 @@ namespace TimeAPI.API.Controllroers
                 modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
-
                 if (TaskViewModel.employees != null)
                 {
                     foreach (var item in TaskViewModel.employees.empid.Distinct())
                     {
-
                         modal.id = Guid.NewGuid().ToString();
                         modal.created_date = _dateTime.ToString();
                         modal.is_deleted = false;
-
 
                         var TaskTeamMembers = new TaskTeamMember()
                         {
@@ -873,7 +858,6 @@ namespace TimeAPI.API.Controllroers
                             createdby = modal.createdby,
                             created_date = _dateTime.ToString(),
                             is_deleted = false
-
                         };
                         _unitOfWork.TaskTeamMembersRepository.Add(TaskTeamMembers);
                     }
@@ -928,7 +912,6 @@ namespace TimeAPI.API.Controllroers
         [Route("GetAllTasks")]
         public async Task<object> GetAllTasks(CancellationToken cancellationToken)
         {
-
             try
             {
                 if (cancellationToken != null)
@@ -991,7 +974,6 @@ namespace TimeAPI.API.Controllroers
                 {
                     foreach (var item in TaskViewModel.employees.empid.Distinct())
                     {
-
                         modal.id = Guid.NewGuid().ToString();
                         modal.created_date = _dateTime.ToString();
                         modal.is_deleted = false;
@@ -1004,7 +986,6 @@ namespace TimeAPI.API.Controllroers
                             createdby = modal.createdby,
                             created_date = _dateTime.ToString(),
                             is_deleted = false
-
                         };
                         _unitOfWork.TaskTeamMembersRepository.Add(TaskTeamMembers);
                     }

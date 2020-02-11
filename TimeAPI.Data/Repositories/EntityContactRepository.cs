@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using TimeAPI.Domain.Entities;
-using TimeAPI.Domain.Model;
 using TimeAPI.Domain.Repositories;
 
 namespace TimeAPI.Data.Repositories
@@ -10,6 +9,7 @@ namespace TimeAPI.Data.Repositories
     {
         public EntityContactRepository(IDbTransaction transaction) : base(transaction)
         { }
+
         public void Add(EntityContact entity)
         {
             entity.id = ExecuteScalar<string>(
@@ -20,6 +20,7 @@ namespace TimeAPI.Data.Repositories
                     param: entity
                 );
         }
+
         public EntityContact Find(string key)
         {
             return QuerySingleOrDefault<EntityContact>(
@@ -27,6 +28,7 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
+
         public void Remove(string key)
         {
             Execute(
@@ -37,22 +39,24 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
+
         public void Update(EntityContact entity)
         {
             Execute(
                 sql: @"UPDATE entity_contact
-                   SET 
-                    entity_id = @entity_id, 
-                    name = @name, 
-                    position = @position, 
-                    phone = @phone, 
-                    mobile = @mobile, 
-                    email = @email, 
+                   SET
+                    entity_id = @entity_id,
+                    name = @name,
+                    position = @position,
+                    phone = @phone,
+                    mobile = @mobile,
+                    email = @email,
                     modifiedby = @modifiedby
                     WHERE id = @id",
                 param: entity
             );
         }
+
         public IEnumerable<EntityContact> All()
         {
             return Query<EntityContact>(

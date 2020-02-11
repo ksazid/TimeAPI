@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
-using System.Text;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -9,13 +7,11 @@ namespace TimeAPI.Data.Repositories
 {
     public class IndustryTypeRepository : RepositoryBase, IIndustryTypeRepository
     {
-
         public IndustryTypeRepository(IDbTransaction transaction) : base(transaction)
         { }
 
         public void Add(IndustryType entity)
         {
-
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.industry_type
                                   (id, org_id, industry_type_name, industry_type_desc, created_date, createdby)
@@ -48,11 +44,11 @@ namespace TimeAPI.Data.Repositories
         {
             Execute(
                 sql: @"UPDATE dbo.industry_type
-                   SET 
+                   SET
                     org_id =@org_id,
-                    industry_type_name = @industry_type_name, 
-                    industry_type_desc = @industry_type_desc, 
-                    modified_date = @modified_date, 
+                    industry_type_name = @industry_type_name,
+                    industry_type_desc = @industry_type_desc,
+                    modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE id = @id",
                 param: entity

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using TimeAPI.Domain.Entities;
-using TimeAPI.Domain.Model;
 using TimeAPI.Domain.Repositories;
 
 namespace TimeAPI.Data.Repositories
@@ -13,7 +12,6 @@ namespace TimeAPI.Data.Repositories
 
         public void Add(TimesheetActivity entity)
         {
-
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.timesheet_activity
                                   (id, groupid, task_id, task_name, remarks, ondate, start_time, end_time, total_hrs, is_billable, created_date, createdby)
@@ -65,16 +63,16 @@ namespace TimeAPI.Data.Repositories
         {
             Execute(
                 sql: @"UPDATE dbo.timesheet_activity
-                   SET 
-                    groupid = @groupid, 
-                    task_id = @task_id, 
-                    task_name = @task_name, 
-                    remarks = @remarks, 
-                    ondate = @ondate, 
-                    start_time = @start_time, 
+                   SET
+                    groupid = @groupid,
+                    task_id = @task_id,
+                    task_name = @task_name,
+                    remarks = @remarks,
+                    ondate = @ondate,
+                    start_time = @start_time,
                     end_time = @end_time,
                     is_billable = @is_billable,
-                    modified_date = @modified_date, 
+                    modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE id = @id",
                 param: entity
@@ -91,15 +89,15 @@ namespace TimeAPI.Data.Repositories
         public dynamic GetTop10TimesheetActivityOnTaskID(string TaskID)
         {
             return Query<dynamic>(
-                sql: @"SELECT TOP 10 
-                        timesheet_activity.id, 
-                        timesheet_activity.task_name AS task_name, 
-                        FORMAT(CAST(timesheet_activity.start_time AS DATETIME2), N'hh:mm tt') AS start_time, 
-                        FORMAT(CAST(timesheet_activity.end_time AS DATETIME2), N'hh:mm tt') AS end_time, 
+                sql: @"SELECT TOP 10
+                        timesheet_activity.id,
+                        timesheet_activity.task_name AS task_name,
+                        FORMAT(CAST(timesheet_activity.start_time AS DATETIME2), N'hh:mm tt') AS start_time,
+                        FORMAT(CAST(timesheet_activity.end_time AS DATETIME2), N'hh:mm tt') AS end_time,
                         timesheet_activity.total_hrs,
                         timesheet_activity.is_billable,
                         FORMAT(timesheet_activity.ondate, 'dd/MM/yyyy', 'en-US') AS ondate
-                FROM 
+                FROM
                     [dbo].[timesheet_activity] WITH (NOLOCK)
                     INNER JOIN task on timesheet_activity.task_id = task.id
                     WHERE task.id = @TaskID
@@ -107,6 +105,5 @@ namespace TimeAPI.Data.Repositories
                 param: new { TaskID }
             );
         }
-
     }
 }

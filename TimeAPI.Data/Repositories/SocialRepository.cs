@@ -7,18 +7,15 @@ namespace TimeAPI.Data.Repositories
 {
     public class SocialRepository : RepositoryBase, ISocialRepository
     {
-
         public SocialRepository(IDbTransaction transaction) : base(transaction)
         {
-
         }
 
         public void Add(Social entity)
         {
-
             entity.id = ExecuteScalar<string>(
                     sql: @"
-                    INSERT INTO [dbo].[social]  
+                    INSERT INTO [dbo].[social]
                            (id, empid, social_media_name, url, created_date, createdby)
                     VALUES (@id, @empid, @social_media_name, @url, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
@@ -56,8 +53,8 @@ namespace TimeAPI.Data.Repositories
         {
             Execute(
                 sql: @"UPDATE dbo.employee
-                   SET 
-                       empid = @empid, social_media_name = @social_media_name, 
+                   SET
+                       empid = @empid, social_media_name = @social_media_name,
                         url = @url, modified_date = @modified_date, modifiedby = @modifiedby
                     WHERE id = @id",
                 param: entity

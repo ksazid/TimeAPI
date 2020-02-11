@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using TimeAPI.Domain.Entities;
-using TimeAPI.Domain.Model;
 using TimeAPI.Domain.Repositories;
 
 namespace TimeAPI.Data.Repositories
@@ -13,7 +12,6 @@ namespace TimeAPI.Data.Repositories
 
         public void Add(TimesheetActivityFile entity)
         {
-
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.timesheet
                                   (id, empid, ondate, check_in, check_out, is_checkout, groupid, created_date, createdby)
@@ -30,6 +28,7 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
+
         public void Remove(string key)
         {
             Execute(
@@ -45,14 +44,14 @@ namespace TimeAPI.Data.Repositories
         {
             Execute(
                 sql: @"UPDATE dbo.timesheet
-                   SET 
+                   SET
                     empid = @empid,
                     ondate = @ondate,
                     check_in = @check_in,
                     check_out = @check_out,
                     is_checkout = @is_checkout,
                     groupid = @groupid,
-                    modified_date = @modified_date, 
+                    modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE id = @id",
                 param: entity

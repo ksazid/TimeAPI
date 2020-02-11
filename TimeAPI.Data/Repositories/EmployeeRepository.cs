@@ -15,7 +15,7 @@ namespace TimeAPI.Data.Repositories
         {
             entity.id = ExecuteScalar<string>(
                         sql: @"
-                    INSERT INTO [dbo].[employee] (id, org_id, user_id, deptid, full_name, first_name,last_name, alias, gender, emp_status_id, emp_type_id, imgurl_id, workemail, 
+                    INSERT INTO [dbo].[employee] (id, org_id, user_id, deptid, full_name, first_name,last_name, alias, gender, emp_status_id, emp_type_id, imgurl_id, workemail,
                                    emp_code, role_id, designation_id, dob, joined_date, phone, mobile, email, summary, created_date, createdby, is_admin, is_superadmin, is_password_reset)
                     VALUES (@id, @org_id, @user_id, @deptid, @full_name, @first_name, @last_name, @alias,  @gender, @emp_status_id, @emp_type_id, @imgurl_id, @workemail, @emp_code,
                                   @role_id, @designation_id, @dob, @joined_date, @phone, @mobile, @email, @summary, @created_date, @createdby, @is_admin, @is_superadmin, @is_password_reset);
@@ -62,11 +62,11 @@ namespace TimeAPI.Data.Repositories
         {
             Execute(
                 sql: @"UPDATE dbo.employee
-                   SET 
-                       deptid = @deptid, full_name = @full_name, first_name = @first_name, last_name = @last_name, alias = @alias, 
-                       gender = @gender, emp_status_id = @emp_status_id, emp_type_id = @emp_type_id, imgurl_id = @imgurl_id, workemail = @workemail, 
-                       emp_code = @emp_code, role_id = @role_id, designation_id = @designation_id, dob = @dob, joined_date = @joined_date, 
-                       phone = @phone, mobile = @mobile, summary = @summary, modified_date = @modified_date, modifiedby = @modifiedby, 
+                   SET
+                       deptid = @deptid, full_name = @full_name, first_name = @first_name, last_name = @last_name, alias = @alias,
+                       gender = @gender, emp_status_id = @emp_status_id, emp_type_id = @emp_type_id, imgurl_id = @imgurl_id, workemail = @workemail,
+                       emp_code = @emp_code, role_id = @role_id, designation_id = @designation_id, dob = @dob, joined_date = @joined_date,
+                       phone = @phone, mobile = @mobile, summary = @summary, modified_date = @modified_date, modifiedby = @modifiedby,
                        is_admin = @is_admin
                     WHERE id = @id",
                 param: entity
@@ -77,13 +77,13 @@ namespace TimeAPI.Data.Repositories
         {
             Execute(
                 sql: @"UPDATE dbo.employee
-                   SET 
+                   SET
                       is_password_reset = 1
                     WHERE user_id = @key",
                 param: new { key }
             );
         }
-        
+
         public Employee FindByEmpName(string full_name)
         {
             return QuerySingleOrDefault<Employee>(
@@ -119,7 +119,7 @@ namespace TimeAPI.Data.Repositories
         public dynamic FetchGridDataEmployeeByOrgID(string key)
         {
             return Query<dynamic>(
-                   sql: @"SELECT 
+                   sql: @"SELECT
 	                        employee.id,
 	                        employee.full_name,
 	                        employee.workemail,
@@ -138,7 +138,7 @@ namespace TimeAPI.Data.Repositories
 	                          LEFT JOIN department ON employee.deptid = department.id
 	                          LEFT JOIN designation ON employee.designation_id = designation.id
                           WHERE employee.org_id =  @key AND employee.is_deleted = 0
-                          AND employee.is_superadmin = 0 
+                          AND employee.is_superadmin = 0
                           ORDER BY employee.full_name ASC",
                       param: new { key }
                );
@@ -163,7 +163,7 @@ namespace TimeAPI.Data.Repositories
                 sql: @"SELECT employee.id, employee.full_name FROM dbo.employee
                         INNER JOIN department ON employee.deptid = department.id
                         WHERE  employee.is_deleted = 0
-                        AND employee.is_superadmin = 0 
+                        AND employee.is_superadmin = 0
                         AND department.id = @DepartmentID
                         ORDER BY employee.full_name ASC",
                 param: new { DepartmentID }
@@ -173,7 +173,7 @@ namespace TimeAPI.Data.Repositories
         public dynamic FindEmpDepartDesignByEmpID(string key)
         {
             return QuerySingleOrDefault<dynamic>(
-                   sql: @"	SELECT 
+                   sql: @"	SELECT
 	                        employee.id,
 	                        employee.full_name,
 	                        employee.workemail,
@@ -188,7 +188,7 @@ namespace TimeAPI.Data.Repositories
 	                LEFT JOIN department ON employee.deptid = department.id
 	                LEFT JOIN designation ON employee.designation_id = designation.id
 	                WHERE employee.id =  @key AND employee.is_deleted = 0
-	                AND employee.is_superadmin = 0 
+	                AND employee.is_superadmin = 0
 	                ORDER BY employee.full_name ASC",
                       param: new { key }
                );
@@ -200,7 +200,7 @@ namespace TimeAPI.Data.Repositories
                 sql: @"select employee.id, employee.full_name from employee
                         INNER JOIN employee_type on employee.emp_type_id = employee_type.id
                         WHERE UPPER(employee_type.employee_type_name) = 'OUTSOURCED'
-                        AND employee.org_id = @OrgID 
+                        AND employee.org_id = @OrgID
                         AND employee.is_deleted = 0",
                 param: new { OrgID }
             );
@@ -212,16 +212,16 @@ namespace TimeAPI.Data.Repositories
                 sql: @"select employee.id, employee.full_name from employee
                         INNER JOIN employee_type on employee.emp_type_id = employee_type.id
                         WHERE UPPER(employee_type.employee_type_name) = 'FREELANCER'
-                        AND employee.org_id = @OrgID 
+                        AND employee.org_id = @OrgID
                         AND employee.is_deleted = 0",
                 param: new { OrgID }
             );
         }
-        
+
         public dynamic FindEmpDepartDesignByTeamID(string key)
         {
             return Query<dynamic>(
-                   sql: @" SELECT 
+                   sql: @" SELECT
 	                        employee.id,
 	                        employee.full_name,
 	                        employee.workemail,
@@ -237,7 +237,7 @@ namespace TimeAPI.Data.Repositories
 	                        LEFT JOIN designation ON employee.designation_id = designation.id
 	                        LEFT JOIN team_members ON employee.id = team_members.emp_id
 	                        WHERE team_members.team_id =  @key and employee.is_deleted = 0
-	                        AND employee.is_superadmin = 0 
+	                        AND employee.is_superadmin = 0
 	                        ORDER BY employee.full_name ASC",
                       param: new { key }
                );
@@ -253,6 +253,5 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
-
     }
 }
