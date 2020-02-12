@@ -109,33 +109,33 @@ namespace TimeAPI.Data.Repositories
         public dynamic GetTimesheetActivityByGroupAndProjectID(string GroupID, string ProjectID)
         {
             return Query<dynamic>(
-                sql: @"	SELECT        
-				        UPPER(dbo.timesheet_x_project_category.project_category_type) + ': '
-					        + dbo.project.project_name + ' ('
-					        + FORMAT(CAST(dbo.timesheet.check_in AS DATETIME2), N'hh:mm tt')  + ' - '
-					        + FORMAT(CAST(dbo.timesheet.check_out AS DATETIME2), N'hh:mm tt')  + ' | ' 
-					        + dbo.timesheet.total_hrs +  ')' as timesheet, 
-					        dbo.project_activity.activity_name, 
-					        dbo.timesheet_activity.task_name,
-					        dbo.timesheet_activity.remarks,
-					        FORMAT(CAST(dbo.timesheet_activity.start_time AS DATETIME2), N'hh:mm tt') as start_time ,
-					        FORMAT(CAST(dbo.timesheet_activity.end_time AS DATETIME2), N'hh:mm tt') as end_time,
-					        timesheet_activity.total_hrs,
-					        timesheet_activity.is_billable,
-					        FORMAT(timesheet_activity.ondate, 'dd-MM-yyyy', 'en-US') AS ondate
-                        FROM
-                            dbo.timesheet_activity WITH (NOLOCK)
-                            INNER JOIN task on timesheet_activity.task_id = task.id
-					        INNER JOIN project_activity_x_task on project_activity_x_task.task_id = task.id 
-					        INNER JOIN project_activity on project_activity.id = project_activity_x_task.activity_id
-					        INNER JOIN project on project.id = project_activity_x_task.project_id 
-					        INNER JOIN timesheet on timesheet.groupid = dbo.timesheet_activity.groupid
-					        INNER JOIN timesheet_x_project_category on timesheet_x_project_category.groupid = dbo.timesheet_activity.groupid
-                           WHERE dbo.timesheet_activity.groupid = @GroupID
-				            AND dbo.timesheet_activity.is_deleted  = 0
-				            AND dbo.project.id  = @ProjectID
-                            AND FORMAT(timesheet_activity.ondate, 'dd-MM-yyyy', 'en-US') = FORMAT(GETDATE(), 'd', 'EN-US')
-					        ORDER BY FORMAT(CAST(dbo.timesheet_activity.end_time AS DATETIME2), N'hh:mm tt') ASC",
+                sql: @"SELECT        
+				    UPPER([dbo].[timesheet_x_project_category].project_category_type) + ': '
+					+ [dbo].[project].project_name + ' ('
+					+ FORMAT(CAST([dbo].[timesheet].check_in AS DATETIME2), N'hh:mm tt')  + ' - '
+					+ FORMAT(CAST([dbo].[timesheet].check_out AS DATETIME2), N'hh:mm tt')  + ' | ' 
+					+ [dbo].[timesheet].total_hrs +  ' )' as timesheet, 
+					[dbo].[project_activity].activity_name, 
+					[dbo].[timesheet_activity].task_name,
+					[dbo].[timesheet_activity].remarks,
+					FORMAT(CAST([dbo].[timesheet_activity].start_time AS DATETIME2), N'hh:mm tt') as start_time ,
+					FORMAT(CAST([dbo].[timesheet_activity].end_time AS DATETIME2), N'hh:mm tt') as end_time,
+					timesheet_activity.total_hrs,
+					timesheet_activity.is_billable,
+					FORMAT(timesheet_activity.ondate, 'dd-MM-yyyy', 'en-US') AS ondate
+                FROM
+                    [dbo].[timesheet_activity] WITH (NOLOCK)
+                    INNER JOIN task on timesheet_activity.task_id = task.id
+					INNER JOIN project_activity_x_task on project_activity_x_task.task_id = task.id 
+					INNER JOIN project_activity on project_activity.id = project_activity_x_task.activity_id
+					INNER JOIN project on project.id = project_activity_x_task.project_id 
+					INNER JOIN timesheet on timesheet.groupid = [dbo].[timesheet_activity].groupid
+					INNER JOIN timesheet_x_project_category on timesheet_x_project_category.groupid = [dbo].[timesheet_activity].groupid
+                    WHERE [dbo].[timesheet_activity].groupid =@GroupID
+				    AND [dbo].[timesheet_activity].is_deleted  = 0
+				    AND FORMAT(timesheet_activity.ondate, 'dd-MM-yyyy', 'en-US') = FORMAT(GETDATE(), 'dd-MM-yyyy', 'en-US')
+				    AND [dbo].[project].id  = @ProjectID
+				ORDER BY FORMAT(CAST([dbo].[timesheet_activity].end_time AS DATETIME2), N'hh:mm tt') DESC",
                 param: new { GroupID, ProjectID }
             );
         }
