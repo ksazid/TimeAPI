@@ -118,7 +118,7 @@ namespace TimeAPI.Data.Repositories
                         WHERE empid = @empid
                         AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') = FORMAT(DATEADD(HOUR,11,GETDATE()), 'd', 'EN-US')
                         AND timesheet.is_deleted = 0
-                        ORDER BY FORMAT(CAST(timesheet.ondate AS DATETIME2), N'hh:mm tt') ASC;",
+                        ORDER BY FORMAT(CAST(timesheet.ondate AS DATETIME2), N'hh:mm tt') DESC;",
                 param: new { empid = resultsEmployee.id }
             );
 
