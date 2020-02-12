@@ -414,10 +414,18 @@ namespace TimeAPI.API.Controllers
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<TimesheetActivity>(timesheetActivityViewModel);
 
-                var _TotalMinutes = (Convert.ToDateTime(modal.end_time) - Convert.ToDateTime(modal.start_time)).TotalMinutes;
-                TimeSpan spWorkMin = TimeSpan.FromMinutes(_TotalMinutes);
-                modal.total_hrs = spWorkMin.ToString(FormatTime);
+                //var _TotalMinutes = (Convert.ToDateTime(modal.end_time) - Convert.ToDateTime(modal.start_time)).TotalMinutes;
+                //TimeSpan spWorkMin = TimeSpan.FromMinutes(_TotalMinutes);
+                //modal.total_hrs = spWorkMin.ToString(FormatTime);
 
+                var _TotalMinutes = (Convert.ToDateTime(modal.end_time) - Convert.ToDateTime(modal.start_time)).Ticks;
+                TimeSpan elapsedSpan = new TimeSpan(_TotalMinutes);
+
+                string TotalHours;
+                string TotalMinutes;
+                ConvertHoursAndMinutes(elapsedSpan, out TotalHours, out TotalMinutes);
+
+                modal.total_hrs = string.Format(@"{0}:{1}", TotalHours, TotalMinutes);
                 _unitOfWork.TimesheetActivityRepository.Add(modal);
                 _unitOfWork.Commit();
 
@@ -574,9 +582,21 @@ namespace TimeAPI.API.Controllers
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<TimesheetAdministrative>(timesheetAdministrativeActivityViewModel);
 
-                var _TotalMinutes = (Convert.ToDateTime(modal.start_time) - Convert.ToDateTime(modal.end_time)).TotalMinutes;
-                TimeSpan spWorkMin = TimeSpan.FromMinutes(_TotalMinutes);
-                modal.total_hrs = spWorkMin.ToString(FormatTime);
+                //var _TotalMinutes = (Convert.ToDateTime(modal.start_time) - Convert.ToDateTime(modal.end_time)).TotalMinutes;
+                //TimeSpan spWorkMin = TimeSpan.FromMinutes(_TotalMinutes);
+                //modal.total_hrs = spWorkMin.ToString(FormatTime);
+
+
+                var _TotalMinutes = (Convert.ToDateTime(modal.end_time) - Convert.ToDateTime(modal.start_time)).Ticks;
+                TimeSpan elapsedSpan = new TimeSpan(_TotalMinutes);
+
+                string TotalHours;
+                string TotalMinutes;
+                ConvertHoursAndMinutes(elapsedSpan, out TotalHours, out TotalMinutes);
+
+                modal.total_hrs = string.Format(@"{0}:{1}", TotalHours, TotalMinutes);
+
+
 
                 _unitOfWork.TimesheetAdministrativeRepository.Add(modal);
                 _unitOfWork.Commit();
