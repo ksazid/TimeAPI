@@ -114,7 +114,7 @@ namespace TimeAPI.Data.Repositories
 					        + [dbo].[project].project_name + ' ('
 					        + FORMAT(CAST([dbo].[timesheet].check_in AS DATETIME2), N'hh:mm tt')  + ' - '
 					        + FORMAT(CAST([dbo].[timesheet].check_out AS DATETIME2), N'hh:mm tt')  + ' | ' 
-					        + [dbo].[timesheet].total_hrs +  ' )' as timesheet, 
+					        + [dbo].[timesheet].total_hrs +  ')' as timesheet, 
 					        [dbo].[project_activity].activity_name, 
 					        [dbo].[timesheet_activity].task_name,
 					        [dbo].[timesheet_activity].remarks,
