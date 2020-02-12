@@ -106,7 +106,6 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        //FORMAT(getdate(), 'd', 'en-us') added 11 hours to mountain time
         public dynamic GetTimesheetActivityByGroupAndProjectID(string GroupID, string ProjectID)
         {
             return Query<dynamic>(
@@ -135,7 +134,7 @@ namespace TimeAPI.Data.Repositories
                            WHERE dbo.timesheet_activity.groupid = @GroupID
 				            AND dbo.timesheet_activity.is_deleted  = 0
 				            AND dbo.project.id  = @ProjectID
-                            AND FORMAT(timesheet_activity.ondate, 'dd-MM-yyyy', 'en-US') = FORMAT(DATEADD(HOUR,11,GETDATE()), 'd', 'EN-US')
+                            AND FORMAT(timesheet_activity.ondate, 'dd-MM-yyyy', 'en-US') = FORMAT(GETDATE(), 'd', 'EN-US')
 					        ORDER BY FORMAT(CAST(dbo.timesheet_activity.end_time AS DATETIME2), N'hh:mm tt') ASC",
                 param: new { GroupID, ProjectID }
             );
