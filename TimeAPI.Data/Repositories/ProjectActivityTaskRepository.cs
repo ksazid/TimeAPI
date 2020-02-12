@@ -89,6 +89,7 @@ namespace TimeAPI.Data.Repositories
             return Query<dynamic>(
                    sql: @"SELECT
                             dbo.task.id,
+                            dbo.task.task_name,
                             dbo.task.task_desc
                         FROM dbo.task WITH(NOLOCK)
                         INNER JOIN  dbo.project_activity_x_task on task.id = dbo.project_activity_x_task.task_id

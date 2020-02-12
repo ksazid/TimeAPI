@@ -114,10 +114,11 @@ namespace TimeAPI.Data.Repositories
 
             //FORMAT(getdate(), 'd', 'en-us') added 11 hours to mountain time
             var resultsTimesheetGrpID = Query<string>(
-                sql: @"SELECT distinct(groupid) from timesheet WITH (NOLOCK)
+                sql: @"SELECT distinct(groupid), FORMAT(CAST(timesheet.ondate AS DATETIME2), N'hh:mm tt')  from timesheet WITH (NOLOCK)
                         WHERE empid = @empid
                         AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') = FORMAT(DATEADD(HOUR,11,GETDATE()), 'd', 'EN-US')
-                        AND timesheet.is_deleted = 0;",
+                        AND timesheet.is_deleted = 0
+                        ORDER BY FORMAT(CAST(timesheet.ondate AS DATETIME2), N'hh:mm tt') ASC;",
                 param: new { empid = resultsEmployee.id }
             );
 
