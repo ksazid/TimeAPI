@@ -106,7 +106,7 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public dynamic GetTimesheetActivityByGroupAndProjectID(string GroupID, string ProjectID)
+        public dynamic GetTimesheetActivityByGroupAndProjectID(string GroupID, string ProjectID, string Date)
         {
             return Query<dynamic>(
                 sql: @"SELECT        
@@ -133,10 +133,10 @@ namespace TimeAPI.Data.Repositories
 					INNER JOIN timesheet_x_project_category on timesheet_x_project_category.groupid = [dbo].[timesheet_activity].groupid
                     WHERE [dbo].[timesheet_activity].groupid =@GroupID
 				    AND [dbo].[timesheet_activity].is_deleted  = 0
-				    AND FORMAT(timesheet_activity.ondate, 'dd-MM-yyyy', 'en-US') = FORMAT(GETDATE(), 'dd-MM-yyyy', 'en-US')
+				    AND FORMAT(timesheet_activity.ondate, 'dd-MM-yyyy', 'en-US') =  FORMAT(CAST(@Date AS DATE), 'd', 'EN-US')
 				    AND [dbo].[project].id  = @ProjectID
 				ORDER BY FORMAT(CAST([dbo].[timesheet_activity].end_time AS DATETIME2), N'hh:mm tt') DESC",
-                param: new { GroupID, ProjectID }
+                param: new { GroupID, ProjectID, Date }
             );
         }
     }

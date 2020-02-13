@@ -95,7 +95,7 @@ namespace TimeAPI.Data.Repositories
         //        );
         //}
 
-        public UserDataGroupDataSet GetUserDataGroupByUserID(string UserID)
+        public UserDataGroupDataSet GetUserDataGroupByUserID(string UserID, string Date)
         {
             var resultsAspNetUsers = QuerySingleOrDefault<User>(
                 sql: @"SELECT * from AspNetUsers WITH (NOLOCK) WHERE id = @UserID;",
@@ -115,10 +115,10 @@ namespace TimeAPI.Data.Repositories
             var resultsTimesheetGrpID = Query<string>(
                 sql: @"SELECT distinct(groupid), FORMAT(CAST(timesheet.ondate AS DATETIME2), N'hh:mm tt')  from timesheet WITH (NOLOCK)
                         WHERE empid = @empid
-                        AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') = FORMAT(GETDATE(), 'd', 'EN-US')
+                        AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') = FORMAT(CAST(@Date AS DATE), 'd', 'EN-US')
                         AND timesheet.is_deleted = 0
                         ORDER BY FORMAT(CAST(timesheet.ondate AS DATETIME2), N'hh:mm tt') DESC;",
-                param: new { empid = resultsEmployee.id }
+                param: new { empid = resultsEmployee.id, Date }
             );
 
             List<Organization> orgList = GetOrgAddress(resultsOrganization);

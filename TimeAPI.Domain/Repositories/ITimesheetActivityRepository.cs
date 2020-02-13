@@ -12,7 +12,7 @@ namespace TimeAPI.Domain.Repositories
 
         dynamic GetTop10TimesheetActivityOnTaskID(string TaskID);
 
-        dynamic GetTimesheetActivityByGroupAndProjectID(string GroupID, string ProjectID);
+        dynamic GetTimesheetActivityByGroupAndProjectID(string GroupID, string ProjectID, string Date);
 
         //IEnumerable<dynamic> FetchAllTeamsByOrgID(string OrgID);
         //IEnumerable<dynamic> FetchAllTeamMembersByTeamID(string key);
