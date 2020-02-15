@@ -67,7 +67,50 @@ namespace TimeAPI.API.Controllroers
                                             .FirstOrDefault();
 
                 modal.created_date = _dateTime.ToString();
+
                 modal.is_deleted = false;
+
+                if (projectViewModel.EntityContact != null)
+                {
+                    var entityContact = new EntityContact()
+                    {
+                        id = Guid.NewGuid().ToString(),
+                        entity_id = modal.id,
+                        name = projectViewModel.EntityContact.name,
+                        position = projectViewModel.EntityContact.position,
+                        phone = projectViewModel.EntityContact.phone,
+                        mobile = projectViewModel.EntityContact.mobile,
+                        email = projectViewModel.EntityContact.email,
+                        createdby = projectViewModel.createdby,
+                        created_date = _dateTime.ToString(),
+                        is_deleted = false
+                    };
+                    _unitOfWork.EntityContactRepository.Add(entityContact);
+                }
+
+                if (projectViewModel.EntityLocation != null)
+                {
+                    var entityLocation = new EntityLocation()
+                    {
+                        id = Guid.NewGuid().ToString(),
+                        entity_id = modal.id,
+                        geo_address = projectViewModel.EntityLocation.id,
+                        formatted_address = projectViewModel.EntityLocation.formatted_address,
+                        lat = projectViewModel.EntityLocation.lat,
+                        lang = projectViewModel.EntityLocation.lang,
+                        street_number = projectViewModel.EntityLocation.street_number,
+                        route = projectViewModel.EntityLocation.route,
+                        locality = projectViewModel.EntityLocation.locality,
+                        administrative_area_level_2 = projectViewModel.EntityLocation.administrative_area_level_2,
+                        administrative_area_level_1 = projectViewModel.EntityLocation.administrative_area_level_1,
+                        postal_code = projectViewModel.EntityLocation.postal_code,
+                        country = projectViewModel.EntityLocation.country,
+                        createdby = projectViewModel.createdby,
+                        created_date = _dateTime.ToString(),
+                        is_deleted = false
+                    };
+                    _unitOfWork.EntityLocationRepository.Add(entityLocation);
+                }
 
                 _unitOfWork.ProjectRepository.Add(modal);
                 _unitOfWork.Commit();
@@ -186,6 +229,45 @@ namespace TimeAPI.API.Controllroers
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Project>(projectViewModel);
                 modal.modified_date = _dateTime.ToString();
+
+                if (projectViewModel.EntityContact != null)
+                {
+                    var entityContact = new EntityContact()
+                    {
+                        entity_id = modal.id,
+                        name = projectViewModel.EntityContact.name,
+                        position = projectViewModel.EntityContact.position,
+                        phone = projectViewModel.EntityContact.phone,
+                        mobile = projectViewModel.EntityContact.mobile,
+                        email = projectViewModel.EntityContact.email,
+                        modifiedby = projectViewModel.createdby,
+                        modified_date = _dateTime.ToString()
+                    };
+                    _unitOfWork.EntityContactRepository.Update(entityContact);
+                }
+
+                if (projectViewModel.EntityLocation != null)
+                {
+                    var entityLocation = new EntityLocation()
+                    {
+                        entity_id = modal.id,
+                        geo_address = projectViewModel.EntityLocation.id,
+                        formatted_address = projectViewModel.EntityLocation.formatted_address,
+                        lat = projectViewModel.EntityLocation.lat,
+                        lang = projectViewModel.EntityLocation.lang,
+                        street_number = projectViewModel.EntityLocation.street_number,
+                        route = projectViewModel.EntityLocation.route,
+                        locality = projectViewModel.EntityLocation.locality,
+                        administrative_area_level_2 = projectViewModel.EntityLocation.administrative_area_level_2,
+                        administrative_area_level_1 = projectViewModel.EntityLocation.administrative_area_level_1,
+                        postal_code = projectViewModel.EntityLocation.postal_code,
+                        country = projectViewModel.EntityLocation.country,
+                        modifiedby = projectViewModel.createdby,
+                        modified_date = _dateTime.ToString()
+                    };
+                    _unitOfWork.EntityLocationRepository.Update(entityLocation);
+                }
+
 
                 _unitOfWork.ProjectRepository.Update(modal);
                 _unitOfWork.Commit();

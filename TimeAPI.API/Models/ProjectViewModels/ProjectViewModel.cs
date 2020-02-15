@@ -21,6 +21,8 @@ namespace TimeAPI.API.Models.ProjectViewModels
         public bool is_public { get; set; }
         public bool is_inactive { get; set; }
         public string createdby { get; set; }
+        public EntityContact EntityContact { get; set; }
+        public EntityLocation EntityLocation { get; set; }
     }
 
     public class ProjectStatusModel
