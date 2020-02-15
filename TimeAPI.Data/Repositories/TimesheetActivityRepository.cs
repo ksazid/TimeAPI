@@ -110,8 +110,7 @@ namespace TimeAPI.Data.Repositories
         {
             return Query<dynamic>(
                 sql: @"SELECT        
-				  	                UPPER(dbo.timesheet_x_project_category.project_category_type) + ': '
-					                + dbo.project.project_name + ' (' 
+				  	                dbo.project.project_name + ' (' 
 					                + ISNULL(NULLIF(FORMAT(CAST(eTime.check_in AS DATETIME2), N'hh:mm tt'), ' '), 'NA') + ' - '
 					                + ISNULL(NULLIF(FORMAT(CAST(eTime.check_out AS DATETIME2), N'hh:mm tt'), ' '), 'NA')  + ' | '  
 					                + ISNULL(NULLIF(eTime.total_hrs, ' '), 'NA') +  ' )' as timesheet, 
@@ -146,8 +145,7 @@ namespace TimeAPI.Data.Repositories
         {
             return Query<dynamic>(
                 sql: @"SELECT				
-				    UPPER(dbo.timesheet_x_project_category.project_category_type) + ': '
-					+ dbo.project.project_name + ' (' 
+				    dbo.project.project_name + ' (' 
 					+ ISNULL(NULLIF(FORMAT(CAST(timesheet.check_in AS DATETIME2), N'hh:mm tt'), ' '), 'NA') + ' - '
 					+ ISNULL(NULLIF(FORMAT(CAST(timesheet.check_out AS DATETIME2), N'hh:mm tt'), ' '), 'NA')  + ' | '  
 					+ ISNULL(NULLIF(timesheet.total_hrs, ' '), 'NA') +  ' )' as timesheet, 
