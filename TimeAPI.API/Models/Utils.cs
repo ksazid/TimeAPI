@@ -85,6 +85,14 @@ namespace TimeAPI.API.Models
         public string ProjectID { get; set; }
     }
 
+    public class UtilsEmpIDAndDate
+    {
+        public string EmpID { get; set; }
+        public string StartDate { get; set; }
+        public string EndDate { get; set; }
+    }
+
+
 
     public class UtilPhone
     {

@@ -14,9 +14,7 @@ namespace TimeAPI.Domain.Repositories
 
         dynamic GetTimesheetActivityByGroupAndProjectID(string GroupID, string ProjectID, string Date);
 
-        //IEnumerable<dynamic> FetchAllTeamsByOrgID(string OrgID);
-        //IEnumerable<dynamic> FetchAllTeamMembersByTeamID(string key);
-        //dynamic GetAllTeamMembersByTeamID(string key);
+        dynamic GetTimesheetActivityByEmpID(string EmpID, string StartDate, string EndDate);
 
     }
 }
