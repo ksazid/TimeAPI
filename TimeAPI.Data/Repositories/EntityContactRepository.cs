@@ -59,11 +59,31 @@ namespace TimeAPI.Data.Repositories
                     phone = @phone,
                     mobile = @mobile,
                     email = @email,
+                    modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE id = @id",
                 param: entity
             );
         }
+
+
+        public void UpdateByEntityID(EntityContact entity)
+        {
+            Execute(
+                sql: @"UPDATE entity_contact
+                   SET
+                    name = @name,
+                    position = @position,
+                    phone = @phone,
+                    mobile = @mobile,
+                    email = @email,
+                    modified_date = @modified_date,
+                    modifiedby = @modifiedby
+                    WHERE entity_id = @entity_id",
+                param: entity
+            );
+        }
+
 
         public IEnumerable<EntityContact> All()
         {

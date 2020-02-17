@@ -8,6 +8,7 @@ namespace TimeAPI.Domain.Repositories
     public interface IEntityContactRepository : IRepository<EntityContact, string>
     {
         void RemoveByEntityID(string EntityID);
+        void UpdateByEntityID(EntityContact entity);
         EntityContact FindByEntityID(string EntityID);
 
     }

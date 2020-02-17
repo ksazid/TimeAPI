@@ -100,11 +100,9 @@ namespace TimeAPI.API.Controllroers
                 var mapper1 = config.CreateMapper();
                 var modal1 = mapper.Map<EntityContact>(CustomerViewModel.EntityContact);
                 modal1.modified_date = _dateTime.ToString();
+                modal1.entity_id = modal.id;
 
-
-                _unitOfWork.CustomerRepository.Update(modal);
-
-
+                _unitOfWork.EntityContactRepository.UpdateByEntityID(modal1);
                 _unitOfWork.CustomerRepository.Update(modal);
                 _unitOfWork.Commit();
 
@@ -158,6 +156,8 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
+        [HttpPost]
+        [Route("FindByCustomerId")]
         public async Task<object> FindByCustomerId([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
