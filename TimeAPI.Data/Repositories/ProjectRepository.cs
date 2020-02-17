@@ -29,6 +29,31 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
+        public Project FindAutoProjectPrefixByOrgID(string key)
+        {
+            return QuerySingleOrDefault<Project>(
+                sql: @"SELECT TOP 1 project_prefix 
+                            FROM dbo.project 
+                        WHERE 
+                            CONTAINS(project_prefix, 'JOB')  
+                            AND org_id = @key
+                            ORDER BY created_date DESC",
+                param: new { key }
+            );
+        }
+
+        public Project FindCustomProjectPrefixByOrgIDAndPrefix(string key, string project_prefix)
+        {
+            return QuerySingleOrDefault<Project>(
+                sql: @"SELECT top 1 project_prefix    
+                        FROM dbo.project  WHERE 
+                     NOT CONTAINS(project_prefix, 'JOB')  AND project_prefix = @project_prefix
+                        org_id = @key
+                     ORDER BY created_date DESC",
+                param: new { key, project_prefix  }
+            );
+        }
+
         public void Remove(string key)
         {
             Execute(

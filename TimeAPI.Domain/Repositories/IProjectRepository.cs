@@ -11,7 +11,7 @@ namespace TimeAPI.Domain.Repositories
         //dynamic FindByTeamID(string TeamID);
         IEnumerable<dynamic> FetchAllProjectByOrgID(string OrgID);
         void UpdateProjectStatusByID(Project entity);
-        //IEnumerable<dynamic> FetchAllTeamMembersByTeamID(string key);
-        //dynamic GetAllTeamMembersByTeamID(string key);
+        Project FindAutoProjectPrefixByOrgID(string key);
+        Project FindCustomProjectPrefixByOrgIDAndPrefix(string key, string key1);
     }
 }
