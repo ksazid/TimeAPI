@@ -62,7 +62,7 @@ namespace TimeAPI.API.Controllroers
                 var config1 = new AutoMapper.MapperConfiguration(m => m.CreateMap<EntityContact, EntityContact>());
                 var mapper1 = config.CreateMapper();
                 var modal1 = mapper.Map<EntityContact>(CustomerViewModel.EntityContact);
-
+                modal1.id = Guid.NewGuid().ToString();
                 modal1.entity_id = modal.id;
 
                 _unitOfWork.EntityContactRepository.Add(modal1);
