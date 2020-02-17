@@ -9,5 +9,7 @@ namespace TimeAPI.Domain.Repositories
         User FindByNormalizedEmail(string normalizedEmail);
         //void CustomEmailConfirmedFlagUpdate(string UserID);
         UserDataGroupDataSet GetUserDataGroupByUserID(string EmpID, string Date);
+
+        //void RemovePermanent(string UserID);
     }
 }

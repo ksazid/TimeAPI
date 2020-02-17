@@ -166,7 +166,12 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
+               
+
+                var result = _unitOfWork.EmployeeRepository.Find(Utils.ID);
+
                 _unitOfWork.EmployeeRepository.Remove(Utils.ID);
+                _unitOfWork.UserRepository.Remove(result.user_id);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee removed succefully." }).ConfigureAwait(false);

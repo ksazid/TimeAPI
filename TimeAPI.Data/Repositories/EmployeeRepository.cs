@@ -58,6 +58,16 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
+        public void RemovePermanent(string key)
+        {
+            Execute(
+                sql: @"DELETE  
+                        dbo.employee 
+                    WHERE id = @key",
+                param: new { key }
+            );
+        }
+
         public void Update(Employee entity)
         {
             Execute(

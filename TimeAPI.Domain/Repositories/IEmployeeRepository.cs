@@ -21,5 +21,7 @@ namespace TimeAPI.Domain.Repositories
         dynamic GetAllOutsourcedEmpByOrgID(string OrgID);
         IEnumerable<Employee> GetAllFreelancerEmpByOrgID(string OrgID);
         void SetEmployeeInactiveByEmpID(string OrgID);
+
+        void RemovePermanent(string EmpID);
     }
 }
