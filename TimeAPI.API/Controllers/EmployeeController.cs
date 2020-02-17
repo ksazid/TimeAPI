@@ -166,8 +166,6 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-               
-
                 var result = _unitOfWork.EmployeeRepository.Find(Utils.ID);
 
                 _unitOfWork.EmployeeRepository.Remove(Utils.ID);

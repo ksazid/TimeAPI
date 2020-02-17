@@ -10,6 +10,7 @@ namespace TimeAPI.API.Models.CustomerViewModels
     public class CustomerViewModel
     {
         public string id { get; set; }
+        public string org_id { get; set; }
         public string cst_name { get; set; }
         public string cst_type { get; set; }
         public string email { get; set; }

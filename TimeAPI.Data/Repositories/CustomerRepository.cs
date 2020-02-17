@@ -15,8 +15,8 @@ namespace TimeAPI.Data.Repositories
         {
             entity.id = ExecuteScalar<string>(
                         sql: @"
-                    INSERT INTO dbo.customer (id, cst_name, cst_type, email, phone, adr,street, city, created_date, createdby)
-                    VALUES (@id, @cst_name, @cst_type, @email, @phone, @adr, @street, @city, @created_date, @createdby);
+                    INSERT INTO dbo.customer (id, org_id, cst_name, cst_type, email, phone, adr,street, city, created_date, createdby)
+                    VALUES (@id, @org_id, @cst_name, @cst_type, @email, @phone, @adr, @street, @city, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                         param: entity
                     );
@@ -61,7 +61,7 @@ namespace TimeAPI.Data.Repositories
             Execute(
                 sql: @"UPDATE dbo.customer
                    SET
-                    cst_name = @cst_name, 
+                    cst_name = @cst_name,   
                     cst_type = @cst_type, 
                     email = @email, 
                     phone = @phone, 
@@ -74,5 +74,13 @@ namespace TimeAPI.Data.Repositories
                 param: entity
             );
         }
+
+        public IEnumerable<Customer> FindCustomerByOrgID(string key)
+        {
+            return Query<Customer>(
+                sql: "SELECT * FROM dbo.customer where is_deleted = 0 AND org_id = @key"
+            );
+        }
+
     }
 }

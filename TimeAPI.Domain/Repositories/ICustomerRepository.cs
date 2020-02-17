@@ -9,11 +9,6 @@ namespace TimeAPI.Domain.Repositories
 {
     public interface ICustomerRepository : IRepository<Customer, string>
     {
-        //dynamic FindByTaskDetailsByEmpID(string empid);
-
-        //void UpdateTaskStatus(Tasks entity);
-
-        //RootEmployeeTask GetAllTaskByEmpID(string empid);
-       
+        IEnumerable<Customer> FindCustomerByOrgID(string OrgID);
     }
 }
