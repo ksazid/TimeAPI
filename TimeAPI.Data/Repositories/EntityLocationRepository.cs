@@ -30,7 +30,13 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
-
+        public EntityLocation FindByEnitiyID(string key)
+        {
+            return QuerySingleOrDefault<EntityLocation>(
+                sql: "SELECT * FROM dbo.entity_location WHERE is_deleted = 0 and entity_id = @key",
+                param: new { key }
+            );
+        }
         public void Remove(string key)
         {
             Execute(

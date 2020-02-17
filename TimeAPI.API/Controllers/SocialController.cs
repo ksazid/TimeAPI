@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
+using System.Net;
+using System.Net.Mail;
 using System.Threading;
 using System.Threading.Tasks;
 using TimeAPI.API.Models;
@@ -179,5 +181,46 @@ namespace TimeAPI.API.Controllroers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
+
+
+        //private void SolvedComplainMailtoCustomer()
+        //{
+        //    try
+        //    {
+        //        //Mail Message
+        //        MailMessage mM = new MailMessage();
+        //        //Mail Address
+        //        mM.From = new MailAddress("noreply.Interfuture@gmail.com");
+        //        //receiver email id      
+              
+        //        mM.Bcc.Add("sazid@interfuture.ae");
+
+        //        ///////Customer mail Format///////////
+        //        mM.Subject = "Your Complaint has been Solved. ";
+
+        //        string mailformat = "Hello world";
+        //        mM.IsBodyHtml = true;
+        //        mM.Body = mailformat.ToString();
+        //        //////////////////////////////////////
+        //        //SMTP client
+        //        SmtpClient sC = new SmtpClient("smtp.gmail.com");
+        //        //port number for Hot mail
+        //        sC.Port = 465;
+        //        //credentials to login in to hotmail account
+        //        sC.Credentials = new NetworkCredential("noreply.Interfuture@gmail.com", "interfuture123");
+        //        sC.DeliveryMethod = SmtpDeliveryMethod.Network;
+        //        sC.UseDefaultCredentials = false;
+
+        //        //enabled SSL
+        //        sC.EnableSsl = true;
+        //        //Send an email
+        //        sC.Send(mM);
+        //    }
+        //    catch (Exception ex)
+        //    {
+
+
+        //    }
+        //}
     }
 }

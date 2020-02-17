@@ -146,6 +146,8 @@ namespace TimeAPI.API.Controllers
         {
             try
             {
+                OrganizationViewModel organizationViewModel = new OrganizationViewModel();
+
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
@@ -153,8 +155,15 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 var result = _unitOfWork.OrganizationRepository.Find(Utils.ID);
+                var resultLocation = _unitOfWork.EntityLocationRepository.FindByEnitiyID(result.org_id);
 
-                return await Task.FromResult<object>(result).ConfigureAwait(false);
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationViewModel, Organization>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<Organization>(result);
+
+                modal.EntityLocation = resultLocation;
+
+                return await Task.FromResult<object>(modal).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
