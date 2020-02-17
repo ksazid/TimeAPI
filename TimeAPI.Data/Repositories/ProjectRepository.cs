@@ -29,16 +29,17 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public Project FindAutoProjectPrefixByOrgID(string key)
+        public Project FindAutoProjectPrefixByOrgID(string key, string date)
         {
             return QuerySingleOrDefault<Project>(
                 sql: @"SELECT TOP 1 project_prefix 
                             FROM dbo.project 
                         WHERE 
                             CONTAINS(project_prefix, 'JOB')  
-                            AND org_id = @key
+                            AND org_id = @key 
+                            AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US')
                             ORDER BY created_date DESC",
-                param: new { key }
+                param: new { key , date }
             );
         }
 

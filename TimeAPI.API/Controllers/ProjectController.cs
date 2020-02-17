@@ -337,7 +337,7 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.OrgID));
 
-                var results = _unitOfWork.ProjectRepository.FindAutoProjectPrefixByOrgID(Utils.OrgID);
+                var results = _unitOfWork.ProjectRepository.FindAutoProjectPrefixByOrgID(Utils.OrgID, _dateTime.ToString());
 
                 return await Task.FromResult<object>(results).ConfigureAwait(false);
 
