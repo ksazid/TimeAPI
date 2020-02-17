@@ -46,11 +46,11 @@ namespace TimeAPI.Data.Repositories
         public Project FindCustomProjectPrefixByOrgIDAndPrefix(string key, string project_prefix)
         {
             return QuerySingleOrDefault<Project>(
-                sql: @"SELECT top 1 project_prefix    
-                        FROM dbo.project  WHERE 
-                     NOT CONTAINS(project_prefix, 'JOB')  AND project_prefix = @project_prefix
-                        org_id = @key
-                     ORDER BY created_date DESC",
+                sql: @"SELECT TOP 1 project_prefix    
+                            FROM dbo.project  WHERE 
+                            project_prefix = @project_prefix
+                            AND org_id =@key
+                            ORDER BY created_date DESC",
                 param: new { key, project_prefix  }
             );
         }
