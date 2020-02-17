@@ -153,6 +153,8 @@ namespace TimeAPI.API.Controllroers
         {
             try
             {
+                ProjectViewModel projectViewModel = new ProjectViewModel();
+
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
@@ -160,8 +162,18 @@ namespace TimeAPI.API.Controllroers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 var results = _unitOfWork.ProjectRepository.Find(Utils.ID);
+                var resultLocation = _unitOfWork.EntityLocationRepository.FindByEnitiyID(results.id);
+                var resultContact = _unitOfWork.EntityContactRepository.FindByEntityID(results.id);
 
-                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(results, Formatting.Indented)).ConfigureAwait(false);
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<ProjectViewModel, Project>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<Project>(results);
+
+                modal.EntityLocation = resultLocation;
+                modal.EntityContact = resultContact;
+
+                return await Task.FromResult<object>(modal).ConfigureAwait(false);
+
             }
             catch (Exception ex)
             {

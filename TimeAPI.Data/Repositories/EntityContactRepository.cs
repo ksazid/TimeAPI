@@ -28,6 +28,14 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
+        public EntityContact FindByEntityID(string key)
+        {
+            return QuerySingleOrDefault<EntityContact>(
+                sql: "SELECT * FROM entity_contact WHERE is_deleted = 0 and entity_id = @key",
+                param: new { key }
+            );
+        }
+        
 
         public void Remove(string key)
         {
