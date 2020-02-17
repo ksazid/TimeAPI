@@ -37,7 +37,7 @@ namespace TimeAPI.Data.Repositories
                         WHERE 
                             CONTAINS(project_prefix, 'JOB')  
                             AND org_id = @key 
-                            AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US')
+                            AND FORMAT(CAST(created_date AS DATE), 'd', 'EN-US') = FORMAT(CAST(@date AS DATE), 'd', 'EN-US')
                             ORDER BY created_date DESC",
                 param: new { key , date }
             );

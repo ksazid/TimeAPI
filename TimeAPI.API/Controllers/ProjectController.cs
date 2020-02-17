@@ -348,30 +348,30 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
-        [HttpPost]
-        [Route("FindCustomProjectPrefixByOrgIDAndPrefix")]
-        public async Task<object> FindCustomProjectPrefixByOrgIDAndPrefix([FromBody] UtilsOrgIDAndPrefix Utils, CancellationToken cancellationToken)
-        {
-            try
-            {
-                ProjectViewModel projectViewModel = new ProjectViewModel();
+        //[HttpPost]
+        //[Route("FindCustomProjectPrefixByOrgIDAndPrefix")]
+        //public async Task<object> FindCustomProjectPrefixByOrgIDAndPrefix([FromBody] UtilsOrgIDAndPrefix Utils, CancellationToken cancellationToken)
+        //{
+        //    try
+        //    {
+        //        ProjectViewModel projectViewModel = new ProjectViewModel();
 
-                if (cancellationToken != null)
-                    cancellationToken.ThrowIfCancellationRequested();
+        //        if (cancellationToken != null)
+        //            cancellationToken.ThrowIfCancellationRequested();
 
-                if (Utils == null)
-                    throw new ArgumentNullException(nameof(Utils.OrgID));
+        //        if (Utils == null)
+        //            throw new ArgumentNullException(nameof(Utils.OrgID));
 
-                var results = _unitOfWork.ProjectRepository.FindCustomProjectPrefixByOrgIDAndPrefix(Utils.OrgID, Utils.Prefix);
+        //        var results = _unitOfWork.ProjectRepository.FindCustomProjectPrefixByOrgIDAndPrefix(Utils.OrgID, Utils.Prefix);
 
-                return await Task.FromResult<object>(results).ConfigureAwait(false);
+        //        return await Task.FromResult<object>(results).ConfigureAwait(false);
 
-            }
-            catch (Exception ex)
-            {
-                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-            }
-        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+        //    }
+        //}
 
         #endregion Projects
 
