@@ -187,7 +187,7 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("GetAllCustomerByOrgID")]
         public async Task<object> GetAllCustomerByOrgID([FromBody] UtilsOrgID Utils, CancellationToken cancellationToken)
         {
