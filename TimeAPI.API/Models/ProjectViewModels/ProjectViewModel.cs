@@ -8,6 +8,7 @@ namespace TimeAPI.API.Models.ProjectViewModels
 {
     public class ProjectViewModel
     {
+        public string id { get; set; }
         public string user_id { get; set; }
         public string org_id { get; set; }
         public string cst_id { get; set; }
@@ -25,7 +26,6 @@ namespace TimeAPI.API.Models.ProjectViewModels
         public EntityContact EntityContact { get; set; }
         public EntityLocation EntityLocation { get; set; }
     }
-
     public class ProjectStatusModel
     {
         public string id { get; set; }
@@ -33,5 +33,12 @@ namespace TimeAPI.API.Models.ProjectViewModels
         public string modifiedby { get; set; }
         //public EntityContact EntityContact { get; set; }
         //public EntityLocation EntityLocation { get; set; }
+    }
+
+    public class ProjectCustomerViewModel
+    {
+        public string cst_id { get; set; }
+        public string project_id { get; set; }
+        public string createdby { get; set; }
     }
 }

@@ -399,6 +399,59 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
+
+        [HttpPost]
+        [Route("AddProjectCustomer")]
+        public async Task<object> AddProjectCustomer([FromBody] ProjectCustomerViewModel statusingViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (statusingViewModel == null)
+                    throw new ArgumentNullException(nameof(statusingViewModel));
+
+                var CustomerProject = _unitOfWork.CustomerProjectRepository.Find(statusingViewModel.project_id);
+
+                if (CustomerProject == null)
+                {
+                    var modal = new CustomerProject()
+                    {
+                        id = Guid.NewGuid().ToString(),
+                        project_id = statusingViewModel.project_id,
+                        cst_id = statusingViewModel.cst_id,
+                        createdby = statusingViewModel.createdby,
+                        created_date = _dateTime.ToString(),
+                        is_deleted = false,
+                    };
+
+                    _unitOfWork.CustomerProjectRepository.Add(modal);
+                }
+                else if (CustomerProject != null)
+                {
+                    var modal = new CustomerProject()
+                    {
+                        project_id = statusingViewModel.project_id,
+                        cst_id = statusingViewModel.cst_id,
+                        modifiedby = statusingViewModel.createdby,
+                        created_date = _dateTime.ToString(),
+                        is_deleted = false,
+                    };
+
+                    _unitOfWork.CustomerProjectRepository.Update(modal);
+                }
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Project registered succefully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+
         #endregion Projects
 
         #region EntityLocation
@@ -803,6 +856,8 @@ namespace TimeAPI.API.Controllroers
         }
 
         #endregion ProjectStatus
+
+
 
         #region ProjectActivity
 
