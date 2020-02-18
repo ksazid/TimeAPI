@@ -454,6 +454,29 @@ namespace TimeAPI.API.Controllroers
         }
 
 
+        [HttpPost]
+        [Route("ProjectTaskCountByProjectID")]
+        public async Task<object> ProjectTaskCountByProjectID([FromBody] Utils _Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (_Utils == null)
+                    throw new ArgumentNullException(nameof(_Utils));
+
+                var results = _unitOfWork.ProjectRepository.ProjectTaskCount(_Utils.ID);
+
+                return await Task.FromResult<object>(results).ConfigureAwait(false);
+
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
         #endregion Projects
 
         #region EntityLocation

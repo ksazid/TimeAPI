@@ -39,7 +39,7 @@ namespace TimeAPI.Data.Repositories
                             AND org_id = @key 
                             AND FORMAT(CAST(created_date AS DATE), 'd', 'EN-US') = FORMAT(CAST(@date AS DATE), 'd', 'EN-US')
                             ORDER BY created_date DESC",
-                param: new { key , date }
+                param: new { key, date }
             );
         }
 
@@ -51,7 +51,7 @@ namespace TimeAPI.Data.Repositories
                             project_prefix = @project_prefix
                             AND org_id =@key
                             ORDER BY created_date DESC",
-                param: new { key, project_prefix  }
+                param: new { key, project_prefix }
             );
         }
 
@@ -131,5 +131,31 @@ namespace TimeAPI.Data.Repositories
                param: entity
            );
         }
+
+        public string ProjectTaskCount(string entity)
+        {
+            return QuerySingleOrDefault<string>(
+                     sql: @"SELECT 
+                            TaskCount = COUNT (task.id) FROM dbo.project
+                            INNER JOIN project_activity_x_task on project.id = project_activity_x_task.project_id
+                            INNER JOIN project_activity on project_activity_x_task.activity_id = project_activity.id
+                            INNER JOIN task on task.id = project_activity_x_task.task_id
+                        WHERE project.id = @entity",
+               param: entity
+           );
+        }
+
+        //public string ProjectActivityCount(string entity)
+        //{
+        //    return QuerySingleOrDefault<string>(
+        //             sql: @"SELECT 
+        //                    COUNT(project.id) FROM dbo.project
+        //                    INNER JOIN project_activity_x_task on project.id = project_activity_x_task.project_id
+        //                    INNER JOIN project_activity on project_activity_x_task.activity_id = project_activity.id
+        //                    INNER JOIN task on task.id = project_activity_x_task.task_id
+        //                WHERE project.id = @entity",
+        //       param: entity
+        //   );
+        //}
     }
 }

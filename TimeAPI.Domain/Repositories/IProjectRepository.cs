@@ -13,5 +13,8 @@ namespace TimeAPI.Domain.Repositories
         void UpdateProjectStatusByID(Project entity);
         Project FindAutoProjectPrefixByOrgID(string key, string key1);
         Project FindCustomProjectPrefixByOrgIDAndPrefix(string key, string key1);
+        string ProjectTaskCount(string key);
+        //string ProjectActivityCount(string key);
+
     }
 }
