@@ -998,7 +998,7 @@ namespace TimeAPI.API.Controllers
                     //timesheet_id = modal.id,
                     groupid = modal.groupid,
                     project_category_type = timesheetViewModel.TimesheetCategoryViewModel.project_category_type,
-                    //project_or_comp_id = timesheetViewModel.TimesheetCategoryViewModel.project_or_comp_id,
+                    project_or_comp_id = timesheetViewModel.TimesheetCategoryViewModel.project_or_comp_id,
                     project_or_comp_name = timesheetViewModel.TimesheetCategoryViewModel.project_or_comp_name,
                     //project_or_comp_type = timesheetViewModel.TimesheetCategoryViewModel.project_or_comp_type,
                     is_deleted = false,
