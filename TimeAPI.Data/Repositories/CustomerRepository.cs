@@ -83,5 +83,15 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
+        public Customer FindCustomerByProjectID(string key)
+        {
+            return QuerySingleOrDefault<Customer>(
+                sql:@"SELECT * FROM customer
+                        INNER JOIN customer_x_project ON customer_x_project.cst_id = customer.id
+                        WHERE customer_x_project.project_id = @key",
+                 param: new { key }
+            );
+        }
+
     }
 }

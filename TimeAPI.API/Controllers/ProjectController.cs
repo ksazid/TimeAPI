@@ -167,7 +167,7 @@ namespace TimeAPI.API.Controllroers
         {
             try
             {
-                ProjectViewModel projectViewModel = new ProjectViewModel();
+                ProjectDetailViewModel projectViewModel = new ProjectDetailViewModel();
 
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
@@ -178,13 +178,15 @@ namespace TimeAPI.API.Controllroers
                 var results = _unitOfWork.ProjectRepository.Find(Utils.ID);
                 var resultLocation = _unitOfWork.EntityLocationRepository.FindByEnitiyID(results.id);
                 var resultContact = _unitOfWork.EntityContactRepository.FindByEntityID(results.id);
+                var resultCustomer = _unitOfWork.CustomerRepository.FindCustomerByProjectID(results.id);
 
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<ProjectViewModel, Project>());
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<ProjectDetailViewModel, Project>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Project>(results);
 
                 modal.EntityLocation = resultLocation;
                 modal.EntityContact = resultContact;
+                modal.EntityCustomer = resultCustomer;
 
                 return await Task.FromResult<object>(modal).ConfigureAwait(false);
 
@@ -856,8 +858,6 @@ namespace TimeAPI.API.Controllroers
         }
 
         #endregion ProjectStatus
-
-
 
         #region ProjectActivity
 

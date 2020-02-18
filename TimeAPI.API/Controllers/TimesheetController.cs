@@ -370,20 +370,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        private static void ConvertHoursAndMinutes(TimeSpan elapsedSpan, out string TotalHours, out string TotalMinutes)
-        {
-            if (elapsedSpan.TotalHours.ToString().Split('.')[0].Length == 1)
-                TotalHours = "0" + elapsedSpan.TotalHours.ToString().Split('.')[0].ToString();
-            else
-                TotalHours = elapsedSpan.TotalHours.ToString().Split('.')[0].ToString();
-
-
-            if (elapsedSpan.Minutes.ToString().Split('.')[0].Length == 1)
-                TotalMinutes = "0" + elapsedSpan.Minutes.ToString().Split('.')[0].ToString();
-            else
-                TotalMinutes = elapsedSpan.Minutes.ToString().Split('.')[0].ToString();
-        }
-
         #endregion Timesheet
 
         #region TimesheetActivity
@@ -413,10 +399,6 @@ namespace TimeAPI.API.Controllers
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetActivityViewModel, TimesheetActivity>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<TimesheetActivity>(timesheetActivityViewModel);
-
-                //var _TotalMinutes = (Convert.ToDateTime(modal.end_time) - Convert.ToDateTime(modal.start_time)).TotalMinutes;
-                //TimeSpan spWorkMin = TimeSpan.FromMinutes(_TotalMinutes);
-                //modal.total_hrs = spWorkMin.ToString(FormatTime);
 
                 var _TotalMinutes = (Convert.ToDateTime(modal.end_time) - Convert.ToDateTime(modal.start_time)).Ticks;
                 TimeSpan elapsedSpan = new TimeSpan(_TotalMinutes);
@@ -1075,6 +1057,20 @@ namespace TimeAPI.API.Controllers
             }
 
             #endregion CurrentLocation
+        }
+
+        private static void ConvertHoursAndMinutes(TimeSpan elapsedSpan, out string TotalHours, out string TotalMinutes)
+        {
+            if (elapsedSpan.TotalHours.ToString().Split('.')[0].Length == 1)
+                TotalHours = "0" + elapsedSpan.TotalHours.ToString().Split('.')[0].ToString();
+            else
+                TotalHours = elapsedSpan.TotalHours.ToString().Split('.')[0].ToString();
+
+
+            if (elapsedSpan.Minutes.ToString().Split('.')[0].Length == 1)
+                TotalMinutes = "0" + elapsedSpan.Minutes.ToString().Split('.')[0].ToString();
+            else
+                TotalMinutes = elapsedSpan.Minutes.ToString().Split('.')[0].ToString();
         }
 
         #endregion Private
