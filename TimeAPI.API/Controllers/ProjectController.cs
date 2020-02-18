@@ -94,7 +94,7 @@ namespace TimeAPI.API.Controllroers
                     {
                         id = Guid.NewGuid().ToString(),
                         entity_id = modal.id,
-                        geo_address = projectViewModel.EntityLocation.id,
+                        geo_address = projectViewModel.EntityLocation.geo_address,
                         formatted_address = projectViewModel.EntityLocation.formatted_address,
                         lat = projectViewModel.EntityLocation.lat,
                         lang = projectViewModel.EntityLocation.lang,
@@ -110,6 +110,20 @@ namespace TimeAPI.API.Controllroers
                         is_deleted = false
                     };
                     _unitOfWork.EntityLocationRepository.Add(entityLocation);
+                }
+
+                if (projectViewModel.cst_id != null)
+                {
+                    var customerProject = new CustomerProject()
+                    {
+                        id = Guid.NewGuid().ToString(),
+                        cst_id = projectViewModel.cst_id,
+                        project_id = modal.id,
+                        createdby = projectViewModel.createdby,
+                        created_date = _dateTime.ToString(),
+                        is_deleted = false
+                    };
+                    _unitOfWork.CustomerProjectRepository.Add(customerProject);
                 }
 
                 _unitOfWork.ProjectRepository.Add(modal);
@@ -280,6 +294,18 @@ namespace TimeAPI.API.Controllroers
                     _unitOfWork.EntityLocationRepository.Update(entityLocation);
                 }
 
+                if (projectViewModel.cst_id != null)
+                {
+                    var customerProject = new CustomerProject()
+                    {
+                        cst_id = projectViewModel.cst_id,
+                        project_id = modal.id,
+                        createdby = projectViewModel.createdby,
+                        created_date = _dateTime.ToString(),
+                        is_deleted = false
+                    };
+                    _unitOfWork.CustomerProjectRepository.Update(customerProject);
+                }
 
                 _unitOfWork.ProjectRepository.Update(modal);
                 _unitOfWork.Commit();
