@@ -163,7 +163,7 @@ namespace TimeAPI.Data.Repositories
                         FROM
                             dbo.timesheet_administrative_activity WITH (NOLOCK)
 	                        LEFT JOIN (select top 1 * from dbo.timesheet   where groupid IN (SELECT groupid FROM timesheet_activity 
-                            WHERE dbo.timesheet_activity.groupid = '5f0b9faf-fbb4-468c-a9e8-b8d8b8c5b043')) eTime
+                            WHERE dbo.timesheet_activity.groupid = @GroupID)) eTime
 	                        on eTime.groupid = dbo.timesheet_administrative_activity.groupid
 	                        LEFT JOIN timesheet_x_project_category on timesheet_x_project_category.groupid = dbo.timesheet_administrative_activity.groupid
 	                        LEFT JOIN (select top 1 * from dbo.timesheet_location  WHERE groupid IN (SELECT groupid FROM timesheet_activity 
