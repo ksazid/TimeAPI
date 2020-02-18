@@ -78,7 +78,8 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<Customer> FindCustomerByOrgID(string key)
         {
             return Query<Customer>(
-                sql: "SELECT * FROM dbo.customer where is_deleted = 0 AND org_id = @key"
+                sql: "SELECT * FROM dbo.customer where is_deleted = 0 AND org_id = @key",
+                 param: new { key }
             );
         }
 
