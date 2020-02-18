@@ -25,7 +25,7 @@ namespace TimeAPI.Data.Repositories
         public CustomerProject Find(string key)
         {
             return QuerySingleOrDefault<CustomerProject>(
-                sql: "SELECT * FROM dbo.customer_x_project WHERE id = @key and is_deleted = 0",
+                sql: "SELECT * FROM dbo.customer_x_project WHERE project_id = @key and is_deleted = 0",
                 param: new { key }
             );
         }
