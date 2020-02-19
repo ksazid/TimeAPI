@@ -66,7 +66,7 @@ namespace TimeAPI.Data.Repositories
             return Query<PlanPrice>(
                 sql: @"SELECT saas_plan_price.* FROM saas_plan_price
                         INNER JOIN saas_plan ON saas_plan_price.plan_id = saas_plan.id
-                        WHERE plan_id =  @key",
+                        WHERE plan_id =  @key AND  is_deleted = 0",
                 param: new { key }
             );
         }
