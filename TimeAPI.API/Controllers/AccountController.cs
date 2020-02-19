@@ -115,16 +115,9 @@ namespace TimeAPI.API.Controllers
                 var employee = GetEmployeeProperty(user);
                 _unitOfWork.EmployeeRepository.Add(employee);
 
-                
-                //subscr
-
-
-
-
-
-
-
-
+                //subscription
+                var subscription = SetSubscription(user, employee);
+                _unitOfWork.SubscriptionRepository.Add(subscription);
 
                 if (_unitOfWork.Commit())
                     await UserVerificationCode(user).ConfigureAwait(true);
@@ -147,6 +140,8 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = _Code, Desc = _Description });
             }
         }
+
+
 
         [HttpPost]
         [Route("Logout")]
@@ -261,28 +256,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        private IActionResult RedirectToLocal(string returnUrl)
-        {
-            if (Url.IsLocalUrl(returnUrl))
-            {
-                return Redirect(returnUrl);
-            }
-            else
-            {
-                return RedirectToAction(nameof(HomeController.Index), "Home");
-            }
-        }
-
-        private static string EncodeServerName(string serverName)
-        {
-            return Convert.ToBase64String(Encoding.UTF8.GetBytes(serverName));
-        }
-
-        private static string DecodeServerName(string encodedServername)
-        {
-            return Encoding.UTF8.GetString(Convert.FromBase64String(encodedServername));
-        }
-
         private void GetUserName(RegisterViewModel UserModel)
         {
             if (UserModel.Email == null || string.IsNullOrEmpty(UserModel.Email)
@@ -370,6 +343,29 @@ namespace TimeAPI.API.Controllers
                 Role = "Superadmin",
                 PhoneNumber = UserHelpers.IsPhoneValid(UserModel.Phone),
                 isSuperAdmin = true
+            };
+        }
+
+        private static Subscription SetSubscription(ApplicationUser user, Employee employee)
+        {
+            return new Subscription()
+            {
+                id = Guid.NewGuid().ToString(),
+                user_id = user.Id,
+                api_key = Guid.NewGuid().ToString(),
+                current_plan_id = null,
+                subscription_start_date = _dateTime.ToString(),
+                subscription_end_date = _dateTime.AddDays(21).ToString(),
+                on_date_subscribed = _dateTime.ToString(),
+                offer_id = null,
+                offer_start_date = _dateTime.ToString(),
+                offer_end_date = _dateTime.ToString(),
+                is_trial = true,
+                is_subscibe_after_trial = false,
+                is_active = true,
+                created_date = _dateTime.ToString(),
+                createdby = employee.full_name,
+                is_deleted = false
             };
         }
 
