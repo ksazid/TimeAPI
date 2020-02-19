@@ -110,6 +110,7 @@ namespace TimeAPI.Data.Repositories
 
             var _employeeTasks = Query<EmployeeTasks>(
                      sql: @"SELECT
+                            distinct(task.task_name),
                             task.id,
 	                        employee.id as empid,
 	                        task.task_name,
@@ -123,7 +124,7 @@ namespace TimeAPI.Data.Repositories
 	                        inner join priority on task.priority_id = priority.id
 	                        inner join employee on task.assigned_empid = employee.id
 	                        inner join status on status.id = task.status_id
-                        WHERE task.is_deleted = 0 and task.empid =@key",
+                        WHERE task.is_deleted = 0 and task.empid =@key OR  task.assigned_empid =@key",
                         param: new { key }
                  );
 
