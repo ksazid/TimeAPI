@@ -115,6 +115,17 @@ namespace TimeAPI.API.Controllers
                 var employee = GetEmployeeProperty(user);
                 _unitOfWork.EmployeeRepository.Add(employee);
 
+                
+                //subscr
+
+
+
+
+
+
+
+
+
                 if (_unitOfWork.Commit())
                     await UserVerificationCode(user).ConfigureAwait(true);
 

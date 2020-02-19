@@ -61,9 +61,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public PlanPrice FindPlanPriceByPlanID(string key)
+        public IEnumerable<PlanPrice> FindPlanPriceByPlanID(string key)
         {
-            return QuerySingleOrDefault<PlanPrice>(
+            return Query<PlanPrice>(
                 sql: @"SELECT saas_plan_price.* FROM saas_plan_price
                         INNER JOIN saas_plan ON saas_plan_price.plan_id = saas_plan.id
                         WHERE plan_id =  @key",

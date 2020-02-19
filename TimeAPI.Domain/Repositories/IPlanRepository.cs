@@ -7,6 +7,6 @@ namespace TimeAPI.Domain.Repositories
 {
     public interface IPlanRepository : IRepository<Plan, string>
     {
-        PlanPrice FindPlanPriceByPlanID(string PlanID);
+        IEnumerable<PlanPrice>  FindPlanPriceByPlanID(string PlanID);
     }
 }
