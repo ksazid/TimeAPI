@@ -532,7 +532,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpPost]
         [Route("GetTimesheetActivityByEmpIDAndDate")]
         public async Task<object> GetTimesheetActivityByEmpIDAndDate([FromBody] UtilsEmpIDAndDate Utils, CancellationToken cancellationToken)

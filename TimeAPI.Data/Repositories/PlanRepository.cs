@@ -60,5 +60,15 @@ namespace TimeAPI.Data.Repositories
                 sql: "SELECT * FROM dbo.saas_plan where is_deleted = 0"
             );
         }
+
+        public PlanPrice FindPlanPriceByPlanID(string key)
+        {
+            return QuerySingleOrDefault<PlanPrice>(
+                sql: @"SELECT saas_plan_price.* FROM saas_plan_price
+                        INNER JOIN saas_plan ON saas_plan_price.plan_id = saas_plan.id
+                        WHERE plan_id =  @key",
+                param: new { key }
+            );
+        }
     }
 }
