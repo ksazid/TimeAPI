@@ -112,6 +112,11 @@ namespace TimeAPI.Data.Repositories
                 param: new { UserID }
             );
 
+            var resultsSubscription = QuerySingleOrDefault<Subscription>(
+                   sql: @"SELECT * from subscription WITH (NOLOCK) WHERE user_id = @UserID and is_deleted = 0;",
+                   param: new { UserID }
+            );
+
             var resultsTimesheetGrpID = Query<string>(
                 sql: @"SELECT distinct(groupid), FORMAT(CAST(timesheet.ondate AS DATETIME2), N'hh:mm tt')  from timesheet WITH (NOLOCK)
                         WHERE empid = @empid
@@ -130,6 +135,7 @@ namespace TimeAPI.Data.Repositories
             _UserDataGroupDataSet.User = resultsAspNetUsers;
             _UserDataGroupDataSet.Organization = orgList;
             _UserDataGroupDataSet.Employee = resultsEmployee;
+            _UserDataGroupDataSet.Subscription = resultsSubscription;
             _UserDataGroupDataSet.Timesheet = RootTimesheetDataList;
 
             return _UserDataGroupDataSet;
