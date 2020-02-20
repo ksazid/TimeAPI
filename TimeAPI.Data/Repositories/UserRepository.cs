@@ -157,6 +157,27 @@ namespace TimeAPI.Data.Repositories
             return orgList;
         }
 
+        public dynamic GetTimesheetDashboardDataByOrgID(string org_id)
+        {
+            var resultsAspNetUsers = Query<dynamic>(
+                sql: @"SELECT 
+                        employee_type.employee_type_name,
+                        COUNT(*) employee_count
+                    FROM [dbo].[employee] WITH (NOLOCK)
+                    left JOIN [dbo].[timesheet] ON  [dbo].[employee].id = [dbo].[timesheet].empid
+                    left JOIN [dbo].[employee_type] ON  [dbo].[employee].emp_type_id = [dbo].[employee_type].id
+                    WHERE [dbo].[employee].is_deleted = 0 AND [dbo].[employee].is_inactive = 0  
+                    AND [dbo].[employee].org_id = @org_id
+
+                    GROUP BY 
+                        employee_type.employee_type_name",
+                param: new { org_id }
+            );
+            return resultsAspNetUsers;
+        }
+
+        
+
         #region PrivateMethods
 
         private List<RootTimesheetData> GetTimesheetProperty(IEnumerable<string> resultsTimesheetGrpID)
@@ -266,7 +287,6 @@ namespace TimeAPI.Data.Repositories
 
             return TimesheetSearchLocationViewModel;
         }
-
         private IEnumerable<TimesheetCurrentLocationViewModel> GetTimesheetCurrentLocationViewModel(string GroupID)
         {
             var TimesheetCurrentLocationViewModel = Query<TimesheetCurrentLocationViewModel>(

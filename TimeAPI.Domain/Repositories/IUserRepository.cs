@@ -10,6 +10,6 @@ namespace TimeAPI.Domain.Repositories
         //void CustomEmailConfirmedFlagUpdate(string UserID);
         UserDataGroupDataSet GetUserDataGroupByUserID(string EmpID, string Date);
 
-        //void RemovePermanent(string UserID);
+        dynamic GetTimesheetDashboardDataByOrgID(string OrgID);
     }
 }

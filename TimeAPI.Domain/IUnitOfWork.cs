@@ -51,6 +51,8 @@ namespace TimeAPI.Domain
         ICustomerRepository CustomerRepository { get; }
         ICustomerProjectRepository CustomerProjectRepository { get; }
 
+        //ISystemAdminRepository SystemAdminRepository { get; }
+
         #region systemadmin
         IPlanRepository PlanRepository { get; }
         IPlanFeatureRepository PlanFeatureRepository { get; }
