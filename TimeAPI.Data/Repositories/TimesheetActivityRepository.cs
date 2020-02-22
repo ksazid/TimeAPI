@@ -250,7 +250,7 @@ namespace TimeAPI.Data.Repositories
 		                        + ISNULL(NULLIF(FORMAT(CAST(eTime.check_in AS DATETIME2), N'hh:mm tt'), ' '), 'NA') + ' - '
 		                        + ISNULL(NULLIF(FORMAT(CAST(eTime.check_out AS DATETIME2), N'hh:mm tt'), ' '), 'NA')  + ' | '  
 		                        + ISNULL(NULLIF(eTime.total_hrs, ' '), 'NA') +  ' )' as timesheet, 
-		                        activity_name =ISNULL( dbo.project_activity.activity_name, 'NA'),
+		                        activity_name =ISNULL( dbo.project_activity.activity_name, dbo.timesheet_activity.milestone_name),
 		                        task_name = ISNULL( dbo.timesheet_activity.task_name, 'NA'),
 		                        remarks= dbo.timesheet_activity.remarks,
 		                        FORMAT(CAST(dbo.timesheet_activity.start_time AS DATETIME2), N'hh:mm tt') as start_time ,
@@ -261,7 +261,7 @@ namespace TimeAPI.Data.Repositories
                                     FROM
                                         [dbo].[timesheet_activity] WITH (NOLOCK)
 										INNER JOIN project on project.id = [timesheet_activity].project_id 
-										INNER JOIN project_activity on project_activity.id =[timesheet_activity].milestone_id 
+										LEFT JOIN project_activity on project_activity.id =[timesheet_activity].milestone_id 
                                         LEFT JOIN task on dbo.timesheet_activity.task_id = task.id
 				                        INNER JOIN (select top 1 * from dbo.timesheet   where groupid IN (SELECT groupid FROM timesheet_activity 
                                         WHERE dbo.timesheet_activity.groupid = @GroupID)) eTime
