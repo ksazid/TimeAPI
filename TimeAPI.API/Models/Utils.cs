@@ -24,6 +24,13 @@ namespace TimeAPI.API.Models
         public string Prefix { get; set; }
     }
 
+    public class UtilsOrgIDAndDate
+    {
+        public string OrgID { get; set; }
+        public string fromDate { get; set; }
+        public string toDate { get; set; }
+    }
+
     public class UtilsName
     {
         public string FullName { get; set; }

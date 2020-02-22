@@ -157,26 +157,46 @@ namespace TimeAPI.Data.Repositories
             return orgList;
         }
 
-        public dynamic GetTimesheetDashboardDataByOrgID(string org_id)
+        public dynamic TotalEmployeeDashboardDataByOrgID(string org_id)
         {
             var resultsAspNetUsers = Query<dynamic>(
                 sql: @"SELECT 
-                        employee_type.employee_type_name,
-                        COUNT(*) employee_count
+                    UPPER(employee_type.employee_type_name) AS employee_type_name,
+                    COUNT (DISTINCT [dbo].[employee].id) AS employee_count
                     FROM [dbo].[employee] WITH (NOLOCK)
-                    left JOIN [dbo].[timesheet] ON  [dbo].[employee].id = [dbo].[timesheet].empid
-                    left JOIN [dbo].[employee_type] ON  [dbo].[employee].emp_type_id = [dbo].[employee_type].id
+                    LEFT JOIN [dbo].[employee_type] ON  [dbo].[employee].emp_type_id = [dbo].[employee_type].id
                     WHERE [dbo].[employee].is_deleted = 0 AND [dbo].[employee].is_inactive = 0  
                     AND [dbo].[employee].org_id = @org_id
-
                     GROUP BY 
-                        employee_type.employee_type_name",
+                    employee_type.employee_type_name",
+                param: new { org_id }
+            );
+            return resultsAspNetUsers;
+        }
+
+        public dynamic GetTimesheetDashboardDataByOrgIDAndDate(string org_id,  string fromDate, string toDate)
+        {
+            var resultsAspNetUsers = Query<dynamic>(
+                sql: @"SELECT  
+                            UPPER(employee_type.employee_type_name) AS employee_type_name,
+                            COUNT (DISTINCT [dbo].[employee].id) AS employee_count
+                            FROM [dbo].[employee] WITH (NOLOCK)
+                            LEFT JOIN [dbo].[timesheet] ON  [dbo].[employee].id = [dbo].[timesheet].empid
+                            LEFT JOIN [dbo].[employee_type] ON  [dbo].[employee].emp_type_id = [dbo].[employee_type].id
+                            WHERE [dbo].[employee].is_deleted = 0 AND [dbo].[employee].is_inactive = 0  
+                            AND [dbo].[employee].org_id =  @org_id
+                            AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US') AND
+                            FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
+                            GROUP BY 
+                            employee_type.employee_type_name",
                 param: new { org_id }
             );
             return resultsAspNetUsers;
         }
 
         
+
+
 
         #region PrivateMethods
 
