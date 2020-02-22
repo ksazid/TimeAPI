@@ -189,7 +189,7 @@ namespace TimeAPI.Data.Repositories
                             FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
                             GROUP BY 
                             employee_type.employee_type_name",
-                param: new { org_id }
+                param: new { org_id, fromDate , toDate }
             );
             return resultsAspNetUsers;
         }
