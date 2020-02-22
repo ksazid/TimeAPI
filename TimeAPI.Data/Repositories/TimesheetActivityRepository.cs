@@ -14,8 +14,8 @@ namespace TimeAPI.Data.Repositories
         {
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.timesheet_activity
-                                  (id, groupid, task_id, task_name, remarks, ondate, start_time, end_time, total_hrs, is_billable, created_date, createdby)
-                           VALUES (@id, @groupid, @task_id, @task_name, @remarks, @ondate, @start_time, @end_time, @total_hrs, @is_billable, @created_date, @createdby);
+                                  (id, groupid, project_id, milestone_id, milestone_name, task_id, task_name, remarks, ondate, start_time, end_time, total_hrs, is_billable, created_date, createdby)
+                           VALUES (@id, @groupid, @project_id, @milestone_id, @milestone_name, @task_id, @task_name, @remarks, @ondate, @start_time, @end_time, @total_hrs, @is_billable, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -65,6 +65,9 @@ namespace TimeAPI.Data.Repositories
                 sql: @"UPDATE dbo.timesheet_activity
                    SET
                     groupid = @groupid,
+                    project_id =@project_id, 
+                    milestone_id = @milestone_id, 
+                    milestone_name = @milestone_name,
                     task_id = @task_id,
                     task_name = @task_name,
                     remarks = @remarks,
@@ -110,34 +113,34 @@ namespace TimeAPI.Data.Repositories
         //{
         //    return Query<dynamic>(
         //        sql: @"SELECT        
-				  	 //       UPPER(dbo.timesheet_x_project_category.project_category_type) + ': '
-					   //     + dbo.project.project_name + ' (' 
-					   //     + ISNULL(NULLIF(FORMAT(CAST(eTime.check_in AS DATETIME2), N'hh:mm tt'), ' '), 'NA') + ' - '
-					   //     + ISNULL(NULLIF(FORMAT(CAST(eTime.check_out AS DATETIME2), N'hh:mm tt'), ' '), 'NA')  + ' | '  
-					   //     + ISNULL(NULLIF(eTime.total_hrs, ' '), 'NA') +  ' )' as timesheet, 
-					   //     dbo.project_activity.activity_name,
-					   //     dbo.timesheet_activity.task_name,
-					   //     dbo.timesheet_activity.remarks,
-					   //     FORMAT(CAST(dbo.timesheet_activity.start_time AS DATETIME2), N'hh:mm tt') as start_time ,
-					   //     FORMAT(CAST(dbo.timesheet_activity.end_time AS DATETIME2), N'hh:mm tt') as end_time,
-					   //     timesheet_activity.total_hrs,
-					   //     timesheet_activity.is_billable,
-					   //     FORMAT(dbo.timesheet_activity.ondate, 'dd-MM-yyyy', 'en-US') AS ondate
+        //       UPPER(dbo.timesheet_x_project_category.project_category_type) + ': '
+        //     + dbo.project.project_name + ' (' 
+        //     + ISNULL(NULLIF(FORMAT(CAST(eTime.check_in AS DATETIME2), N'hh:mm tt'), ' '), 'NA') + ' - '
+        //     + ISNULL(NULLIF(FORMAT(CAST(eTime.check_out AS DATETIME2), N'hh:mm tt'), ' '), 'NA')  + ' | '  
+        //     + ISNULL(NULLIF(eTime.total_hrs, ' '), 'NA') +  ' )' as timesheet, 
+        //     dbo.project_activity.activity_name,
+        //     dbo.timesheet_activity.task_name,
+        //     dbo.timesheet_activity.remarks,
+        //     FORMAT(CAST(dbo.timesheet_activity.start_time AS DATETIME2), N'hh:mm tt') as start_time ,
+        //     FORMAT(CAST(dbo.timesheet_activity.end_time AS DATETIME2), N'hh:mm tt') as end_time,
+        //     timesheet_activity.total_hrs,
+        //     timesheet_activity.is_billable,
+        //     FORMAT(dbo.timesheet_activity.ondate, 'dd-MM-yyyy', 'en-US') AS ondate
         //                FROM
         //                    [dbo].[timesheet_activity] WITH (NOLOCK)
         //                        INNER JOIN task on dbo.timesheet_activity.task_id = task.id
-					   //     INNER JOIN project_activity_x_task on project_activity_x_task.task_id = task.id 
-					   //     INNER JOIN project_activity on project_activity.id = project_activity_x_task.activity_id
-					   //     INNER JOIN project on project.id = project_activity_x_task.project_id 
-					   //     INNER JOIN (select top 1 * from dbo.timesheet   where groupid IN (SELECT groupid FROM timesheet_activity 
+        //     INNER JOIN project_activity_x_task on project_activity_x_task.task_id = task.id 
+        //     INNER JOIN project_activity on project_activity.id = project_activity_x_task.activity_id
+        //     INNER JOIN project on project.id = project_activity_x_task.project_id 
+        //     INNER JOIN (select top 1 * from dbo.timesheet   where groupid IN (SELECT groupid FROM timesheet_activity 
         //                    WHERE dbo.timesheet_activity.groupid = @GroupID)) eTime
-					   //     on eTime.groupid = dbo.timesheet_activity.groupid
-					   //     INNER JOIN timesheet_x_project_category on timesheet_x_project_category.groupid = dbo.timesheet_activity.groupid
+        //     on eTime.groupid = dbo.timesheet_activity.groupid
+        //     INNER JOIN timesheet_x_project_category on timesheet_x_project_category.groupid = dbo.timesheet_activity.groupid
         //                    WHERE dbo.timesheet_activity.groupid =@GroupID
-				    //        AND [dbo].[timesheet_activity].is_deleted  = 0
+        //        AND [dbo].[timesheet_activity].is_deleted  = 0
         //                    AND FORMAT(CAST(timesheet_activity.ondate AS DATE), 'd', 'EN-US') = FORMAT(CAST(@Date AS DATE), 'd', 'EN-US')
-				    //        AND [dbo].[project].id  = @ProjectID
-				    //    ORDER BY FORMAT(CAST([dbo].[timesheet_activity].end_time AS DATETIME2), N'hh:mm tt') DESC",
+        //        AND [dbo].[project].id  = @ProjectID
+        //    ORDER BY FORMAT(CAST([dbo].[timesheet_activity].end_time AS DATETIME2), N'hh:mm tt') DESC",
         //        param: new { GroupID, ProjectID, Date }
         //    );
         //}

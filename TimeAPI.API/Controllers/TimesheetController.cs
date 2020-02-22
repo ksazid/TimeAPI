@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -15,6 +16,7 @@ using TimeAPI.API.Models.TimesheetViewModels;
 using TimeAPI.API.Services;
 using TimeAPI.Domain;
 using TimeAPI.Domain.Entities;
+using TimeAPI.Domain.Repositories;
 
 namespace TimeAPI.API.Controllers
 {
@@ -30,15 +32,19 @@ namespace TimeAPI.API.Controllers
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
         private readonly DateTime _dateTime;
+        private IHubContext<NotifyHub, ITypedHubClient> _hubContext;
+
 
         public TimesheetController(IUnitOfWork unitOfWork, ILogger<TimesheetController> logger,
-            IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings)
+            IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings,
+            IHubContext<NotifyHub, ITypedHubClient> hubContext)
         {
             _emailSender = emailSender;
             _logger = logger;
             _appSettings = AppSettings.Value;
             _unitOfWork = unitOfWork;
             _dateTime = InternetTime.GetCurrentTimeFromTimeZone().Value.DateTime;
+            _hubContext = hubContext;
         }
 
         #region Timesheet
@@ -1073,5 +1079,24 @@ namespace TimeAPI.API.Controllers
         }
 
         #endregion Private
+
+
+        [HttpPost]
+        public string Post([FromBody]Message msg)
+        {
+            string retMessage;
+
+            try
+            {
+                _hubContext.Clients.All.BroadcastMessage(msg.Type, msg.Payload);
+                retMessage = "Success";
+            }
+            catch (Exception e)
+            {
+                retMessage = e.ToString();
+            }
+
+            return retMessage;
+        }
     }
 }

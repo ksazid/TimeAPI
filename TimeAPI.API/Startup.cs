@@ -25,6 +25,7 @@ using System.IO;
 using TimeAPI.API.Filters;
 using System.Linq;
 using Newtonsoft.Json.Serialization;
+using Hangfire;
 
 namespace TimeAPI.API
 {
@@ -59,17 +60,21 @@ namespace TimeAPI.API
                     });
             });
 
+            services.AddSignalR();
+
+
             services.AddDataProtection(options =>
             {
                 options.ApplicationDiscriminator = "TimeAPI.API";
             });
 
             services.AddAuthentication();
-            //services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
             services.AddMvc().AddNewtonsoftJson(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
 
             services.AddControllers().AddNewtonsoftJson();
             services.AddMvcCore().AddApiExplorer();
+
 
             //Inject appsetting.json for controllers.
             services.Configure<ApplicationSettings>(Configuration.GetSection("ApplicationSettings"));
@@ -143,11 +148,18 @@ namespace TimeAPI.API
                     });
 
             services.Configure<SecurityStampValidatorOptions>(o => o.ValidationInterval = TimeSpan.FromDays(100));
+
+
+
+            //services.AddHangfire(x => x.UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnection")));
+            //services.AddHangfireServer();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            //app.UseHangfireDashboard();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -157,6 +169,12 @@ namespace TimeAPI.API
                 app.UseExceptionHandler("/Home/Error");
             }
             app.UseCors("CorsPolicy");
+
+            app.UseSignalR((options) =>
+            {
+
+            });
+
             app.UseAuthentication();
             app.UseStaticFiles();
             app.UseRouting();

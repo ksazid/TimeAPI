@@ -194,10 +194,6 @@ namespace TimeAPI.Data.Repositories
             return resultsAspNetUsers;
         }
 
-        
-
-
-
         #region PrivateMethods
 
         private List<RootTimesheetData> GetTimesheetProperty(IEnumerable<string> resultsTimesheetGrpID)

@@ -10,6 +10,9 @@ namespace TimeAPI.API.Models.TimesheetActivityViewModels
     {
         public string id { get; set; }
         public string groupid { get; set; }
+        public string project_id { get; set; }
+        public string milestone_id { get; set; }
+        public string milestone_name { get; set; }
         public string task_id { get; set; }
         public string task_name { get; set; }
         public string remarks { get; set; }

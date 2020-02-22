@@ -112,6 +112,11 @@ namespace TimeAPI.API.Models
         public string PhoneNumber { get; set; }
     }
 
+    public class Message
+    {
+        public string Type { get; set; }
+        public string Payload { get; set; }
+    }
 
 
     public class UtilDepartmentChecked
