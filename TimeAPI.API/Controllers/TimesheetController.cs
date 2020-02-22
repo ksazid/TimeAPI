@@ -1080,7 +1080,6 @@ namespace TimeAPI.API.Controllers
 
         #endregion Private
 
-
         [HttpPost]
         public string Post([FromBody]Message msg)
         {
