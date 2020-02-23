@@ -52,6 +52,7 @@ namespace TimeAPI.Domain
         ICustomerProjectRepository CustomerProjectRepository { get; }
         IDelegationsRepository DelegationsRepository { get; }
         IDelegationsDelegateeRepository DelegationsDelegateeRepository { get; }
+        ISuperadminOrganizationRepository SuperadminOrganizationRepository { get; }
 
         #region systemadmin
         IPlanRepository PlanRepository { get; }

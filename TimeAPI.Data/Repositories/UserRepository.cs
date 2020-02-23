@@ -179,7 +179,7 @@ namespace TimeAPI.Data.Repositories
             var resultsAspNetUsers = Query<dynamic>(
                 sql: @"SELECT  
                             UPPER(employee_type.employee_type_name) AS employee_type_name,
-                            COUNT (DISTINCT [dbo].[employee].id) AS employee_count
+                            COUNT ([dbo].[employee].id) AS employee_count
                             FROM [dbo].[employee] WITH (NOLOCK)
                             LEFT JOIN [dbo].[timesheet] ON  [dbo].[employee].id = [dbo].[timesheet].empid
                             LEFT JOIN [dbo].[employee_type] ON  [dbo].[employee].emp_type_id = [dbo].[employee_type].id

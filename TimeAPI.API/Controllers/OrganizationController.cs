@@ -56,6 +56,24 @@ namespace TimeAPI.API.Controllers
                 modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
+                //SuperAdminXOrg
+                var result = _unitOfWork.EmployeeRepository.FindByEmpUserID(modal.user_id);
+
+                if (result.is_admin)
+                {
+                    var SuperAdminXOrg = new SuperadminOrganization()
+                    {
+                        id = Guid.NewGuid().ToString(),
+                        superadmin_empid = result.id,
+                        org_id = modal.org_id,
+                        is_deleted = false,
+                        createdby = organizationViewModel.createdby
+                    };
+
+                    _unitOfWork.SuperadminOrganizationRepository.Add(SuperAdminXOrg);
+                }
+
+
                 if (organizationViewModel.EntityLocationViewModel != null)
                 {
                     var OrgLocation = SetLocationForOrg(organizationViewModel.EntityLocationViewModel, modal.org_id.ToString());
@@ -130,6 +148,7 @@ namespace TimeAPI.API.Controllers
 
                 _unitOfWork.OrganizationRepository.Remove(Utils.ID);
                 _unitOfWork.EntityLocationRepository.Remove(Utils.ID);
+                _unitOfWork.SuperadminOrganizationRepository.RemoveByOrgID(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Organization remvoed succefully." }).ConfigureAwait(false);

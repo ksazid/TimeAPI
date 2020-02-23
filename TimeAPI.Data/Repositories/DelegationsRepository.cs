@@ -71,7 +71,9 @@ namespace TimeAPI.Data.Repositories
         public dynamic GetAllDelegateeByOrgIDAndEmpID(string OrgID, string EmpID)
         {
             return Query<dynamic>(
-                sql: @"	SELECT [dbo].[employee].id as empid,
+                sql: @"	SELECT 
+                            [dbo].[delegations].id as delegationsid,
+                            [dbo].[employee].id as empid,
                             [dbo].[employee].full_name, 
 	                        [dbo].[delegations].is_type_temporary, 
 	                        [dbo].[delegations].is_type_permanent 

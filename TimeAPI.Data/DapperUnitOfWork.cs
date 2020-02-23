@@ -61,6 +61,7 @@ namespace TimeAPI.Data
         private ICustomerProjectRepository _customerProjectRepository;
         private IDelegationsRepository _delegationsRepository;
         private IDelegationsDelegateeRepository _delegationsDelegateeRepository;
+        private ISuperadminOrganizationRepository _superadminOrganizationRepository;
 
         #region systemadmin
         private IPlanRepository _planRepository;
@@ -538,6 +539,15 @@ namespace TimeAPI.Data
             {
                 return _delegationsDelegateeRepository
                     ?? (_delegationsDelegateeRepository = new DelegationsDelegateeRepository(_transaction));
+            }
+        }
+
+        public ISuperadminOrganizationRepository SuperadminOrganizationRepository
+        {
+            get
+            {
+                return _superadminOrganizationRepository
+                    ?? (_superadminOrganizationRepository = new SuperadminOrganizationRepository(_transaction));
             }
         }
 
