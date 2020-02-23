@@ -75,17 +75,7 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public void SetCustomerAsAdminByEmpID(string key)
-        {
-            Execute(
-                sql: @"UPDATE dbo.customer
-                   SET
-                   is_admin = 1,
-                   modified_date = GETDATE()
-                   WHERE id = @key",
-                param: new { key }
-            );
-        }
+
 
         public IEnumerable<Customer> FindCustomerByOrgID(string key)
         {
@@ -105,16 +95,6 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public void RemoveAdminRightByEmpID(string key)
-        {
-            Execute(
-                sql: @"UPDATE dbo.customer
-                   SET
-                   is_admin = 0,
-                   modified_date = GETDATE()
-                   WHERE id = @key",
-                param: new { key }
-            );
-        }
+     
     }
 }

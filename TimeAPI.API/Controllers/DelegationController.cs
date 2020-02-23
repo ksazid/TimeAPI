@@ -70,7 +70,7 @@ namespace TimeAPI.API.Controllers
                         is_deleted = false
                     };
 
-                    _unitOfWork.CustomerRepository.SetCustomerAsAdminByEmpID(modal.id);
+                    _unitOfWork.EmployeeRepository.SetCustomerAsAdminByEmpID(item);
                     _unitOfWork.DelegationsDelegateeRepository.Add(Delegatee);
                 }
 
@@ -228,7 +228,7 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 _unitOfWork.DelegationsDelegateeRepository.RemoveByDelegateeID(Utils.ID);
-                _unitOfWork.CustomerRepository.RemoveAdminRightByEmpID(Utils.ID);
+                _unitOfWork.EmployeeRepository.RemoveAdminRightByEmpID(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Rights removed succefully." }).ConfigureAwait(false);

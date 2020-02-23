@@ -23,5 +23,8 @@ namespace TimeAPI.Domain.Repositories
         void SetEmployeeInactiveByEmpID(string OrgID);
 
         void RemovePermanent(string EmpID);
+
+        void SetCustomerAsAdminByEmpID(string EmpID);
+        void RemoveAdminRightByEmpID(string key);
     }
 }
