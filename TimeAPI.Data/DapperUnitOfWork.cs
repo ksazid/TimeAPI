@@ -59,6 +59,8 @@ namespace TimeAPI.Data
         private IProjectActivityTaskRepository _projectActivityTaskRepository;
         private ICustomerRepository _customerRepository;
         private ICustomerProjectRepository _customerProjectRepository;
+        private IDelegationsRepository _delegationsRepository;
+        private IDelegationsDelegateeRepository _delegationsDelegateeRepository;
 
         #region systemadmin
         private IPlanRepository _planRepository;
@@ -519,7 +521,26 @@ namespace TimeAPI.Data
                     ?? (_customerProjectRepository = new CustomerProjectRepository(_transaction));
             }
         }
-         
+
+
+        public IDelegationsRepository DelegationsRepository
+        {
+            get
+            {
+                return _delegationsRepository
+                    ?? (_delegationsRepository = new DelegationsRepository(_transaction));
+            }
+        }
+
+        public IDelegationsDelegateeRepository DelegationsDelegateeRepository
+        {
+            get
+            {
+                return _delegationsDelegateeRepository
+                    ?? (_delegationsDelegateeRepository = new DelegationsDelegateeRepository(_transaction));
+            }
+        }
+
 
         public bool Commit()
         {

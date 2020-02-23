@@ -75,6 +75,17 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
+        public void SetCustomerAsAdminByEmpID(string key)
+        {
+            Execute(
+                sql: @"UPDATE dbo.customer
+                   SET
+                   is_admin = true
+                   WHERE id = @key",
+                param: key
+            );
+        }
+
         public IEnumerable<Customer> FindCustomerByOrgID(string key)
         {
             return Query<Customer>(

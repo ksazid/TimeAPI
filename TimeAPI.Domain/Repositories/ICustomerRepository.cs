@@ -11,5 +11,6 @@ namespace TimeAPI.Domain.Repositories
     {
         IEnumerable<Customer> FindCustomerByOrgID(string OrgID);
         Customer FindCustomerByProjectID(string ProjectID);
+        void SetCustomerAsAdminByEmpID(string EmpID);
     }
 }

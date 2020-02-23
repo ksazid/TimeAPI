@@ -13,9 +13,11 @@ namespace TimeAPI.Data.Repositories
         public void Add(Billing entity)
         {
             entity.id = ExecuteScalar<string>(
-                    sql: @"INSERT INTO dbo.team
-                                  (id, org_id, team_name, team_desc, team_by, team_department_id, team_lead_empid, created_date, createdby)
-                           VALUES (@id, @org_id, @team_name,  @team_desc, @team_by, @team_department_id, @team_lead_empid, @created_date, @createdby);
+                    sql: @"INSERT INTO dbo.saas_billing
+                                  (id, user_id, user_email, current_plan_id, billing_cycle, total_user, total_cost, first_name, last_name, 
+                                    card_no, expire_month, expire_year, cvv, adr1, zip, state, country, created_date createdby)
+                           VALUES (@id, @user_id, @user_email, @current_plan_id, @billing_cycle, @total_user, @total_cost, @first_name, @last_name,
+                                    @card_no, @expire_month, @expire_year, @cvv, @adr1, @zip, @state, @country, @created_date @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -24,7 +26,7 @@ namespace TimeAPI.Data.Repositories
         public Billing Find(string key)
         {
             return QuerySingleOrDefault<Billing>(
-                sql: "SELECT * FROM dbo.team WHERE is_deleted = 0 and id = @key",
+                sql: "SELECT * FROM dbo.saas_billing WHERE is_deleted = 0 and id = @key",
                 param: new { key }
             );
         }
@@ -32,7 +34,7 @@ namespace TimeAPI.Data.Repositories
         public void Remove(string key)
         {
             Execute(
-                sql: @"UPDATE dbo.team
+                sql: @"UPDATE dbo.saas_billing
                    SET
                        modified_date = GETDATE(), is_deleted = 1
                     WHERE id = @key",
@@ -43,14 +45,24 @@ namespace TimeAPI.Data.Repositories
         public void Update(Billing entity)
         {
             Execute(
-                sql: @"UPDATE dbo.team
+                sql: @"UPDATE dbo.saas_billing
                    SET
-                    org_id = @org_id,
-                    team_name = @team_name,
-                    team_desc = @team_desc,
-                    team_by = @team_by,
-                    team_department_id = @team_department_id,
-                    team_lead_empid = @team_lead_empid,
+                    user_id = @user_id, 
+                    user_email = @user_email, 
+                    current_plan_id = @current_plan_id, 
+                    billing_cycle = @billing_cycle, 
+                    total_user = @total_user, 
+                    total_cost = @total_cost, 
+                    first_name = @first_name, 
+                    last_name = @last_name, 
+                    card_no = @card_no, 
+                    expire_month = @expire_month,
+                    expire_year = @expire_year, 
+                    cvv = @cvv, 
+                    adr1 = @adr1, 
+                    zip = @zip, 
+                    state = @state, 
+                    country = @country,
                     modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE id = @id",
@@ -68,7 +80,7 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<Billing> FindBillingsByOrgID(string key)
         {
             return Query<Billing>(
-                sql: "SELECT * FROM dbo.team WHERE is_deleted = 0 and org_id = @key",
+                sql: "SELECT * FROM dbo.saas_billing WHERE is_deleted = 0 and org_id = @key",
                 param: new { key }
             );
         }
