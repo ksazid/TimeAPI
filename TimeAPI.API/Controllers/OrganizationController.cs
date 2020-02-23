@@ -90,7 +90,8 @@ namespace TimeAPI.API.Controllers
                     var mapper1 = config.CreateMapper();
                     var modal1 = mapper.Map<OrganizationSetup>(organizationViewModel.OrganizationSetup);
 
-                    modal1.org_id = Guid.NewGuid().ToString();
+                    modal1.id = Guid.NewGuid().ToString();
+                    modal1.org_id = modal.org_id;
                     modal1.created_date = _dateTime.ToString();
                     modal1.is_deleted = false;
 
