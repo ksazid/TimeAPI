@@ -15,6 +15,7 @@ namespace TimeAPI.Domain
         IUserRoleRepository UserRoleRepository { get; }
         IEmployeeRepository EmployeeRepository { get; }
         IOrganizationRepository OrganizationRepository { get; }
+        IOrganizationSetupRepository OrganizationSetupRepository { get; }
         IDepartmentRepository DepartmentRepository { get; }
         IProfileImageRepository ProfileImageRepository { get; }
         IReportingRepository ReportingRepository { get; }

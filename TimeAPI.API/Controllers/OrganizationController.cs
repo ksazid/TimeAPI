@@ -84,6 +84,19 @@ namespace TimeAPI.API.Controllers
                     _unitOfWork.EntityLocationRepository.Add(OrgLocation);
                 }
 
+                if (organizationViewModel.OrganizationSetup != null)
+                {
+                    var configs = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationSetup, OrganizationSetup>());
+                    var mapper1 = config.CreateMapper();
+                    var modal1 = mapper.Map<OrganizationSetup>(organizationViewModel.OrganizationSetup);
+
+                    modal1.org_id = Guid.NewGuid().ToString();
+                    modal1.created_date = _dateTime.ToString();
+                    modal1.is_deleted = false;
+
+                    _unitOfWork.OrganizationSetupRepository.Add(modal1);
+                }
+
                 _unitOfWork.OrganizationRepository.Add(modal);
                 _unitOfWork.Commit();
 
@@ -124,6 +137,18 @@ namespace TimeAPI.API.Controllers
                     _unitOfWork.EntityLocationRepository.Update(EntityLocation);
                 }
 
+                if (organizationViewModel.OrganizationSetup != null)
+                {
+                    var configs = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationSetup, OrganizationSetup>());
+                    var mapper1 = config.CreateMapper();
+                    var modal1 = mapper.Map<OrganizationSetup>(organizationViewModel.OrganizationSetup);
+
+                    modal1.modified_date = _dateTime.ToString();
+                    modal1.is_deleted = false;
+
+                    _unitOfWork.OrganizationSetupRepository.Update(modal1);
+                }
+
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Organization Updated succefully." }).ConfigureAwait(false);
@@ -146,9 +171,10 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                _unitOfWork.OrganizationRepository.Remove(Utils.ID);
                 _unitOfWork.EntityLocationRepository.Remove(Utils.ID);
                 _unitOfWork.SuperadminOrganizationRepository.RemoveByOrgID(Utils.ID);
+                _unitOfWork.OrganizationSetupRepository.RemoveByOrgID(Utils.ID);
+                _unitOfWork.OrganizationRepository.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Organization remvoed succefully." }).ConfigureAwait(false);
@@ -175,12 +201,14 @@ namespace TimeAPI.API.Controllers
 
                 var result = _unitOfWork.OrganizationRepository.Find(Utils.ID);
                 var resultLocation = _unitOfWork.EntityLocationRepository.FindByEnitiyID(result.org_id);
+                var resultSetup = _unitOfWork.OrganizationSetupRepository.FindByEnitiyID(result.org_id);
 
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationViewModel, Organization>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Organization>(result);
 
                 modal.EntityLocation = resultLocation;
+                modal.OrganizationSetup = resultSetup;
 
                 return await Task.FromResult<object>(modal).ConfigureAwait(false);
             }

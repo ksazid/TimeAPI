@@ -24,6 +24,7 @@ namespace TimeAPI.Data
         private IUserRoleRepository _userRoleRepository;
         private IEmployeeRepository _employeeRepository;
         private IOrganizationRepository _organizationRepository;
+        private IOrganizationSetupRepository _organizationSetupRepository;
         private IDepartmentRepository _departmentRepository;
         private IProfileImageRepository _profileImageRepository;
         private ISocialRepository _socialRepository;
@@ -162,6 +163,16 @@ namespace TimeAPI.Data
                     ?? (_organizationRepository = new OrganizationRepository(_transaction));
             }
         }
+
+        public IOrganizationSetupRepository OrganizationSetupRepository
+        {
+            get
+            {
+                return _organizationSetupRepository
+                    ?? (_organizationSetupRepository = new OrganizationSetupRepository(_transaction));
+            }
+        }
+        
 
         public IDepartmentRepository DepartmentRepository
         {

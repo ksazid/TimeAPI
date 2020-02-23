@@ -87,6 +87,5 @@ namespace TimeAPI.Data.Repositories
                 param: new { OrgID, EmpID }
             );
         }
-        
     }
 }

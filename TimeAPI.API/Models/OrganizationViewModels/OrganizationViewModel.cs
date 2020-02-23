@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using TimeAPI.API.Models.EntityLocationViewModels;
+using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.API.Models.OrganizationViewModels
 {
@@ -30,7 +31,7 @@ namespace TimeAPI.API.Models.OrganizationViewModels
         public bool is_deleted { get; set; }
 
         public EntityLocationViewModel EntityLocationViewModel { get; set; }
-
+        public OrganizationSetup OrganizationSetup  { get; set; }
     }
 
 
