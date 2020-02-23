@@ -52,9 +52,22 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-
+        public void RemoveByDelegateeID(string key)
+        {
+            Execute(
+                sql: @"UPDATE delegations_x_delegatee
+                   SET
+                       modified_date = GETDATE(), is_deleted = 1
+                    WHERE delegatee_id = @key",
+                param: new { key }
+            );
+        }
 
         
+
+
+
+
 
         public void Update(DelegationsDelegatee entity)
         {

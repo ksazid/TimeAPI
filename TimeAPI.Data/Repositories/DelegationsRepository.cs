@@ -68,12 +68,22 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        //public IEnumerable<Delegations> FindBillingsByOrgID(string key)
-        //{
-        //    return Query<Delegations>(
-        //        sql: "SELECT * FROM dbo.delegations WHERE is_deleted = 0 and org_id = @key",
-        //        param: new { key }
-        //    );
-        //}
+        public dynamic GetAllDelegateeByOrgIDAndEmpID(string OrgID, string EmpID)
+        {
+            return Query<dynamic>(
+                sql: @"	SELECT [dbo].[employee].id as empid,
+                            [dbo].[employee].full_name, 
+	                        [dbo].[delegations].is_type_temporary, 
+	                        [dbo].[delegations].is_type_permanent 
+	                    FROM [dbo].[delegations]
+	                    INNER JOIN [dbo].[delegations_x_delegatee] ON [dbo].[delegations].id = [dbo].[delegations_x_delegatee].delegator_id
+	                    INNER JOIN [dbo].[employee] on [dbo].[delegations_x_delegatee].delegatee_id = [dbo].[employee].id
+	                    WHERE [dbo].[delegations].org_id  = @OrgID
+	                AND  [dbo].[delegations].delegator = @EmpID
+	                AND  [dbo].[delegations].is_deleted = 0",
+                param: new { OrgID, EmpID }
+            );
+        }
+        
     }
 }

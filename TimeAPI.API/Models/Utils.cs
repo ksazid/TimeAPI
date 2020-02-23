@@ -31,6 +31,12 @@ namespace TimeAPI.API.Models
         public string toDate { get; set; }
     }
 
+    public class UtilsOrgAndEmpID
+    {
+        public string OrgID { get; set; }
+        public string EmpID { get; set; }
+    }
+
     public class UtilsName
     {
         public string FullName { get; set; }
@@ -77,6 +83,8 @@ namespace TimeAPI.API.Models
         }
 
     }
+
+
 
 
     public class UtilPhoneResult

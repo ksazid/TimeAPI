@@ -193,6 +193,52 @@ namespace TimeAPI.API.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("GetAllDelegateeByOrgIDAndEmpID")]
+        public async Task<object> GetAllDelegateeByOrgIDAndEmpID([FromBody] UtilsOrgAndEmpID Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils));
+
+                var result = _unitOfWork.DelegationsRepository.GetAllDelegateeByOrgIDAndEmpID(Utils.OrgID, Utils.EmpID);
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("RemoveAdminRightByEmpID")]
+        public async Task<object> RemoveAdminRightByEmpID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                _unitOfWork.DelegationsDelegateeRepository.RemoveByDelegateeID(Utils.ID);
+                _unitOfWork.CustomerRepository.RemoveAdminRightByEmpID(Utils.ID);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Rights removed succefully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
         #endregion Delegations
     }
 }
