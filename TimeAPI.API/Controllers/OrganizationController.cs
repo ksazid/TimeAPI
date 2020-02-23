@@ -73,7 +73,6 @@ namespace TimeAPI.API.Controllers
                     _unitOfWork.SuperadminOrganizationRepository.Add(SuperAdminXOrg);
                 }
 
-
                 if (organizationViewModel.EntityLocationViewModel != null)
                 {
                     var OrgLocation = SetLocationForOrg(organizationViewModel.EntityLocationViewModel, modal.org_id.ToString());
@@ -232,6 +231,7 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 var result = _unitOfWork.OrganizationRepository.FindByUsersID(Utils.ID);
+
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)

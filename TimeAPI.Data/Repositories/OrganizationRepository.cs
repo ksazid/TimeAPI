@@ -108,7 +108,14 @@ namespace TimeAPI.Data.Repositories
                    param: new { item = orgList[i].org_id }
                   );
 
+                var entitySetup = QuerySingleOrDefault<OrganizationSetup>(
+                       sql: @"SELECT * from organization_setup WITH (NOLOCK) WHERE org_id = @item and is_deleted = 0;",
+                       param: new { item = orgList[i].org_id }
+                    );
+
+
                 orgList[i].EntityLocation = entityLocation;
+                orgList[i].OrganizationSetup = entitySetup;
             }
 
             return orgList;
