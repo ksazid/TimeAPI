@@ -82,7 +82,7 @@ namespace TimeAPI.Data.Repositories
                    SET
                    is_admin = true
                    WHERE id = @key",
-                param: key
+                param: new { key }
             );
         }
 
