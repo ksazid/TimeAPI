@@ -32,42 +32,6 @@ namespace TimeAPI.API.Controllers
             _dateTime = InternetTime.GetCurrentTimeFromTimeZone().Value.DateTime;
         }
 
-        [HttpPost]
-        [Route("GetTimesheetDashboardDataByOrgIDAndDate")]
-        public async Task<object> GetTimesheetDashboardDataByOrgIDAndDate([FromBody] UtilsOrgIDAndDate Utils, CancellationToken cancellationToken)
-        {
-            try
-            {
-                if (cancellationToken != null)
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                var result = _unitOfWork.UserRepository.GetTimesheetDashboardDataByOrgIDAndDate(Utils.OrgID, Utils.fromDate, Utils.toDate);
-
-                return await Task.FromResult<object>(result).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-            }
-        }
-
-        [HttpPost]
-        [Route("TotalEmployeeDashboardDataByOrgID")]
-        public async Task<object> TotalEmployeeDashboardDataByOrgID([FromBody] Utils Utils, CancellationToken cancellationToken)
-        {
-            try
-            {
-                if (cancellationToken != null)
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                var result = _unitOfWork.UserRepository.TotalEmployeeDashboardDataByOrgID(Utils.ID);
-
-                return await Task.FromResult<object>(result).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-            }
-        }
+     
     }
 }
