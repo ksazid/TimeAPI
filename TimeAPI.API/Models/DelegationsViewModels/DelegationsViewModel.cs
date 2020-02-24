@@ -26,8 +26,5 @@ namespace TimeAPI.API.Models.DelegationsViewModels
         public string modifiedby { get; set; }
         public bool is_deleted { get; set; }
 
-
-        
-
     }
 }

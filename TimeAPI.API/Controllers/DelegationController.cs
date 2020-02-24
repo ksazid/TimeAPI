@@ -62,7 +62,6 @@ namespace TimeAPI.API.Controllers
                 {
                     var Delegatee = new DelegationsDelegatee()
                     {
-                        id = Guid.NewGuid().ToString(),
                         delegator_id = modal.id,
                         delegatee_id = item,
                         is_type_temporary = planViewModel.is_type_temporary,
@@ -108,12 +107,10 @@ namespace TimeAPI.API.Controllers
                 var modal = mapper.Map<Delegations>(planViewModel);
                 modal.modified_date = _dateTime.ToString();
 
-                _unitOfWork.DelegationsDelegateeRepository.RemoveByDelegator(modal.id);
                 foreach (var item in planViewModel.delegatee_emp_id)
                 {
                     var Delegatee = new DelegationsDelegatee()
                     {
-                        id = Guid.NewGuid().ToString(),
                         delegator_id = modal.id,
                         delegatee_id = item,
                         is_type_temporary = planViewModel.is_type_temporary,
@@ -122,13 +119,13 @@ namespace TimeAPI.API.Controllers
                         is_notify_delegator_and_delegatee = planViewModel.is_notify_delegator_and_delegatee,
                         is_notify_delegatee = planViewModel.is_notify_delegatee,
                         role_id = planViewModel.role_id,
-                        createdby = modal.createdby,
-                        created_date = _dateTime.ToString(),
+                        modifiedby = modal.createdby,
+                        modified_date = _dateTime.ToString(),
                         is_deleted = false
                     };
 
                     _unitOfWork.EmployeeRepository.SetCustomerAsAdminByEmpID(item);
-                    _unitOfWork.DelegationsDelegateeRepository.Add(Delegatee);
+                    _unitOfWork.DelegationsDelegateeRepository.Update(Delegatee);
                 }
 
                 _unitOfWork.DelegationsRepository.Update(modal);

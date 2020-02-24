@@ -69,8 +69,6 @@ namespace TimeAPI.Data.Repositories
             Execute(
                 sql: @"UPDATE delegations_x_delegatee
                    SET
-                    delegator_id = @delegator_id, 
-                    delegatee_id = @delegatee_id,
                     is_type_temporary = @is_type_temporary, 
                     expires_on = @expires_on, 
                     is_type_permanent = @is_type_permanent, 
@@ -78,7 +76,7 @@ namespace TimeAPI.Data.Repositories
                     is_notify_delegatee = @is_notify_delegatee,
                     modified_date = @modified_date,
                     modifiedby = @modifiedby
-                    WHERE id = @id",
+                    WHERE delegatee_id = @delegatee_id AND delegator_id = @delegator_id",
                 param: entity
             );
         }
