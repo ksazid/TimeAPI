@@ -59,7 +59,7 @@ namespace TimeAPI.API.Controllers
                 //SuperAdminXOrg
                 var result = _unitOfWork.EmployeeRepository.FindByEmpUserID(modal.user_id);
 
-                if (result.is_admin)
+                if (result.is_superadmin)
                 {
                     var SuperAdminXOrg = new SuperadminOrganization()
                     {
