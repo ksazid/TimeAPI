@@ -14,10 +14,8 @@ namespace TimeAPI.Data.Repositories
         {
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.delegations
-                                  (id, org_id, delegator, is_type_temporary, is_type_permanent, is_notify_delegator_and_delegatee, 
-                                    is_notify_delegatee, delegations_desc, created_date, createdby)
-                           VALUES (@id, @org_id, @delegator, @is_type_temporary, @is_type_permanent, @is_notify_delegator_and_delegatee, 
-                                    @is_notify_delegatee, @delegations_desc, @created_date, @createdby);
+                                  (id, org_id, delegation_name, delegator, delegations_desc,  created_date, createdby)
+                           VALUES (@id, @org_id, @delegation_name, @delegator, @delegations_desc, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -27,6 +25,29 @@ namespace TimeAPI.Data.Repositories
         {
             return QuerySingleOrDefault<Delegations>(
                 sql: "SELECT * FROM dbo.delegations WHERE is_deleted = 0 and id = @key",
+                param: new { key }
+            );
+        }
+
+        public dynamic FindByDelegateesID(string key)
+        {
+            return QuerySingleOrDefault<dynamic>(
+                sql: @"SELECT top 1 delegations_x_delegatee.delegatee_id as empid,  
+                        dbo.delegations.* 
+                        FROM dbo.delegations 
+                        INNER JOIN  dbo.delegations_x_delegatee on dbo.delegations.id = delegations_x_delegatee.delegator_id
+                        WHERE delegations_x_delegatee.is_deleted = 0 and delegations_x_delegatee.delegatee_id =  @key",
+                param: new { key }
+            );
+        }
+
+        public void RemoveByDelegateesID(string key)
+        {
+            Execute(
+                sql: @"UPDATE dbo.delegations_x_delegatee
+                   SET
+                       modified_date = GETDATE(), is_deleted = 1
+                    WHERE delegatee_id = @key",
                 param: new { key }
             );
         }
@@ -48,11 +69,8 @@ namespace TimeAPI.Data.Repositories
                 sql: @"UPDATE dbo.delegations
                    SET
                     org_id = @org_id,
-                    delegator = @delegator, 
-                    is_type_temporary = @is_type_temporary, 
-                    is_type_permanent = @is_type_permanent, 
-                    is_notify_delegator_and_delegatee = @is_notify_delegator_and_delegatee, 
-                    is_notify_delegatee = @is_notify_delegatee, 
+                    delegation_name = @delegation_name, 
+                    delegator = @delegator,
                     delegations_desc = @delegations_desc,
                     modified_date = @modified_date,
                     modifiedby = @modifiedby
@@ -71,7 +89,7 @@ namespace TimeAPI.Data.Repositories
         public dynamic GetAllDelegateeByOrgIDAndEmpID(string OrgID, string EmpID)
         {
             return Query<dynamic>(
-                sql: @"	SELECT 
+                sql: @"SELECT 
                             [dbo].[delegations].id as delegationsid,
                             [dbo].[employee].id as empid,
                             [dbo].[employee].full_name, 

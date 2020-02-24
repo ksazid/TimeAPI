@@ -27,7 +27,7 @@ namespace TimeAPI.API.Controllers
         private readonly DateTime _dateTime;
 
         public OrganizationController(IUnitOfWork unitOfWork, ILogger<EmployeeController> logger,
-            IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings)
+                                        IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings)
         {
             _emailSender = emailSender;
             _logger = logger;

@@ -8,11 +8,8 @@ namespace TimeAPI.Domain.Entities
     {
         public string id { get; set; }
         public string org_id { get; set; }
+        public string delegation_name { get; set; }
         public string delegator { get; set; }
-        public bool is_type_temporary { get; set; }
-        public bool is_type_permanent { get; set; }
-        public bool is_notify_delegator_and_delegatee { get; set; }
-        public bool is_notify_delegatee { get; set; }
         public string delegations_desc { get; set; }
         public string created_date { get; set; }
         public string createdby { get; set; }

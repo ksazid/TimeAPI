@@ -65,6 +65,12 @@ namespace TimeAPI.API.Controllers
                         id = Guid.NewGuid().ToString(),
                         delegator_id = modal.id,
                         delegatee_id = item,
+                        is_type_temporary = planViewModel.is_type_temporary,
+                        expires_on = planViewModel.expires_on,
+                        is_type_permanent = planViewModel.is_type_permanent,
+                        is_notify_delegator_and_delegatee = planViewModel.is_notify_delegator_and_delegatee,
+                        is_notify_delegatee = planViewModel.is_notify_delegatee,
+                        role_id = planViewModel.role_id,
                         createdby = modal.createdby,
                         created_date = _dateTime.ToString(),
                         is_deleted = false
@@ -110,10 +116,18 @@ namespace TimeAPI.API.Controllers
                         id = Guid.NewGuid().ToString(),
                         delegator_id = modal.id,
                         delegatee_id = item,
+                        is_type_temporary = planViewModel.is_type_temporary,
+                        expires_on = planViewModel.expires_on,
+                        is_type_permanent = planViewModel.is_type_permanent,
+                        is_notify_delegator_and_delegatee = planViewModel.is_notify_delegator_and_delegatee,
+                        is_notify_delegatee = planViewModel.is_notify_delegatee,
+                        role_id = planViewModel.role_id,
                         createdby = modal.createdby,
                         created_date = _dateTime.ToString(),
                         is_deleted = false
                     };
+
+                    _unitOfWork.EmployeeRepository.SetCustomerAsAdminByEmpID(item);
                     _unitOfWork.DelegationsDelegateeRepository.Add(Delegatee);
                 }
 

@@ -14,8 +14,10 @@ namespace TimeAPI.Data.Repositories
         {
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO delegations_x_delegatee
-                                  (id, delegator_id, delegatee_id, created_date, createdby)
-                           VALUES (@id, @delegator_id, @delegatee_id,  @created_date, @createdby);
+                                  (id, delegator_id, delegatee_id, is_type_temporary, expires_on, is_type_permanent, is_notify_delegator_and_delegatee, 
+                                    is_notify_delegatee, created_date, createdby)
+                           VALUES (@id, @delegator_id, @delegatee_id, @is_type_temporary, @expires_on, @is_type_permanent, @is_notify_delegator_and_delegatee, 
+                                    @is_notify_delegatee, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -40,7 +42,6 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-
         public void RemoveByDelegator(string key)
         {
             Execute(
@@ -63,12 +64,6 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        
-
-
-
-
-
         public void Update(DelegationsDelegatee entity)
         {
             Execute(
@@ -76,6 +71,11 @@ namespace TimeAPI.Data.Repositories
                    SET
                     delegator_id = @delegator_id, 
                     delegatee_id = @delegatee_id,
+                    is_type_temporary = @is_type_temporary, 
+                    expires_on = @expires_on, 
+                    is_type_permanent = @is_type_permanent, 
+                    is_notify_delegator_and_delegatee = @is_notify_delegator_and_delegatee, 
+                    is_notify_delegatee = @is_notify_delegatee,
                     modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE id = @id",
