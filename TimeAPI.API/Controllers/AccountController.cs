@@ -141,7 +141,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpPost]
         [Route("Logout")]
         public async Task<object> Logout()

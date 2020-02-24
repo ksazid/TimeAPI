@@ -174,22 +174,50 @@ namespace TimeAPI.Data.Repositories
             return resultsAspNetUsers;
         }
 
-        public dynamic GetTimesheetDashboardDataByOrgIDAndDate(string org_id,  string fromDate, string toDate)
+        //public dynamic GetTimesheetDashboardDataByOrgIDAndDate(string org_id,  string fromDate, string toDate)
+        //{
+        //    var resultsAspNetUsers = Query<dynamic>(
+        //        sql: @"SELECT  
+        //                    UPPER(employee_type.employee_type_name) AS employee_type_name,
+        //                    COUNT ([dbo].[employee].id) AS employee_count
+        //                    FROM [dbo].[employee] WITH (NOLOCK)
+        //                    LEFT JOIN [dbo].[timesheet] ON  [dbo].[employee].id = [dbo].[timesheet].empid
+        //                    LEFT JOIN [dbo].[employee_type] ON  [dbo].[employee].emp_type_id = [dbo].[employee_type].id
+        //                    WHERE [dbo].[employee].is_deleted = 0 AND [dbo].[employee].is_inactive = 0  
+        //                    AND [dbo].[employee].org_id =  @org_id
+        //                    AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US') AND
+        //                    FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
+        //                    GROUP BY 
+        //                    employee_type.employee_type_name",
+        //        param: new { org_id, fromDate , toDate }
+        //    );
+        //    return resultsAspNetUsers;
+        //}
+
+        public dynamic GetTimesheetDashboardDataByOrgIDAndDate(string org_id, string fromDate, string toDate)
         {
             var resultsAspNetUsers = Query<dynamic>(
-                sql: @"SELECT  
-                            UPPER(employee_type.employee_type_name) AS employee_type_name,
-                            COUNT ([dbo].[employee].id) AS employee_count
-                            FROM [dbo].[employee] WITH (NOLOCK)
-                            LEFT JOIN [dbo].[timesheet] ON  [dbo].[employee].id = [dbo].[timesheet].empid
-                            LEFT JOIN [dbo].[employee_type] ON  [dbo].[employee].emp_type_id = [dbo].[employee_type].id
-                            WHERE [dbo].[employee].is_deleted = 0 AND [dbo].[employee].is_inactive = 0  
-                            AND [dbo].[employee].org_id =  @org_id
-                            AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US') AND
-                            FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
-                            GROUP BY 
-                            employee_type.employee_type_name",
-                param: new { org_id, fromDate , toDate }
+                sql: @"SELECT SUM(Attandance) as Attandance  FROM (
+                        SELECT COUNT (DISTINCT(timesheet.empid)) as Attandance  
+                        FROM timesheet 
+                        INNER JOIN employee ON timesheet.empid = employee.id
+                        INNER JOIN superadmin_x_org ON superadmin_x_org.superadmin_empid = employee.id
+                        WHERE 
+                        superadmin_x_org.org_id = @org_id 
+                        AND FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US') between FORMAT(CAST(@fromDate   AS DATE), 'd', 'EN-US') 
+                        AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
+                        GROUP BY FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US')
+
+                        UNION ALL
+
+                        SELECT count (distinct(timesheet.empid)) as Attandance from timesheet 
+                        INNER JOIN employee on timesheet.empid = employee.id
+                        WHERE 
+                        employee.org_id = @org_id  
+                        AND FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US') between FORMAT(CAST(@fromDate   AS DATE), 'd', 'EN-US') 
+                        AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
+                        GROUP BY FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US')) x",
+                param: new { org_id, fromDate, toDate }
             );
             return resultsAspNetUsers;
         }

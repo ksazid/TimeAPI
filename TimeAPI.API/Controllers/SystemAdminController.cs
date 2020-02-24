@@ -1,19 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 using TimeAPI.API.Models;
-using TimeAPI.API.Models.BillingViewModels;
-using TimeAPI.API.Models.OrganizationViewModel;
-using TimeAPI.API.Models.PlanFeatureViewModels;
-using TimeAPI.API.Models.PlanPriceViewModels;
-using TimeAPI.API.Models.PlanViewModels;
 using TimeAPI.API.Services;
 using TimeAPI.Domain;
-using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.API.Controllers
 {
@@ -38,7 +31,6 @@ namespace TimeAPI.API.Controllers
             _unitOfWork = unitOfWork;
             _dateTime = InternetTime.GetCurrentTimeFromTimeZone().Value.DateTime;
         }
-      
 
         [HttpPost]
         [Route("GetTimesheetDashboardDataByOrgIDAndDate")]
@@ -77,6 +69,5 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
     }
 }

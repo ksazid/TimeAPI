@@ -164,7 +164,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpPost]
         [Route("FindPlanPriceByPlanID")]
         public async Task<object> FindPlanPriceByPlanID([FromBody] Utils Utils, CancellationToken cancellationToken)

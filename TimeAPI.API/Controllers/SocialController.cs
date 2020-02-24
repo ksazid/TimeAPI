@@ -2,8 +2,6 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
-using System.Net;
-using System.Net.Mail;
 using System.Threading;
 using System.Threading.Tasks;
 using TimeAPI.API.Models;
@@ -182,7 +180,6 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
-
         //private void SolvedComplainMailtoCustomer()
         //{
         //    try
@@ -191,8 +188,8 @@ namespace TimeAPI.API.Controllroers
         //        MailMessage mM = new MailMessage();
         //        //Mail Address
         //        mM.From = new MailAddress("noreply.Interfuture@gmail.com");
-        //        //receiver email id      
-              
+        //        //receiver email id
+
         //        mM.Bcc.Add("sazid@interfuture.ae");
 
         //        ///////Customer mail Format///////////
@@ -218,8 +215,6 @@ namespace TimeAPI.API.Controllroers
         //    }
         //    catch (Exception ex)
         //    {
-
-
         //    }
         //}
     }

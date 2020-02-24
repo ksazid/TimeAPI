@@ -2,13 +2,10 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
-using System.Net;
-using System.Net.Mail;
 using System.Threading;
 using System.Threading.Tasks;
 using TimeAPI.API.Models;
 using TimeAPI.API.Models.CustomerViewModels;
-using TimeAPI.API.Models.SocialViewModels;
 using TimeAPI.API.Services;
 using TimeAPI.Domain;
 using TimeAPI.Domain.Entities;
@@ -58,7 +55,6 @@ namespace TimeAPI.API.Controllroers
                 modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
-
                 var config1 = new AutoMapper.MapperConfiguration(m => m.CreateMap<EntityContact, EntityContact>());
                 var mapper1 = config.CreateMapper();
                 var modal1 = mapper.Map<EntityContact>(CustomerViewModel.EntityContact);
@@ -94,7 +90,6 @@ namespace TimeAPI.API.Controllroers
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Customer>(CustomerViewModel);
                 modal.modified_date = _dateTime.ToString();
-
 
                 var config1 = new AutoMapper.MapperConfiguration(m => m.CreateMap<EntityContact, EntityContact>());
                 var mapper1 = config.CreateMapper();
@@ -204,6 +199,5 @@ namespace TimeAPI.API.Controllroers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-        
     }
 }

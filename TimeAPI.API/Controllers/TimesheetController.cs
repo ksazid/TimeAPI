@@ -34,7 +34,6 @@ namespace TimeAPI.API.Controllers
         private readonly DateTime _dateTime;
         private IHubContext<NotifyHub, ITypedHubClient> _hubContext;
 
-
         public TimesheetController(IUnitOfWork unitOfWork, ILogger<TimesheetController> logger,
             IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings,
             IHubContext<NotifyHub, ITypedHubClient> hubContext)
@@ -593,7 +592,6 @@ namespace TimeAPI.API.Controllers
                 //TimeSpan spWorkMin = TimeSpan.FromMinutes(_TotalMinutes);
                 //modal.total_hrs = spWorkMin.ToString(FormatTime);
 
-
                 var _TotalMinutes = (Convert.ToDateTime(modal.end_time) - Convert.ToDateTime(modal.start_time)).Ticks;
                 TimeSpan elapsedSpan = new TimeSpan(_TotalMinutes);
 
@@ -602,8 +600,6 @@ namespace TimeAPI.API.Controllers
                 ConvertHoursAndMinutes(elapsedSpan, out TotalHours, out TotalMinutes);
 
                 modal.total_hrs = string.Format(@"{0}:{1}", TotalHours, TotalMinutes);
-
-
 
                 _unitOfWork.TimesheetAdministrativeRepository.Add(modal);
                 _unitOfWork.Commit();
@@ -1070,7 +1066,6 @@ namespace TimeAPI.API.Controllers
                 TotalHours = "0" + elapsedSpan.TotalHours.ToString().Split('.')[0].ToString();
             else
                 TotalHours = elapsedSpan.TotalHours.ToString().Split('.')[0].ToString();
-
 
             if (elapsedSpan.Minutes.ToString().Split('.')[0].Length == 1)
                 TotalMinutes = "0" + elapsedSpan.Minutes.ToString().Split('.')[0].ToString();

@@ -189,7 +189,6 @@ namespace TimeAPI.API.Controllroers
                 modal.EntityCustomer = resultCustomer;
 
                 return await Task.FromResult<object>(modal).ConfigureAwait(false);
-
             }
             catch (Exception ex)
             {
@@ -368,7 +367,6 @@ namespace TimeAPI.API.Controllroers
                 var results = _unitOfWork.ProjectRepository.FindAutoProjectPrefixByOrgID(Utils.OrgID, _dateTime.ToString());
 
                 return await Task.FromResult<object>(results).ConfigureAwait(false);
-
             }
             catch (Exception ex)
             {
@@ -393,14 +391,12 @@ namespace TimeAPI.API.Controllroers
                 var results = _unitOfWork.ProjectRepository.FindCustomProjectPrefixByOrgIDAndPrefix(Utils.OrgID, Utils.Prefix);
 
                 return await Task.FromResult<object>(results).ConfigureAwait(false);
-
             }
             catch (Exception ex)
             {
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
 
         [HttpPost]
         [Route("AddProjectCustomer")]
@@ -453,7 +449,6 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
-
         [HttpPost]
         [Route("ProjectTaskCountByProjectID")]
         public async Task<object> ProjectTaskCountByProjectID([FromBody] Utils _Utils, CancellationToken cancellationToken)
@@ -469,7 +464,6 @@ namespace TimeAPI.API.Controllroers
                 var results = _unitOfWork.ProjectRepository.ProjectTaskCount(_Utils.ID);
 
                 return await Task.FromResult<object>(results).ConfigureAwait(false);
-
             }
             catch (Exception ex)
             {

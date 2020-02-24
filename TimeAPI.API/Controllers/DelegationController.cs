@@ -1,16 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 using TimeAPI.API.Models;
+using TimeAPI.API.Models.DelegationsViewModels;
 using TimeAPI.API.Services;
 using TimeAPI.Domain;
 using TimeAPI.Domain.Entities;
-using TimeAPI.API.Models.PlanViewModels;
-using TimeAPI.API.Models.DelegationsViewModels;
 
 namespace TimeAPI.API.Controllers
 {
