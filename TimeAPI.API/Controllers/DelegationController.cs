@@ -62,6 +62,7 @@ namespace TimeAPI.API.Controllers
                 {
                     var Delegatee = new DelegationsDelegatee()
                     {
+                        id = Guid.NewGuid().ToString(),
                         delegator_id = modal.id,
                         delegatee_id = item,
                         is_type_temporary = planViewModel.is_type_temporary,
@@ -283,7 +284,7 @@ namespace TimeAPI.API.Controllers
 
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
- 
+
                 _unitOfWork.DelegationsDelegateeRepository.RemoveByDelegateeID(Utils.ID);
                 _unitOfWork.Commit();
 
