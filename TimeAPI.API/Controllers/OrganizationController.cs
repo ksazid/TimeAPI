@@ -66,6 +66,7 @@ namespace TimeAPI.API.Controllers
                         id = Guid.NewGuid().ToString(),
                         superadmin_empid = result.id,
                         org_id = modal.org_id,
+                        created_date = _dateTime.ToString(),
                         is_deleted = false,
                         createdby = organizationViewModel.createdby
                     };
