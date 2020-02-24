@@ -93,8 +93,8 @@ namespace TimeAPI.Data.Repositories
                             [dbo].[delegations].id as delegationsid,
                             [dbo].[employee].id as empid,
                             [dbo].[employee].full_name, 
-	                        [dbo].[delegations].is_type_temporary, 
-	                        [dbo].[delegations].is_type_permanent ,
+	                        [dbo].[delegations_x_delegatee].is_type_temporary, 
+	                        [dbo].[delegations_x_delegatee].is_type_permanent ,
 	                        [dbo].[delegations].delegations_desc
 	                    FROM [dbo].[delegations]
 	                    INNER JOIN [dbo].[delegations_x_delegatee] ON [dbo].[delegations].id = [dbo].[delegations_x_delegatee].delegator_id
