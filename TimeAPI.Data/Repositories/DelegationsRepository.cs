@@ -105,6 +105,7 @@ namespace TimeAPI.Data.Repositories
 	                    INNER JOIN [dbo].[employee] on [dbo].[delegations_x_delegatee].delegatee_id = [dbo].[employee].id
 	                    WHERE [dbo].[delegations].org_id  = @OrgID
 	                AND  [dbo].[delegations].delegator = @EmpID
+	                AND  [dbo].[delegations_x_delegatee].is_deleted = 0
 	                AND  [dbo].[delegations].is_deleted = 0",
                 param: new { OrgID, EmpID }
             );
