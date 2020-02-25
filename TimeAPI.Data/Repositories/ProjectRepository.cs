@@ -145,6 +145,33 @@ namespace TimeAPI.Data.Repositories
            );
         }
 
+        public IEnumerable<dynamic> FindAllProjectActivityByProjectID(string key)
+        {
+            return Query<dynamic>(
+                   sql: @"SELECT 
+                            project_activity.project_id, project_activity.activity_name,
+                            project_activity.activity_desc, 
+                            CASE WHEN project_activity.is_approve_req = 0 THEN 'False' ELSE 'True' END as is_approve_req, 
+                            ISNULL(employee.full_name, 'NA') as approver, 
+                            employee.id as approver_id,
+                            CASE WHEN project_activity.is_approved = 0 THEN 'False' ELSE 'True' END as is_approved, 
+                            project_status.project_status_name, 
+                            project_activity.start_date, 
+                            project_activity.end_date 
+                        FROM project_activity 
+                            INNER JOIN project on project_activity.project_id = project.id
+                            LEFT JOIN employee on project_activity.approved_id = employee.id
+                            LEFT JOIN project_status on project_activity.status_id = project_status.id
+                        WHERE project.id = @key
+                            AND project.is_deleted = 0
+                            ORDER BY project_activity.activity_name ASC",
+                      param: new { key }
+               );
+        }
+
+
+        
+
         //public string ProjectActivityCount(string entity)
         //{
         //    return QuerySingleOrDefault<string>(
