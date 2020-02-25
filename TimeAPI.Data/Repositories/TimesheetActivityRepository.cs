@@ -240,7 +240,7 @@ namespace TimeAPI.Data.Repositories
 	                        LEFT JOIN  [dbo].[administrative] on   [dbo].[timesheet_administrative_activity].administrative_id = [dbo].[administrative].id 
                             WHERE dbo.timesheet_administrative_activity.groupid =@GroupID
 	                        AND [dbo].timesheet_administrative_activity.is_deleted  = 0
-                            AND FORMAT(CAST(timesheet_administrative_activity.ondate AS DATE), 'd', 'EN-US') = FORMAT(CAST(GETDATE() AS DATE), 'd', 'EN-US')
+                            AND FORMAT(CAST(timesheet_administrative_activity.ondate AS DATE), 'd', 'EN-US') = FORMAT(CAST(@Date AS DATE), 'd', 'EN-US')
 
                         UNION 
 
@@ -269,7 +269,7 @@ namespace TimeAPI.Data.Repositories
 				                        INNER JOIN timesheet_x_project_category on timesheet_x_project_category.groupid = dbo.timesheet_activity.groupid
                                         WHERE dbo.timesheet_activity.groupid =@GroupID
 				                        AND [dbo].[timesheet_activity].is_deleted  = 0
-                                        AND FORMAT(CAST(timesheet_activity.ondate AS DATE), 'd', 'EN-US') = FORMAT(CAST(GETDATE() AS DATE), 'd', 'EN-US')",
+                                        AND FORMAT(CAST(timesheet_activity.ondate AS DATE), 'd', 'EN-US') = FORMAT(CAST(@Date AS DATE), 'd', 'EN-US')",
                 param: new { GroupID, ProjectID, Date }
             );
         }
