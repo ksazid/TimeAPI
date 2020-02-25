@@ -65,7 +65,10 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<EmployeeType> GetEmployeeTypeByOrgID(string key)
         {
             return Query<EmployeeType>(
-                sql: "SELECT * FROM dbo.employee_type WHERE is_deleted = 0 AND org_id = @key OR org_id = 'default'",
+                sql: @"SELECT * FROM dbo.employee_type 
+                        WHERE is_deleted = 0 AND org_id = @key 
+                        OR org_id = 'default'
+                        ORDER BY employee_type_name DESC",
                 param: new { key }
             );
         }

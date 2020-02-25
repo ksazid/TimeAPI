@@ -67,7 +67,9 @@ namespace TimeAPI.Data.Repositories
             return Query<EmployeeStatus>(
                 sql: @"SELECT * FROM[dbo].[employee_status]
                         WHERE is_deleted = 0
-                        AND org_id = @key OR org_id = 'default'",
+                        AND org_id = @key 
+                        OR org_id = 'default'
+                        ORDER BY employee_status_name DESC",
                 param: new { key }
             );
         }

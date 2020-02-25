@@ -68,7 +68,8 @@ namespace TimeAPI.Data.Repositories
                 sql: @" SELECT *
                     FROM dbo.status
                     WHERE is_deleted = 0
-                    AND org_id = @key OR org_id = 'default'",
+                    AND org_id = @key OR org_id = 'default'
+                    ORDER BY status_name DESC",
                 param: new { key }
             );
         }
