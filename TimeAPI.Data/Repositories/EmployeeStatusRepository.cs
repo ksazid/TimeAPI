@@ -65,12 +65,9 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<EmployeeStatus> GetEmployeeStatusByOrgID(string key)
         {
             return Query<EmployeeStatus>(
-                sql: @"SELECT * FROM [dbo].[employee_status]
-                        WHERE is_deleted = 0 AND org_id IS NULL
-                        UNION ALL
-                        SELECT * FROM[dbo].[employee_status]
+                sql: @"SELECT * FROM[dbo].[employee_status]
                         WHERE is_deleted = 0
-                        AND org_id = @key",
+                        AND org_id = @key OR org_id = 'default'",
                 param: new { key }
             );
         }
