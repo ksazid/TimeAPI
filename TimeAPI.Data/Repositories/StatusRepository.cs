@@ -65,11 +65,13 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<Status> GetStatusByOrgID(string key)
         {
             return Query<Status>(
-                sql: @" SELECT *
-                    FROM dbo.status
-                    WHERE is_deleted = 0
-                    AND org_id = @key OR org_id = 'default'
-                    ORDER BY status_name DESC",
+                sql: @"SELECT * FROM [dbo].[status]
+                        WHERE org_id='default' AND is_deleted = 0
+                        UNION 
+                        SELECT * FROM [dbo].[status]
+                        WHERE org_id= @key
+                        AND is_deleted = 0  
+                        ORDER BY status_name ASC",
                 param: new { key }
             );
         }

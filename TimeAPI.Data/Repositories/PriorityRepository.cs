@@ -34,9 +34,12 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<Priority> GetPriorityByOrgID(string key)
         {
             return Query<Priority>(
-                sql: @"SELECT * FROM [dbo].[priority] WHERE org_id= @key
-                        AND is_deleted = 0 OR org_id='default'
-                        ORDER BY priority_name DESC",
+                sql: @"SELECT * FROM [dbo].[priority]
+                        WHERE org_id='default' AND is_deleted = 0
+                        UNION 
+                        SELECT * FROM [dbo].[priority]
+                        WHERE org_id= @key AND is_deleted = 0  
+                        ORDER BY priority_name ASC",
                 param: new { key }
             );
         }
