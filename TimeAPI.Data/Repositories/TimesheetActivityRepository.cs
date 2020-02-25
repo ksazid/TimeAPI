@@ -260,7 +260,7 @@ namespace TimeAPI.Data.Repositories
 		                        FORMAT(dbo.timesheet_activity.ondate, 'dd-MM-yyyy', 'en-US') AS ondate 
                                     FROM
                                         [dbo].[timesheet_activity] WITH (NOLOCK)
-										INNER JOIN project on project.id = [timesheet_activity].project_id 
+										LEFT JOIN project on project.id = [timesheet_activity].project_id 
 										LEFT JOIN project_activity on project_activity.id =[timesheet_activity].milestone_id 
                                         LEFT JOIN task on dbo.timesheet_activity.task_id = task.id
 				                        INNER JOIN (select top 1 * from dbo.timesheet   where groupid IN (SELECT groupid FROM timesheet_activity 
