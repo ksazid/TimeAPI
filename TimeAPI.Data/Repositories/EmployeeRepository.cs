@@ -216,9 +216,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<Employee> GetAllFreelancerEmpByOrgID(string OrgID)
+        public dynamic GetAllFreelancerEmpByOrgID(string OrgID)
         {
-            return Query<Employee>(
+            return Query<dynamic>(
                 sql: @"select employee.id, employee.full_name from employee
                         INNER JOIN employee_type on employee.emp_type_id = employee_type.id
                         WHERE UPPER(employee_type.employee_type_name) = 'FREELANCER'

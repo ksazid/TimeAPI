@@ -421,7 +421,6 @@ namespace TimeAPI.API.Controllers
                 oDataTable _oDataTable = new oDataTable();
                 var results = _unitOfWork.EmployeeRepository.GetAllOutsourcedEmpByOrgID(UtilsOrgID.OrgID);
                 var xResult = _oDataTable.ToDataTable(results);
-                _unitOfWork.Commit();
 
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
             }
