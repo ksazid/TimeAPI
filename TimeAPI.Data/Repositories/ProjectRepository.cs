@@ -149,7 +149,9 @@ namespace TimeAPI.Data.Repositories
         {
             return Query<dynamic>(
                    sql: @"SELECT 
-                            project_activity.project_id, project_activity.activity_name,
+                            project_activity.project_id, 
+                            project_activity.id as project_activity_id,
+                            project_activity.activity_name,
                             project_activity.activity_desc, 
                             CASE WHEN project_activity.is_approve_req = 0 THEN 'False' ELSE 'True' END as is_approve_req, 
                             ISNULL(employee.full_name, 'NA') as approver, 
