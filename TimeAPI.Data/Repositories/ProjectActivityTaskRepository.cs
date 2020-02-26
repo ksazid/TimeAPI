@@ -113,12 +113,10 @@ namespace TimeAPI.Data.Repositories
                             dbo.priority.priority_name,
                             dbo.status.status_name
                         FROM dbo.task WITH (NOLOCK)
-                            inner join dbo.project_activity_x_task on task.id = dbo.project_activity_x_task.task_id
+                            INNER join dbo.project_activity_x_task on task.id = dbo.project_activity_x_task.task_id
                             INNER JOIN dbo.project_activity on [project_activity_x_task].activity_id = dbo.project_activity.id
                             INNER JOIN dbo.project on [project_activity_x_task].project_id = dbo.project.id
-                            INNER JOIN dbo.employee on project_activity.approved_id = dbo.employee.id
                             INNER JOIN dbo.employee x on task.assigned_empid = x.id
-                            INNER JOIN dbo.project_status on project_activity.status_id = dbo.project_status.id
                             INNER JOIN dbo.priority on task.priority_id = dbo.priority.id
                             INNER JOIN dbo.status on task.status_id = dbo.status.id
                         WHERE project.id = @key
