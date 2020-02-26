@@ -89,5 +89,20 @@ namespace TimeAPI.Data.Repositories
                 param: entity
             );
         }
+
+        public dynamic GetProjectActivityRatioByProjectID(string key)
+        {
+            return Query<dynamic>(
+                   sql: @"SELECT 
+                           dbo.project_status.project_status_name, 
+                           count(*) * 100 / sum(count(*))  over() as ratio
+                    FROM dbo.project_activity WITH(NOLOCK)
+                        INNER JOIN dbo.project_status on dbo.project_activity.status_id = dbo.project_status.id
+                    WHERE dbo.project_activity.project_id = @key
+                        AND dbo.project_activity.is_deleted = 0 
+                        group by dbo.project_status.project_status_name",
+                      param: new { key }
+               );
+        }
     }
 }

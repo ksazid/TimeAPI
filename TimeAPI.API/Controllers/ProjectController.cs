@@ -161,7 +161,6 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
-
         [HttpPost]
         [Route("FindByProjectID")]
         public async Task<object> FindByProjectID([FromBody] Utils Utils, CancellationToken cancellationToken)
@@ -472,7 +471,6 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
-
         [HttpPost]
         [Route("FindAllProjectActivityByProjectID")]
         public async Task<object> FindAllProjectActivityByProjectID([FromBody] Utils Utils, CancellationToken cancellationToken)
@@ -496,8 +494,6 @@ namespace TimeAPI.API.Controllroers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
-
 
         #endregion Projects
 
@@ -1084,6 +1080,28 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
+        [HttpPost]
+        [Route("GetProjectActivityRatioByProjectID")]
+        public async Task<object> GetProjectActivityRatioByProjectID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                var result = _unitOfWork.ProjectActivityRepository.GetProjectActivityRatioByProjectID(Utils.ID);
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
         #endregion ProjectActivity
 
         #region ProjectActivityTask
@@ -1313,6 +1331,27 @@ namespace TimeAPI.API.Controllroers
                 var xResult = _oDataTable.ToDataTable(results);
 
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("GetProjectActivityTaskRatioByProjectID")]
+        public async Task<object> GetProjectActivityTaskRatioByProjectID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                var results = _unitOfWork.ProjectActivityTaskRepository.GetProjectActivityTaskRatioByProjectID(Utils.ID);
+                return await Task.FromResult<object>(results).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
