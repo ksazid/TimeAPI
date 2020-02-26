@@ -1296,6 +1296,30 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
+        [HttpPost]
+        [Route("GetAllTaskByProjectID")]
+        public async Task<object> GetAllTaskByProjectID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                oDataTable _oDataTable = new oDataTable();
+                var results = _unitOfWork.ProjectActivityTaskRepository.GetAllTaskByProjectID(Utils.ID);
+                var xResult = _oDataTable.ToDataTable(results);
+
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
         #endregion ProjectActivityTask
     }
 }

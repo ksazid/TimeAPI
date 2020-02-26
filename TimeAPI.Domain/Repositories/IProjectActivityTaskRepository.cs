@@ -10,7 +10,6 @@ namespace TimeAPI.Domain.Repositories
         void RemoveByProjectActivityID(string ProjectActivityID);
         void RemoveByProjectID(string ProjectID);
         IEnumerable<dynamic> GetAllTaskByActivityID(string ActivityID);
-
-
+        IEnumerable<dynamic> GetAllTaskByProjectID(string ProjectID);
     }
 }
