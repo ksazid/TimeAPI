@@ -7,10 +7,10 @@ namespace TimeAPI.Domain.Repositories
     {
         User FindByNormalizedUserName(string normalizedUserName);
         User FindByNormalizedEmail(string normalizedEmail);
-        //void CustomEmailConfirmedFlagUpdate(string UserID);
         UserDataGroupDataSet GetUserDataGroupByUserID(string EmpID, string Date);
         dynamic TotalEmployeeDashboardDataByOrgID(string OrgID);
         dynamic GetTimesheetDashboardDataByOrgIDAndDate(string OrgID, string toDate, string fromDate);
         dynamic GetTimesheetDashboardGridDataByOrgIDAndDate(string OrgID, string toDate, string fromDate);
+        dynamic GetTimesheetDashboardGridAbsentDataByOrgIDAndDate(string OrgID, string toDate, string fromDate);
     }
 }
