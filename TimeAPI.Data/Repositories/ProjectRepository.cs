@@ -166,6 +166,7 @@ namespace TimeAPI.Data.Repositories
                             LEFT JOIN project_status on project_activity.status_id = project_status.id
                         WHERE project.id = @key
                             AND project.is_deleted = 0
+                            AND project_activity.is_deleted = 0
                             ORDER BY project_activity.activity_name ASC",
                       param: new { key }
                );

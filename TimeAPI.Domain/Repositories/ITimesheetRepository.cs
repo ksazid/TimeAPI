@@ -10,6 +10,7 @@ namespace TimeAPI.Domain.Repositories
         void CheckOutByEmpID(Timesheet entity);
         Timesheet FindTimeSheetByEmpID(string empid, string groupid);
         void RemoveByGroupID(string GroupID);
+        dynamic GetAllTimesheetByOrgID(string OrgID);
 
     }
 }

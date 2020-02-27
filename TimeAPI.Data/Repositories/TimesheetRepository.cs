@@ -98,5 +98,13 @@ namespace TimeAPI.Data.Repositories
                  param: entity
              );
         }
+
+        public dynamic GetAllTimesheetByOrgID(string OrgID)
+        {
+            return Query<dynamic>(
+           sql: "SELECT * FROM [dbo].[timesheet] where is_deleted = 0",
+                param: new { OrgID }
+            );
+        }
     }
 }
