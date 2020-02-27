@@ -11,5 +11,6 @@ namespace TimeAPI.Domain.Repositories
         UserDataGroupDataSet GetUserDataGroupByUserID(string EmpID, string Date);
         dynamic TotalEmployeeDashboardDataByOrgID(string OrgID);
         dynamic GetTimesheetDashboardDataByOrgIDAndDate(string OrgID, string toDate, string fromDate);
+        dynamic GetTimesheetDashboardGridDataByOrgIDAndDate(string OrgID, string toDate, string fromDate);
     }
 }

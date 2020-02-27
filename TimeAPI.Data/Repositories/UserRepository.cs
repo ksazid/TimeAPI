@@ -224,6 +224,82 @@ namespace TimeAPI.Data.Repositories
             return resultsAspNetUsers;
         }
 
+        public dynamic GetTimesheetDashboardGridDataByOrgIDAndDate(string org_id, string fromDate, string toDate)
+        {
+            var resultsAspNetUsers = Query<dynamic>(
+                sql: @"SELECT
+                        project_category_type,
+                        project_or_comp_name,
+                        timesheet_id,
+                        groupid,
+                        employee_id,
+                        latlang,
+                        is_checkout,
+                        full_name,
+                        check_in,
+                        check_out,
+                        total_hrs,
+                        ondate
+
+                    FROM (
+
+                    SELECT  
+                        timesheet_x_project_category.project_category_type,
+                        timesheet_x_project_category.project_or_comp_name,
+                        timesheet.id as timesheet_id,
+                        timesheet.groupid as groupid,
+                        employee.id as employee_id,
+                        eTime.lat + ',' + eTime.lang as latlang,
+                        eTime.is_checkout as is_checkout,
+                        employee.full_name,
+                        FORMAT(CAST(timesheet.check_in AS DATETIME2), N'hh:mm tt') as check_in,
+                        ISNULL(FORMAT(CAST(timesheet.check_out AS DATETIME2), N'hh:mm tt'), 'NA') as check_out,
+                        ISNULL(FORMAT(CAST(timesheet.total_hrs AS DATETIME2), N'hh:mm tt'), 'NA') as total_hrs,
+                        FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US')  as ondate
+                        FROM timesheet WITH (NOLOCK)
+                        INNER JOIN employee ON timesheet.empid = employee.id
+                        INNER JOIN timesheet_x_project_category on timesheet.groupid = timesheet_x_project_category.groupid
+                        INNER JOIN superadmin_x_org ON superadmin_x_org.superadmin_empid = employee.id
+                        INNER JOIN (select distinct(groupid), location.lat, location.lang, location.is_checkout   
+                        FROM dbo.location WHERE groupid IN (SELECT groupid FROM timesheet) and is_checkout = 0) eTime 
+                        ON eTime.groupid = dbo.timesheet.groupid
+                        WHERE 
+                        superadmin_x_org.org_id = @org_id
+                        AND FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US') BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US') 
+                        AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
+
+                    UNION
+
+                    SELECT
+                        timesheet_x_project_category.project_category_type,
+                        timesheet_x_project_category.project_or_comp_name,
+                        timesheet.id as timesheet_id,
+                        timesheet.groupid as groupid,
+                        employee.id as employee_id,
+                        eTime.lat +',' + eTime.lang as latlang,
+                        eTime.is_checkout as is_checkout,
+                        employee.full_name,
+                        FORMAT(CAST(timesheet.check_in AS DATETIME2), N'hh:mm tt') as check_in,
+                        ISNULL(FORMAT(CAST(timesheet.check_out AS DATETIME2), N'hh:mm tt'), 'NA') as check_out,
+                        ISNULL(FORMAT(CAST(timesheet.total_hrs AS DATETIME2), N'hh:mm tt'), 'NA') as total_hrs,
+                        FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US')  as ondate
+                        FROM timesheet WITH (NOLOCK)
+                        INNER JOIN employee ON timesheet.empid = employee.id
+                        INNER JOIN timesheet_x_project_category on timesheet.groupid = timesheet_x_project_category.groupid
+                        INNER JOIN (select distinct(groupid), location.lat, location.lang, location.is_checkout
+                        from dbo.location  where groupid IN (SELECT groupid FROM timesheet) and is_checkout = 0) eTime 
+                        ON eTime.groupid = dbo.timesheet.groupid
+                    WHERE 
+                        employee.org_id = @org_id 
+                        AND FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US') BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US') 
+                        AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')) DATA",
+                param: new { org_id, fromDate, toDate }
+            );
+            return resultsAspNetUsers;
+        }
+
+        
+
         #region PrivateMethods
 
         private List<RootTimesheetData> GetTimesheetProperty(IEnumerable<string> resultsTimesheetGrpID)
