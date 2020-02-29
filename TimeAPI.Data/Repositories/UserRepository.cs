@@ -322,7 +322,6 @@ namespace TimeAPI.Data.Repositories
                         BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US') 
                         AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
                         AND timesheet.is_deleted = 0
-                        AND employee.is_superadmin = 0
 
                     UNION
 
@@ -385,7 +384,6 @@ namespace TimeAPI.Data.Repositories
 	                          LEFT JOIN designation ON employee.designation_id = designation.id
                           WHERE employee.org_id = @org_id  
 						  AND employee.is_deleted = 0
-                          AND employee.is_superadmin = 0
                    
                         EXCEPT
 
