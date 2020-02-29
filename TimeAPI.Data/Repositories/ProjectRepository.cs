@@ -140,7 +140,10 @@ namespace TimeAPI.Data.Repositories
                             INNER JOIN project_activity_x_task on project.id = project_activity_x_task.project_id
                             INNER JOIN project_activity on project_activity_x_task.activity_id = project_activity.id
                             INNER JOIN task on task.id = project_activity_x_task.task_id
-                        WHERE project.id = @entity",
+                        WHERE project.id = @entity
+                            AND project.is_deleted = 0
+                            AND project_activity.is_deleted = 0
+                            AND task.is_deleted = 0",
                param: new { entity }
            );
         }
