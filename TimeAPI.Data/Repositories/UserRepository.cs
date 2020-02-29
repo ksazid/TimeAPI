@@ -202,7 +202,7 @@ namespace TimeAPI.Data.Repositories
 	                        INNER JOIN superadmin_x_org ON superadmin_x_org.superadmin_empid = employee.id
 	                        LEFT JOIN employee_type on employee.emp_type_id = employee_type.id
                             WHERE [dbo].[employee].is_deleted = 0 AND [dbo].[employee].is_inactive = 0  
-                            AND superadmin_x_org.org_id =  '33781a87-ede0-439f-b890-93ad218b2859'
+                            AND superadmin_x_org.org_id = @org_id
                             GROUP BY 
                             employee_type.employee_type_name
 
@@ -214,7 +214,7 @@ namespace TimeAPI.Data.Repositories
                             FROM [dbo].[employee] WITH (NOLOCK)
                             LEFT JOIN [dbo].[employee_type] ON  [dbo].[employee].emp_type_id = [dbo].[employee_type].id
                             WHERE [dbo].[employee].is_deleted = 0 AND [dbo].[employee].is_inactive = 0  
-                            AND [dbo].[employee].org_id =  '33781a87-ede0-439f-b890-93ad218b2859'
+                            AND [dbo].[employee].org_id =  @org_id
                             GROUP BY 
                             employee_type.employee_type_name
 
@@ -227,9 +227,11 @@ namespace TimeAPI.Data.Repositories
                             LEFT JOIN [dbo].[employee_type] ON  [dbo].[employee].emp_type_id = [dbo].[employee_type].id
 							INNER JOIN [dbo].[timesheet] ON  [dbo].[employee].id = [dbo].[timesheet].empid
                             WHERE [dbo].[employee].is_deleted = 0 AND [dbo].[employee].is_inactive = 0  
-                            AND [dbo].[employee].org_id =  '33781a87-ede0-439f-b890-93ad218b2859'
-							AND FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US') BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US') 
+                            AND [dbo].[employee].org_id =  @org_id
+							AND FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US') 
+                            BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US') 
 							AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
+                            AND [dbo].[timesheet].is_delete = 0
                             GROUP BY 
                             employee_type.employee_type_name
 
@@ -242,32 +244,36 @@ namespace TimeAPI.Data.Repositories
         public dynamic GetTimesheetDashboardDataByOrgIDAndDate(string org_id, string fromDate, string toDate)
         {
             var resultsAspNetUsers = Query<dynamic>(
-                sql: @"SELECT employee_type_name, SUM(attandance) as attandance FROM (
+                sql: @"SELECT 
+                    employee_type_name, SUM(attandance) as attandance 
+                FROM (
                     SELECT COUNT (DISTINCT(timesheet.empid)) as attandance, 
-                    ISNULL(UPPER(employee_type.employee_type_name), 'PERMANENT') AS employee_type_name
-                    FROM timesheet 
-                    INNER JOIN employee ON timesheet.empid = employee.id
-                    INNER JOIN superadmin_x_org ON superadmin_x_org.superadmin_empid = employee.id
-                    LEFT JOIN employee_type on employee.emp_type_id = employee_type.id
-                    WHERE 
-                    superadmin_x_org.org_id = @org_id 
-                    AND FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US') between FORMAT(CAST(@fromDate   AS DATE), 'd', 'EN-US') 
-                    AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
-                    GROUP BY FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US'),   employee_type.employee_type_name
+                        ISNULL(UPPER(employee_type.employee_type_name), 'PERMANENT') AS employee_type_name
+                        FROM timesheet 
+                        INNER JOIN employee ON timesheet.empid = employee.id
+                        INNER JOIN superadmin_x_org ON superadmin_x_org.superadmin_empid = employee.id
+                        LEFT JOIN employee_type on employee.emp_type_id = employee_type.id
+                        WHERE 
+                        superadmin_x_org.org_id = @org_id 
+                        AND FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US') 
+                        BETWEEN FORMAT(CAST(@fromDate   AS DATE), 'd', 'EN-US') 
+                        AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
+                        AND timesheet.is_deleted = 0
+                        GROUP BY FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US'),   employee_type.employee_type_name
 
                     UNION ALL
 
                     SELECT COUNT(DISTINCT(timesheet.empid)) as attandance,  
-                    ISNULL(UPPER(employee_type.employee_type_name), 'PERMANENT') AS employee_type_name
-                    FROM timesheet 
-                    INNER JOIN employee on timesheet.empid = employee.id
-                    LEFT JOIN employee_type on employee.emp_type_id = employee_type.id
-                    WHERE 
-                    employee.org_id = @org_id 
-                    AND FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US') between FORMAT(CAST(@fromDate   AS DATE), 'd', 'EN-US') 
-                    AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
-                    GROUP BY FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US'),  employee_type.employee_type_name) x  
-                    GROUP BY employee_type_name",
+                        ISNULL(UPPER(employee_type.employee_type_name), 'PERMANENT') AS employee_type_name
+                        FROM timesheet 
+                        INNER JOIN employee on timesheet.empid = employee.id
+                        LEFT JOIN employee_type on employee.emp_type_id = employee_type.id
+                        WHERE 
+                        employee.org_id = @org_id 
+                        AND FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US') between FORMAT(CAST(@fromDate   AS DATE), 'd', 'EN-US') 
+                        AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
+                        AND timesheet.is_deleted = 0
+                        GROUP BY FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US'),  employee_type.employee_type_name) X  GROUP BY employee_type_name",
                 param: new { org_id, fromDate, toDate }
             );
             return resultsAspNetUsers;
@@ -277,19 +283,10 @@ namespace TimeAPI.Data.Repositories
         {
             var resultsAspNetUsers = Query<dynamic>(
                 sql: @"SELECT
-                        project_category_type,
-                        project_or_comp_name,
-                        timesheet_id,
-                        groupid,
-                        is_checkout,
-                        employee_id,
-                        full_name,
-                        check_in,
-                        check_out,
-                        total_hrs,
-                        lat,
-                        lang,
-                        ondate
+                        project_category_type, project_or_comp_name,
+                        timesheet_id, groupid, is_checkout,
+                        employee_id, full_name, check_in,
+                        check_out, total_hrs, lat, lang, ondate
 
                     FROM (
 
@@ -324,6 +321,8 @@ namespace TimeAPI.Data.Repositories
                         AND FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US') 
                         BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US') 
                         AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
+                        AND timesheet.is_deleted = 0
+                        AND employee.is_superadmin = 0
 
                     UNION
 
@@ -356,7 +355,8 @@ namespace TimeAPI.Data.Repositories
                         employee.org_id = @org_id 
                         AND FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US') 
                         BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US') 
-                        AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')) DATA",
+                        AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
+                        AND timesheet.is_deleted = 0) DATA",
                 param: new { org_id, fromDate, toDate }
             );
             return resultsAspNetUsers;
@@ -413,6 +413,7 @@ namespace TimeAPI.Data.Repositories
 						  AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
 						  AND employee.is_deleted = 0
                           AND employee.is_superadmin = 0
+                          AND timesheet.is_deleted = 0
                           ORDER BY employee.full_name ASC",
                 param: new { org_id, fromDate, toDate }
             );
