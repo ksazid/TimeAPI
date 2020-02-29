@@ -73,6 +73,25 @@ namespace TimeAPI.API.Controllers
         }
 
         [HttpPost]
+        [Route("TotalEmployeeAbsentDashboardDataByOrgID")]
+        public async Task<object> TotalEmployeeAbsentDashboardDataByOrgID([FromBody] UtilsOrgIDAndDate Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                var result = _unitOfWork.UserRepository.TotalEmployeeAbsentDashboardDataByOrgID(Utils.OrgID, Utils.fromDate, Utils.toDate);
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
         [Route("GetTimesheetDashboardGridDataByOrgIDAndDate")]
         public async Task<object> GetTimesheetDashboardGridDataByOrgIDAndDate([FromBody] UtilsOrgIDAndDate Utils, CancellationToken cancellationToken)
         {

@@ -190,6 +190,55 @@ namespace TimeAPI.Data.Repositories
             return resultsAspNetUsers;
         }
 
+        public dynamic TotalEmployeeAbsentDashboardDataByOrgID(string org_id, string fromDate, string toDate)
+        {
+            var resultsAspNetUsers = Query<dynamic>(
+                sql: @"SELECT  SUM(employee_count) as absentcount  FROM 
+                    (
+                        SELECT 
+                            ISNULL(UPPER(employee_type.employee_type_name), 'PERMANENT') AS employee_type_name,
+                            COUNT (DISTINCT [dbo].[employee].id) AS employee_count
+                            FROM [dbo].[employee] WITH (NOLOCK)
+	                        INNER JOIN superadmin_x_org ON superadmin_x_org.superadmin_empid = employee.id
+	                        LEFT JOIN employee_type on employee.emp_type_id = employee_type.id
+                            WHERE [dbo].[employee].is_deleted = 0 AND [dbo].[employee].is_inactive = 0  
+                            AND superadmin_x_org.org_id =  '33781a87-ede0-439f-b890-93ad218b2859'
+                            GROUP BY 
+                            employee_type.employee_type_name
+
+	                    UNION ALL
+
+                        SELECT 
+                            ISNULL(UPPER(employee_type.employee_type_name), 'PERMANENT') AS employee_type_name,
+                            COUNT (DISTINCT [dbo].[employee].id) AS employee_count
+                            FROM [dbo].[employee] WITH (NOLOCK)
+                            LEFT JOIN [dbo].[employee_type] ON  [dbo].[employee].emp_type_id = [dbo].[employee_type].id
+                            WHERE [dbo].[employee].is_deleted = 0 AND [dbo].[employee].is_inactive = 0  
+                            AND [dbo].[employee].org_id =  '33781a87-ede0-439f-b890-93ad218b2859'
+                            GROUP BY 
+                            employee_type.employee_type_name
+
+					EXCEPT
+
+					SELECT 
+                            ISNULL(UPPER(employee_type.employee_type_name), 'PERMANENT') AS employee_type_name,
+                            COUNT (DISTINCT [dbo].[employee].id) AS employee_count
+                            FROM [dbo].[employee] WITH (NOLOCK)
+                            LEFT JOIN [dbo].[employee_type] ON  [dbo].[employee].emp_type_id = [dbo].[employee_type].id
+							INNER JOIN [dbo].[timesheet] ON  [dbo].[employee].id = [dbo].[timesheet].empid
+                            WHERE [dbo].[employee].is_deleted = 0 AND [dbo].[employee].is_inactive = 0  
+                            AND [dbo].[employee].org_id =  '33781a87-ede0-439f-b890-93ad218b2859'
+							AND FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US') BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US') 
+							AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
+                            GROUP BY 
+                            employee_type.employee_type_name
+
+                        ) x",
+                param: new { org_id }
+            );
+            return resultsAspNetUsers;
+        }
+
         public dynamic GetTimesheetDashboardDataByOrgIDAndDate(string org_id, string fromDate, string toDate)
         {
             var resultsAspNetUsers = Query<dynamic>(
