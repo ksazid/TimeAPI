@@ -55,14 +55,15 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("TotalEmployeeDashboardDataByOrgID")]
-        public async Task<object> TotalEmployeeDashboardDataByOrgID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        public async Task<object> TotalEmployeeDashboardDataByOrgID([FromBody] UtilsOrgIDAndDate Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.UserRepository.TotalEmployeeDashboardDataByOrgID(Utils.ID);
+                var result = _unitOfWork.UserRepository.TotalEmployeeDashboardDataByOrgID(Utils.OrgID, Utils.fromDate, Utils.toDate);
+
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }

@@ -157,35 +157,51 @@ namespace TimeAPI.Data.Repositories
             return orgList;
         }
 
-        public dynamic TotalEmployeeDashboardDataByOrgID(string org_id)
+        public dynamic TotalEmployeeDashboardDataByOrgID(string OrgID, string toDate, string fromDate)
         {
             var resultsAspNetUsers = Query<dynamic>(
-                sql: @"SELECT employee_type_name, SUM(employee_count) as attandance  FROM 
-                        (
-                        SELECT 
-                            ISNULL(UPPER(employee_type.employee_type_name), 'PERMANENT') AS employee_type_name,
-                            COUNT (DISTINCT [dbo].[employee].id) AS employee_count
-                            FROM [dbo].[employee] WITH (NOLOCK)
-	                        INNER JOIN superadmin_x_org ON superadmin_x_org.superadmin_empid = employee.id
-	                        LEFT JOIN employee_type on employee.emp_type_id = employee_type.id
-                            WHERE [dbo].[employee].is_deleted = 0 AND [dbo].[employee].is_inactive = 0  
-                            AND superadmin_x_org.org_id =  @org_id
-                            GROUP BY 
-                            employee_type.employee_type_name
+                sql: @"SELECT 
+                        SUM(empcount) as attandance, employee_type_name 
+                               FROM 
+                                    (
 
-	                        UNION ALL
+                                SELECT 
+                                    DISTINCT(FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US')) as ondate, 
+                                    count(DISTINCT empid) as empcount,
+                                    ISNULL(UPPER(employee_type.employee_type_name), 'PERMANENT') AS employee_type_name
+                                    FROM timesheet
+                                    INNER JOIN [dbo].[employee] ON  [dbo].[timesheet].empid = [dbo].[employee].id 
+                                    LEFT JOIN [dbo].[employee_type] ON  [dbo].[employee].emp_type_id = [dbo].[employee_type].id
+                                    INNER JOIN [dbo].[superadmin_x_org] ON  [dbo].[timesheet].empid = [dbo].[superadmin_x_org].superadmin_empid 
+                                WHERE FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US') 
+                                BETWEEN 
+                                    FORMAT(CAST(@fromDate   AS DATE), 'd', 'EN-US') 
+                                    AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
+                                    AND [dbo].[employee].org_id =  @OrgID
+                                    AND [dbo].[employee].is_deleted = 0
+                                    AND [dbo].[timesheet].is_deleted = 0
+                                    group by FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') , employee_type.employee_type_name
 
-                        SELECT 
-                            ISNULL(UPPER(employee_type.employee_type_name), 'PERMANENT') AS employee_type_name,
-                            COUNT (DISTINCT [dbo].[employee].id) AS employee_count
-                            FROM [dbo].[employee] WITH (NOLOCK)
-                            LEFT JOIN [dbo].[employee_type] ON  [dbo].[employee].emp_type_id = [dbo].[employee_type].id
-                            WHERE [dbo].[employee].is_deleted = 0 AND [dbo].[employee].is_inactive = 0  
-                            AND [dbo].[employee].org_id =  @org_id
-                            GROUP BY 
-                            employee_type.employee_type_name
-                        ) x  group by employee_type_name",
-                param: new { org_id }
+                                UNION ALL 
+
+                                SELECT 
+                                    DISTINCT(FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')) as ondate, 
+                                    count(DISTINCT empid) as empcount,
+                                    ISNULL(UPPER(employee_type.employee_type_name), 'PERMANENT') AS employee_type_name
+                                    FROM timesheet
+                                    INNER JOIN [dbo].[employee] ON  [dbo].[timesheet].empid = [dbo].[employee].id 
+                                    LEFT JOIN [dbo].[employee_type] ON  [dbo].[employee].emp_type_id = [dbo].[employee_type].id
+                                WHERE FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US') 
+                                    BETWEEN 
+                                    FORMAT(CAST(@fromDate   AS DATE), 'd', 'EN-US') 
+                                    AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
+                                    AND [dbo].[employee].org_id =  @OrgID
+                                    AND [dbo].[employee].is_deleted = 0
+                                    AND [dbo].[timesheet].is_deleted = 0
+                                group by FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US'), employee_type.employee_type_name
+
+                                    ) x  group by  employee_type_name",
+                param: new { OrgID, toDate, fromDate }
             );
             return resultsAspNetUsers;
         }
