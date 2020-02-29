@@ -117,7 +117,7 @@ namespace TimeAPI.Data.Repositories
                             INNER JOIN dbo.project_activity on [project_activity_x_task].activity_id = dbo.project_activity.id
                             INNER JOIN dbo.project on [project_activity_x_task].project_id = dbo.project.id
                             INNER JOIN dbo.employee x on task.assigned_empid = x.id
-                            INNER JOIN dbo.priority on task.priority_id = dbo.priority.id
+                            LEFT JOIN dbo.priority on task.priority_id = dbo.priority.id
                             INNER JOIN dbo.status on task.status_id = dbo.status.id
                         WHERE project.id = @key
                             AND dbo.project.is_deleted = 0
