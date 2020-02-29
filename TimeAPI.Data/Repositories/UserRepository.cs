@@ -232,13 +232,14 @@ namespace TimeAPI.Data.Repositories
                         project_or_comp_name,
                         timesheet_id,
                         groupid,
-                        employee_id,
-                        latlang,
                         is_checkout,
+                        employee_id,
                         full_name,
                         check_in,
                         check_out,
                         total_hrs,
+                        lat,
+                        lang,
                         ondate
 
                     FROM (
@@ -249,15 +250,21 @@ namespace TimeAPI.Data.Repositories
                         timesheet.id as timesheet_id,
                         timesheet.groupid as groupid,
                         employee.id as employee_id,
-                        eTime.lat + ',' + eTime.lang as latlang,
+                        eTime.lat as lat,
+                        eTime.lang as lang,
                         eTime.is_checkout as is_checkout,
                         employee.full_name,
+                        employee_type.employee_type_name as employee_type_name,
+                        employee.workemail as workemail,
+                        employee.emp_code as emp_code,
+                        employee.phone as phone,
                         FORMAT(CAST(timesheet.check_in AS DATETIME2), N'hh:mm tt') as check_in,
                         ISNULL(FORMAT(CAST(timesheet.check_out AS DATETIME2), N'hh:mm tt'), 'NA') as check_out,
                         ISNULL(FORMAT(CAST(timesheet.total_hrs AS DATETIME2), N'hh:mm tt'), 'NA') as total_hrs,
                         FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US')  as ondate
                         FROM timesheet WITH (NOLOCK)
                         INNER JOIN employee ON timesheet.empid = employee.id
+                        LEFT JOIN employee_type ON employee.emp_type_id = employee_type.id
                         INNER JOIN timesheet_x_project_category on timesheet.groupid = timesheet_x_project_category.groupid
                         INNER JOIN superadmin_x_org ON superadmin_x_org.superadmin_empid = employee.id
                         INNER JOIN (select distinct(groupid), location.lat, location.lang, location.is_checkout   
@@ -265,7 +272,8 @@ namespace TimeAPI.Data.Repositories
                         ON eTime.groupid = dbo.timesheet.groupid
                     WHERE 
                         superadmin_x_org.org_id = @org_id
-                        AND FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US') BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US') 
+                        AND FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US') 
+                        BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US') 
                         AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
 
                     UNION
@@ -276,22 +284,29 @@ namespace TimeAPI.Data.Repositories
                         timesheet.id as timesheet_id,
                         timesheet.groupid as groupid,
                         employee.id as employee_id,
-                        eTime.lat +',' + eTime.lang as latlang,
+                        eTime.lat as lat,
+                        eTime.lang as lang,
                         eTime.is_checkout as is_checkout,
                         employee.full_name,
+                        employee_type.employee_type_name as employee_type_name,
+                        employee.workemail as workemail,
+                        employee.emp_code as emp_code,
+                        employee.phone as phone,
                         FORMAT(CAST(timesheet.check_in AS DATETIME2), N'hh:mm tt') as check_in,
                         ISNULL(FORMAT(CAST(timesheet.check_out AS DATETIME2), N'hh:mm tt'), 'NA') as check_out,
                         ISNULL(FORMAT(CAST(timesheet.total_hrs AS DATETIME2), N'hh:mm tt'), 'NA') as total_hrs,
                         FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US')  as ondate
                         FROM timesheet WITH (NOLOCK)
                         INNER JOIN employee ON timesheet.empid = employee.id
+                        LEFT JOIN employee_type ON employee.emp_type_id = employee_type.id
                         INNER JOIN timesheet_x_project_category on timesheet.groupid = timesheet_x_project_category.groupid
                         INNER JOIN (select distinct(groupid), location.lat, location.lang, location.is_checkout
                         from dbo.location  where groupid IN (SELECT groupid FROM timesheet) and is_checkout = 0) eTime 
                         ON eTime.groupid = dbo.timesheet.groupid
                     WHERE 
                         employee.org_id = @org_id 
-                        AND FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US') BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US') 
+                        AND FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US') 
+                        BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US') 
                         AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')) DATA",
                 param: new { org_id, fromDate, toDate }
             );
