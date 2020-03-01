@@ -8,7 +8,6 @@ namespace TimeAPI.Domain.Model
     {
         public IEnumerable<EmployeeTasks> EmployeeTasks { get; set; }
         public IEnumerable<EmployeeTasks> AssignedEmployeeTasks { get; set; }
-
     }
 
     public class EmployeeTasks
@@ -22,6 +21,8 @@ namespace TimeAPI.Domain.Model
         public string assigned_to { get; set; }
         public string due_date { get; set; }
         public string created_date { get; set; }
+        public string approver_id { get; set; }
+        public string approver_name { get; set; }
 
     }
 }

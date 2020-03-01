@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Model;
 using TimeAPI.Domain.Repositories;
@@ -241,51 +242,19 @@ namespace TimeAPI.Data.Repositories
 
         public dynamic TotalEmployeeAbsentDashboardDataByOrgID(string org_id, string fromDate, string toDate)
         {
-            var resultsAspNetUsers = Query<dynamic>(
-                sql: @"SELECT  SUM(employee_count) as absentcount  FROM
-                    (
-                        SELECT
-                            ISNULL(UPPER(employee_type.employee_type_name), 'PERMANENT') AS employee_type_name,
-                            COUNT (DISTINCT [dbo].[employee].id) AS employee_count
-                            FROM [dbo].[employee] WITH (NOLOCK)
-	                        INNER JOIN superadmin_x_org ON superadmin_x_org.superadmin_empid = employee.id
-	                        LEFT JOIN employee_type on employee.emp_type_id = employee_type.id
-                            WHERE [dbo].[employee].is_deleted = 0 AND [dbo].[employee].is_inactive = 0
-                            AND superadmin_x_org.org_id = @org_id
-                            GROUP BY
-                            employee_type.employee_type_name
+            List<TimesheetAbsent> TotalEmpCount = new List<TimesheetAbsent>();
 
-	                    UNION ALL
+            var GetDates =  GetDateFromTimesheet(org_id, fromDate, toDate);
+            var TotalEmp =  GetTotalEmpCountByOrgID(org_id);
 
-                        SELECT
-                            ISNULL(UPPER(employee_type.employee_type_name), 'PERMANENT') AS employee_type_name,
-                            COUNT (DISTINCT [dbo].[employee].id) AS employee_count
-                            FROM [dbo].[employee] WITH (NOLOCK)
-                            LEFT JOIN [dbo].[employee_type] ON  [dbo].[employee].emp_type_id = [dbo].[employee_type].id
-                            WHERE [dbo].[employee].is_deleted = 0 AND [dbo].[employee].is_inactive = 0
-                            AND [dbo].[employee].org_id =  @org_id
-                            GROUP BY
-                            employee_type.employee_type_name
+            for (int i = 0; i < GetDates.Count(); i++)
+            {
+                var EmpCountAttended = GetEmpCountAttendedByOrgIDAndDate(org_id, fromDate, toDate);
+                var result = TotalEmp.Except(EmpCountAttended);
+                TotalEmpCount.AddRange(result);
+            }
 
-					EXCEPT
-
-					SELECT
-                            ISNULL(UPPER(employee_type.employee_type_name), 'PERMANENT') AS employee_type_name,
-                            COUNT (DISTINCT [dbo].[employee].id) AS employee_count
-                            FROM [dbo].[employee] WITH (NOLOCK)
-                            LEFT JOIN [dbo].[employee_type] ON  [dbo].[employee].emp_type_id = [dbo].[employee_type].id
-							INNER JOIN [dbo].[timesheet] ON  [dbo].[employee].id = [dbo].[timesheet].empid
-                            WHERE [dbo].[employee].is_deleted = 0 AND [dbo].[employee].is_inactive = 0
-                            AND [dbo].[employee].org_id =  @org_id
-							AND FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US')
-                            BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US')
-							AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
-                            AND [dbo].[timesheet].is_deleted = 0
-                            GROUP BY
-                            employee_type.employee_type_name) x",
-                param: new { org_id }
-            );
-            return resultsAspNetUsers;
+            return TotalEmpCount.Count();
         }
 
         public dynamic GetTimesheetDashboardDataByOrgIDAndDate(string org_id, string fromDate, string toDate)
@@ -600,9 +569,9 @@ namespace TimeAPI.Data.Repositories
             return TimesheetCurrentLocationViewModel;
         }
 
-        private dynamic GetTotalEmpCountByOrgID(string OrgID)
+        private IEnumerable<TimesheetAbsent> GetTotalEmpCountByOrgID(string OrgID)
         {
-            return Query<dynamic>(
+            return Query<TimesheetAbsent>(
                   sql: @"	SELECT
 							employee.id,
 							employee.full_name,
@@ -646,6 +615,88 @@ namespace TimeAPI.Data.Repositories
 						WHERE superadmin_x_org.org_id = '33781a87-ede0-439f-b890-93ad218b2859'
 							AND employee.is_deleted = 0",
                    param: new { OrgID }
+               );
+        }
+
+        private IEnumerable<TimesheetAbsent> GetEmpCountAttendedByOrgIDAndDate(string OrgID, string fromDate, string toDate)
+        {
+            return Query<TimesheetAbsent>(
+                  sql: @"SELECT
+	                        employee.id,
+	                        employee.full_name,
+	                        employee.workemail,
+	                        employee.emp_code,
+	                        employee.phone,
+	                        employee_status.employee_status_name,
+	                        employee_type.employee_type_name,
+	                        AspNetRoles.Name as role_name,
+	                        department.dep_name,
+                            department.id as department_id,
+	                        designation.designation_name
+                          FROM dbo.employee WITH(NOLOCK)
+							  INNER JOIN timesheet ON  employee.id = timesheet.empid
+	                          LEFT JOIN employee_status ON employee.emp_status_id = employee_status.id
+	                          LEFT JOIN employee_type ON employee.emp_type_id = employee_type.id
+	                          LEFT JOIN AspNetRoles ON employee.role_id = AspNetRoles.id
+	                          LEFT JOIN department ON employee.deptid = department.id
+	                          LEFT JOIN designation ON employee.designation_id = designation.id
+                          WHERE employee.org_id = @OrgID
+						  AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') 
+				          BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US')
+						  AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
+						  AND employee.is_deleted = 0
+                          AND employee.is_superadmin = 0
+                          AND timesheet.is_deleted = 0
+					UNION ALL
+						SELECT
+	                        employee.id,
+	                        employee.full_name,
+	                        employee.workemail,
+	                        employee.emp_code,
+	                        employee.phone,
+	                        employee_status.employee_status_name,
+	                        employee_type.employee_type_name,
+	                        AspNetRoles.Name as role_name,
+	                        department.dep_name,
+                            department.id as department_id,
+	                        designation.designation_name
+							
+                          FROM dbo.employee WITH(NOLOCK)
+							  INNER JOIN superadmin_x_org on  dbo.employee.id = superadmin_x_org.superadmin_empid
+							  INNER JOIN timesheet ON  employee.id = timesheet.empid
+	                          LEFT JOIN employee_status ON employee.emp_status_id = employee_status.id
+	                          LEFT JOIN employee_type ON employee.emp_type_id = employee_type.id
+	                          LEFT JOIN AspNetRoles ON employee.role_id = AspNetRoles.id
+	                          LEFT JOIN department ON employee.deptid = department.id
+	                          LEFT JOIN designation ON employee.designation_id = designation.id
+                          WHERE superadmin_x_org.org_id = @OrgID
+						  AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') 
+						  BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US')
+						  AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
+						  AND employee.is_deleted = 0
+                          AND employee.is_superadmin = 1
+                          AND timesheet.is_deleted = 0
+                          ORDER BY employee.full_name ASC",
+                   param: new { OrgID, fromDate, toDate }
+               );
+        }
+
+        private IEnumerable<string> GetDateFromTimesheet(string OrgID, string fromDate, string toDate)
+        {
+            return Query<string>(
+                  sql: @"   SELECT
+	                         FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') 
+                          FROM dbo.employee WITH(NOLOCK)
+							  INNER JOIN timesheet ON  employee.id = timesheet.empid
+	                      WHERE employee.org_id = @OrgID
+						  AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') 
+						  BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US')
+						  AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
+						  AND employee.is_deleted = 0
+                          AND employee.is_superadmin = 0
+                          AND timesheet.is_deleted = 0
+						  group by FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') ",
+                   param: new { OrgID, fromDate, toDate }
                );
         }
 

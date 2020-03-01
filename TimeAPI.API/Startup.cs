@@ -60,7 +60,7 @@ namespace TimeAPI.API
                     });
             });
 
-            services.AddSignalR();
+            //services.AddSignalR();
 
 
             services.AddDataProtection(options =>
@@ -170,10 +170,10 @@ namespace TimeAPI.API
             }
             app.UseCors("CorsPolicy");
 
-            app.UseSignalR((options) =>
-            {
+            //app.UseSignalR((options) =>
+            //{
 
-            });
+            //});
 
             app.UseAuthentication();
             app.UseStaticFiles();
@@ -181,10 +181,10 @@ namespace TimeAPI.API
             app.UseAuthorization();
             app.UseCookiePolicy();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapHealthChecks("/health");
-            });
+            //app.UseEndpoints(endpoints =>
+            //{
+            //    endpoints.MapHealthChecks("/health");
+            //});
 
             app.UseEndpoints(endpoints =>
             {

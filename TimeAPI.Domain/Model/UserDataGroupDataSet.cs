@@ -114,4 +114,20 @@ namespace TimeAPI.Domain.Model
         public bool is_checkout { get; set; }
     }
 
+
+    public  class TimesheetAbsent
+    {
+        public string id { get; set; }
+        public string full_name { get; set; }
+        public string workemail { get; set; }
+        public string emp_code { get; set; }
+        public string mobile { get; set; }
+        public string employee_status_name { get; set; }
+        public string employee_type_name { get; set; }
+        public string role_name { get; set; }
+        public string dep_name { get; set; }
+        public string department_id { get; set; }
+        public string designation_name { get; set; }
+    
+    }
 }
