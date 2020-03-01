@@ -62,7 +62,7 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.UserRepository.TotalEmployeeDashboardDataByOrgID(Utils.OrgID, Utils.fromDate, Utils.toDate);
+                var result = _unitOfWork.UserRepository.TotalEmployeeDashboardDataByOrgID(Utils.OrgID);
 
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
