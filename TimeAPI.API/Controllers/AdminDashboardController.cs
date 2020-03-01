@@ -129,5 +129,24 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
+
+        [HttpPost]
+        [Route("GetCheckOutLocationByGroupID")]
+        public async Task<object> GetCheckOutLocationByGroupID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                var result = _unitOfWork.UserRepository.GetCheckOutLocationByGroupID(Utils.ID);
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
     }
 }
