@@ -35,11 +35,6 @@ namespace TimeAPI.API.Filters
             }
 
             await next().ConfigureAwait(true);
-
         }
     }
-
-
-
-
 }

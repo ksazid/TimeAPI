@@ -61,8 +61,8 @@ namespace TimeAPI.API.Controllroers
 
                 modal.id = Guid.NewGuid().ToString();
 
-                modal.project_status_id = _unitOfWork.ProjectStatusRepository.GetProjectStatusByOrgID("")
-                                            .Where(s => s.project_status_name.Equals("Active"))
+                modal.project_status_id = _unitOfWork.ProjectStatusRepository.GetProjectStatusByOrgID("default")
+                                            .Where(s => s.project_status_name.Equals("Open"))
                                             .Select(s => s.id)
                                             .FirstOrDefault();
 
@@ -922,6 +922,11 @@ namespace TimeAPI.API.Controllroers
                 modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
+                modal.status_id = _unitOfWork.ProjectStatusRepository.GetProjectStatusByOrgID("default")
+                                      .Where(s => s.project_status_name.Equals("Open"))
+                                      .Select(s => s.id)
+                                      .FirstOrDefault();
+
                 _unitOfWork.ProjectActivityRepository.Add(modal);
                 _unitOfWork.Commit();
 
@@ -1123,10 +1128,11 @@ namespace TimeAPI.API.Controllroers
                 var modal = mapper.Map<Domain.Entities.Tasks>(TaskViewModel);
 
                 modal.id = Guid.NewGuid().ToString();
-                modal.status_id = _unitOfWork.StatusRepository.GetStatusByOrgID("")
-                            .Where(s => s.status_name.Equals("Open"))
-                            .Select(s => s.id)
-                            .FirstOrDefault();
+                modal.status_id = _unitOfWork.StatusRepository.GetStatusByOrgID("default")
+                                    .Where(s => s.status_name.Equals("Open"))
+                                    .Select(s => s.id)
+                                    .FirstOrDefault();
+
                 modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 

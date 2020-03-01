@@ -2,8 +2,6 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
-using System.Threading;
-using System.Threading.Tasks;
 using TimeAPI.API.Models;
 using TimeAPI.API.Services;
 using TimeAPI.Domain;
@@ -31,7 +29,5 @@ namespace TimeAPI.API.Controllers
             _unitOfWork = unitOfWork;
             _dateTime = InternetTime.GetCurrentTimeFromTimeZone().Value.DateTime;
         }
-
-     
     }
 }

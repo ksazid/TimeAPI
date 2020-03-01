@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -17,7 +18,6 @@ using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.API.Controllers
 {
-    //[EnableCors("CorsPolicy")]
     [Route("[controller]")]
     //[Authorize]
     public class EmployeeController : Controller

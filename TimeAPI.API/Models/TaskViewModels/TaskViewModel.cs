@@ -21,6 +21,7 @@ namespace TimeAPI.API.Models.TaskViewModels
         public string modifiedby { get; set; }
         public bool is_deleted { get; set; }
         public bool is_approver { get; set; }
+        public string is_approver_id { get; set; }
         public Employees employees { get; set; }
     }
 

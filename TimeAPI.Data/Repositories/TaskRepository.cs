@@ -16,8 +16,8 @@ namespace TimeAPI.Data.Repositories
         {
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.task
-                                  (id, empid, task_name, task_desc, priority_id, status_id, assigned_empid, due_date, created_date, createdby, is_approver)
-                           VALUES (@id, @empid, @task_name, @task_desc, @priority_id, @status_id, @assigned_empid, @due_date, @created_date, @createdby, @is_approver);
+                                  (id, empid, task_name, task_desc, priority_id, status_id, assigned_empid, due_date, created_date, createdby, is_approver, is_approver_id)
+                           VALUES (@id, @empid, @task_name, @task_desc, @priority_id, @status_id, @assigned_empid, @due_date, @created_date, @createdby, @is_approver, @is_approver_id);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -56,7 +56,8 @@ namespace TimeAPI.Data.Repositories
                     due_date = @due_date,
                     modified_date = @modified_date,
                     modifiedby = @modifiedby,
-                    is_approver = @is_approver
+                    is_approver = @is_approver,
+                    is_approver_id = @is_approver_id
                     WHERE id =  @id",
                 param: entity
             );
@@ -79,10 +80,13 @@ namespace TimeAPI.Data.Repositories
 		                    priority.priority_name,
 		                    status.status_name,
 		                    employee.full_name,
+		                    e.id as approver_id,
+		                    e.full_name as approver_name,
 		                    task.due_date
 		                    FROM[dbo].[task]
 		                    inner join priority on task.priority_id = priority.id
 		                    inner join employee on task.assigned_empid = employee.id
+		                    inner join employee e on task.is_approver_id = e.id
 		                    inner join status on status.id = task.status_id
 		                WHERE task.is_deleted = 0 and task.empid = @key",
                       param: new { key }
@@ -118,13 +122,16 @@ namespace TimeAPI.Data.Repositories
 	                        priority.priority_name as priority,
 	                        status.status_name as status,
 	                        employee.full_name as assigned_to,
+                            e.id as approver_id,
+		                    e.full_name as approver_name,
 	                        task.due_date,
 	                        task.created_date
 	                        FROM[dbo].[task]
 	                        inner join priority on task.priority_id = priority.id
 	                        inner join employee on task.assigned_empid = employee.id
+	                        inner join employee e on task.is_approver_id = e.id
 	                        inner join status on status.id = task.status_id
-                        WHERE task.is_deleted = 0 and task.empid =@key OR  task.assigned_empid =@key",
+                        WHERE task.is_deleted = 0 and task.empid =@key OR task.assigned_empid =@key",
                         param: new { key }
                  );
 
@@ -137,11 +144,14 @@ namespace TimeAPI.Data.Repositories
 	                        priority.priority_name as priority,
 	                        status.status_name as status,
 	                        employee.full_name as assigned_to,
+                            e.id as approver_id,
+		                    e.full_name as approver_name,
 	                        task.due_date,
 	                        task.created_date
 	                        FROM[dbo].[task]
 	                        inner join priority on task.priority_id = priority.id
 	                        inner join employee on task.assigned_empid = employee.id
+                            inner join employee e on task.is_approver_id = e.id
 	                        inner join status on status.id = task.status_id
                         WHERE task.is_deleted = 0 and task.assigned_empid =@key",
                       param: new { key }

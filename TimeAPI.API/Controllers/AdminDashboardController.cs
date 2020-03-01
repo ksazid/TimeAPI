@@ -1,14 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 using TimeAPI.API.Models;
 using TimeAPI.API.Services;
 using TimeAPI.Domain;
-using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.API.Controllers
 {
@@ -63,7 +61,6 @@ namespace TimeAPI.API.Controllers
                     cancellationToken.ThrowIfCancellationRequested();
 
                 var result = _unitOfWork.UserRepository.TotalEmployeeDashboardDataByOrgID(Utils.OrgID);
-
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
