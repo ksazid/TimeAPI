@@ -55,7 +55,7 @@ namespace TimeAPI.API.Controllers
                 var modal = mapper.Map<Domain.Entities.Tasks>(TaskViewModel);
 
                 modal.id = Guid.NewGuid().ToString();
-                modal.status_id = _unitOfWork.StatusRepository.GetStatusByOrgID("")
+                modal.status_id = _unitOfWork.StatusRepository.GetStatusByOrgID("default")
                                                .Where(s => s.status_name.Equals("Open"))
                                                .Select(s => s.id)
                                                .FirstOrDefault();
