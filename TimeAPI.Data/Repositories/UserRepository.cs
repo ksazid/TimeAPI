@@ -244,12 +244,12 @@ namespace TimeAPI.Data.Repositories
         {
             List<TimesheetAbsent> TotalEmpCount = new List<TimesheetAbsent>();
 
-            var GetDates =  GetDateFromTimesheet(org_id, fromDate, toDate);
+            var GetDates =  GetDateFromTimesheet(org_id, fromDate, toDate).ToList();
             var TotalEmp =  GetTotalEmpCountByOrgID(org_id);
 
             for (int i = 0; i < GetDates.Count(); i++)
             {
-                var EmpCountAttended = GetEmpCountAttendedByOrgIDAndDate(org_id, fromDate, toDate);
+                var EmpCountAttended = GetEmpCountAttendedByOrgIDAndDate(org_id, GetDates[i], GetDates[i]);
                 var result = TotalEmp.Except(EmpCountAttended);
                 TotalEmpCount.AddRange(result);
             }
@@ -573,7 +573,7 @@ namespace TimeAPI.Data.Repositories
         {
             return Query<TimesheetAbsent>(
                   sql: @"	SELECT
-							employee.id,
+							distinct(employee.id),
 							employee.full_name,
 							employee.workemail,
 							employee.emp_code,
@@ -590,11 +590,11 @@ namespace TimeAPI.Data.Repositories
 							LEFT JOIN AspNetRoles ON employee.role_id = AspNetRoles.id
 							LEFT JOIN department ON employee.deptid = department.id
 							LEFT JOIN designation ON employee.designation_id = designation.id
-						WHERE employee.org_id = '33781a87-ede0-439f-b890-93ad218b2859'
+						WHERE employee.org_id = @OrgID
 							AND employee.is_deleted = 0
 					UNION ALL
 						SELECT
-							employee.id,
+							distinct(employee.id),
 							employee.full_name,
 							employee.workemail,
 							employee.emp_code,
@@ -612,7 +612,7 @@ namespace TimeAPI.Data.Repositories
 							LEFT JOIN AspNetRoles ON employee.role_id = AspNetRoles.id
 							LEFT JOIN department ON employee.deptid = department.id
 							LEFT JOIN designation ON employee.designation_id = designation.id
-						WHERE superadmin_x_org.org_id = '33781a87-ede0-439f-b890-93ad218b2859'
+						WHERE superadmin_x_org.org_id = @OrgID
 							AND employee.is_deleted = 0",
                    param: new { OrgID }
                );
@@ -622,7 +622,7 @@ namespace TimeAPI.Data.Repositories
         {
             return Query<TimesheetAbsent>(
                   sql: @"SELECT
-	                        employee.id,
+	                        distinct(employee.id),
 	                        employee.full_name,
 	                        employee.workemail,
 	                        employee.emp_code,
@@ -649,7 +649,7 @@ namespace TimeAPI.Data.Repositories
                           AND timesheet.is_deleted = 0
 					UNION ALL
 						SELECT
-	                        employee.id,
+	                        distinct(employee.id),
 	                        employee.full_name,
 	                        employee.workemail,
 	                        employee.emp_code,
@@ -684,7 +684,7 @@ namespace TimeAPI.Data.Repositories
         private IEnumerable<string> GetDateFromTimesheet(string OrgID, string fromDate, string toDate)
         {
             return Query<string>(
-                  sql: @"   SELECT
+                  sql: @"SELECT
 	                         FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') 
                           FROM dbo.employee WITH(NOLOCK)
 							  INNER JOIN timesheet ON  employee.id = timesheet.empid
@@ -693,7 +693,6 @@ namespace TimeAPI.Data.Repositories
 						  BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US')
 						  AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
 						  AND employee.is_deleted = 0
-                          AND employee.is_superadmin = 0
                           AND timesheet.is_deleted = 0
 						  group by FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') ",
                    param: new { OrgID, fromDate, toDate }
