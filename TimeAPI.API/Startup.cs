@@ -147,9 +147,7 @@ namespace TimeAPI.API
                         };
                     });
 
-            services.Configure<SecurityStampValidatorOptions>(o => o.ValidationInterval = TimeSpan.FromDays(100));
-
-
+            services.Configure<SecurityStampValidatorOptions>(o => o.ValidationInterval = TimeSpan.FromMinutes(60));
 
             //services.AddHangfire(x => x.UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnection")));
             //services.AddHangfireServer();

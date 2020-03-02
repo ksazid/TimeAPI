@@ -285,6 +285,8 @@ namespace TimeAPI.API.Controllers
         }
 
 
+        #region helper
+        
         //not in use
         [HttpPost]
         [Route("AddOrganizationBranch")]
@@ -335,7 +337,7 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        private EntityLocation SetLocationForOrg(EntityLocationViewModel OrgLocation, string OrgID)
+        private EntityLocation SetLocationForOrg(EntityLocation OrgLocation, string OrgID)
         {
             var EntityLocation = new EntityLocation()
             {
@@ -423,57 +425,65 @@ namespace TimeAPI.API.Controllers
             if (organizationViewModel.OrganizationBranchViewModel != null)
             {
                 var ListOfBranch = organizationViewModel.OrganizationBranchViewModel;
+                string orgid = string.Empty;
                 for (int i = 0; i < ListOfBranch.Count; i++)
                 {
                     OrganizationBranchViewModel organization = ListOfBranch[i];
                     var configBranch = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationBranchViewModel, Organization>());
                     var mapperBranch = configBranch.CreateMapper();
                     var modalBranch = mapperBranch.Map<Organization>(organization);
-
                     modalBranch.modifiedby = organizationViewModel.createdby;
                     modalBranch.modified_date = _dateTime.ToString();
                     modalBranch.is_deleted = false;
 
-                    //saving in x table
-                    var OrgBranch = new OrganizationBranch()
+                    if (modalBranch.org_id == null)
                     {
-                        parent_org_id = org_id,
-                        org_id = modalBranch.org_id,
-                        modifiedby = organizationViewModel.createdby,
-                        modified_date = _dateTime.ToString(),
-                        is_deleted = false
-                    };
-                    _unitOfWork.OrganizationBranchRepository.Update(OrgBranch);
-
-                    //setup for branch
-                    if (organizationViewModel.OrganizationSetup != null)
-                    {
-                        var configsBranchSetup = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationSetup, OrganizationSetup>());
-                        var mapperBranchSetup = configsBranchSetup.CreateMapper();
-                        var modalBranchSetup = mapperBranchSetup.Map<OrganizationSetup>(organizationViewModel.OrganizationSetup);
-
-                        modalBranchSetup.org_id = modalBranch.org_id;
-                        modalBranchSetup.createdby = organizationViewModel.createdby;
-                        modalBranchSetup.created_date = _dateTime.ToString();
-                        modalBranchSetup.is_deleted = false;
-
-                        _unitOfWork.OrganizationSetupRepository.Update(modalBranchSetup);
+                        AddBranchOrg(organizationViewModel, org_id);
                     }
-
-                    //Location for branch
-                    if (ListOfBranch[i].EntityLocationViewModel != null)
+                    else
                     {
-                        var OrgLocation = SetLocationForOrg(ListOfBranch[i].EntityLocationViewModel, modalBranch.org_id.ToString());
-                        OrgLocation.modifiedby = organizationViewModel.createdby;
-                        OrgLocation.modified_date = _dateTime.ToString();
-                        OrgLocation.is_deleted = false;
-                        OrgLocation.createdby = organizationViewModel.createdby;
-                        _unitOfWork.EntityLocationRepository.Update(OrgLocation);
+                        //saving in x table
+                        var OrgBranch = new OrganizationBranch()
+                        {
+                            parent_org_id = org_id,
+                            org_id = modalBranch.org_id,
+                            modifiedby = organizationViewModel.createdby,
+                            modified_date = _dateTime.ToString(),
+                            is_deleted = false
+                        };
+                        _unitOfWork.OrganizationBranchRepository.Update(OrgBranch);
+
+                        //setup for branch
+                        if (organizationViewModel.OrganizationSetup != null)
+                        {
+                            var configsBranchSetup = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationSetup, OrganizationSetup>());
+                            var mapperBranchSetup = configsBranchSetup.CreateMapper();
+                            var modalBranchSetup = mapperBranchSetup.Map<OrganizationSetup>(organizationViewModel.OrganizationSetup);
+
+                            modalBranchSetup.org_id = modalBranch.org_id;
+                            modalBranchSetup.createdby = organizationViewModel.createdby;
+                            modalBranchSetup.created_date = _dateTime.ToString();
+                            modalBranchSetup.is_deleted = false;
+
+                            _unitOfWork.OrganizationSetupRepository.Update(modalBranchSetup);
+                        }
+
+                        //Location for branch
+                        if (ListOfBranch[i].EntityLocationViewModel != null)
+                        {
+                            var OrgLocation = SetLocationForOrg(ListOfBranch[i].EntityLocationViewModel, orgid);
+                            OrgLocation.modifiedby = organizationViewModel.createdby;
+                            OrgLocation.modified_date = _dateTime.ToString();
+                            OrgLocation.is_deleted = false;
+                            _unitOfWork.EntityLocationRepository.Update(OrgLocation);
+                        }
+
+                        _unitOfWork.OrganizationRepository.Update(modalBranch);
                     }
-
-                    _unitOfWork.OrganizationRepository.Update(modalBranch);
-
                 }
+
+
+                
             }
         }
 
@@ -537,5 +547,7 @@ namespace TimeAPI.API.Controllers
                 }
             }
         }
+
+        #endregion helper
     }
 }

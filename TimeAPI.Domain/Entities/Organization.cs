@@ -27,11 +27,10 @@ namespace TimeAPI.Domain.Entities
         public bool is_deleted { get; set; }
         public EntityLocation EntityLocation { get; set; }
         public OrganizationSetup OrganizationSetup { get; set; }
-
-        public List<OrganizationBranchDTO> OrganizationBranchViewModel { get; set; }
+        public List<OrganizationBranchViewModel> OrganizationBranchViewModel { get; set; }
     }
 
-    public class OrganizationBranchDTO
+    public class OrganizationBranchViewModel
     {
         public string parent_org_id { get; set; }
         public string org_id { get; set; }

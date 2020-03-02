@@ -99,9 +99,9 @@ namespace TimeAPI.Data.Repositories
             return result;
         }
 
-        public IEnumerable<OrganizationBranchDTO> FindByAllBranchByParengOrgID(string ParengOrgID)
+        public IEnumerable<OrganizationBranchViewModel> FindByAllBranchByParengOrgID(string ParengOrgID)
         {
-            var Rest = Query<OrganizationBranchDTO>(
+            var Rest = Query<OrganizationBranchViewModel>(
                   sql: @"SELECT 
                                dbo.organization_branch.parent_org_id,  
                                dbo.organization_branch.org_id,  
@@ -146,9 +146,9 @@ namespace TimeAPI.Data.Repositories
             return orgList;
         }
 
-        private List<OrganizationBranchDTO> GetOrgBranchAddress(IEnumerable<OrganizationBranchDTO> resultsOrganization)
+        private List<OrganizationBranchViewModel> GetOrgBranchAddress(IEnumerable<OrganizationBranchViewModel> resultsOrganization)
         {
-            List<OrganizationBranchDTO> orgList = (resultsOrganization as List<OrganizationBranchDTO>);
+            List<OrganizationBranchViewModel> orgList = (resultsOrganization as List<OrganizationBranchViewModel>);
             for (int i = 0; i < orgList.Count; i++)
             {
                 var entityLocation = QuerySingleOrDefault<EntityLocation>(
