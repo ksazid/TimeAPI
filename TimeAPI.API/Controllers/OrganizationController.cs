@@ -55,6 +55,7 @@ namespace TimeAPI.API.Controllers
                 var modal = mapper.Map<Organization>(organizationViewModel);
 
                 modal.org_id = Guid.NewGuid().ToString();
+                modal.createdby = organizationViewModel.createdby;
                 modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
@@ -279,6 +280,8 @@ namespace TimeAPI.API.Controllers
             }
         }
 
+
+        //not in use
         [HttpPost]
         [Route("AddOrganizationBranch")]
         public async Task<object> AddOrganizationBranch([FromBody] OrganizationBranchViewModel organizationBranchViewModel, CancellationToken cancellationToken)
@@ -355,9 +358,10 @@ namespace TimeAPI.API.Controllers
                 var ListOfBranch = organizationViewModel.OrganizationBranchViewModel;
                 for (int i = 0; i < ListOfBranch.Count; i++)
                 {
-                    var configBranch = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationViewModel, Organization>());
+                    OrganizationBranchViewModel organization = ListOfBranch[i];
+                    var configBranch = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationBranchViewModel, Organization>());
                     var mapperBranch = configBranch.CreateMapper();
-                    var modalBranch = mapperBranch.Map<Organization>(ListOfBranch[i]);
+                    var modalBranch = mapperBranch.Map<Organization>(organization);
 
                     modalBranch.org_id = Guid.NewGuid().ToString();
                     modalBranch.createdby = organizationViewModel.createdby;

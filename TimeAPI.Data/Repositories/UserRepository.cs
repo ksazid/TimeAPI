@@ -244,8 +244,8 @@ namespace TimeAPI.Data.Repositories
         {
             List<TimesheetAbsent> TotalEmpCount = new List<TimesheetAbsent>();
 
-            var GetDates =  GetDateFromTimesheet(org_id, fromDate, toDate).ToList();
-            var TotalEmp =  GetTotalEmpCountByOrgID(org_id);
+            var GetDates = GetDateFromTimesheet(org_id, fromDate, toDate).ToList();
+            var TotalEmp = GetTotalEmpCountByOrgID(org_id);
 
             for (int i = 0; i < GetDates.Count(); i++)
             {
@@ -394,7 +394,17 @@ namespace TimeAPI.Data.Repositories
         {
             List<TimesheetAbsent> TotalEmpCount = new List<TimesheetAbsent>();
 
-            
+            string offdays = GetWeekOffsFromOrg(org_id);
+            List<string> OffDaysList = new List<string>();
+
+            if (offdays.Contains(","))
+            {
+                string[] words = offdays.Split(',');
+                foreach (var item in words)
+                {
+                    OffDaysList.Add(item);
+                }
+            }
 
             var GetDates = GetDateFromTimesheet(org_id, fromDate, toDate).ToList();
             var TotalEmp = GetTotalEmpCountByOrgID(org_id);
@@ -665,17 +675,8 @@ namespace TimeAPI.Data.Repositories
         private string GetWeekOffsFromOrg(string OrgID)
         {
             return QuerySingleOrDefault<string>(
-                  sql: @"SELECT
-	                         FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') 
-                          FROM dbo.employee WITH(NOLOCK)
-							  INNER JOIN timesheet ON  employee.id = timesheet.empid
-	                      WHERE employee.org_id = @OrgID
-						  AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') 
-						  BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US')
-						  AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
-						  AND employee.is_deleted = 0
-                          AND timesheet.is_deleted = 0
-						  group by FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') ",
+                  sql: @"SELECT start_of_week FROM [dbo].[organization_setup] 
+                        WHERE id = @OrgID",
                    param: new { OrgID }
                );
         }
