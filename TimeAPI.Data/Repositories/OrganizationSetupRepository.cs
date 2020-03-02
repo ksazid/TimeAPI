@@ -60,7 +60,7 @@ namespace TimeAPI.Data.Repositories
                                 working_hrs = @working_hrs, 
                                 date_format = @date_format, 
                                 currency = @currency, 
-                                time_zome = @time_zome
+                                time_zome = @time_zome,
                                 modified_date = @modified_date,
                                 modifiedby = @modifiedby
                          WHERE org_id = @org_id",

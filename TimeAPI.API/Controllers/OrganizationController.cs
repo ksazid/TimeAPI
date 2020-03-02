@@ -421,9 +421,10 @@ namespace TimeAPI.API.Controllers
                 var ListOfBranch = organizationViewModel.OrganizationBranchViewModel;
                 for (int i = 0; i < ListOfBranch.Count; i++)
                 {
-                    var configBranch = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationViewModel, Organization>());
+                    OrganizationBranchViewModel organization = ListOfBranch[i];
+                    var configBranch = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationBranchViewModel, Organization>());
                     var mapperBranch = configBranch.CreateMapper();
-                    var modalBranch = mapperBranch.Map<Organization>(ListOfBranch[i]);
+                    var modalBranch = mapperBranch.Map<Organization>(organization);
 
                     modalBranch.modifiedby = organizationViewModel.createdby;
                     modalBranch.modified_date = _dateTime.ToString();
