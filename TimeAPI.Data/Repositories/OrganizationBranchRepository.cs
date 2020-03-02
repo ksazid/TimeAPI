@@ -30,6 +30,15 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
+        public IEnumerable<OrganizationBranch> FindByParentOrgID(string key)
+        {
+            return Query<OrganizationBranch>(
+                sql: "SELECT * FROM [dbo].[organization_branch] WHERE parent_org_id = @key and is_deleted = 0",
+                param: new { key }
+            );
+        }
+
+
         public IEnumerable<OrganizationBranch> All()
         {
             return Query<OrganizationBranch>(

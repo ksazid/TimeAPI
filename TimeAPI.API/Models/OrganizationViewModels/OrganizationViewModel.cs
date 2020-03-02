@@ -31,7 +31,9 @@ namespace TimeAPI.API.Models.OrganizationViewModels
         public bool is_deleted { get; set; }
 
         public EntityLocationViewModel EntityLocationViewModel { get; set; }
-        public OrganizationSetup OrganizationSetup  { get; set; }
+        public OrganizationSetup OrganizationSetup { get; set; }
+        public List<OrganizationBranchViewModel> OrganizationBranchViewModel { get; set; }
+
     }
 
 
@@ -73,7 +75,6 @@ namespace TimeAPI.API.Models.OrganizationViewModels
         public string modified_date { get; set; }
         public string modifiedby { get; set; }
         public bool is_deleted { get; set; }
-
         public EntityLocationViewModel EntityLocationViewModel { get; set; }
 
     }

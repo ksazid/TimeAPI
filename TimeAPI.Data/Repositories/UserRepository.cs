@@ -392,62 +392,9 @@ namespace TimeAPI.Data.Repositories
 
         public dynamic GetTimesheetDashboardGridAbsentDataByOrgIDAndDate(string org_id, string fromDate, string toDate)
         {
-            //    var resultsAspNetUsers = Query<dynamic>(
-            //        sql: @"SELECT
-            //                 employee.id,
-            //                 employee.full_name,
-            //                 employee.workemail,
-            //                 employee.emp_code,
-            //                 employee.phone,
-            //                 employee_status.employee_status_name,
-            //                 employee_type.employee_type_name,
-            //                 AspNetRoles.Name as role_name,
-            //                 department.dep_name,
-            //                    department.id as department_id,
-            //                 designation.designation_name
-            //                  FROM dbo.employee WITH(NOLOCK)
-            //                   LEFT JOIN employee_status ON employee.emp_status_id = employee_status.id
-            //                   LEFT JOIN employee_type ON employee.emp_type_id = employee_type.id
-            //                   LEFT JOIN AspNetRoles ON employee.role_id = AspNetRoles.id
-            //                   LEFT JOIN department ON employee.deptid = department.id
-            //                   LEFT JOIN designation ON employee.designation_id = designation.id
-            //                  WHERE employee.org_id = @org_id
-            //AND employee.is_deleted = 0
-
-            //                EXCEPT
-
-            //                SELECT
-            //                 employee.id,
-            //                 employee.full_name,
-            //                 employee.workemail,
-            //                 employee.emp_code,
-            //                 employee.phone,
-            //                 employee_status.employee_status_name,
-            //                 employee_type.employee_type_name,
-            //                 AspNetRoles.Name as role_name,
-            //                 department.dep_name,
-            //                    department.id as department_id,
-            //                 designation.designation_name
-            //                  FROM dbo.employee WITH(NOLOCK)
-            // INNER JOIN timesheet ON  employee.id = timesheet.empid
-            //                   LEFT JOIN employee_status ON employee.emp_status_id = employee_status.id
-            //                   LEFT JOIN employee_type ON employee.emp_type_id = employee_type.id
-            //                   LEFT JOIN AspNetRoles ON employee.role_id = AspNetRoles.id
-            //                   LEFT JOIN department ON employee.deptid = department.id
-            //                   LEFT JOIN designation ON employee.designation_id = designation.id
-            //                  WHERE employee.org_id = @org_id
-            //AND FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US') BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US')
-            //AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
-            //AND employee.is_deleted = 0
-            //                  AND employee.is_superadmin = 0
-            //                  AND timesheet.is_deleted = 0
-            //                  ORDER BY employee.full_name ASC",
-            //        param: new { org_id, fromDate, toDate }
-            //    );
-            //    return resultsAspNetUsers;
-
-
             List<TimesheetAbsent> TotalEmpCount = new List<TimesheetAbsent>();
+
+            
 
             var GetDates = GetDateFromTimesheet(org_id, fromDate, toDate).ToList();
             var TotalEmp = GetTotalEmpCountByOrgID(org_id);
@@ -712,6 +659,24 @@ namespace TimeAPI.Data.Repositories
                           AND timesheet.is_deleted = 0
 						  group by FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') ",
                    param: new { OrgID, fromDate, toDate }
+               );
+        }
+
+        private string GetWeekOffsFromOrg(string OrgID)
+        {
+            return QuerySingleOrDefault<string>(
+                  sql: @"SELECT
+	                         FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') 
+                          FROM dbo.employee WITH(NOLOCK)
+							  INNER JOIN timesheet ON  employee.id = timesheet.empid
+	                      WHERE employee.org_id = @OrgID
+						  AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') 
+						  BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US')
+						  AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
+						  AND employee.is_deleted = 0
+                          AND timesheet.is_deleted = 0
+						  group by FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') ",
+                   param: new { OrgID }
                );
         }
 

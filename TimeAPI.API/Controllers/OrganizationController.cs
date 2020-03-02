@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using TimeAPI.API.Models;
@@ -92,11 +93,15 @@ namespace TimeAPI.API.Controllers
 
                     modal1.id = Guid.NewGuid().ToString();
                     modal1.org_id = modal.org_id;
+                    modal1.createdby = organizationViewModel.createdby;
                     modal1.created_date = _dateTime.ToString();
                     modal1.is_deleted = false;
 
                     _unitOfWork.OrganizationSetupRepository.Add(modal1);
                 }
+
+                //Adding Branch
+                AddBranchOrg(organizationViewModel, modal.org_id);
 
                 _unitOfWork.OrganizationRepository.Add(modal);
                 _unitOfWork.Commit();
@@ -126,7 +131,7 @@ namespace TimeAPI.API.Controllers
                 var modal = mapper.Map<Organization>(organizationViewModel);
                 modal.modified_date = _dateTime.ToString();
 
-                _unitOfWork.OrganizationRepository.Update(modal);
+
 
                 if (organizationViewModel.EntityLocationViewModel != null)
                 {
@@ -150,6 +155,10 @@ namespace TimeAPI.API.Controllers
                     _unitOfWork.OrganizationSetupRepository.Update(modal1);
                 }
 
+                //Adding Branch
+                UpdateBranchOrg(organizationViewModel, modal.org_id);
+
+                _unitOfWork.OrganizationRepository.Update(modal);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Organization Updated succefully." }).ConfigureAwait(false);
@@ -176,9 +185,19 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.SuperadminOrganizationRepository.RemoveByOrgID(Utils.ID);
                 _unitOfWork.OrganizationSetupRepository.RemoveByOrgID(Utils.ID);
                 _unitOfWork.OrganizationRepository.Remove(Utils.ID);
+
+                var ListBranch = _unitOfWork.OrganizationBranchRepository.FindByParentOrgID(Utils.ID).ToList();
+                for (int i = 0; i < ListBranch.Count; i++)
+                {
+                    _unitOfWork.OrganizationRepository.Remove(ListBranch[i].org_id);
+                    _unitOfWork.OrganizationBranchRepository.Remove(Utils.ID);
+                    //_unitOfWork.SuperadminOrganizationRepository.RemoveByOrgID(ListBranch[i].org_id);
+                    _unitOfWork.EntityLocationRepository.Remove(ListBranch[i].org_id);
+                    _unitOfWork.OrganizationSetupRepository.RemoveByOrgID(ListBranch[i].org_id);
+                }
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Organization remvoed succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Organization removed succefully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -347,6 +366,126 @@ namespace TimeAPI.API.Controllers
                 country = OrgLocation.country
             };
             return EntityLocation;
+        }
+
+        private void AddBranchOrg(OrganizationViewModel organizationViewModel, string org_id)
+        {
+            if (organizationViewModel.OrganizationBranchViewModel != null)
+            {
+                var ListOfBranch = organizationViewModel.OrganizationBranchViewModel;
+                for (int i = 0; i < ListOfBranch.Count; i++)
+                {
+                    var configBranch = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationViewModel, Organization>());
+                    var mapperBranch = configBranch.CreateMapper();
+                    var modalBranch = mapperBranch.Map<Organization>(ListOfBranch[i]);
+
+                    modalBranch.org_id = Guid.NewGuid().ToString();
+                    modalBranch.createdby = organizationViewModel.createdby;
+                    modalBranch.created_date = _dateTime.ToString();
+                    modalBranch.is_deleted = false;
+
+                    //saving in x table
+                    var OrgBranch = new OrganizationBranch()
+                    {
+                        id = Guid.NewGuid().ToString(),
+                        parent_org_id = org_id,
+                        org_id = modalBranch.org_id,
+                        createdby = organizationViewModel.createdby,
+                        created_date = _dateTime.ToString(),
+                        is_deleted = false
+                    };
+                    _unitOfWork.OrganizationBranchRepository.Add(OrgBranch);
+
+                    //setup for branch
+                    if (organizationViewModel.OrganizationSetup != null)
+                    {
+                        var configsBranchSetup = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationSetup, OrganizationSetup>());
+                        var mapperBranchSetup = configsBranchSetup.CreateMapper();
+                        var modalBranchSetup = mapperBranchSetup.Map<OrganizationSetup>(organizationViewModel.OrganizationSetup);
+
+                        modalBranchSetup.id = Guid.NewGuid().ToString();
+                        modalBranchSetup.org_id = modalBranch.org_id;
+                        modalBranchSetup.createdby = organizationViewModel.createdby;
+                        modalBranchSetup.created_date = _dateTime.ToString();
+                        modalBranchSetup.is_deleted = false;
+
+                        _unitOfWork.OrganizationSetupRepository.Add(modalBranchSetup);
+                    }
+
+                    //Location for branch
+                    if (ListOfBranch[i].EntityLocationViewModel != null)
+                    {
+                        var OrgLocation = SetLocationForOrg(ListOfBranch[i].EntityLocationViewModel, modalBranch.org_id.ToString());
+                        OrgLocation.id = Guid.NewGuid().ToString();
+                        OrgLocation.createdby = organizationViewModel.createdby;
+                        OrgLocation.created_date = _dateTime.ToString();
+                        OrgLocation.is_deleted = false;
+                        OrgLocation.createdby = organizationViewModel.createdby;
+                        _unitOfWork.EntityLocationRepository.Add(OrgLocation);
+                    }
+
+                    _unitOfWork.OrganizationRepository.Add(modalBranch);
+
+                }
+            }
+        }
+
+        private void UpdateBranchOrg(OrganizationViewModel organizationViewModel, string org_id)
+        {
+            if (organizationViewModel.OrganizationBranchViewModel != null)
+            {
+                var ListOfBranch = organizationViewModel.OrganizationBranchViewModel;
+                for (int i = 0; i < ListOfBranch.Count; i++)
+                {
+                    var configBranch = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationViewModel, Organization>());
+                    var mapperBranch = configBranch.CreateMapper();
+                    var modalBranch = mapperBranch.Map<Organization>(ListOfBranch[i]);
+
+                    modalBranch.modifiedby = organizationViewModel.createdby;
+                    modalBranch.modified_date = _dateTime.ToString();
+                    modalBranch.is_deleted = false;
+
+                    //saving in x table
+                    var OrgBranch = new OrganizationBranch()
+                    {
+                        parent_org_id = org_id,
+                        org_id = modalBranch.org_id,
+                        modifiedby = organizationViewModel.createdby,
+                        modified_date = _dateTime.ToString(),
+                        is_deleted = false
+                    };
+                    _unitOfWork.OrganizationBranchRepository.Update(OrgBranch);
+
+                    //setup for branch
+                    if (organizationViewModel.OrganizationSetup != null)
+                    {
+                        var configsBranchSetup = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationSetup, OrganizationSetup>());
+                        var mapperBranchSetup = configsBranchSetup.CreateMapper();
+                        var modalBranchSetup = mapperBranchSetup.Map<OrganizationSetup>(organizationViewModel.OrganizationSetup);
+
+                        modalBranchSetup.org_id = modalBranch.org_id;
+                        modalBranchSetup.createdby = organizationViewModel.createdby;
+                        modalBranchSetup.created_date = _dateTime.ToString();
+                        modalBranchSetup.is_deleted = false;
+
+                        _unitOfWork.OrganizationSetupRepository.Update(modalBranchSetup);
+                    }
+
+                    //Location for branch
+                    if (ListOfBranch[i].EntityLocationViewModel != null)
+                    {
+                        var OrgLocation = SetLocationForOrg(ListOfBranch[i].EntityLocationViewModel, modalBranch.org_id.ToString());
+                        OrgLocation.modifiedby = organizationViewModel.createdby;
+                        OrgLocation.modified_date = _dateTime.ToString();
+                        OrgLocation.is_deleted = false;
+                        OrgLocation.createdby = organizationViewModel.createdby;
+                        _unitOfWork.EntityLocationRepository.Update(OrgLocation);
+                    }
+
+                    _unitOfWork.OrganizationRepository.Update(modalBranch);
+
+                }
+            }
         }
     }
 }
