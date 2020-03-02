@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
@@ -131,33 +132,12 @@ namespace TimeAPI.API.Controllers
                 var modal = mapper.Map<Organization>(organizationViewModel);
                 modal.modified_date = _dateTime.ToString();
 
+                var result = _unitOfWork.EntityLocationRepository.FindByEnitiyID(modal.org_id);
+                var result1 = _unitOfWork.OrganizationSetupRepository.FindByEnitiyID(modal.org_id);
+                AddOrUpdateSetupAndLocation(organizationViewModel, config, mapper, modal, result, result1);
 
-
-                if (organizationViewModel.EntityLocationViewModel != null)
-                {
-                    //var EntityLocation = SetUpdateOrgAddress(organizationViewModel, modal);
-                    var EntityLocation = SetLocationForOrg(organizationViewModel.EntityLocationViewModel, modal.org_id.ToString());
-                    EntityLocation.modified_date = _dateTime.ToString();
-                    EntityLocation.modifiedby = organizationViewModel.createdby;
-
-                    _unitOfWork.EntityLocationRepository.Update(EntityLocation);
-                }
-
-                if (organizationViewModel.OrganizationSetup != null)
-                {
-                    var configs = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationSetup, OrganizationSetup>());
-                    var mapper1 = config.CreateMapper();
-                    var modal1 = mapper.Map<OrganizationSetup>(organizationViewModel.OrganizationSetup);
-
-                    modal1.modified_date = _dateTime.ToString();
-                    modal1.is_deleted = false;
-
-                    _unitOfWork.OrganizationSetupRepository.Update(modal1);
-                }
-
-                //Adding Branch
+                //Update Branch
                 UpdateBranchOrg(organizationViewModel, modal.org_id);
-
                 _unitOfWork.OrganizationRepository.Update(modal);
                 _unitOfWork.Commit();
 
@@ -484,6 +464,67 @@ namespace TimeAPI.API.Controllers
 
                     _unitOfWork.OrganizationRepository.Update(modalBranch);
 
+                }
+            }
+        }
+
+        private void AddOrUpdateSetupAndLocation(OrganizationViewModel organizationViewModel, MapperConfiguration config,
+            IMapper mapper, Organization modal, EntityLocation result, OrganizationSetup result1)
+        {
+            if (result != null)
+            {
+                if (organizationViewModel.EntityLocationViewModel != null)
+                {
+                    //var EntityLocation = SetUpdateOrgAddress(organizationViewModel, modal);
+                    var EntityLocation = SetLocationForOrg(organizationViewModel.EntityLocationViewModel, modal.org_id.ToString());
+                    EntityLocation.modified_date = _dateTime.ToString();
+                    EntityLocation.modifiedby = organizationViewModel.createdby;
+
+                    _unitOfWork.EntityLocationRepository.Update(EntityLocation);
+                }
+            }
+            else
+            {
+                if (organizationViewModel.EntityLocationViewModel != null)
+                {
+                    var OrgLocation = SetLocationForOrg(organizationViewModel.EntityLocationViewModel, modal.org_id.ToString());
+                    OrgLocation.id = Guid.NewGuid().ToString();
+                    OrgLocation.created_date = _dateTime.ToString();
+                    OrgLocation.is_deleted = false;
+                    OrgLocation.createdby = organizationViewModel.createdby;
+                    _unitOfWork.EntityLocationRepository.Add(OrgLocation);
+                }
+            }
+
+            if (result1 != null)
+            {
+                if (organizationViewModel.OrganizationSetup != null)
+                {
+                    var configs = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationSetup, OrganizationSetup>());
+                    var mapper1 = config.CreateMapper();
+                    var modal1 = mapper.Map<OrganizationSetup>(organizationViewModel.OrganizationSetup);
+
+                    modal1.modified_date = _dateTime.ToString();
+                    modal1.is_deleted = false;
+
+                    _unitOfWork.OrganizationSetupRepository.Update(modal1);
+                }
+            }
+            else
+            {
+                if (organizationViewModel.OrganizationSetup != null)
+                {
+                    var configs = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationSetup, OrganizationSetup>());
+                    var mapper1 = config.CreateMapper();
+                    var modal1 = mapper.Map<OrganizationSetup>(organizationViewModel.OrganizationSetup);
+
+                    modal1.id = Guid.NewGuid().ToString();
+                    modal1.org_id = modal.org_id;
+                    modal1.createdby = organizationViewModel.createdby;
+                    modal1.created_date = _dateTime.ToString();
+                    modal1.is_deleted = false;
+
+                    _unitOfWork.OrganizationSetupRepository.Add(modal1);
                 }
             }
         }
