@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -203,6 +204,7 @@ namespace TimeAPI.API.Controllers
                 var result = _unitOfWork.OrganizationRepository.Find(Utils.ID);
                 var resultLocation = _unitOfWork.EntityLocationRepository.FindByEnitiyID(result.org_id);
                 var resultSetup = _unitOfWork.OrganizationSetupRepository.FindByEnitiyID(result.org_id);
+                var resultBranch = _unitOfWork.OrganizationRepository.FindByAllBranchByParengOrgID(result.org_id);
 
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationViewModel, Organization>());
                 var mapper = config.CreateMapper();
@@ -210,6 +212,22 @@ namespace TimeAPI.API.Controllers
 
                 modal.EntityLocation = resultLocation;
                 modal.OrganizationSetup = resultSetup;
+
+
+                List<OrganizationBranchDTO> listBranchDTO = new List<OrganizationBranchDTO>();
+                OrganizationBranchDTO organizationBranchDTO = new OrganizationBranchDTO()
+                {
+
+
+                };
+
+
+
+
+
+
+
+                modal.OrganizationBranchViewModel = resultBranch;
 
                 return await Task.FromResult<object>(modal).ConfigureAwait(false);
             }

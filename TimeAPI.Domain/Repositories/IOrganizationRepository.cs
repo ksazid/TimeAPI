@@ -9,5 +9,6 @@ namespace TimeAPI.Domain.Repositories
     {
         Organization FindByOrgName(string full_name);
         dynamic FindByUsersID(string user_id);
+        dynamic FindByAllBranchByParengOrgID(string OrgID);
     }
 }

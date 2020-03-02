@@ -632,8 +632,8 @@ namespace TimeAPI.Data.Repositories
 	                        AspNetRoles.Name as role_name,
 	                        department.dep_name,
                             department.id as department_id,
-	                        designation.designation_name
-							
+	                        designation.designation_name,
+                            FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')  as ondate
                           FROM dbo.employee WITH(NOLOCK)
 							  INNER JOIN superadmin_x_org on  dbo.employee.id = superadmin_x_org.superadmin_empid
 							  INNER JOIN timesheet ON  employee.id = timesheet.empid

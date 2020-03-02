@@ -98,6 +98,26 @@ namespace TimeAPI.Data.Repositories
             return result;
         }
 
+        public dynamic FindByAllBranchByParengOrgID(string ParengOrgID)
+        {
+            var Rest = Query<Organization>(
+                  sql: @"SELECT [dbo].[organization].org_id, [dbo].[organization].user_id, [dbo].[organization].org_name, 
+	                           [dbo].[organization].type, [dbo].[organization].summary, [dbo].[organization].img_url,
+                               [dbo].[organization].img_name, [dbo].[organization].country_id, [dbo].[organization].adr1, 
+	                           [dbo].[organization].adr2, [dbo].[organization].city, [dbo].[organization].primary_cont_name,
+                               [dbo].[organization].primary_cont_type, [dbo].[organization].time_zone_id, [dbo].[organization].created_date, 
+	                           [dbo].[organization].createdby, [dbo].[organization].modified_date, [dbo].[organization].modifiedby, [dbo].[organization].is_deleted 
+	                           FROM [dbo].[organization]
+                            INNER JOIN [dbo].[organization_branch] on [dbo].[organization].org_id = 
+	                        [dbo].[organization_branch].parent_org_id
+                            WHERE [dbo].[organization_branch].parent_org_id = @ParengOrgID and  [dbo].[organization_branch].is_deleted = 0",
+                  param: new { ParengOrgID }
+              );
+
+            var result = GetOrgAddress(Rest);
+            return result;
+        }
+
         private List<Organization> GetOrgAddress(IEnumerable<Organization> resultsOrganization)
         {
             List<Organization> orgList = (resultsOrganization as List<Organization>);
