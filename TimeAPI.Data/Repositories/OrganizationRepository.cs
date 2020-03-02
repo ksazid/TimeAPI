@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -98,23 +99,27 @@ namespace TimeAPI.Data.Repositories
             return result;
         }
 
-        public dynamic FindByAllBranchByParengOrgID(string ParengOrgID)
+        public IEnumerable<OrganizationBranchDTO> FindByAllBranchByParengOrgID(string ParengOrgID)
         {
-            var Rest = Query<Organization>(
-                  sql: @"SELECT [dbo].[organization].org_id, [dbo].[organization].user_id, [dbo].[organization].org_name, 
-	                           [dbo].[organization].type, [dbo].[organization].summary, [dbo].[organization].img_url,
-                               [dbo].[organization].img_name, [dbo].[organization].country_id, [dbo].[organization].adr1, 
-	                           [dbo].[organization].adr2, [dbo].[organization].city, [dbo].[organization].primary_cont_name,
-                               [dbo].[organization].primary_cont_type, [dbo].[organization].time_zone_id, [dbo].[organization].created_date, 
-	                           [dbo].[organization].createdby, [dbo].[organization].modified_date, [dbo].[organization].modifiedby, [dbo].[organization].is_deleted 
-	                           FROM [dbo].[organization]
-                            INNER JOIN [dbo].[organization_branch] on [dbo].[organization].org_id = 
-	                        [dbo].[organization_branch].parent_org_id
-                            WHERE [dbo].[organization_branch].parent_org_id = @ParengOrgID and  [dbo].[organization_branch].is_deleted = 0",
+            var Rest = Query<OrganizationBranchDTO>(
+                  sql: @"SELECT 
+                               dbo.organization_branch.parent_org_id,  
+                               dbo.organization_branch.org_id,  
+                               dbo.organization.user_id,  
+                               dbo.organization.org_name, 
+	                           dbo.organization.type,
+                                dbo.organization.summary, dbo.organization.img_url,
+                               dbo.organization.img_name, dbo.organization.country_id, dbo.organization.adr1, 
+	                           dbo.organization.adr2, dbo.organization.city, dbo.organization.primary_cont_name,
+                               dbo.organization.primary_cont_type, dbo.organization.time_zone_id, dbo.organization.created_date, 
+	                           dbo.organization.createdby, dbo.organization.modified_date, dbo.organization.modifiedby, dbo.organization.is_deleted 
+	                           FROM dbo.organization
+                            INNER JOIN dbo.organization_branch on dbo.organization.org_id = dbo.organization_branch.parent_org_id
+                            WHERE dbo.organization_branch.parent_org_id = @ParengOrgID and  dbo.organization_branch.is_deleted = 0",
                   param: new { ParengOrgID }
               );
 
-            var result = GetOrgAddress(Rest);
+            var result = GetOrgBranchAddress(Rest);
             return result;
         }
 
@@ -135,6 +140,29 @@ namespace TimeAPI.Data.Repositories
 
 
                 orgList[i].EntityLocation = entityLocation;
+                orgList[i].OrganizationSetup = entitySetup;
+            }
+
+            return orgList;
+        }
+
+        private List<OrganizationBranchDTO> GetOrgBranchAddress(IEnumerable<OrganizationBranchDTO> resultsOrganization)
+        {
+            List<OrganizationBranchDTO> orgList = (resultsOrganization as List<OrganizationBranchDTO>);
+            for (int i = 0; i < orgList.Count; i++)
+            {
+                var entityLocation = QuerySingleOrDefault<EntityLocation>(
+                   sql: @"SELECT * from entity_location WITH (NOLOCK) WHERE entity_id = @item and is_deleted = 0;",
+                   param: new { item = orgList[i].org_id }
+                  );
+
+                var entitySetup = QuerySingleOrDefault<OrganizationSetup>(
+                       sql: @"SELECT * from organization_setup WITH (NOLOCK) WHERE org_id = @item and is_deleted = 0;",
+                       param: new { item = orgList[i].org_id }
+                    );
+
+    
+                orgList[i].EntityLocationViewModel = entityLocation;
                 orgList[i].OrganizationSetup = entitySetup;
             }
 
