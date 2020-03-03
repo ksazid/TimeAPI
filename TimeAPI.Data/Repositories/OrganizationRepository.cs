@@ -29,7 +29,32 @@ namespace TimeAPI.Data.Repositories
         public Organization Find(string key)
         {
             return QuerySingleOrDefault<Organization>(
-                sql: "SELECT * FROM [dbo].[organization] WHERE org_id = @key and is_deleted = 0",
+                sql: @"SELECT 
+                            dbo.organization.org_id
+                          , organization_branch.parent_org_id
+                          , dbo.organization.user_id
+                          , dbo.organization.org_name
+                          , dbo.organization.type
+                          , dbo.organization.summary
+                          , dbo.organization.img_url
+                          , dbo.organization.img_name
+                          , dbo.organization.country_id
+                          , dbo.organization.adr1
+                          , dbo.organization.adr2
+                          , dbo.organization.city
+                          , dbo.organization.primary_cont_name
+                          , dbo.organization.primary_cont_type
+                          , dbo.organization.time_zone_id
+                          , dbo.organization.created_date
+                          , dbo.organization.createdby
+                          , dbo.organization.modified_date
+                          , dbo.organization.modifiedby
+                          , dbo.organization.is_deleted
+                      FROM dbo.organization WITH(NOLOCK)
+                      LEFT JOIN dbo.organization_branch
+                      ON dbo.organization.org_id = dbo.organization_branch.org_id
+                    WHERE dbo.organization.org_id = @key 
+                      AND organization_branch.is_deleted = 0",
                 param: new { key }
             );
         }
