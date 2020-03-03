@@ -284,7 +284,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         #region helper
         
         //not in use
@@ -369,53 +368,55 @@ namespace TimeAPI.API.Controllers
                     var mapperBranch = configBranch.CreateMapper();
                     var modalBranch = mapperBranch.Map<Organization>(organization);
 
-                    modalBranch.org_id = Guid.NewGuid().ToString();
-                    modalBranch.createdby = organizationViewModel.createdby;
-                    modalBranch.created_date = _dateTime.ToString();
-                    modalBranch.is_deleted = false;
-
-                    //saving in x table
-                    var OrgBranch = new OrganizationBranch()
+                    if (modalBranch.org_id == null)
                     {
-                        id = Guid.NewGuid().ToString(),
-                        parent_org_id = org_id,
-                        org_id = modalBranch.org_id,
-                        createdby = organizationViewModel.createdby,
-                        created_date = _dateTime.ToString(),
-                        is_deleted = false
-                    };
-                    _unitOfWork.OrganizationBranchRepository.Add(OrgBranch);
+                        modalBranch.org_id = Guid.NewGuid().ToString();
+                        modalBranch.createdby = organizationViewModel.createdby;
+                        modalBranch.created_date = _dateTime.ToString();
+                        modalBranch.is_deleted = false;
 
-                    //setup for branch
-                    if (organizationViewModel.OrganizationSetup != null)
-                    {
-                        var configsBranchSetup = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationSetup, OrganizationSetup>());
-                        var mapperBranchSetup = configsBranchSetup.CreateMapper();
-                        var modalBranchSetup = mapperBranchSetup.Map<OrganizationSetup>(organizationViewModel.OrganizationSetup);
+                        //saving in x table
+                        var OrgBranch = new OrganizationBranch()
+                        {
+                            id = Guid.NewGuid().ToString(),
+                            parent_org_id = org_id,
+                            org_id = modalBranch.org_id,
+                            createdby = organizationViewModel.createdby,
+                            created_date = _dateTime.ToString(),
+                            is_deleted = false
+                        };
+                        _unitOfWork.OrganizationBranchRepository.Add(OrgBranch);
 
-                        modalBranchSetup.id = Guid.NewGuid().ToString();
-                        modalBranchSetup.org_id = modalBranch.org_id;
-                        modalBranchSetup.createdby = organizationViewModel.createdby;
-                        modalBranchSetup.created_date = _dateTime.ToString();
-                        modalBranchSetup.is_deleted = false;
+                        //setup for branch
+                        if (organizationViewModel.OrganizationSetup != null)
+                        {
+                            var configsBranchSetup = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationSetup, OrganizationSetup>());
+                            var mapperBranchSetup = configsBranchSetup.CreateMapper();
+                            var modalBranchSetup = mapperBranchSetup.Map<OrganizationSetup>(organizationViewModel.OrganizationSetup);
 
-                        _unitOfWork.OrganizationSetupRepository.Add(modalBranchSetup);
+                            modalBranchSetup.id = Guid.NewGuid().ToString();
+                            modalBranchSetup.org_id = modalBranch.org_id;
+                            modalBranchSetup.createdby = organizationViewModel.createdby;
+                            modalBranchSetup.created_date = _dateTime.ToString();
+                            modalBranchSetup.is_deleted = false;
+
+                            _unitOfWork.OrganizationSetupRepository.Add(modalBranchSetup);
+                        }
+
+                        //Location for branch
+                        if (ListOfBranch[i].EntityLocationViewModel != null)
+                        {
+                            var OrgLocation = SetLocationForOrg(ListOfBranch[i].EntityLocationViewModel, modalBranch.org_id.ToString());
+                            OrgLocation.id = Guid.NewGuid().ToString();
+                            OrgLocation.createdby = organizationViewModel.createdby;
+                            OrgLocation.created_date = _dateTime.ToString();
+                            OrgLocation.is_deleted = false;
+                            OrgLocation.createdby = organizationViewModel.createdby;
+                            _unitOfWork.EntityLocationRepository.Add(OrgLocation);
+                        }
+
+                        _unitOfWork.OrganizationRepository.Add(modalBranch);
                     }
-
-                    //Location for branch
-                    if (ListOfBranch[i].EntityLocationViewModel != null)
-                    {
-                        var OrgLocation = SetLocationForOrg(ListOfBranch[i].EntityLocationViewModel, modalBranch.org_id.ToString());
-                        OrgLocation.id = Guid.NewGuid().ToString();
-                        OrgLocation.createdby = organizationViewModel.createdby;
-                        OrgLocation.created_date = _dateTime.ToString();
-                        OrgLocation.is_deleted = false;
-                        OrgLocation.createdby = organizationViewModel.createdby;
-                        _unitOfWork.EntityLocationRepository.Add(OrgLocation);
-                    }
-
-                    _unitOfWork.OrganizationRepository.Add(modalBranch);
-
                 }
             }
         }
@@ -436,6 +437,9 @@ namespace TimeAPI.API.Controllers
                     modalBranch.modified_date = _dateTime.ToString();
                     modalBranch.is_deleted = false;
 
+
+
+                    // need to paas only the id for create new not whole list......
                     if (modalBranch.org_id == null)
                     {
                         AddBranchOrg(organizationViewModel, org_id);

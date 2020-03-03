@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using TimeAPI.Domain.Entities;
@@ -244,12 +245,25 @@ namespace TimeAPI.Data.Repositories
         {
             List<TimesheetAbsent> TotalEmpCount = new List<TimesheetAbsent>();
 
-            var GetDates = GetDateFromTimesheet(org_id, fromDate, toDate).ToList();
+            string offdays = GetWeekOffsFromOrg(org_id);
+            List<string> OffDaysList = new List<string>();
+           
+            List<DateTime> Dates = GetDateRange(Convert.ToDateTime(fromDate), Convert.ToDateTime(toDate)).ToList();
+
+            for (int i = 0; i < Dates.Count(); i++)
+            {
+
+                if (!offdays.Contains(Dates[i].DayOfWeek.ToString(), StringComparison.OrdinalIgnoreCase))
+                {
+                    OffDaysList.Add(Dates[i].Date.ToString());
+                }
+            }
+
             var TotalEmp = GetTotalEmpCountByOrgID(org_id);
 
-            for (int i = 0; i < GetDates.Count(); i++)
+            for (int i = 0; i < OffDaysList.Count(); i++)
             {
-                var EmpCountAttended = GetEmpCountAttendedByOrgIDAndDate(org_id, GetDates[i], GetDates[i]);
+                var EmpCountAttended = GetEmpCountAttendedByOrgIDAndDate(org_id, OffDaysList[i], OffDaysList[i]);
                 var result = TotalEmp.Except(EmpCountAttended);
                 TotalEmpCount.AddRange(result);
             }
@@ -396,22 +410,38 @@ namespace TimeAPI.Data.Repositories
 
             string offdays = GetWeekOffsFromOrg(org_id);
             List<string> OffDaysList = new List<string>();
+            //List<string> DatesList = new List<string>();
 
-            if (offdays.Contains(","))
+            //if (offdays.Contains(","))
+            //{
+            //    string[] words = offdays.Split(',');
+            //    foreach (var item in words)
+            //    {
+            //        OffDaysList.Add(item);
+            //    }
+            //}
+            //else
+            //{ OffDaysList.Add(offdays); }
+
+            List<DateTime> Dates = GetDateRange(Convert.ToDateTime(fromDate), Convert.ToDateTime(toDate)).ToList();
+
+            for (int i = 0; i < Dates.Count(); i++)
             {
-                string[] words = offdays.Split(',');
-                foreach (var item in words)
+
+                if (!offdays.Contains(Dates[i].DayOfWeek.ToString(), StringComparison.OrdinalIgnoreCase))
                 {
-                    OffDaysList.Add(item);
+                    OffDaysList.Add(Dates[i].Date.ToString());
                 }
             }
 
-            var GetDates = GetDateFromTimesheet(org_id, fromDate, toDate).ToList();
+
+
+            //var GetDates = GetDateFromTimesheet(org_id, fromDate, toDate).ToList();
             var TotalEmp = GetTotalEmpCountByOrgID(org_id);
 
-            for (int i = 0; i < GetDates.Count(); i++)
+            for (int i = 0; i < OffDaysList.Count; i++)
             {
-                var EmpCountAttended = GetEmpCountAttendedByOrgIDAndDate(org_id, GetDates[i], GetDates[i]);
+                var EmpCountAttended = GetEmpCountAttendedByOrgIDAndDate(org_id, OffDaysList[i], OffDaysList[i]);
                 var result = TotalEmp.Except(EmpCountAttended);
                 TotalEmpCount.AddRange(result);
             }
@@ -654,24 +684,36 @@ namespace TimeAPI.Data.Repositories
                );
         }
 
-        private IEnumerable<string> GetDateFromTimesheet(string OrgID, string fromDate, string toDate)
-        {
-            return Query<string>(
-                  sql: @"SELECT
-	                         FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') 
-                          FROM dbo.employee WITH(NOLOCK)
-							  INNER JOIN timesheet ON  employee.id = timesheet.empid
-	                      WHERE employee.org_id = @OrgID
-						  AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') 
-						  BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US')
-						  AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
-						  AND employee.is_deleted = 0
-                          AND timesheet.is_deleted = 0
-						  group by FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') ",
-                   param: new { OrgID, fromDate, toDate }
-               );
-        }
+        //private IEnumerable<string> GetDateFromTimesheet(string OrgID, string fromDate, string toDate)
+        //{
+        //    return Query<string>(
+        //          sql: @"SELECT
+        //                  FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') 
+        //                  FROM dbo.employee WITH(NOLOCK)
+        // INNER JOIN timesheet ON  employee.id = timesheet.empid
+        //               WHERE employee.org_id = @OrgID
+        //AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') 
+        //BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US')
+        //AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
+        //AND employee.is_deleted = 0
+        //                  AND timesheet.is_deleted = 0
+        //group by FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') ",
+        //           param: new { OrgID, fromDate, toDate }
+        //       );
+        //}
 
+
+        public static IEnumerable<DateTime> GetDateRange(DateTime startDate, DateTime endDate)
+        {
+            if (endDate < startDate)
+                throw new ArgumentException("endDate must be greater than or equal to startDate");
+
+            while (startDate <= endDate)
+            {
+                yield return startDate;
+                startDate = startDate.AddDays(1);
+            }
+        }
         private string GetWeekOffsFromOrg(string OrgID)
         {
             return QuerySingleOrDefault<string>(
