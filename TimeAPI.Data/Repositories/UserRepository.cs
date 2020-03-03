@@ -247,7 +247,7 @@ namespace TimeAPI.Data.Repositories
 
             string offdays = GetWeekOffsFromOrg(org_id);
             List<string> OffDaysList = new List<string>();
-           
+
             List<DateTime> Dates = GetDateRange(Convert.ToDateTime(fromDate), Convert.ToDateTime(toDate)).ToList();
 
             for (int i = 0; i < Dates.Count(); i++)
@@ -263,7 +263,7 @@ namespace TimeAPI.Data.Repositories
             for (int i = 0; i < OffDaysList.Count(); i++)
             {
                 var EmpCountAttended = GetEmpCountAttendedByOrgIDAndDate(org_id, OffDaysList[i], OffDaysList[i]);
-                var result = TotalEmp.Except(EmpCountAttended);
+                var result = TotalEmp.Except(EmpCountAttended, new MyComparer()).ToList();
                 TotalEmpCount.AddRange(result);
             }
 
@@ -415,17 +415,22 @@ namespace TimeAPI.Data.Repositories
             for (int i = 0; i < Dates.Count(); i++)
             {
                 if (!offdays.Contains(Dates[i].DayOfWeek.ToString(), StringComparison.OrdinalIgnoreCase))
-                {
                     OffDaysList.Add(Dates[i].Date.ToString());
-                }
             }
 
-            var TotalEmp = GetTotalEmpCountByOrgID(org_id);
+            var TotalEmp = GetTotalEmpCountByOrgID(org_id).OrderByDescending(x => x.full_name);
 
             for (int i = 0; i < OffDaysList.Count(); i++)
             {
+                List<TimesheetAbsent> AbsentDataTemp = new List<TimesheetAbsent>();
                 var EmpCountAttended = GetEmpCountAttendedByOrgIDAndDate(org_id, OffDaysList[i], OffDaysList[i]);
-                var result = TotalEmp.Except(EmpCountAttended);
+
+                var result = TotalEmp.Except(EmpCountAttended, new MyComparer()).ToList();
+
+                //AbsentDataTemp = TotalEmp.ToList().Select(x=>x.id).Except(EmpCountAttended).Select(x => x.id).ToList();
+                                         //.Select(c => { c.ondate = OffDaysList[i]; return c; })
+                                         //.ToList();
+
                 AbsentData.AddRange(result);
             }
 
@@ -617,8 +622,7 @@ namespace TimeAPI.Data.Repositories
 	                        AspNetRoles.Name as role_name,
 	                        department.dep_name,
                             department.id as department_id,
-	                        designation.designation_name,
-                            FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')  as ondate
+	                        designation.designation_name
                           FROM dbo.employee WITH(NOLOCK)
 							  INNER JOIN timesheet ON  employee.id = timesheet.empid
 	                          LEFT JOIN employee_status ON employee.emp_status_id = employee_status.id
@@ -645,8 +649,7 @@ namespace TimeAPI.Data.Repositories
 	                        AspNetRoles.Name as role_name,
 	                        department.dep_name,
                             department.id as department_id,
-	                        designation.designation_name,
-                            FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')  as ondate
+	                        designation.designation_name
                           FROM dbo.employee WITH(NOLOCK)
 							  INNER JOIN superadmin_x_org on  dbo.employee.id = superadmin_x_org.superadmin_empid
 							  INNER JOIN timesheet ON  employee.id = timesheet.empid
@@ -707,5 +710,24 @@ namespace TimeAPI.Data.Repositories
         }
 
         #endregion PrivateMethods
+    }
+
+
+    sealed class MyComparer : IEqualityComparer<TimesheetAbsent>
+    {
+        public bool Equals(TimesheetAbsent x, TimesheetAbsent y)
+        {
+            if (x == null)
+                return y == null;
+            else if (y == null)
+                return false;
+            else
+                return x.id == y.id && x.full_name == y.full_name;
+        }
+
+        public int GetHashCode(TimesheetAbsent obj)
+        {
+            return obj.id.GetHashCode();
+        }
     }
 }
