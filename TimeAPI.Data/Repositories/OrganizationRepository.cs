@@ -54,7 +54,7 @@ namespace TimeAPI.Data.Repositories
                       LEFT JOIN dbo.organization_branch
                       ON dbo.organization.org_id = dbo.organization_branch.org_id
                     WHERE dbo.organization.org_id = @key 
-                      AND organization_branch.is_deleted = 0",
+                      AND organization.is_deleted = 0",
                 param: new { key }
             );
         }
