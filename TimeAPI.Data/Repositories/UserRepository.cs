@@ -252,7 +252,6 @@ namespace TimeAPI.Data.Repositories
 
             for (int i = 0; i < Dates.Count(); i++)
             {
-
                 if (!offdays.Contains(Dates[i].DayOfWeek.ToString(), StringComparison.OrdinalIgnoreCase))
                 {
                     OffDaysList.Add(Dates[i].Date.ToString());
@@ -406,47 +405,31 @@ namespace TimeAPI.Data.Repositories
 
         public dynamic GetTimesheetDashboardGridAbsentDataByOrgIDAndDate(string org_id, string fromDate, string toDate)
         {
-            List<TimesheetAbsent> TotalEmpCount = new List<TimesheetAbsent>();
+            List<TimesheetAbsent> AbsentData = new List<TimesheetAbsent>();
 
             string offdays = GetWeekOffsFromOrg(org_id);
             List<string> OffDaysList = new List<string>();
-            //List<string> DatesList = new List<string>();
-
-            //if (offdays.Contains(","))
-            //{
-            //    string[] words = offdays.Split(',');
-            //    foreach (var item in words)
-            //    {
-            //        OffDaysList.Add(item);
-            //    }
-            //}
-            //else
-            //{ OffDaysList.Add(offdays); }
 
             List<DateTime> Dates = GetDateRange(Convert.ToDateTime(fromDate), Convert.ToDateTime(toDate)).ToList();
 
             for (int i = 0; i < Dates.Count(); i++)
             {
-
                 if (!offdays.Contains(Dates[i].DayOfWeek.ToString(), StringComparison.OrdinalIgnoreCase))
                 {
                     OffDaysList.Add(Dates[i].Date.ToString());
                 }
             }
 
-
-
-            //var GetDates = GetDateFromTimesheet(org_id, fromDate, toDate).ToList();
             var TotalEmp = GetTotalEmpCountByOrgID(org_id);
 
-            for (int i = 0; i < OffDaysList.Count; i++)
+            for (int i = 0; i < OffDaysList.Count(); i++)
             {
                 var EmpCountAttended = GetEmpCountAttendedByOrgIDAndDate(org_id, OffDaysList[i], OffDaysList[i]);
                 var result = TotalEmp.Except(EmpCountAttended);
-                TotalEmpCount.AddRange(result);
+                AbsentData.AddRange(result);
             }
 
-            return TotalEmpCount;
+            return AbsentData;
         }
 
         #region PrivateMethods
@@ -718,7 +701,7 @@ namespace TimeAPI.Data.Repositories
         {
             return QuerySingleOrDefault<string>(
                   sql: @"SELECT start_of_week FROM [dbo].[organization_setup] 
-                        WHERE id = @OrgID",
+                        WHERE org_id= @OrgID AND is_deleted = 0",
                    param: new { OrgID }
                );
         }
