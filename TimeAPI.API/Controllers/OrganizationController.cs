@@ -399,6 +399,7 @@ namespace TimeAPI.API.Controllers
                             modalBranchSetup.createdby = organizationViewModel.createdby;
                             modalBranchSetup.created_date = _dateTime.ToString();
                             modalBranchSetup.is_deleted = false;
+                            modalBranchSetup.fiscal_year = modalBranchSetup.fiscal_year;
 
                             _unitOfWork.OrganizationSetupRepository.Add(modalBranchSetup);
                         }
@@ -464,9 +465,10 @@ namespace TimeAPI.API.Controllers
                             var mapperBranchSetup = configsBranchSetup.CreateMapper();
                             var modalBranchSetup = mapperBranchSetup.Map<OrganizationSetup>(organizationViewModel.OrganizationSetup);
 
+                            modalBranchSetup.fiscal_year = modalBranchSetup.fiscal_year;
                             modalBranchSetup.org_id = modalBranch.org_id;
-                            modalBranchSetup.createdby = organizationViewModel.createdby;
-                            modalBranchSetup.created_date = _dateTime.ToString();
+                            modalBranchSetup.modifiedby = organizationViewModel.createdby;
+                            modalBranchSetup.modified_date = _dateTime.ToString();
                             modalBranchSetup.is_deleted = false;
 
                             _unitOfWork.OrganizationSetupRepository.Update(modalBranchSetup);
