@@ -25,6 +25,7 @@ namespace TimeAPI.Domain.Entities
         public string modified_date { get; set; }
         public string modifiedby { get; set; }
         public bool is_deleted { get; set; }
+        public string parent_org_id { get; set; }
         public EntityLocation EntityLocation { get; set; }
         public OrganizationSetup OrganizationSetup { get; set; }
         public List<OrganizationBranchViewModel> OrganizationBranchViewModel { get; set; }
