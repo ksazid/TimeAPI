@@ -485,9 +485,6 @@ namespace TimeAPI.API.Controllers
                         _unitOfWork.OrganizationRepository.Update(modalBranch);
                     }
                 }
-
-
-                
             }
         }
 
