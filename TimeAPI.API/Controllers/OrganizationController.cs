@@ -99,6 +99,8 @@ namespace TimeAPI.API.Controllers
                     modal1.createdby = organizationViewModel.createdby;
                     modal1.created_date = _dateTime.ToString();
                     modal1.is_deleted = false;
+                    modal1.fiscal_year = organizationViewModel.OrganizationSetup.fiscal_year;
+                    modal1.start_of_week = organizationViewModel.OrganizationSetup.start_of_week;
 
                     _unitOfWork.OrganizationSetupRepository.Add(modal1);
                 }
@@ -400,6 +402,7 @@ namespace TimeAPI.API.Controllers
                             modalBranchSetup.created_date = _dateTime.ToString();
                             modalBranchSetup.is_deleted = false;
                             modalBranchSetup.fiscal_year = modalBranchSetup.fiscal_year;
+                            modalBranchSetup.start_of_week = modalBranchSetup.start_of_week;
 
                             _unitOfWork.OrganizationSetupRepository.Add(modalBranchSetup);
                         }
@@ -437,8 +440,6 @@ namespace TimeAPI.API.Controllers
                     modalBranch.modifiedby = organizationViewModel.createdby;
                     modalBranch.modified_date = _dateTime.ToString();
                     modalBranch.is_deleted = false;
-
-
 
                     // need to paas only the id for create new not whole list......
                     if (modalBranch.org_id == null)
@@ -525,9 +526,10 @@ namespace TimeAPI.API.Controllers
                     var configs = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationSetup, OrganizationSetup>());
                     var mapper1 = config.CreateMapper();
                     var modal1 = mapper.Map<OrganizationSetup>(organizationViewModel.OrganizationSetup);
-
+                    modal1.org_id = organizationViewModel.org_id;
                     modal1.modified_date = _dateTime.ToString();
                     modal1.is_deleted = false;
+
 
                     _unitOfWork.OrganizationSetupRepository.Update(modal1);
                 }
