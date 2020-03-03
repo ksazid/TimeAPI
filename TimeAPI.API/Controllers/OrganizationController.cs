@@ -141,7 +141,8 @@ namespace TimeAPI.API.Controllers
                 AddOrUpdateSetupAndLocation(organizationViewModel, config, mapper, modal, result, result1);
 
                 //Update Branch
-                UpdateBranchOrg(organizationViewModel, modal.org_id);
+                AddBranchOrg(organizationViewModel, modal.org_id);
+                //UpdateBranchOrg(organizationViewModel, modal.org_id);
                 _unitOfWork.OrganizationRepository.Update(modal);
                 _unitOfWork.Commit();
 
@@ -425,71 +426,71 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-        private void UpdateBranchOrg(OrganizationViewModel organizationViewModel, string org_id)
-        {
-            if (organizationViewModel.OrganizationBranchViewModel != null)
-            {
-                var ListOfBranch = organizationViewModel.OrganizationBranchViewModel;
-                string orgid = string.Empty;
-                for (int i = 0; i < ListOfBranch.Count; i++)
-                {
-                    OrganizationBranchViewModel organization = ListOfBranch[i];
-                    var configBranch = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationBranchViewModel, Organization>());
-                    var mapperBranch = configBranch.CreateMapper();
-                    var modalBranch = mapperBranch.Map<Organization>(organization);
-                    modalBranch.modifiedby = organizationViewModel.createdby;
-                    modalBranch.modified_date = _dateTime.ToString();
-                    modalBranch.is_deleted = false;
+        //private void UpdateBranchOrg(OrganizationViewModel organizationViewModel, string org_id)
+        //{
+        //    if (organizationViewModel.OrganizationBranchViewModel != null)
+        //    {
+        //        var ListOfBranch = organizationViewModel.OrganizationBranchViewModel;
+        //        string orgid = string.Empty;
+        //        for (int i = 0; i < ListOfBranch.Count; i++)
+        //        {
+        //            OrganizationBranchViewModel organization = ListOfBranch[i];
+        //            var configBranch = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationBranchViewModel, Organization>());
+        //            var mapperBranch = configBranch.CreateMapper();
+        //            var modalBranch = mapperBranch.Map<Organization>(organization);
+        //            modalBranch.modifiedby = organizationViewModel.createdby;
+        //            modalBranch.modified_date = _dateTime.ToString();
+        //            modalBranch.is_deleted = false;
 
-                    // need to paas only the id for create new not whole list......
-                    if (modalBranch.org_id == null)
-                    {
-                        AddBranchOrg(organizationViewModel, org_id);
-                    }
-                    else
-                    {
-                        //saving in x table
-                        var OrgBranch = new OrganizationBranch()
-                        {
-                            parent_org_id = org_id,
-                            org_id = modalBranch.org_id,
-                            modifiedby = organizationViewModel.createdby,
-                            modified_date = _dateTime.ToString(),
-                            is_deleted = false
-                        };
-                        _unitOfWork.OrganizationBranchRepository.Update(OrgBranch);
+        //            // need to paas only the id for create new not whole list......
+        //            if (modalBranch.org_id == null)
+        //            {
+        //                AddBranchOrg(organizationViewModel, org_id);
+        //            }
+        //            //else
+        //            //{
+        //            //    //saving in x table
+        //            //    var OrgBranch = new OrganizationBranch()
+        //            //    {
+        //            //        parent_org_id = org_id,
+        //            //        org_id = modalBranch.org_id,
+        //            //        modifiedby = organizationViewModel.createdby,
+        //            //        modified_date = _dateTime.ToString(),
+        //            //        is_deleted = false
+        //            //    };
+        //            //    _unitOfWork.OrganizationBranchRepository.Update(OrgBranch);
 
-                        //setup for branch
-                        if (organizationViewModel.OrganizationSetup != null)
-                        {
-                            var configsBranchSetup = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationSetup, OrganizationSetup>());
-                            var mapperBranchSetup = configsBranchSetup.CreateMapper();
-                            var modalBranchSetup = mapperBranchSetup.Map<OrganizationSetup>(organizationViewModel.OrganizationSetup);
+        //            //    //setup for branch
+        //            //    if (organizationViewModel.OrganizationSetup != null)
+        //            //    {
+        //            //        var configsBranchSetup = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationSetup, OrganizationSetup>());
+        //            //        var mapperBranchSetup = configsBranchSetup.CreateMapper();
+        //            //        var modalBranchSetup = mapperBranchSetup.Map<OrganizationSetup>(organizationViewModel.OrganizationSetup);
 
-                            modalBranchSetup.fiscal_year = modalBranchSetup.fiscal_year;
-                            modalBranchSetup.org_id = modalBranch.org_id;
-                            modalBranchSetup.modifiedby = organizationViewModel.createdby;
-                            modalBranchSetup.modified_date = _dateTime.ToString();
-                            modalBranchSetup.is_deleted = false;
+        //            //        modalBranchSetup.fiscal_year = modalBranchSetup.fiscal_year;
+        //            //        modalBranchSetup.org_id = modalBranch.org_id;
+        //            //        modalBranchSetup.modifiedby = organizationViewModel.createdby;
+        //            //        modalBranchSetup.modified_date = _dateTime.ToString();
+        //            //        modalBranchSetup.is_deleted = false;
 
-                            _unitOfWork.OrganizationSetupRepository.Update(modalBranchSetup);
-                        }
+        //            //        _unitOfWork.OrganizationSetupRepository.Update(modalBranchSetup);
+        //            //    }
 
-                        //Location for branch
-                        if (ListOfBranch[i].EntityLocationViewModel != null)
-                        {
-                            var OrgLocation = SetLocationForOrg(ListOfBranch[i].EntityLocationViewModel, orgid);
-                            OrgLocation.modifiedby = organizationViewModel.createdby;
-                            OrgLocation.modified_date = _dateTime.ToString();
-                            OrgLocation.is_deleted = false;
-                            _unitOfWork.EntityLocationRepository.Update(OrgLocation);
-                        }
+        //            //    //we are not updating branch in edit
+        //            //    //if (ListOfBranch[i].EntityLocationViewModel != null)
+        //            //    //{
+        //            //    //    var OrgLocation = SetLocationForOrg(ListOfBranch[i].EntityLocationViewModel, orgid);
+        //            //    //    OrgLocation.modifiedby = organizationViewModel.createdby;
+        //            //    //    OrgLocation.modified_date = _dateTime.ToString();
+        //            //    //    OrgLocation.is_deleted = false;
+        //            //    //    _unitOfWork.EntityLocationRepository.Update(OrgLocation);
+        //            //    //}
 
-                        _unitOfWork.OrganizationRepository.Update(modalBranch);
-                    }
-                }
-            }
-        }
+        //            //    _unitOfWork.OrganizationRepository.Update(modalBranch);
+        //            //}
+        //        }
+        //    }
+        //}
 
         private void AddOrUpdateSetupAndLocation(OrganizationViewModel organizationViewModel, MapperConfiguration config,
             IMapper mapper, Organization modal, EntityLocation result, OrganizationSetup result1)
