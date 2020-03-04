@@ -63,6 +63,7 @@ namespace TimeAPI.Data
         private IDelegationsRepository _delegationsRepository;
         private IDelegationsDelegateeRepository _delegationsDelegateeRepository;
         private ISuperadminOrganizationRepository _superadminOrganizationRepository;
+        private IAdminDashboardRepository _adminDashboardRepository;
 
         #region systemadmin
         private IPlanRepository _planRepository;
@@ -407,6 +408,18 @@ namespace TimeAPI.Data
                     ?? (_locationRepository = new LocationRepository(_transaction));
             }
         }
+
+        public IAdminDashboardRepository AdminDashboardRepository
+        {
+            get
+            {
+                return _adminDashboardRepository
+                    ?? (_adminDashboardRepository = new AdminDashboardRepository(_transaction));
+            }
+        }
+
+
+        
 
         public IEntityLocationRepository EntityLocationRepository
         {

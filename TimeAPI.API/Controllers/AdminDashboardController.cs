@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -41,9 +42,11 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.UserRepository.GetTimesheetDashboardDataByOrgIDAndDate(Utils.OrgID, Utils.fromDate, Utils.toDate);
+                oDataTable _oDataTable = new oDataTable();
+                var results = _unitOfWork.AdminDashboardRepository.TotalEmpAttentedCountByOrgIDAndDate(Utils.OrgID, Utils.fromDate, Utils.toDate);
+                var xResult = _oDataTable.ToDataTable(results);
 
-                return await Task.FromResult<object>(result).ConfigureAwait(false);
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -60,7 +63,7 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.UserRepository.TotalEmployeeDashboardDataByOrgID(Utils.OrgID);
+                var result = _unitOfWork.AdminDashboardRepository.TotalDefaultEmpCountByOrgID(Utils.OrgID);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -79,7 +82,7 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.UserRepository.TotalEmployeeAbsentDashboardDataByOrgID(Utils.OrgID, Utils.fromDate, Utils.toDate);
+                var result = _unitOfWork.AdminDashboardRepository.TotalEmpAbsentCountByOrgIDAndDate(Utils.OrgID, Utils.fromDate, Utils.toDate);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -98,7 +101,7 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.UserRepository.GetTimesheetDashboardGridDataByOrgIDAndDate(Utils.OrgID, Utils.fromDate, Utils.toDate);
+                var result = _unitOfWork.AdminDashboardRepository.GetTimesheetDashboardGridDataByOrgIDAndDate(Utils.OrgID, Utils.fromDate, Utils.toDate);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -117,7 +120,7 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.UserRepository.GetTimesheetDashboardGridAbsentDataByOrgIDAndDate(Utils.OrgID, Utils.fromDate, Utils.toDate);
+                var result = _unitOfWork.AdminDashboardRepository.GetTimesheetDashboardGridAbsentDataByOrgIDAndDate(Utils.OrgID, Utils.fromDate, Utils.toDate);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -136,7 +139,7 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.UserRepository.GetCheckOutLocationByGroupID(Utils.ID);
+                var result = _unitOfWork.AdminDashboardRepository.GetCheckOutLocationByGroupID(Utils.ID);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
