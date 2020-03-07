@@ -128,6 +128,6 @@ namespace TimeAPI.Domain.Model
         public string department_id { get; set; }
         public string designation_name { get; set; }
         public string ondate { get; set; }
-
+        public int rowno { get; set; }
     }
 }

@@ -80,7 +80,7 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<Customer> FindCustomerByOrgID(string key)
         {
             return Query<Customer>(
-                sql: "SELECT * FROM dbo.customer where is_deleted = 0 AND org_id = @key",
+                sql: "SELECT  ROW_NUMBER() OVER (ORDER BY dbo.customer.id) AS rowno, * FROM dbo.customer where is_deleted = 0 AND org_id = @key",
                  param: new { key }
             );
         }

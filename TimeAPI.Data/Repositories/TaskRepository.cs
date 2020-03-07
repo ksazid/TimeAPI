@@ -74,6 +74,7 @@ namespace TimeAPI.Data.Repositories
         {
             return Query<dynamic>(
                    sql: @"	SELECT
+                            ROW_NUMBER() OVER (ORDER BY task.id) AS rowno,
                             task.id,
 		                    task.task_name,
 		                    task.task_desc,

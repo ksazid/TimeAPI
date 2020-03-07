@@ -231,6 +231,7 @@ namespace TimeAPI.Data.Repositories
 
             var resultsAspNetUsers = Query<dynamic>(
                 sql: @"SELECT
+                        ROW_NUMBER() OVER (ORDER BY full_name) AS rowno,
                         project_category_type, project_or_comp_name,
                         timesheet_id, groupid, is_checkout,
                         employee_id, full_name, check_in,
@@ -328,27 +329,46 @@ namespace TimeAPI.Data.Repositories
             List<TimesheetAbsent> AbsentData = new List<TimesheetAbsent>();
 
             string offdays = GetWeekOffsFromOrg(org_id);
-            List<string> OffDaysList = new List<string>();
+            List<DateTime> OffDaysList = new List<DateTime>();
 
-            List<DateTime> Dates = GetDateRange(Convert.ToDateTime(fromDate), Convert.ToDateTime(toDate)).ToList();
+            List<DateTime> Dates = Enumerable.Range(0, (Convert.ToDateTime(toDate) - Convert.ToDateTime(fromDate)).Days + 1)
+                                             .Select(d => Convert.ToDateTime(fromDate).AddDays(d)).ToList();
 
-            for (int i = 0; i < Dates.Count(); i++)
+            foreach (var item in offdays.Split(','))
             {
-                if (!offdays.Contains(Dates[i].DayOfWeek.ToString(), StringComparison.OrdinalIgnoreCase))
-                    OffDaysList.Add(Dates[i].Date.ToString());
+                var RangeDate = Dates.Where(x => x.DayOfWeek.ToString().Contains(item.ToString(), StringComparison.OrdinalIgnoreCase))
+                                     .Select(x => Convert.ToDateTime(DateTime.Parse(x.Date.ToString()).ToString("MM/dd/yyyy"))).ToList();
+
+                OffDaysList.AddRange(RangeDate);
             }
+
+            OffDaysList = Dates.Except(OffDaysList).ToList();
 
             var TotalEmp = GetTotalEmpCountByOrgID(org_id).OrderByDescending(x => x.full_name);
 
             for (int i = 0; i < OffDaysList.Count(); i++)
             {
                 List<TimesheetAbsent> AbsentDataTemp = new List<TimesheetAbsent>();
-                var EmpCountAttended = GetEmpCountAttendedByOrgIDAndDate(org_id, OffDaysList[i], OffDaysList[i]);
-                var result = TotalEmp.Except(EmpCountAttended, new MyComparer()).ToList();
-                result.Select(c => { c.ondate = Convert.ToDateTime(OffDaysList[i]).ToString("dd/MM/yyyy"); return c; }).ToList();
+                var EmpCountAttended = GetEmpCountAttendedByOrgIDAndDate(org_id, OffDaysList[i].ToString(), OffDaysList[i].ToString());
+                var result = TotalEmp.Except(EmpCountAttended, new MyComparer())
+                                     .Select(c => { c.ondate = Convert.ToDateTime(OffDaysList[i])
+                                     .ToString("dd/MM/yyyy"); return c; })
+                                     .ToList();
+
+                //result.Select(c => { c.ondate = Convert.ToDateTime(OffDaysList[i]).ToString("dd/MM/yyyy"); return c; })
+                //      .ToList();
+
+
+                //var xResult = result.Select((stock, index) => new
+                //{
+                //    Row = stock.ondate = Convert.ToDateTime(OffDaysList[i]).ToString("dd/MM/yyyy"),
+                //    RowNumber = index + 1
+                //}).ToList();
+
                 AbsentData.AddRange(result);
             }
 
+           
             return AbsentData;
         }
 
@@ -531,19 +551,9 @@ namespace TimeAPI.Data.Repositories
 				            dbo.project.is_deleted = 0 
 				        GROUP BY dbo.project_status.project_status_name, 
 				            dbo.project.project_name",
-                param: new { OrgID}
+                param: new { OrgID }
             );
         }
-
-
-        
-
-
-
-
-
-
-
 
 
         #region PrivateMethods

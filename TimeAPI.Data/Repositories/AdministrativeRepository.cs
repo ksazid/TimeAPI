@@ -100,6 +100,7 @@ namespace TimeAPI.Data.Repositories
         {
             return Query<AdministrativeDropDown>(
               sql: @"SELECT
+                    ROW_NUMBER() OVER (ORDER BY id) AS rowno,
                     id,
                     administrative_name as text
             FROM[dbo].[administrative]

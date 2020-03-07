@@ -68,7 +68,7 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<Team> FindTeamsByOrgID(string key)
         {
             return Query<Team>(
-                sql: "SELECT * FROM dbo.team WHERE is_deleted = 0 and org_id = @key",
+                sql: "SELECT ROW_NUMBER() OVER (ORDER BY team.id) AS rowno,* FROM dbo.team WHERE is_deleted = 0 and org_id = @key",
                 param: new { key }
             );
         }
