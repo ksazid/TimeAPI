@@ -453,7 +453,7 @@ namespace TimeAPI.Data.Repositories
             return resultsAspNetUsers;
         }
 
-        public dynamic GetTimesheetActivityByGroup(string GroupID)
+        public dynamic GetTimesheetActivityByGroupAndDate(string GroupID, string Date)
         {
             return Query<dynamic>(
                 sql: @"SELECT    
@@ -481,6 +481,7 @@ namespace TimeAPI.Data.Repositories
 	                        ON eTimeLocation.groupid = dbo.timesheet_administrative_activity.groupid
 	                        LEFT JOIN  [dbo].[administrative] on   [dbo].[timesheet_administrative_activity].administrative_id = [dbo].[administrative].id 
                             WHERE dbo.timesheet_administrative_activity.groupid =@GroupID
+                            AND FORMAT(CAST(timesheet_administrative_activity.ondate AS DATE), 'dd-MM-yyyy', 'EN-US') = FORMAT(CAST(@Date AS DATE), 'dd-MM-yyyy', 'EN-US')
 
                         UNION 
 
@@ -507,8 +508,9 @@ namespace TimeAPI.Data.Repositories
                                         WHERE dbo.timesheet_activity.groupid = @GroupID)) eTime
 				                        on eTime.groupid = dbo.timesheet_activity.groupid
 				                        INNER JOIN timesheet_x_project_category on timesheet_x_project_category.groupid = dbo.timesheet_activity.groupid
-                                        WHERE dbo.timesheet_activity.groupid =@GroupID",
-                param: new { GroupID}
+                                        WHERE dbo.timesheet_activity.groupid =@GroupID
+                                        AND FORMAT(CAST(timesheet_activity.ondate AS DATE), 'dd-MM-yyyy', 'EN-US') = FORMAT(CAST(@Date AS DATE), 'dd-MM-yyyy', 'EN-US')",
+                param: new { GroupID, Date }
             );
         }
 

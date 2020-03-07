@@ -150,15 +150,15 @@ namespace TimeAPI.API.Controllers
         }
 
         [HttpPost]
-        [Route("GetTimesheetActivityByGroup")]
-        public async Task<object> GetTimesheetActivityByGroup([FromBody] Utils Utils, CancellationToken cancellationToken)
+        [Route("GetTimesheetActivityByGroupAndDate")]
+        public async Task<object> GetTimesheetActivityByGroupAndDate([FromBody] UtilsGroupIDAndDate Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.AdminDashboardRepository.GetTimesheetActivityByGroup(Utils.ID);
+                var result = _unitOfWork.AdminDashboardRepository.GetTimesheetActivityByGroupAndDate(Utils.ID, Utils.Date);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -167,7 +167,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
         
     }
 }

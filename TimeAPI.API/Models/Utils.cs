@@ -13,6 +13,13 @@ namespace TimeAPI.API.Models
         public string ID { get; set; }
     }
 
+    public class UtilsGroupIDAndDate
+    {
+        public string ID { get; set; }
+        public string Date { get; set; }
+
+    }
+
     public class UtilsOrgID
     {
         public string OrgID { get; set; }

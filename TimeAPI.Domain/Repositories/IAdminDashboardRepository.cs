@@ -17,8 +17,7 @@ namespace TimeAPI.Domain.Repositories
         dynamic GetTimesheetDashboardGridDataByOrgIDAndDate(string OrgID, string toDate, string fromDate);
         dynamic GetTimesheetDashboardGridAbsentDataByOrgIDAndDate(string OrgID, string toDate, string fromDate);
         dynamic GetCheckOutLocationByGroupID(string GroupID);
-
-        dynamic GetTimesheetActivityByGroup(string GroupID);
+        dynamic GetTimesheetActivityByGroupAndDate(string GroupID, string Date);
 
 
     }
