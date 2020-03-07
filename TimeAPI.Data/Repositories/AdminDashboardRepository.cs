@@ -453,6 +453,64 @@ namespace TimeAPI.Data.Repositories
             return resultsAspNetUsers;
         }
 
+        public dynamic GetTimesheetActivityByGroup(string GroupID)
+        {
+            return Query<dynamic>(
+                sql: @"SELECT    
+		                UPPER(dbo.timesheet_x_project_category.project_category_type) + ': '
+			                        + [dbo].[administrative].administrative_name + ' (' 
+			                        + ISNULL(NULLIF(FORMAT(CAST(eTime.check_in AS DATETIME2), N'hh:mm tt'), ' '), 'NA') + ' - '
+			                        + ISNULL(NULLIF(FORMAT(CAST(eTime.check_out AS DATETIME2), N'hh:mm tt'), ' '), 'NA')  + ' | '  
+			                        + ISNULL(NULLIF(eTime.total_hrs, ' '), 'NA') +  ' )' as timesheet, 
+			                        activity_name = [dbo].[administrative].administrative_name,
+			                        task_name = dbo.timesheet_administrative_activity.purpose,
+			                        remarks = dbo.timesheet_administrative_activity.remarks,
+			                        FORMAT(CAST(dbo.timesheet_administrative_activity.start_time AS DATETIME2), N'hh:mm tt') as start_time ,
+			                        FORMAT(CAST(dbo.timesheet_administrative_activity.end_time AS DATETIME2), N'hh:mm tt') as end_time,
+			                        timesheet_administrative_activity.total_hrs,
+			                        timesheet_administrative_activity.is_billable,
+			                        FORMAT(dbo.timesheet_administrative_activity.ondate, 'dd-MM-yyyy', 'en-US') AS ondate 
+                        FROM
+                            dbo.timesheet_administrative_activity WITH (NOLOCK)
+	                        LEFT JOIN (select top 1 * from dbo.timesheet   where groupid IN (SELECT groupid FROM timesheet_activity 
+                            WHERE dbo.timesheet_activity.groupid = @GroupID)) eTime
+	                        on eTime.groupid = dbo.timesheet_administrative_activity.groupid
+	                        LEFT JOIN timesheet_x_project_category on timesheet_x_project_category.groupid = dbo.timesheet_administrative_activity.groupid
+	                        LEFT JOIN (select top 1 * from dbo.timesheet_location  WHERE groupid IN (SELECT groupid FROM timesheet_activity 
+                            WHERE dbo.timesheet_activity.groupid = @GroupID)) eTimeLocation
+	                        ON eTimeLocation.groupid = dbo.timesheet_administrative_activity.groupid
+	                        LEFT JOIN  [dbo].[administrative] on   [dbo].[timesheet_administrative_activity].administrative_id = [dbo].[administrative].id 
+                            WHERE dbo.timesheet_administrative_activity.groupid =@GroupID
+
+                        UNION 
+
+                          SELECT  
+		                        UPPER(dbo.timesheet_x_project_category.project_category_type) + ': '
+		                        + ISNULL(dbo.project.project_name, 'Activity') + ' (' 
+		                        + ISNULL(NULLIF(FORMAT(CAST(eTime.check_in AS DATETIME2), N'hh:mm tt'), ' '), 'NA') + ' - '
+		                        + ISNULL(NULLIF(FORMAT(CAST(eTime.check_out AS DATETIME2), N'hh:mm tt'), ' '), 'NA')  + ' | '  
+		                        + ISNULL(NULLIF(eTime.total_hrs, ' '), 'NA') +  ' )' as timesheet, 
+		                        activity_name =ISNULL( dbo.project_activity.activity_name, dbo.timesheet_activity.milestone_name),
+		                        task_name = ISNULL( dbo.timesheet_activity.task_name, 'NA'),
+		                        remarks= dbo.timesheet_activity.remarks,
+		                        FORMAT(CAST(dbo.timesheet_activity.start_time AS DATETIME2), N'hh:mm tt') as start_time ,
+		                        FORMAT(CAST(dbo.timesheet_activity.end_time AS DATETIME2), N'hh:mm tt') as end_time,
+		                        timesheet_activity.total_hrs,
+		                        timesheet_activity.is_billable,
+		                        FORMAT(dbo.timesheet_activity.ondate, 'dd-MM-yyyy', 'en-US') AS ondate 
+                                    FROM
+                                        [dbo].[timesheet_activity] WITH (NOLOCK)
+										LEFT JOIN project on project.id = [timesheet_activity].project_id 
+										LEFT JOIN project_activity on project_activity.id =[timesheet_activity].milestone_id 
+                                        LEFT JOIN task on dbo.timesheet_activity.task_id = task.id
+				                        INNER JOIN (select top 1 * from dbo.timesheet   where groupid IN (SELECT groupid FROM timesheet_activity 
+                                        WHERE dbo.timesheet_activity.groupid = @GroupID)) eTime
+				                        on eTime.groupid = dbo.timesheet_activity.groupid
+				                        INNER JOIN timesheet_x_project_category on timesheet_x_project_category.groupid = dbo.timesheet_activity.groupid
+                                        WHERE dbo.timesheet_activity.groupid =@GroupID",
+                param: new { GroupID}
+            );
+        }
 
 
         #region PrivateMethods
