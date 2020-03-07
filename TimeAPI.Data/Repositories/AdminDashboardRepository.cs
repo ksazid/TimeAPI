@@ -514,6 +514,37 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
+        public dynamic AllProjectRatioByOrgID(string OrgID)
+        {
+            return Query<dynamic>(
+                sql: @"SELECT 
+				            dbo.project.project_name,
+				            dbo.project_status.project_status_name, 
+				            count(*) * 100 / sum(count(*))  over() as ratio
+				        FROM dbo.project_activity WITH(NOLOCK)
+				            INNER JOIN dbo.project_status on dbo.project_activity.status_id = dbo.project_status.id
+				            INNER JOIN dbo.project on dbo.project_activity.project_id = dbo.project.id
+				        WHERE 
+				            dbo.project.org_id = '33781a87-ede0-439f-b890-93ad218b2859' AND 
+				            dbo.project_status.project_status_name = 'Completed' AND 
+				            dbo.project_activity.is_deleted = 0 AND 
+				            dbo.project.is_deleted = 0 
+				        GROUP BY dbo.project_status.project_status_name, 
+				            dbo.project.project_name",
+                param: new { OrgID}
+            );
+        }
+
+
+        
+
+
+
+
+
+
+
+
 
         #region PrivateMethods
         //currently not in use

@@ -9,15 +9,14 @@ namespace TimeAPI.Domain.Repositories
         dynamic TotalEmpAbsentCountByOrgIDAndDate(string OrgID, string toDate, string fromDate);
         dynamic TotalEmpAttentedCountByOrgIDAndDate(string OrgID, string toDate, string fromDate);
         dynamic TotalEmpOverTimeCountByOrgIDAndDate(string OrgID, string toDate, string fromDate);
-
-
-
+        
 
 
         dynamic GetTimesheetDashboardGridDataByOrgIDAndDate(string OrgID, string toDate, string fromDate);
         dynamic GetTimesheetDashboardGridAbsentDataByOrgIDAndDate(string OrgID, string toDate, string fromDate);
         dynamic GetCheckOutLocationByGroupID(string GroupID);
         dynamic GetTimesheetActivityByGroupAndDate(string GroupID, string Date);
+        dynamic AllProjectRatioByOrgID(string OrgID);
 
 
     }
