@@ -114,7 +114,6 @@ namespace TimeAPI.Domain.Model
         public bool is_checkout { get; set; }
     }
 
-
     public  class TimesheetAbsent
     {
         public string id { get; set; }

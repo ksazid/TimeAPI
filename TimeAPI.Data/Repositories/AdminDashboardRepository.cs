@@ -161,14 +161,6 @@ namespace TimeAPI.Data.Repositories
             string offdays = GetWeekOffsFromOrg(org_id);
             List<DateTime> OffDaysList = new List<DateTime>();
 
-            //List<DateTime> Dates = GetDateRange(Convert.ToDateTime(fromDate), Convert.ToDateTime(toDate)).ToList();
-
-            //for (int i = 0; i < Dates.Count(); i++)
-            //{
-            //    if (!offdays.Contains(Dates[i].DayOfWeek.ToString(), StringComparison.OrdinalIgnoreCase))
-            //        OffDaysList.Add(Dates[i].Date.ToString());
-            //}
-
             List<DateTime> Dates = Enumerable.Range(0, (Convert.ToDateTime(toDate) - Convert.ToDateTime(fromDate)).Days + 1)
                                    .Select(d => Convert.ToDateTime(fromDate).AddDays(d)).ToList();
 
@@ -224,17 +216,6 @@ namespace TimeAPI.Data.Repositories
         {
             List<string> OffDaysList = new List<string>();
 
-            //string offdays = GetWeekOffsFromOrg(org_id);
-            //List<DateTime> Dates = GetDateRange(Convert.ToDateTime(fromDate), Convert.ToDateTime(toDate)).ToList();
-
-            //for (int i = 0; i < Dates.Count(); i++)
-            //    if (offdays.Contains(Dates[i].DayOfWeek.ToString(), StringComparison.OrdinalIgnoreCase))
-            //        OffDaysList.Add(DateTime.Parse(Dates[i].Date.ToString().Split(' ')[0]).ToString("MM/dd/yyyy"));
-
-
-            //var date = Dates.Select(x => x.DayOfWeek.ToString().Contains(offdays, StringComparison.OrdinalIgnoreCase));
-
-
             string offdays = GetWeekOffsFromOrg(org_id);
             List<DateTime> Dates = Enumerable.Range(0, (Convert.ToDateTime(toDate) - Convert.ToDateTime(fromDate)).Days + 1)
                                     .Select(d => Convert.ToDateTime(fromDate).AddDays(d)).ToList();
@@ -255,7 +236,7 @@ namespace TimeAPI.Data.Repositories
                         employee_id, full_name, check_in,
                         check_out, total_hrs, lat, lang, ondate
 
-                    FROM (
+                FROM (
 
                     SELECT
                         timesheet_x_project_category.project_category_type,
@@ -317,13 +298,13 @@ namespace TimeAPI.Data.Repositories
                         INNER JOIN (select distinct(groupid), location.lat, location.lang, location.is_checkout
                         from dbo.location  where groupid IN (SELECT groupid FROM timesheet) and is_checkout = 0) eTime
                         ON eTime.groupid = dbo.timesheet.groupid
-            
-                        WHERE employee.org_id =@org_id
+                    WHERE employee.org_id =@org_id
 						AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') 
 						BETWEEN FORMAT(CAST(@fromDate  AS DATE), 'd', 'EN-US')
                         AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
                         AND timesheet.is_deleted = 0) REALDATA 
-						WHERE FORMAT(CAST(ondate  AS DATE), 'MM/dd/yyyy', 'EN-US') NOT IN ('" + weekoffs + "')",
+						WHERE FORMAT(CAST(ondate  AS DATE), 'MM/dd/yyyy', 'EN-US') 
+                        NOT IN ('" + weekoffs + "')",
                 param: new { org_id, fromDate, toDate }
             );
             return resultsAspNetUsers;
@@ -364,11 +345,115 @@ namespace TimeAPI.Data.Repositories
                 List<TimesheetAbsent> AbsentDataTemp = new List<TimesheetAbsent>();
                 var EmpCountAttended = GetEmpCountAttendedByOrgIDAndDate(org_id, OffDaysList[i], OffDaysList[i]);
                 var result = TotalEmp.Except(EmpCountAttended, new MyComparer()).ToList();
+                result.Select(c => { c.ondate = Convert.ToDateTime(OffDaysList[i]).ToString("dd/MM/yyyy"); return c; }).ToList();
                 AbsentData.AddRange(result);
             }
 
             return AbsentData;
         }
+
+        public dynamic TotalEmpOverTimeCountByOrgIDAndDate(string org_id, string fromDate, string toDate)
+        {
+            List<TimesheetAbsent> TotalEmpCount = new List<TimesheetAbsent>();
+
+            string offdays = GetWeekOffsFromOrg(org_id);
+            List<DateTime> OffDaysList = new List<DateTime>();
+
+            List<DateTime> Dates = Enumerable.Range(0, (Convert.ToDateTime(toDate) - Convert.ToDateTime(fromDate)).Days + 1)
+                                   .Select(d => Convert.ToDateTime(fromDate).AddDays(d)).ToList();
+
+            foreach (var item in offdays.Split(','))
+            {
+                var RangeDate = Dates.Where(x => x.DayOfWeek.ToString().Contains(item.ToString(), StringComparison.OrdinalIgnoreCase))
+                                     .Select(x => Convert.ToDateTime(DateTime.Parse(x.Date.ToString()).ToString("MM/dd/yyyy"))).ToList();
+
+                OffDaysList.AddRange(RangeDate);
+            }
+
+            string weekoffs = String.Join("','", OffDaysList);
+
+            var resultsAspNetUsers = Query<dynamic>(
+                sql: @"SELECT
+                        project_category_type, project_or_comp_name,
+                        timesheet_id, groupid, is_checkout,
+                        employee_id, full_name, check_in,
+                        check_out, total_hrs, lat, lang, ondate
+
+                FROM (
+
+                    SELECT
+                        timesheet_x_project_category.project_category_type,
+                        timesheet_x_project_category.project_or_comp_name,
+                        timesheet.id as timesheet_id,
+                        timesheet.groupid as groupid,
+                        employee.id as employee_id,
+                        eTime.lat as lat,
+                        eTime.lang as lang,
+                        eTime.is_checkout as is_checkout,
+                        employee.full_name,
+                        employee_type.employee_type_name as employee_type_name,
+                        employee.workemail as workemail,
+                        employee.emp_code as emp_code,
+                        employee.phone as phone,
+                        FORMAT(CAST(timesheet.check_in AS DATETIME2), N'hh:mm tt') as check_in,
+                        ISNULL(FORMAT(CAST(timesheet.check_out AS DATETIME2), N'hh:mm tt'), 'NA') as check_out,
+                        ISNULL(total_hrs, 'NA') as total_hrs,
+                        FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US')  as ondate
+                        FROM timesheet WITH (NOLOCK)
+                        INNER JOIN employee ON timesheet.empid = employee.id
+                        LEFT JOIN employee_type ON employee.emp_type_id = employee_type.id
+                        INNER JOIN timesheet_x_project_category on timesheet.groupid = timesheet_x_project_category.groupid
+                        INNER JOIN superadmin_x_org ON superadmin_x_org.superadmin_empid = employee.id
+                        INNER JOIN (select distinct(groupid), location.lat, location.lang, location.is_checkout
+                        FROM dbo.location WHERE groupid IN (SELECT groupid FROM timesheet) and is_checkout = 0) eTime
+                        ON eTime.groupid = dbo.timesheet.groupid
+                    WHERE
+                        superadmin_x_org.org_id = @org_id
+                  AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') 
+						BETWEEN FORMAT(CAST(@fromDate  AS DATE), 'd', 'EN-US')
+                        AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
+                        AND timesheet.is_deleted = 0
+
+                    UNION
+
+                    SELECT
+                        timesheet_x_project_category.project_category_type,
+                        timesheet_x_project_category.project_or_comp_name,
+                        timesheet.id as timesheet_id,
+                        timesheet.groupid as groupid,
+                        employee.id as employee_id,
+                        eTime.lat as lat,
+                        eTime.lang as lang,
+                        eTime.is_checkout as is_checkout,
+                        employee.full_name,
+                        employee_type.employee_type_name as employee_type_name,
+                        employee.workemail as workemail,
+                        employee.emp_code as emp_code,
+                        employee.phone as phone,
+                        FORMAT(CAST(timesheet.check_in AS DATETIME2), N'hh:mm tt') as check_in,
+                        ISNULL(FORMAT(CAST(timesheet.check_out AS DATETIME2), N'hh:mm tt'), 'NA') as check_out,
+                        ISNULL(total_hrs, 'NA') as total_hrs,
+                        FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US')  as ondate
+                        FROM timesheet WITH (NOLOCK)
+                        INNER JOIN employee ON timesheet.empid = employee.id
+                        LEFT JOIN employee_type ON employee.emp_type_id = employee_type.id
+                        INNER JOIN timesheet_x_project_category on timesheet.groupid = timesheet_x_project_category.groupid
+                        INNER JOIN (select distinct(groupid), location.lat, location.lang, location.is_checkout
+                        from dbo.location  where groupid IN (SELECT groupid FROM timesheet) and is_checkout = 0) eTime
+                        ON eTime.groupid = dbo.timesheet.groupid
+                    WHERE employee.org_id =@org_id
+						AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') 
+						BETWEEN FORMAT(CAST(@fromDate  AS DATE), 'd', 'EN-US')
+                        AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
+                        AND timesheet.is_deleted = 0) REALDATA 
+						WHERE FORMAT(CAST(ondate  AS DATE), 'MM/dd/yyyy', 'EN-US') 
+                        NOT IN ('" + weekoffs + "')",
+                      param: new { org_id, fromDate, toDate }
+                  );
+            return resultsAspNetUsers;
+        }
+
+
 
         #region PrivateMethods
         //currently not in use
@@ -551,7 +636,7 @@ namespace TimeAPI.Data.Repositories
             string weekoffs = String.Join("','", OffDaysList);
 
             return Query<dynamic>(
-                sql: @"SELECT employee_type_name, SUM(attandance) as attandance, ondate
+                sql: @"SELECT employee_type_name, SUM(attandance) as attandance, ondate 
                 FROM (
                     SELECT COUNT (DISTINCT(timesheet.empid)) as attandance,
                         ISNULL(UPPER(employee_type.employee_type_name), 'PERMANENT') AS employee_type_name,

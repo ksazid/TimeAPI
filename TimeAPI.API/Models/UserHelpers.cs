@@ -301,9 +301,10 @@ namespace TimeAPI
 
     public static class InternetTime
     {
-        public static DateTimeOffset? GetCurrentTimeFromTimeZone()
+        public static DateTimeOffset? GetCurrentTimeFromTimeZone(string timezone = "Arabian Standard Time")
         {
-            DateTime eastern = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, "Arabian Standard Time");
+            //DateTime eastern = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(Convert.ToDateTime(DateTime.UtcNow.ToString("dd/MM/yyyy")), "Arabian Standard Time");
+            DateTime eastern = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, timezone);
             return eastern;
         }
     }
