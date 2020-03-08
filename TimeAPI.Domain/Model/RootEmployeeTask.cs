@@ -20,10 +20,11 @@ namespace TimeAPI.Domain.Model
         public string status { get; set; }
         public string assigned_to { get; set; }
         public string assigned_to_name { get; set; }
+        public string is_approver { get; set; }
+        public string is_approver_id { get; set; }
+        public string approver_name { get; set; }
         public string due_date { get; set; }
         public string created_date { get; set; }
-        public string approver_id { get; set; }
-        public string approver_name { get; set; }
 
     }
 }

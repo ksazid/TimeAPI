@@ -73,27 +73,53 @@ namespace TimeAPI.Data.Repositories
         public dynamic FindByTaskDetailsByEmpID(string key)
         {
             return Query<dynamic>(
-                   sql: @"	SELECT
-                            ROW_NUMBER() OVER (ORDER BY task.task_name) AS rowno,
-                            task.id,
-	                        task.task_name,
-	                        task.task_desc,
-	                        priority.priority_name,
-	                        status.status_name,
-		                    task.assigned_empid as assigned_to,
-	                        e.full_name as assigned_to_name,
-                            et.id as approver_id,
-		                    et.full_name as approver_name,
-	                        task.due_date,
-	                        task.created_date
-		                FROM[dbo].[task]
-		                    INNER JOIN employee on task.empid = employee.id
-			                LEFT JOIN employee e on task.assigned_empid = e.id
-			                LEFT JOIN employee et on task.is_approver_id = et.id
-			                LEFT JOIN priority on task.priority_id = priority.id
-			                LEFT JOIN status on status.id = task.status_id
-		                WHERE task.is_deleted = 0 and task.empid = @key",
-                      param: new { key }
+                   sql: @"SELECT
+                                DISTINCT(task.task_name),
+                                task.id,
+	                            employee.id as empid,
+	                            task.task_desc,
+	                            priority.priority_name as priority,
+	                            status.id as status,
+		                        task.assigned_empid as assigned_to,
+	                            e.full_name as assigned_to_name,
+                                task.is_approver as is_approver,
+                                task.is_approver_id as is_approver_id,
+		                        et.full_name as approver_name,
+	                            task.due_date,
+	                            task.created_date
+	                            FROM[dbo].[task] WITH (NOLOCK)
+			                        INNER JOIN employee on task.empid = employee.id
+			                        LEFT JOIN employee e on task.assigned_empid = e.id
+			                        LEFT JOIN employee et on task.is_approver_id = et.id
+			                        LEFT JOIN priority on task.priority_id = priority.id
+			                        LEFT JOIN status on status.id = task.status_id
+                            WHERE task.is_deleted = 0 and task.empid =@key 
+	
+	                  UNION
+
+	                    SELECT
+                                 DISTINCT(task.task_name),
+                                task.id,
+	                            employee.id as empid,
+	                            task.task_desc,
+	                            priority.priority_name as priority,
+	                            status.id as status,
+		                        task.assigned_empid as assigned_to,
+	                            e.full_name as assigned_to_name,
+                                task.is_approver as is_approver,
+                                task.is_approver_id as is_approver_id,
+		                        et.full_name as approver_name,
+	                            task.due_date,
+	                            task.created_date
+	                           FROM [dbo].[task] WITH (NOLOCK)
+			                        INNER JOIN employee on task.empid = employee.id
+			                        LEFT JOIN employee e on task.assigned_empid = e.id
+			                        LEFT JOIN employee et on task.is_approver_id = et.id
+			                        LEFT JOIN priority on task.priority_id = priority.id
+			                        LEFT JOIN status on status.id = task.status_id
+                            WHERE task.is_deleted = 0 
+	                        AND task.assigned_empid =@key",
+                param: new { key }
                );
         }
 
@@ -114,20 +140,18 @@ namespace TimeAPI.Data.Repositories
         {
             RootEmployeeTask rootEmployeeTask = new RootEmployeeTask();
 
-            List<EmployeeTasks> employeeTasks = new List<EmployeeTasks>();
-
             var _employeeTasks = Query<EmployeeTasks>(
-                     sql: @"SELECT
-                               distinct(task.task_name),
+                         sql: @"SELECT
+                                DISTINCT(task.task_name),
                                 task.id,
 	                            employee.id as empid,
-	                            task.task_name,
 	                            task.task_desc,
 	                            priority.priority_name as priority,
 	                            status.id as status,
 		                        task.assigned_empid as assigned_to,
 	                            e.full_name as assigned_to_name,
-                                et.id as approver_id,
+                                task.is_approver as is_approver,
+                                task.is_approver_id as is_approver_id,
 		                        et.full_name as approver_name,
 	                            task.due_date,
 	                            task.created_date
@@ -139,56 +163,59 @@ namespace TimeAPI.Data.Repositories
 			                        LEFT JOIN status on status.id = task.status_id
                             WHERE task.is_deleted = 0 and task.empid =@key 
 	
-	                        UNION
+	                  UNION
 
-	                        SELECT
-                               distinct(task.task_name),
+	                    SELECT
+                                 DISTINCT(task.task_name),
                                 task.id,
 	                            employee.id as empid,
-	                            task.task_name,
 	                            task.task_desc,
 	                            priority.priority_name as priority,
 	                            status.id as status,
 		                        task.assigned_empid as assigned_to,
 	                            e.full_name as assigned_to_name,
-                                et.id as approver_id,
+                                task.is_approver as is_approver,
+                                task.is_approver_id as is_approver_id,
 		                        et.full_name as approver_name,
 	                            task.due_date,
 	                            task.created_date
-	                            FROM [dbo].[task]  WITH (NOLOCK)
-			                        INNER JOIN employee on task.assigned_empid = employee.id
-			                        LEFT JOIN employee e on task.is_approver_id = e.id
+	                           FROM [dbo].[task] WITH (NOLOCK)
+			                        INNER JOIN employee on task.empid = employee.id
+			                        LEFT JOIN employee e on task.assigned_empid = e.id
+			                        LEFT JOIN employee et on task.is_approver_id = et.id
 			                        LEFT JOIN priority on task.priority_id = priority.id
 			                        LEFT JOIN status on status.id = task.status_id
                             WHERE task.is_deleted = 0 
-	                        AND task.assigned_empid =@key ",
-                        param: new { key }
-                 );
+	                        AND task.assigned_empid =@key",
+                            param: new { key }
+                     );
 
             var _employeeAssignedTasks = Query<EmployeeTasks>(
                    sql: @"SELECT
-                            distinct(task.task_name),
+                                 DISTINCT(task.task_name),
                                 task.id,
 	                            employee.id as empid,
-	                            task.task_name,
 	                            task.task_desc,
 	                            priority.priority_name as priority,
 	                            status.id as status,
 		                        task.assigned_empid as assigned_to,
-	                            employee.full_name as assigned_to_name,
-                                et.id as approver_id,
+	                            e.full_name as assigned_to_name,
+                                task.is_approver as is_approver,
+                                task.is_approver_id as is_approver_id,
 		                        et.full_name as approver_name,
 	                            task.due_date,
 	                            task.created_date
-	                        FROM [dbo].[task]  WITH (NOLOCK)
-			                    INNER JOIN employee on task.assigned_empid = employee.id
-			                    LEFT JOIN employee e on task.is_approver_id = e.id
-			                    LEFT JOIN priority on task.priority_id = priority.id
-			                    LEFT JOIN status on status.id = task.status_id
-                        WHERE task.is_deleted = 0 
-	                    AND task.assigned_empid =@key",
+	                           FROM [dbo].[task] WITH (NOLOCK)
+			                        INNER JOIN employee on task.empid = employee.id
+			                        LEFT JOIN employee e on task.assigned_empid = e.id
+			                        LEFT JOIN employee et on task.is_approver_id = et.id
+			                        LEFT JOIN priority on task.priority_id = priority.id
+			                        LEFT JOIN status on status.id = task.status_id
+                            WHERE task.is_deleted = 0 
+	                        AND task.assigned_empid =@key",
                       param: new { key }
                );
+
             rootEmployeeTask.EmployeeTasks = _employeeTasks;
             rootEmployeeTask.AssignedEmployeeTasks = _employeeAssignedTasks;
 
