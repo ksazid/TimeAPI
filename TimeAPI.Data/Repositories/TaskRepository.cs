@@ -190,7 +190,7 @@ namespace TimeAPI.Data.Repositories
             //var result = _employeeTasks.Except(_employeeAssignedTasks);
             //employeeTasks.AddRange(result);
 
-            rootEmployeeTask.EmployeeTasks = employeeTasks;
+            rootEmployeeTask.EmployeeTasks = _employeeTasks;
             rootEmployeeTask.AssignedEmployeeTasks = _employeeAssignedTasks;
 
             return rootEmployeeTask;
