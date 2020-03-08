@@ -74,21 +74,24 @@ namespace TimeAPI.Data.Repositories
         {
             return Query<dynamic>(
                    sql: @"	SELECT
-                            ROW_NUMBER() OVER (ORDER BY task.id) AS rowno,
+                            ROW_NUMBER() OVER (ORDER BY task.task_name) AS rowno,
                             task.id,
-		                    task.task_name,
-		                    task.task_desc,
-		                    priority.priority_name,
-		                    status.status_name,
-		                    employee.full_name,
-		                    e.id as approver_id,
-		                    e.full_name as approver_name,
-		                    task.due_date
-		                    FROM[dbo].[task]
-		                    inner join priority on task.priority_id = priority.id
-		                    inner join employee on task.assigned_empid = employee.id
-		                    inner join employee e on task.is_approver_id = e.id
-		                    inner join status on status.id = task.status_id
+	                        task.task_name,
+	                        task.task_desc,
+	                        priority.priority_name,
+	                        status.status_name,
+		                    task.assigned_empid as assigned_to,
+	                        e.full_name as assigned_to_name,
+                            et.id as approver_id,
+		                    et.full_name as approver_name,
+	                        task.due_date,
+	                        task.created_date
+		                FROM[dbo].[task]
+		                    INNER JOIN employee on task.empid = employee.id
+			                LEFT JOIN employee e on task.assigned_empid = e.id
+			                LEFT JOIN employee et on task.is_approver_id = et.id
+			                LEFT JOIN priority on task.priority_id = priority.id
+			                LEFT JOIN status on status.id = task.status_id
 		                WHERE task.is_deleted = 0 and task.empid = @key",
                       param: new { key }
                );
@@ -121,11 +124,11 @@ namespace TimeAPI.Data.Repositories
 	                            task.task_name,
 	                            task.task_desc,
 	                            priority.priority_name as priority,
-		                        task.assigned_empid as assigned_to_empid,
-	                            employee.full_name as assigned_to,
+	                            status.id as status,
+		                        task.assigned_empid as assigned_to,
+	                            e.full_name as assigned_to_name,
                                 et.id as approver_id,
 		                        et.full_name as approver_name,
-                                employee.full_name as approver_name,
 	                            task.due_date,
 	                            task.created_date
 	                            FROM[dbo].[task] WITH (NOLOCK)
@@ -139,17 +142,17 @@ namespace TimeAPI.Data.Repositories
 	                        UNION
 
 	                        SELECT
-                                distinct(task.task_name),
+                               distinct(task.task_name),
                                 task.id,
 	                            employee.id as empid,
 	                            task.task_name,
 	                            task.task_desc,
 	                            priority.priority_name as priority,
-		                        task.assigned_empid as assigned_to_empid,
-	                            employee.full_name as assigned_to,
-                                e.id as approver_id,
-		                        e.full_name as approver_name,
-                                employee.full_name as approver_name,
+	                            status.id as status,
+		                        task.assigned_empid as assigned_to,
+	                            e.full_name as assigned_to_name,
+                                et.id as approver_id,
+		                        et.full_name as approver_name,
 	                            task.due_date,
 	                            task.created_date
 	                            FROM [dbo].[task]  WITH (NOLOCK)
@@ -165,18 +168,18 @@ namespace TimeAPI.Data.Repositories
             var _employeeAssignedTasks = Query<EmployeeTasks>(
                    sql: @"SELECT
                             distinct(task.task_name),
-                            task.id,
-	                        employee.id as empid,
-	                        task.task_name,
-	                        task.task_desc,
-	                        priority.priority_name as priority,
-		                    task.assigned_empid as assigned_to_empid,
-	                        employee.full_name as assigned_to,
-                            e.id as approver_id,
-		                    e.full_name as approver_name,
-                            employee.full_name as approver_name,
-	                        task.due_date,
-	                        task.created_date
+                                task.id,
+	                            employee.id as empid,
+	                            task.task_name,
+	                            task.task_desc,
+	                            priority.priority_name as priority,
+	                            status.id as status,
+		                        task.assigned_empid as assigned_to,
+	                            employee.full_name as assigned_to_name,
+                                et.id as approver_id,
+		                        et.full_name as approver_name,
+	                            task.due_date,
+	                            task.created_date
 	                        FROM [dbo].[task]  WITH (NOLOCK)
 			                    INNER JOIN employee on task.assigned_empid = employee.id
 			                    LEFT JOIN employee e on task.is_approver_id = e.id
@@ -186,10 +189,6 @@ namespace TimeAPI.Data.Repositories
 	                    AND task.assigned_empid =@key",
                       param: new { key }
                );
-
-            //var result = _employeeTasks.Except(_employeeAssignedTasks);
-            //employeeTasks.AddRange(result);
-
             rootEmployeeTask.EmployeeTasks = _employeeTasks;
             rootEmployeeTask.AssignedEmployeeTasks = _employeeAssignedTasks;
 
