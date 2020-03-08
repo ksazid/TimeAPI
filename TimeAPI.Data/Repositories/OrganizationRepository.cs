@@ -141,7 +141,8 @@ namespace TimeAPI.Data.Repositories
                             FROM dbo.organization_branch
                             INNER JOIN dbo.organization on dbo.organization_branch.org_id = dbo.organization.org_id
                             WHERE dbo.organization_branch.parent_org_id = @ParengOrgID
-                            and  dbo.organization_branch.is_deleted = 0",
+                            and  dbo.organization_branch.is_deleted = 0
+                            and  dbo.organization.is_deleted = 0",
                   param: new { ParengOrgID }
               );
 

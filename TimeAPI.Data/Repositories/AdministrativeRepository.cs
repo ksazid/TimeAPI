@@ -116,6 +116,7 @@ namespace TimeAPI.Data.Repositories
             return Query<dynamic>(
                 sql: @"SELECT dbo.department.id as department_id, 
                         dbo.department.dep_name, 
+                        dbo.administrative.id,
                         dbo.administrative.administrative_name,
                         dbo.administrative.summary
                     FROM dbo.administrative 
