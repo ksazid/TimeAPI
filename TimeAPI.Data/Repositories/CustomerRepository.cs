@@ -77,10 +77,10 @@ namespace TimeAPI.Data.Repositories
 
 
 
-        public IEnumerable<Customer> FindCustomerByOrgID(string key)
+        public IEnumerable<dynamic> FindCustomerByOrgID(string key)
         {
-            return Query<Customer>(
-                sql: "SELECT  ROW_NUMBER() OVER (ORDER BY dbo.customer.id) AS rowno, * FROM dbo.customer where is_deleted = 0 AND org_id = @key",
+            return Query<dynamic>(
+                sql: "SELECT  ROW_NUMBER() OVER (ORDER BY dbo.customer.cst_name) AS rowno, * FROM dbo.customer where is_deleted = 0 AND org_id = @key",
                  param: new { key }
             );
         }
@@ -94,7 +94,6 @@ namespace TimeAPI.Data.Repositories
                  param: new { key }
             );
         }
-
      
     }
 }

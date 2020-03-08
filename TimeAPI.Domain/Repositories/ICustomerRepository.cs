@@ -9,7 +9,7 @@ namespace TimeAPI.Domain.Repositories
 {
     public interface ICustomerRepository : IRepository<Customer, string>
     {
-        IEnumerable<Customer> FindCustomerByOrgID(string OrgID);
+        IEnumerable<dynamic> FindCustomerByOrgID(string OrgID);
         Customer FindCustomerByProjectID(string ProjectID);
 
     }

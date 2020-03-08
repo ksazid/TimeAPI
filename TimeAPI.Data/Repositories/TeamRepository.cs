@@ -65,10 +65,10 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<Team> FindTeamsByOrgID(string key)
+        public IEnumerable<dynamic> FindTeamsByOrgID(string key)
         {
-            return Query<Team>(
-                sql: "SELECT ROW_NUMBER() OVER (ORDER BY team.id) AS rowno,* FROM dbo.team WHERE is_deleted = 0 and org_id = @key",
+            return Query<dynamic>(
+                sql: "SELECT ROW_NUMBER() OVER (ORDER BY team.team_name) AS rowno,* FROM dbo.team WHERE is_deleted = 0 and org_id = @key",
                 param: new { key }
             );
         }

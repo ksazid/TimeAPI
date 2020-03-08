@@ -99,7 +99,7 @@ namespace TimeAPI.Data.Repositories
         {
             return Query<dynamic>(
                    sql: @"SELECT
-                            ROW_NUMBER() OVER (ORDER BY designation.id) AS rowno,
+                            ROW_NUMBER() OVER (ORDER BY designation.dep_name) AS rowno,
 	                        designation.id,
 	                        designation.alias,
 	                        department.dep_name,
