@@ -17,7 +17,8 @@ namespace TimeAPI.Domain.Model
         public string task_name { get; set; }
         public string task_desc { get; set; }
         public string priority { get; set; }
-        public string status { get; set; }
+        public string status_id { get; set; }
+        public string status_name { get; set; }
         public string assigned_to { get; set; }
         public string assigned_to_name { get; set; }
         public string is_approver { get; set; }
