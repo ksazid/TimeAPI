@@ -394,6 +394,7 @@ namespace TimeAPI.Data.Repositories
 
             var resultsAspNetUsers = Query<dynamic>(
                 sql: @"SELECT
+                        ROW_NUMBER() OVER (ORDER BY full_name) AS rowno,
                         project_category_type, project_or_comp_name,
                         timesheet_id, groupid, is_checkout,
                         employee_id, full_name, check_in,

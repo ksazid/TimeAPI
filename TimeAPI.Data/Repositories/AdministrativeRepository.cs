@@ -110,5 +110,21 @@ namespace TimeAPI.Data.Repositories
               param: new { key }
           );
         }
+
+        public dynamic GetAdministrativeTaskByOrgID(string key)
+        {
+            return Query<dynamic>(
+                sql: @"SELECT dbo.department.id as department_id, 
+                        dbo.department.dep_name, 
+                        dbo.administrative.administrative_name,
+                        dbo.administrative.summary
+                    FROM dbo.administrative 
+                        INNER JOIN  dbo.department ON dbo.administrative.dept_id =  dbo.department.id
+                    WHERE  dbo.administrative.is_deleted = 0 
+                        AND  dbo.department.is_deleted = 0 
+                        AND  dbo.administrative.org_id =  @key",
+                param: new { key }
+            );
+        }
     }
 }

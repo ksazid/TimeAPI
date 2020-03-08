@@ -290,6 +290,29 @@ namespace TimeAPI.API.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("GetAdministrativeTaskByOrgID")]
+        public async Task<object> GetAdministrativeTaskByOrgID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                var result = _unitOfWork.AdministrativeRepository.GetAdministrativeTaskByOrgID(Utils.ID);
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+
         #endregion Administrative
 
         #region Priority
