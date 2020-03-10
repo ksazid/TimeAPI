@@ -113,23 +113,24 @@ namespace TimeAPI.Data.Repositories
         {
             var Rest = Query<Organization>(
                   sql: @"SELECT 
-                        dbo.organization.org_id,  
-	                    dbo.organization.user_id, 
-	                    dbo.organization.org_name, 
-	                    organization_branch.parent_org_id as parent_org_id,
-	                    (select org_name from dbo.organization 
-	                    where org_id = dbo.organization_branch.parent_org_id) as branchname,
-	                    dbo.organization.type,  dbo.organization.summary,  dbo.organization.img_url,
-	                    dbo.organization.img_name,  dbo.organization.country_id, 
-	                    dbo.organization.adr1,  dbo.organization.adr2,  dbo.organization.city,  
-	                    dbo.organization.primary_cont_name,
-	                    dbo.organization.primary_cont_type,  dbo.organization.time_zone_id,  
-	                    dbo.organization.created_date,  dbo.organization.createdby,
-	                    dbo.organization.modified_date,  
-	                    dbo.organization.modifiedby,
-	                    dbo.organization_branch.parent_org_id
-                FROM [dbo].[organization]
-                WHERE user_id = @user_id and  is_deleted = 0",
+	                        dbo.organization.org_id,  
+	                        dbo.organization.user_id, 
+	                        dbo.organization.org_name, 
+	                        organization_branch.parent_org_id as parent_org_id,
+	                        (select org_name from dbo.organization 
+	                        where org_id = dbo.organization_branch.parent_org_id) as branchname,
+	                        dbo.organization.type,  dbo.organization.summary,  dbo.organization.img_url,
+	                        dbo.organization.img_name,  dbo.organization.country_id, 
+	                        dbo.organization.adr1,  dbo.organization.adr2,  dbo.organization.city,  
+	                        dbo.organization.primary_cont_name,
+	                        dbo.organization.primary_cont_type,  dbo.organization.time_zone_id,  
+	                        dbo.organization.created_date,  dbo.organization.createdby
+ 
+                        FROM 
+                        dbo.organization
+                        LEFT JOIN organization_branch on dbo.organization.org_id = organization_branch.org_id
+                        WHERE dbo.organization.user_id = 'da59e4af-6e4d-4818-a169-d74a90b1c2d9'
+                        AND  dbo.organization.is_deleted = 0",
                   param: new { user_id }
               );
 
