@@ -15,9 +15,9 @@ namespace TimeAPI.Data.Repositories
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.entity_location
                                   (id, entity_id, geo_address, formatted_address, lat, lang, street_number, route, locality, administrative_area_level_2,
-                                   administrative_area_level_1, postal_code, country, created_date, createdby)
+                                   administrative_area_level_1, postal_code, country, city, created_date, createdby)
                            VALUES (@id, @entity_id, @geo_address, @formatted_address, @lat, @lang, @street_number, @route, @locality, @administrative_area_level_2,
-                                   @administrative_area_level_1, @postal_code, @country, @created_date, @createdby);
+                                   @administrative_area_level_1, @postal_code, @country, @city, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -64,6 +64,7 @@ namespace TimeAPI.Data.Repositories
                     administrative_area_level_1 = @administrative_area_level_1,
                     postal_code = @postal_code,
                     country = @country,
+                    city = @city,
                     modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE entity_id = @entity_id",

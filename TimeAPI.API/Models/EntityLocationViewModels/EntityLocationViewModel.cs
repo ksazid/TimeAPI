@@ -20,6 +20,7 @@ namespace TimeAPI.API.Models.EntityLocationViewModels
         public string administrative_area_level_1 { get; set; }
         public string postal_code { get; set; }
         public string country { get; set; }
+        public string city { get; set; }
         public string created_date { get; set; }
         public string createdby { get; set; }
     

@@ -19,6 +19,7 @@ namespace TimeAPI.Domain.Entities
         public string administrative_area_level_1 { get; set; }
         public string postal_code { get; set; }
         public string country { get; set; }
+        public string city { get; set; }
         public string created_date { get; set; }
         public string createdby { get; set; }
         public string modified_date { get; set; }
