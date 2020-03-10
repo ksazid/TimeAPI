@@ -129,7 +129,7 @@ namespace TimeAPI.Data.Repositories
                         FROM 
                         dbo.organization
                         LEFT JOIN organization_branch on dbo.organization.org_id = organization_branch.org_id
-                        WHERE dbo.organization.user_id = 'da59e4af-6e4d-4818-a169-d74a90b1c2d9'
+                        WHERE dbo.organization.user_id = @user_id
                         AND  dbo.organization.is_deleted = 0",
                   param: new { user_id }
               );
@@ -137,6 +137,51 @@ namespace TimeAPI.Data.Repositories
             var result = GetOrgAddress(Rest);
             return result;
         }
+
+        public dynamic FindAllOrgByHeadOrgID(string OrgID)
+        {
+            var Rest = Query<Organization>(
+                  sql: @"SELECT 
+                            dbo.organization_branch.parent_org_id,  
+                            dbo.organization_branch.org_id,  
+                            dbo.organization.user_id,  
+                            dbo.organization.org_name, 
+                            dbo.organization.type,
+                            dbo.organization.summary, dbo.organization.img_url,
+                            dbo.organization.img_name, dbo.organization.country_id, dbo.organization.adr1, 
+                            dbo.organization.adr2, dbo.organization.city, dbo.organization.primary_cont_name,
+                            dbo.organization.primary_cont_type, dbo.organization.time_zone_id, dbo.organization.created_date, 
+                            dbo.organization.createdby, dbo.organization.modified_date, dbo.organization.modifiedby, dbo.organization.is_deleted 
+                            FROM dbo.organization_branch
+                        INNER JOIN dbo.organization on dbo.organization_branch.org_id = dbo.organization.org_id
+                            WHERE dbo.organization_branch.parent_org_id = @OrgID
+                            and  dbo.organization_branch.is_deleted = 0
+                            and  dbo.organization.is_deleted = 0
+
+                        UNION  ALL
+
+                        SELECT 
+                            dbo.organization.org_id as parent_org_id,  
+                            dbo.organization.org_id,  
+                            dbo.organization.user_id,  
+                            dbo.organization.org_name, 
+                            dbo.organization.type,
+                            dbo.organization.summary, dbo.organization.img_url,
+                            dbo.organization.img_name, dbo.organization.country_id, dbo.organization.adr1, 
+                            dbo.organization.adr2, dbo.organization.city, dbo.organization.primary_cont_name,
+                            dbo.organization.primary_cont_type, dbo.organization.time_zone_id, dbo.organization.created_date, 
+                            dbo.organization.createdby, dbo.organization.modified_date, dbo.organization.modifiedby, dbo.organization.is_deleted 
+                            FROM dbo.organization
+                            WHERE dbo.organization.org_id = @OrgID
+                            AND  dbo.organization.is_deleted = 0",
+                  param: new { OrgID }
+              );
+
+            var result = GetOrgAddress(Rest);
+            return result;
+        }
+
+
 
         public IEnumerable<OrganizationBranchViewModel> FindByAllBranchByParengOrgID(string ParengOrgID)
         {

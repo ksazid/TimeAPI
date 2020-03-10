@@ -588,7 +588,7 @@ namespace TimeAPI.Data.Repositories
         private IEnumerable<TimesheetAbsent> GetTotalEmpCountByOrgID(string OrgID)
         {
             return Query<TimesheetAbsent>(
-                  sql: @"	SELECT
+                  sql: @"SELECT
 							distinct(employee.id),
 							employee.full_name,
 							employee.workemail,

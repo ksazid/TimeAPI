@@ -249,6 +249,29 @@ namespace TimeAPI.API.Controllers
         }
 
         [HttpPost]
+        [Route("FindAllOrgByHeadOrgID")]
+        public async Task<object> FindAllOrgByHeadOrgID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                var result = _unitOfWork.OrganizationRepository.FindAllOrgByHeadOrgID(Utils.ID);
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+        
+
+        [HttpPost]
         [Route("FindByOrgName")]
         public async Task<object> FindOrganizationByName([FromBody] UtilsName UtilsName, CancellationToken cancellationToken)
         {
