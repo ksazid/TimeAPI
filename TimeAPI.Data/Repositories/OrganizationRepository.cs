@@ -173,7 +173,8 @@ namespace TimeAPI.Data.Repositories
                             dbo.organization.createdby, dbo.organization.modified_date, dbo.organization.modifiedby, dbo.organization.is_deleted 
                             FROM dbo.organization
                             WHERE dbo.organization.org_id = @OrgID
-                            AND  dbo.organization.is_deleted = 0",
+                            AND  dbo.organization.is_deleted = 0
+                            ORDER BY created_date asc",
                   param: new { OrgID }
               );
 
