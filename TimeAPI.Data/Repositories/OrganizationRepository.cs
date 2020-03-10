@@ -177,7 +177,7 @@ namespace TimeAPI.Data.Repositories
                   param: new { OrgID }
               );
 
-            var result = GetOrgAddress(Rest);
+            var result = GetOrgAddressBranch(Rest);
             return result;
         }
 
@@ -224,11 +224,25 @@ namespace TimeAPI.Data.Repositories
                        param: new { item = orgList[i].org_id }
                     );
 
-
                 orgList[i].EntityLocation = entityLocation;
                 orgList[i].OrganizationSetup = entitySetup;
             }
 
+            return orgList;
+        }
+
+        private List<Organization> GetOrgAddressBranch(IEnumerable<Organization> resultsOrganization)
+        {
+            List<Organization> orgList = (resultsOrganization as List<Organization>);
+            for (int i = 0; i < orgList.Count; i++)
+            {
+                var entityLocation = QuerySingleOrDefault<EntityLocation>(
+                   sql: @"SELECT * from entity_location WITH (NOLOCK) WHERE entity_id = @item and is_deleted = 0;",
+                   param: new { item = orgList[i].org_id }
+                  );
+
+                orgList[i].EntityLocation = entityLocation;
+            }
             return orgList;
         }
 
@@ -247,7 +261,7 @@ namespace TimeAPI.Data.Repositories
                        param: new { item = orgList[i].org_id }
                     );
 
-    
+
                 orgList[i].EntityLocationViewModel = entityLocation;
                 orgList[i].OrganizationSetup = entitySetup;
             }
