@@ -112,7 +112,8 @@ namespace TimeAPI.Data.Repositories
         public dynamic FindByUsersID(string user_id)
         {
             var Rest = Query<Organization>(
-                  sql: @"dbo.organization.org_id,  
+                  sql: @"SELECT 
+                        dbo.organization.org_id,  
 	                    dbo.organization.user_id, 
 	                    dbo.organization.org_name, 
 	                    organization_branch.parent_org_id as parent_org_id,
