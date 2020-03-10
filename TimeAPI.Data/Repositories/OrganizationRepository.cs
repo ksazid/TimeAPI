@@ -112,10 +112,22 @@ namespace TimeAPI.Data.Repositories
         public dynamic FindByUsersID(string user_id)
         {
             var Rest = Query<Organization>(
-                  sql: @"SELECT org_id, user_id, org_name, type, summary, img_url,
-                       img_name, country_id, adr1, adr2, city, primary_cont_name,
-                       primary_cont_type, time_zone_id, created_date, createdby,
-                       modified_date, modifiedby, is_deleted FROM [dbo].[organization]
+                  sql: @"dbo.organization.org_id,  
+	                    dbo.organization.user_id, 
+	                    dbo.organization.org_name, 
+	                    organization_branch.parent_org_id as parent_org_id,
+	                    (select org_name from dbo.organization 
+	                    where org_id = dbo.organization_branch.parent_org_id) as branchname,
+	                    dbo.organization.type,  dbo.organization.summary,  dbo.organization.img_url,
+	                    dbo.organization.img_name,  dbo.organization.country_id, 
+	                    dbo.organization.adr1,  dbo.organization.adr2,  dbo.organization.city,  
+	                    dbo.organization.primary_cont_name,
+	                    dbo.organization.primary_cont_type,  dbo.organization.time_zone_id,  
+	                    dbo.organization.created_date,  dbo.organization.createdby,
+	                    dbo.organization.modified_date,  
+	                    dbo.organization.modifiedby,
+	                    dbo.organization_branch.parent_org_id
+                FROM [dbo].[organization]
                 WHERE user_id = @user_id and  is_deleted = 0",
                   param: new { user_id }
               );
