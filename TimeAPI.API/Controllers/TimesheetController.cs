@@ -84,6 +84,9 @@ namespace TimeAPI.API.Controllers
                 //Default User Location At the time of checkin
                 AddTimesheetCurrentLocation(timesheetViewModel, modal);
 
+                //Exeception Checkin Not In Range
+                AddTimesheetLocationException(timesheetViewModel, modal);
+
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Timesheet registered succefully." }).ConfigureAwait(false);
@@ -235,6 +238,8 @@ namespace TimeAPI.API.Controllers
 
                 #endregion CurrentLocation
 
+                
+
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Timesheet updated succefully." }).ConfigureAwait(false);
@@ -264,6 +269,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.TimesheetProjectCategoryRepository.RemoveByGroupID(Timesheet.groupid);
                 _unitOfWork.TimesheetActivityRepository.RemoveByGroupID(Timesheet.groupid);
                 _unitOfWork.TimesheetAdministrativeRepository.RemoveByGroupID(Timesheet.groupid);
+                _unitOfWork.LocationExceptionRepository.RemoveByGroupID(Timesheet.groupid);
 
                 _unitOfWork.Commit();
 
@@ -365,6 +371,25 @@ namespace TimeAPI.API.Controllers
                 }
 
                 #endregion Location
+
+                #region CurrentLocationException
+
+                if (timesheetViewModel.TimesheetCurrentLocationViewModel != null)
+                {
+                    var Location = new LocationException
+                    {
+                        group_id = timesheetViewModel.groupid,
+                        checkout_lat = timesheetViewModel.TimesheetCurrentLocationViewModel.lat,
+                        checkout_lang = timesheetViewModel.TimesheetCurrentLocationViewModel.lang,
+                        is_chkout_inrange = timesheetViewModel.is_inrange,
+                        is_checkout = true,
+                        modified_date = _dateTime.ToString(),
+                        modifiedby = timesheetViewModel.modifiedby
+                    };
+                    _unitOfWork.LocationExceptionRepository.Update(Location);
+                }
+
+                #endregion CurrentLocationException
 
                 _unitOfWork.Commit();
 
@@ -1059,6 +1084,30 @@ namespace TimeAPI.API.Controllers
             }
 
             #endregion CurrentLocation
+        }
+
+        private void AddTimesheetLocationException(TimesheetPostViewModel timesheetViewModel, Timesheet modal)
+        {
+            #region CurrentLocationException
+
+            if (timesheetViewModel.TimesheetCurrentLocationViewModel != null)
+            {
+                var Location = new LocationException
+                {
+                    id = Guid.NewGuid().ToString(),
+                    group_id = modal.groupid,
+                    checkin_lat = timesheetViewModel.TimesheetCurrentLocationViewModel.lat,
+                    checkin_lang = timesheetViewModel.TimesheetCurrentLocationViewModel.lang,
+                    is_chkin_inrange = timesheetViewModel.is_inrange,
+                    is_deleted = false,
+                    is_checkout = false,
+                    created_date = _dateTime.ToString(),
+                    createdby = modal.createdby
+                };
+                _unitOfWork.LocationExceptionRepository.Add(Location);
+            }
+
+            #endregion CurrentLocationException
         }
 
         private static void ConvertHoursAndMinutes(TimeSpan elapsedSpan, out string TotalHours, out string TotalMinutes)

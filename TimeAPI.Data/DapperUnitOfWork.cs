@@ -64,6 +64,7 @@ namespace TimeAPI.Data
         private IDelegationsDelegateeRepository _delegationsDelegateeRepository;
         private ISuperadminOrganizationRepository _superadminOrganizationRepository;
         private IAdminDashboardRepository _adminDashboardRepository;
+        private ILocationExceptionRepository _locationExceptionRepository;
 
         #region systemadmin
         private IPlanRepository _planRepository;
@@ -574,6 +575,15 @@ namespace TimeAPI.Data
                     ?? (_superadminOrganizationRepository = new SuperadminOrganizationRepository(_transaction));
             }
         }
+        public ILocationExceptionRepository LocationExceptionRepository
+        {
+            get
+            {
+                return _locationExceptionRepository
+                    ?? (_locationExceptionRepository = new LocationExceptionRepository(_transaction));
+            }
+        }
+        
 
 
         public bool Commit()

@@ -229,8 +229,7 @@ namespace TimeAPI.Data.Repositories
                 AbsentData.AddRange(Result);
             }
 
-            return AbsentData.Select((r, i) => new { Row = r, Index = i })
-                            .OrderByDescending(x => x.Row.ondate);
+            return AbsentData;
         }
 
         public dynamic GetCheckOutLocationByGroupID(string GroupID)
@@ -572,7 +571,6 @@ namespace TimeAPI.Data.Repositories
 
             return Query<TimesheetAbsent>(
                 sql: @"SELECT
-	                        ROW_NUMBER() OVER (ORDER BY full_name) AS rowno,
 	                        employee.id,
 	                        employee.full_name,
 	                        employee.workemail,
