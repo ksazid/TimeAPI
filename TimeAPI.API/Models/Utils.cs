@@ -155,4 +155,24 @@ namespace TimeAPI.API.Models
         public bool is_real_estate { get; set; }
         public bool is_sales { get; set; }
     }
+
+
+
+    //internal sealed class MyComparer : IEqualityComparer<T>
+    //{
+    //    public bool Equals(T x, Y y)
+    //    {
+    //        if (x == null)
+    //            return y == null;
+    //        else if (y == null)
+    //            return false;
+    //        else
+    //            return x.id == y.id && x.full_name == y.full_name;
+    //    }
+
+    //    public int GetHashCode(T obj)
+    //    {
+    //        return obj.id.GetHashCode();
+    //    }
+    //}
 }
