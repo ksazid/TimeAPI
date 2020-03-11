@@ -270,7 +270,6 @@ namespace TimeAPI.API.Controllers
             }
         }
         
-
         [HttpPost]
         [Route("FindByOrgName")]
         public async Task<object> FindOrganizationByName([FromBody] UtilsName UtilsName, CancellationToken cancellationToken)

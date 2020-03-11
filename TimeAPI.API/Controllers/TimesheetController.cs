@@ -238,8 +238,6 @@ namespace TimeAPI.API.Controllers
 
                 #endregion CurrentLocation
 
-                
-
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Timesheet updated succefully." }).ConfigureAwait(false);
@@ -1142,5 +1140,26 @@ namespace TimeAPI.API.Controllers
 
         //    return retMessage;
         //}
+
+        [HttpPost]
+        [Route("FindLocationByEntityID")]
+        public async Task<object> FindLocationByEntityID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+                var resultLocation = _unitOfWork.EntityLocationRepository.FindByEnitiyID(Utils.ID);
+
+                return await Task.FromResult<object>(resultLocation).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
     }
 }
