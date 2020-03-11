@@ -106,17 +106,6 @@ namespace TimeAPI.Data.Repositories
             return resultsAspNetUsers;
         }
 
-        public dynamic TotalEmpAbsentCountByOrgIDAndDate(string org_id, string fromDate, string toDate)
-        {
-            int AbsentCount = 0;
-            var OffDaysList = ExceptOffDaysDates(org_id, fromDate, toDate);
-
-            for (int i = 0; i < OffDaysList.Count(); i++)
-                AbsentCount += GetEmpAbsentCountAttendedByOrgIDAndDate(org_id, OffDaysList[i].ToString(), OffDaysList[i].ToString()).Count();
-
-            return AbsentCount;
-        }
-
         public dynamic TotalEmpAttentedCountByOrgIDAndDate(string org_id, string fromDate, string toDate)
         {
             List<dynamic> TimesheetDashboardData = new List<dynamic>();
@@ -216,6 +205,34 @@ namespace TimeAPI.Data.Repositories
             return resultsAspNetUsers;
         }
 
+        public dynamic TotalEmpAbsentCountByOrgIDAndDate(string org_id, string fromDate, string toDate)
+        {
+            int AbsentCount = 0;
+            var OffDaysList = ExceptOffDaysDates(org_id, fromDate, toDate);
+
+            for (int i = 0; i < OffDaysList.Count(); i++)
+                AbsentCount += GetEmpAbsentCountAttendedByOrgIDAndDate(org_id, OffDaysList[i].ToString(), OffDaysList[i].ToString()).Count();
+
+            return AbsentCount;
+        }
+
+        public dynamic GetTimesheetDashboardGridAbsentDataByOrgIDAndDate(string org_id, string fromDate, string toDate)
+        {
+            List<TimesheetAbsent> AbsentData = new List<TimesheetAbsent>();
+
+            var OffDaysList = ExceptOffDaysDates(org_id, fromDate, toDate);
+            for (int i = 0; i < OffDaysList.Count(); i++)
+            {
+                List<string> EmpList = GetEmpAbsentCountAttendedByOrgIDAndDate(org_id, OffDaysList[i].ToString(), OffDaysList[i].ToString()).ToList();
+                var Result = GettingAllAbsentEmployeeList(OffDaysList[i].ToString(), EmpList);
+
+                AbsentData.AddRange(Result);
+            }
+
+            return AbsentData.Select((r, i) => new { Row = r, Index = i })
+                            .OrderByDescending(x => x.Row.ondate);
+        }
+
         public dynamic GetCheckOutLocationByGroupID(string GroupID)
         {
             var resultsAspNetUsers = Query<dynamic>(
@@ -227,36 +244,6 @@ namespace TimeAPI.Data.Repositories
                 param: new { GroupID }
             );
             return resultsAspNetUsers;
-        }
-
-        public dynamic GetTimesheetDashboardGridAbsentDataByOrgIDAndDate(string org_id, string fromDate, string toDate)
-        {
-            List<TimesheetAbsent> AbsentData = new List<TimesheetAbsent>();
-            List<DateTime> OffDaysList = new List<DateTime>();
-
-            string offdays = GetWeekOffsFromOrg(org_id);
-            List<DateTime> Dates = Enumerable.Range(0, (Convert.ToDateTime(toDate) - Convert.ToDateTime(fromDate)).Days + 1)
-                                             .Select(d => Convert.ToDateTime(fromDate).AddDays(d)).ToList();
-
-            foreach (var item in offdays.Split(','))
-            {
-                var RangeDate = Dates.Where(x => x.DayOfWeek.ToString().Contains(item.ToString(), StringComparison.OrdinalIgnoreCase))
-                                     .Select(x => Convert.ToDateTime(DateTime.Parse(x.Date.ToString()).ToString("MM/dd/yyyy"))).ToList();
-
-                OffDaysList.AddRange(RangeDate);
-            }
-
-            OffDaysList = Dates.Except(OffDaysList).ToList();
-            for (int i = 0; i < OffDaysList.Count(); i++)
-            {
-                List<TimesheetAbsent> AbsentDataTemp = new List<TimesheetAbsent>();
-                List<string> EmpList = GetEmpAbsentCountAttendedByOrgIDAndDate(org_id, OffDaysList[i].ToString(), OffDaysList[i].ToString()).ToList();
-                var Result = GettingAllAbsentEmployeeList(OffDaysList[i].ToString(), EmpList);
-
-                AbsentData.AddRange(Result);
-            }
-
-            return AbsentData;
         }
 
         public dynamic TotalEmpOverTimeCountByOrgIDAndDate(string org_id, string fromDate, string toDate)
@@ -647,6 +634,7 @@ namespace TimeAPI.Data.Repositories
         }
 
         #endregion PrivateMethods
+
     }
 
 }
