@@ -10,8 +10,8 @@ namespace TimeAPI.Domain.Entities
         public string org_id { get; set; }
         public string country { get; set; }
         public string fiscal_year { get; set; }
-        public string start_of_week { get; set; }
-        public List<WeekendHours> working_hrs { get; set; }
+        public List<WeekendHours> weekends { get; set; }
+        public string working_hrs { get; set; }
         public string date_format { get; set; }
         public string currency { get; set; }
         public string time_zome { get; set; }

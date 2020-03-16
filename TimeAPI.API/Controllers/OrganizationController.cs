@@ -100,7 +100,23 @@ namespace TimeAPI.API.Controllers
                     modal1.created_date = _dateTime.ToString();
                     modal1.is_deleted = false;
                     modal1.fiscal_year = organizationViewModel.OrganizationSetup.fiscal_year;
-                    modal1.start_of_week = organizationViewModel.OrganizationSetup.start_of_week;
+
+                    foreach (var item in organizationViewModel.OrganizationSetup.weekends)
+                    {
+                        var weekend = new WeekendHours()
+                        {
+
+                            id = Guid.NewGuid().ToString(),
+                            org_id = modal.org_id,
+                            offworkdays = item.offworkdays,
+                            start_time = item.start_time,
+                            end_time = item.end_time,
+                            created_date = _dateTime.ToString(),
+                            createdby = organizationViewModel.createdby,
+                            is_deleted = false
+                        };
+                        _unitOfWork.WeekendHoursRepository.Add(weekend);
+                    }
 
                     _unitOfWork.OrganizationSetupRepository.Add(modal1);
                 }
@@ -139,6 +155,26 @@ namespace TimeAPI.API.Controllers
                 var result = _unitOfWork.EntityLocationRepository.FindByEnitiyID(modal.org_id);
                 var result1 = _unitOfWork.OrganizationSetupRepository.FindByEnitiyID(modal.org_id);
                 AddOrUpdateSetupAndLocation(organizationViewModel, config, mapper, modal, result, result1);
+
+                // remove weekend
+                _unitOfWork.WeekendHoursRepository.RemoveByOrgID(modal.org_id);
+
+                foreach (var item in organizationViewModel.OrganizationSetup.weekends)
+                {
+                    var weekend = new WeekendHours()
+                    {
+                        id = Guid.NewGuid().ToString(),
+                        org_id = modal.org_id,
+                        offworkdays = item.offworkdays,
+                        start_time = item.start_time,
+                        end_time = item.end_time,
+                        created_date = _dateTime.ToString(),
+                        createdby = organizationViewModel.createdby,
+                        is_deleted = false
+                    };
+                    _unitOfWork.WeekendHoursRepository.Add(weekend);
+                }
+
 
                 //Update Branch
                 AddBranchOrg(organizationViewModel, modal.org_id);
@@ -269,7 +305,7 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-        
+
         [HttpPost]
         [Route("FindByOrgName")]
         public async Task<object> FindOrganizationByName([FromBody] UtilsName UtilsName, CancellationToken cancellationToken)
@@ -310,7 +346,7 @@ namespace TimeAPI.API.Controllers
         }
 
         #region helper
-        
+
         //not in use
         [HttpPost]
         [Route("AddOrganizationBranch")]
@@ -425,8 +461,23 @@ namespace TimeAPI.API.Controllers
                             modalBranchSetup.created_date = _dateTime.ToString();
                             modalBranchSetup.is_deleted = false;
                             modalBranchSetup.fiscal_year = modalBranchSetup.fiscal_year;
-                            modalBranchSetup.start_of_week = modalBranchSetup.start_of_week;
 
+                            _unitOfWork.WeekendHoursRepository.RemoveByOrgID(modalBranch.org_id);
+                            foreach (var item in organizationViewModel.OrganizationSetup.weekends)
+                            {
+                                var weekend = new WeekendHours()
+                                {
+                                    id = Guid.NewGuid().ToString(),
+                                    org_id = modalBranch.org_id,
+                                    offworkdays = item.offworkdays,
+                                    start_time = item.start_time,
+                                    end_time = item.end_time,
+                                    created_date = _dateTime.ToString(),
+                                    createdby = organizationViewModel.createdby,
+                                    is_deleted = false
+                                };
+                                _unitOfWork.WeekendHoursRepository.Add(weekend);
+                            }
                             _unitOfWork.OrganizationSetupRepository.Add(modalBranchSetup);
                         }
 
