@@ -66,6 +66,7 @@ namespace TimeAPI.Data
         private IAdminDashboardRepository _adminDashboardRepository;
         private ILocationExceptionRepository _locationExceptionRepository;
         private IEntityInvitationRepository _entityInvitationRepository;
+        private IWeekendHoursRepository _weekendHoursRepository;
 
         #region systemadmin
         private IPlanRepository _planRepository;
@@ -592,7 +593,15 @@ namespace TimeAPI.Data
                     ?? (_entityInvitationRepository = new EntityInvitationRepository(_transaction));
             }
         }
-        
+
+        public IWeekendHoursRepository WeekendHoursRepository
+        {
+            get
+            {
+                return _weekendHoursRepository
+                    ?? (_weekendHoursRepository = new WeekendHoursRepository(_transaction));
+            }
+        }
 
 
         public bool Commit()

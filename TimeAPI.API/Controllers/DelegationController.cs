@@ -132,11 +132,11 @@ namespace TimeAPI.API.Controllers
 
                 _unitOfWork.DelegationsRepository.Add(modal);
                 if (_unitOfWork.Commit())
-                { 
+                {
                     //send email
                 }
 
-                    return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Delegations Added succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Delegations Added succefully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -231,12 +231,7 @@ namespace TimeAPI.API.Controllers
                     if (Role.NormalizedName.Equals("SUPERADMIN"))
                         _unitOfWork.EmployeeRepository.SetDelegateeAsSuperAdminByEmpID(item);
 
-
-
                     _unitOfWork.EntityInvitationRepository.Add(EntityInvitation);
-
-
-                    //send invitation mail
                 }
 
                 _unitOfWork.DelegationsRepository.Update(modal);
