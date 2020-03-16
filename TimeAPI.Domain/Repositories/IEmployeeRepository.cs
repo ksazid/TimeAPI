@@ -22,7 +22,9 @@ namespace TimeAPI.Domain.Repositories
         dynamic GetAllFreelancerEmpByOrgID(string OrgID);
         void SetEmployeeInactiveByEmpID(string OrgID);
         void RemovePermanent(string EmpID);
-        void SetCustomerAsAdminByEmpID(string EmpID);
+        void SetDelegateeAsAdminByEmpID(string EmpID);
+        void SetDelegateeAsSuperAdminByEmpID(string EmpID);
         void RemoveAdminRightByEmpID(string key);
+        void RemoveSuperAdminRightByEmpID(string key);
     }
 }

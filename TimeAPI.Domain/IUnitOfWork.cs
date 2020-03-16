@@ -56,6 +56,7 @@ namespace TimeAPI.Domain
         ISuperadminOrganizationRepository SuperadminOrganizationRepository { get; }
         IAdminDashboardRepository AdminDashboardRepository { get; }
         ILocationExceptionRepository LocationExceptionRepository { get; }
+        IEntityInvitationRepository EntityInvitationRepository { get; }
 
         #region systemadmin
         IPlanRepository PlanRepository { get; }

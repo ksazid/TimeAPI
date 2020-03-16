@@ -265,7 +265,7 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public void SetCustomerAsAdminByEmpID(string key)
+        public void SetDelegateeAsAdminByEmpID(string key)
         {
             Execute(
                 sql: @"UPDATE dbo.employee
@@ -277,6 +277,29 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
+        public void SetDelegateeAsSuperAdminByEmpID(string key)
+        {
+            Execute(
+                sql: @"UPDATE dbo.employee
+                   SET
+                   is_superadmin = 1,
+                   modified_date = GETDATE()
+                   WHERE id = @key",
+                param: new { key }
+            );
+        }
+
+        public void RemoveSuperAdminRightByEmpID(string key)
+        {
+            Execute(
+                sql: @"UPDATE dbo.employee
+                   SET
+                   is_superadmin = 0,
+                   modified_date = GETDATE()
+                   WHERE id = @key",
+                param: new { key }
+            );
+        }
         public void RemoveAdminRightByEmpID(string key)
         {
             Execute(

@@ -65,6 +65,7 @@ namespace TimeAPI.Data
         private ISuperadminOrganizationRepository _superadminOrganizationRepository;
         private IAdminDashboardRepository _adminDashboardRepository;
         private ILocationExceptionRepository _locationExceptionRepository;
+        private IEntityInvitationRepository _entityInvitationRepository;
 
         #region systemadmin
         private IPlanRepository _planRepository;
@@ -581,6 +582,14 @@ namespace TimeAPI.Data
             {
                 return _locationExceptionRepository
                     ?? (_locationExceptionRepository = new LocationExceptionRepository(_transaction));
+            }
+        }
+        public IEntityInvitationRepository EntityInvitationRepository
+        {
+            get
+            {
+                return _entityInvitationRepository
+                    ?? (_entityInvitationRepository = new EntityInvitationRepository(_transaction));
             }
         }
         

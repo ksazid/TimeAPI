@@ -83,6 +83,8 @@ namespace TimeAPI.API
             services.AddIdentity<ApplicationUser, IdentityRole>()
               .AddCustomStores()
               .AddDefaultTokenProviders();
+              //.AddDefaultTokenProviders(provider => new LifetimeValidator(TimeSpan.FromDays(2)));
+
 
             // Add application services.
             services.AddScoped<IUnitOfWork, DapperUnitOfWork>(provider => new DapperUnitOfWork(Configuration.GetConnectionString("DefaultConnection")));
@@ -143,11 +145,11 @@ namespace TimeAPI.API
                             IssuerSigningKey = new SymmetricSecurityKey(key),
                             ValidateIssuer = false,
                             ValidateAudience = false,
-                            ClockSkew = TimeSpan.Zero
+                            ClockSkew = TimeSpan.Zero 
                         };
                     });
 
-            services.Configure<SecurityStampValidatorOptions>(o => o.ValidationInterval = TimeSpan.FromMinutes(60));
+            services.Configure<SecurityStampValidatorOptions>(o => o.ValidationInterval = TimeSpan.FromDays(1));
 
             //services.AddHangfire(x => x.UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnection")));
             //services.AddHangfireServer();

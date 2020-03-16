@@ -56,6 +56,8 @@ namespace TimeAPI.API.Controllers
                 modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
+                var Role = _unitOfWork.RoleRepository.Find(planViewModel.role_id);
+
                 foreach (var item in planViewModel.delegatee_emp_id)
                 {
                     var Delegatee = new DelegationsDelegatee()
@@ -74,14 +76,67 @@ namespace TimeAPI.API.Controllers
                         is_deleted = false
                     };
 
-                    _unitOfWork.EmployeeRepository.SetCustomerAsAdminByEmpID(item);
+                    if (Role.NormalizedName.Equals("ADMIN"))
+                        _unitOfWork.EmployeeRepository.SetDelegateeAsAdminByEmpID(item);
+
+                    if (Role.NormalizedName.Equals("SUPERADMIN"))
+                        _unitOfWork.EmployeeRepository.SetDelegateeAsSuperAdminByEmpID(item);
+
                     _unitOfWork.DelegationsDelegateeRepository.Add(Delegatee);
                 }
 
-                _unitOfWork.DelegationsRepository.Add(modal);
-                _unitOfWork.Commit();
+                foreach (var item in planViewModel.invitees)
+                {
+                    string entityid, emp_id = string.Empty;
+                    entityid = Guid.NewGuid().ToString();
+                    emp_id = Guid.NewGuid().ToString();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Delegations Added succefully." }).ConfigureAwait(false);
+                    var Delegatee = new DelegationsDelegatee()
+                    {
+                        id = entityid,
+                        delegator_id = modal.id,
+                        delegatee_id = emp_id,
+                        is_type_temporary = planViewModel.is_type_temporary,
+                        expires_on = planViewModel.expires_on,
+                        is_type_permanent = planViewModel.is_type_permanent,
+                        is_notify_delegator_and_delegatee = planViewModel.is_notify_delegator_and_delegatee,
+                        is_notify_delegatee = planViewModel.is_notify_delegatee,
+                        role_id = planViewModel.role_id,
+                        createdby = modal.createdby,
+                        created_date = _dateTime.ToString(),
+                        is_deleted = false
+                    };
+
+                    var EntityInvitation = new EntityInvitation()
+                    {
+                        id = Guid.NewGuid().ToString(),
+                        entity_id = entityid,
+                        org_id = modal.org_id,
+                        emp_id = emp_id,
+                        email = item,
+                        role_id = planViewModel.role_id,
+                        createdby = modal.createdby,
+                        created_date = _dateTime.ToString(),
+                        is_deleted = false
+
+                    };
+
+                    if (Role.NormalizedName.Equals("ADMIN"))
+                        _unitOfWork.EmployeeRepository.SetDelegateeAsAdminByEmpID(item);
+
+                    if (Role.NormalizedName.Equals("SUPERADMIN"))
+                        _unitOfWork.EmployeeRepository.SetDelegateeAsSuperAdminByEmpID(item);
+
+                    _unitOfWork.EntityInvitationRepository.Add(EntityInvitation);
+                }
+
+                _unitOfWork.DelegationsRepository.Add(modal);
+                if (_unitOfWork.Commit())
+                { 
+                    //send email
+                }
+
+                    return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Delegations Added succefully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -106,6 +161,8 @@ namespace TimeAPI.API.Controllers
                 var modal = mapper.Map<Delegations>(planViewModel);
                 modal.modified_date = _dateTime.ToString();
 
+                var Role = _unitOfWork.RoleRepository.Find(planViewModel.role_id);
+
                 foreach (var item in planViewModel.delegatee_emp_id)
                 {
                     var Delegatee = new DelegationsDelegatee()
@@ -123,12 +180,70 @@ namespace TimeAPI.API.Controllers
                         is_deleted = false
                     };
 
-                    _unitOfWork.EmployeeRepository.SetCustomerAsAdminByEmpID(item);
+                    if (Role.NormalizedName.Equals("ADMIN"))
+                        _unitOfWork.EmployeeRepository.SetDelegateeAsAdminByEmpID(item);
+
+                    if (Role.NormalizedName.Equals("SUPERADMIN"))
+                        _unitOfWork.EmployeeRepository.SetDelegateeAsSuperAdminByEmpID(item);
+
                     _unitOfWork.DelegationsDelegateeRepository.Update(Delegatee);
                 }
 
+                foreach (var item in planViewModel.invitees)
+                {
+                    string entityid, emp_id = string.Empty;
+                    entityid = Guid.NewGuid().ToString();
+                    emp_id = Guid.NewGuid().ToString();
+
+                    var Delegatee = new DelegationsDelegatee()
+                    {
+                        id = entityid,
+                        delegator_id = modal.id,
+                        delegatee_id = emp_id,
+                        is_type_temporary = planViewModel.is_type_temporary,
+                        expires_on = planViewModel.expires_on,
+                        is_type_permanent = planViewModel.is_type_permanent,
+                        is_notify_delegator_and_delegatee = planViewModel.is_notify_delegator_and_delegatee,
+                        is_notify_delegatee = planViewModel.is_notify_delegatee,
+                        role_id = planViewModel.role_id,
+                        createdby = modal.createdby,
+                        created_date = _dateTime.ToString(),
+                        is_deleted = false
+                    };
+
+                    var EntityInvitation = new EntityInvitation()
+                    {
+                        id = Guid.NewGuid().ToString(),
+                        entity_id = entityid,
+                        org_id = modal.org_id,
+                        emp_id = emp_id,
+                        email = item,
+                        role_id = planViewModel.role_id,
+                        createdby = modal.createdby,
+                        created_date = _dateTime.ToString(),
+                        is_deleted = false
+
+                    };
+
+                    if (Role.NormalizedName.Equals("ADMIN"))
+                        _unitOfWork.EmployeeRepository.SetDelegateeAsAdminByEmpID(item);
+
+                    if (Role.NormalizedName.Equals("SUPERADMIN"))
+                        _unitOfWork.EmployeeRepository.SetDelegateeAsSuperAdminByEmpID(item);
+
+
+
+                    _unitOfWork.EntityInvitationRepository.Add(EntityInvitation);
+
+
+                    //send invitation mail
+                }
+
                 _unitOfWork.DelegationsRepository.Update(modal);
-                _unitOfWork.Commit();
+                if (_unitOfWork.Commit())
+                {
+                    //send email
+                }
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Delegations updated succefully." }).ConfigureAwait(false);
             }
@@ -152,6 +267,7 @@ namespace TimeAPI.API.Controllers
 
                 _unitOfWork.DelegationsRepository.Remove(Utils.ID);
                 _unitOfWork.DelegationsDelegateeRepository.RemoveByDelegator(Utils.ID);
+                _unitOfWork.EntityInvitationRepository.RemoveByEntityID(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee removed succefully." }).ConfigureAwait(false);
