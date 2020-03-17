@@ -166,9 +166,43 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
+
+                int Result = _unitOfWork.EmployeeRepository.RemoveEmployeeIfZeroActivity(Utils.ID);
+
+                if (Result > 0)
+                {
+                    return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee has being attended more than one project activity. Are you sure to remove all past history of the employee." }).ConfigureAwait(false);
+                }
+
                 var result = _unitOfWork.EmployeeRepository.Find(Utils.ID);
 
-                _unitOfWork.EmployeeRepository.Remove(Utils.ID);
+                _unitOfWork.EmployeeRepository.RemovePermanent(Utils.ID);
+                _unitOfWork.UserRepository.Remove(result.user_id);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee removed succefully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("RemoveEmployeePermanent")]
+        public async Task<object> RemoveEmployeePermanent([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                var result = _unitOfWork.EmployeeRepository.Find(Utils.ID);
+
+                _unitOfWork.EmployeeRepository.RemovePermanent(Utils.ID);
                 _unitOfWork.UserRepository.Remove(result.user_id);
                 _unitOfWork.Commit();
 

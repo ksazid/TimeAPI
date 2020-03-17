@@ -313,16 +313,26 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public void RemoveEmployeeIfZeroActivity(string key)
+        public int RemoveEmployeeIfZeroActivity(string key)
         {
-            Execute(
-                sql: @"UPDATE dbo.employee
-                   SET
-                   is_admin = 0,
-                   modified_date = GETDATE()
-                   WHERE id = @key",
-                param: new { key }
-            );
+            return QuerySingleOrDefault<int>(
+              sql: @"SELECT				
+
+                   COUNT(dbo.timesheet_activity.id) as CoutActivity
+                FROM
+                    dbo.timesheet_activity  with(nolock)
+                    INNER JOIN project on project.id = [timesheet_activity].project_id
+                    INNER JOIN project_activity on project_activity.id =[timesheet_activity].milestone_id
+                    LEFT JOIN task on dbo.timesheet_activity.task_id = task.id
+
+                    INNER JOIN timesheet on dbo.timesheet_activity.groupid = timesheet.groupid
+
+                    INNER JOIN timesheet_x_project_category on timesheet_x_project_category.groupid = dbo.timesheet_activity.groupid
+
+                    AND dbo.timesheet_activity.is_deleted = 0
+                    AND timesheet.empid = @key",
+              param: new { key }
+          );
         }
     }
 }

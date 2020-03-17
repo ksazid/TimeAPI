@@ -26,6 +26,6 @@ namespace TimeAPI.Domain.Repositories
         void SetDelegateeAsSuperAdminByEmpID(string EmpID);
         void RemoveAdminRightByEmpID(string key);
         void RemoveSuperAdminRightByEmpID(string key);
-        void RemoveEmployeeIfZeroActivity(string key);
+        int RemoveEmployeeIfZeroActivity(string key);
     }
 }
