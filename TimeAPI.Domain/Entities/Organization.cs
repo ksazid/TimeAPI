@@ -10,6 +10,7 @@ namespace TimeAPI.Domain.Entities
         public string user_id { get; set; }
         public string org_name { get; set; }
         public string type { get; set; }
+        public string other_type { get; set; }
         public string summary { get; set; }
         public string img_url { get; set; }
         public string img_name { get; set; }
