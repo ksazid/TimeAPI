@@ -92,13 +92,13 @@ namespace TimeAPI.API.Controllers
                 {
                     foreach (var item in planViewModel.invitees)
                     {
-                        string entityid, emp_id = string.Empty;
-                        entityid = Guid.NewGuid().ToString();
+                        string emp_id = string.Empty;
+                        //entityid = Guid.NewGuid().ToString();
                         emp_id = Guid.NewGuid().ToString();
 
                         var Delegatee = new DelegationsDelegatee()
                         {
-                            id = entityid,
+                            id = Guid.NewGuid().ToString(),
                             delegator_id = modal.id,
                             delegatee_id = emp_id,
                             is_type_temporary = planViewModel.is_type_temporary,
@@ -115,7 +115,7 @@ namespace TimeAPI.API.Controllers
                         var EntityInvitation = new EntityInvitation()
                         {
                             id = Guid.NewGuid().ToString(),
-                            entity_id = entityid,
+                            entity_id = modal.id,
                             org_id = modal.org_id,
                             emp_id = emp_id,
                             email = item,
@@ -123,7 +123,6 @@ namespace TimeAPI.API.Controllers
                             createdby = modal.createdby,
                             created_date = _dateTime.ToString(),
                             is_deleted = false
-
                         };
 
                         if (Role.NormalizedName.Equals("ADMIN"))
@@ -131,6 +130,8 @@ namespace TimeAPI.API.Controllers
 
                         if (Role.NormalizedName.Equals("SUPERADMIN"))
                             _unitOfWork.EmployeeRepository.SetDelegateeAsSuperAdminByEmpID(item);
+
+                        _unitOfWork.DelegationsDelegateeRepository.Add(Delegatee);
 
                         _unitOfWork.EntityInvitationRepository.Add(EntityInvitation);
                     }
@@ -175,7 +176,7 @@ namespace TimeAPI.API.Controllers
                     {
                         var Delegatee = new DelegationsDelegatee()
                         {
-                            delegator_id = modal.id,
+                            delegator_id = modal.delegator,
                             delegatee_id = item,
                             is_type_temporary = planViewModel.is_type_temporary,
                             expires_on = planViewModel.expires_on,
@@ -200,17 +201,20 @@ namespace TimeAPI.API.Controllers
 
                 if (planViewModel.invitees != null)
                 {
+                    var Entity = _unitOfWork.EntityInvitationRepository.Find(modal.id);
+                    if (Entity != null)
+                        _unitOfWork.EntityInvitationRepository.RemoveByEntityID(modal.id);
 
                     foreach (var item in planViewModel.invitees)
                     {
-                        string entityid, emp_id = string.Empty;
-                        entityid = Guid.NewGuid().ToString();
+                        string emp_id = string.Empty;
+                        //entityid = Guid.NewGuid().ToString();
                         emp_id = Guid.NewGuid().ToString();
 
                         var Delegatee = new DelegationsDelegatee()
                         {
-                            id = entityid,
-                            delegator_id = modal.id,
+                            id = Guid.NewGuid().ToString(),
+                            delegator_id = modal.delegator,
                             delegatee_id = emp_id,
                             is_type_temporary = planViewModel.is_type_temporary,
                             expires_on = planViewModel.expires_on,
@@ -226,7 +230,7 @@ namespace TimeAPI.API.Controllers
                         var EntityInvitation = new EntityInvitation()
                         {
                             id = Guid.NewGuid().ToString(),
-                            entity_id = entityid,
+                            entity_id = modal.id,
                             org_id = modal.org_id,
                             emp_id = emp_id,
                             email = item,
@@ -243,9 +247,12 @@ namespace TimeAPI.API.Controllers
                         if (Role.NormalizedName.Equals("SUPERADMIN"))
                             _unitOfWork.EmployeeRepository.SetDelegateeAsSuperAdminByEmpID(item);
 
+                        _unitOfWork.DelegationsDelegateeRepository.Add(Delegatee);
+
                         _unitOfWork.EntityInvitationRepository.Add(EntityInvitation);
                     }
                 }
+
                 _unitOfWork.DelegationsRepository.Update(modal);
                 if (_unitOfWork.Commit())
                 {

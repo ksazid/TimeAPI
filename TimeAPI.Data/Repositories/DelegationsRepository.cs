@@ -93,22 +93,49 @@ namespace TimeAPI.Data.Repositories
         public dynamic GetAllDelegateeByOrgIDAndEmpID(string OrgID, string EmpID)
         {
             return Query<dynamic>(
-                sql: @"SELECT 
-                             ROW_NUMBER() OVER (ORDER BY  [dbo].[delegations].id) AS rowno,
+                sql: @"SELECT
+                            ROW_NUMBER() OVER (ORDER BY empid) AS rowno,
+                            delegationsid, empid,
+                            full_name, is_type_temporary, is_type_permanent,
+                            role_name, expires_on,
+                            delegations_desc 
+                FROM (
+                    SELECT 
                             [dbo].[delegations].id as delegationsid,
                             [dbo].[employee].id as empid,
-                            [dbo].[employee].full_name, 
-	                        [dbo].[delegations_x_delegatee].is_type_temporary, 
-	                        [dbo].[delegations_x_delegatee].is_type_permanent ,
-	                        [dbo].[delegations_x_delegatee].expires_on,
-	                        [dbo].[delegations].delegations_desc
-	                    FROM [dbo].[delegations]
+                            [dbo].[employee].full_name as full_name, 
+	                        [dbo].[delegations_x_delegatee].is_type_temporary as is_type_temporary, 
+	                        [dbo].[delegations_x_delegatee].is_type_permanent as is_type_permanent,
+		                    [AspNetRoles].Name as role_name,
+	                        [dbo].[delegations_x_delegatee].expires_on as expires_on,
+	                        [dbo].[delegations].delegations_desc as delegations_desc
+	                    FROM [dbo].[delegations] WITH (NOLOCK)
 	                    INNER JOIN [dbo].[delegations_x_delegatee] ON [dbo].[delegations].id = [dbo].[delegations_x_delegatee].delegator_id
 	                    INNER JOIN [dbo].[employee] on [dbo].[delegations_x_delegatee].delegatee_id = [dbo].[employee].id
-	                    WHERE [dbo].[delegations].org_id  = @OrgID
-	                AND  [dbo].[delegations].delegator = @EmpID
-	                AND  [dbo].[delegations_x_delegatee].is_deleted = 0
-	                AND  [dbo].[delegations].is_deleted = 0",
+	                    LEFT JOIN [dbo].[AspNetRoles] on [dbo].[delegations_x_delegatee].role_id = [dbo].[AspNetRoles].Id
+	                    WHERE [dbo].[delegations].org_id  = @OrgID AND [dbo].[delegations].delegator = @EmpID
+                    AND  [dbo].[delegations_x_delegatee].is_deleted = 0
+                    AND  [dbo].[delegations].is_deleted = 0
+
+                    UNION ALL
+
+                    SELECT 
+                            [dbo].[delegations].id as delegationsid,
+                            [dbo].[entity_invitation].emp_id as empid,
+                            [dbo].[entity_invitation].email as full_name, 
+	                            [dbo].[delegations_x_delegatee].is_type_temporary as is_type_temporary, 
+	                        [dbo].[delegations_x_delegatee].is_type_permanent as is_type_permanent,
+		                    [AspNetRoles].Name as role_name,
+	                        [dbo].[delegations_x_delegatee].expires_on as expires_on,
+	                        [dbo].[delegations].delegations_desc as delegations_desc
+	                    FROM [dbo].[delegations] WITH (NOLOCK)
+	                    INNER JOIN [dbo].[delegations_x_delegatee] ON [dbo].[delegations].id = [dbo].[delegations_x_delegatee].delegator_id
+	                    INNER JOIN [dbo].[entity_invitation] ON [dbo].[delegations_x_delegatee].delegatee_id = [dbo].[entity_invitation].emp_id
+	                    LEFT JOIN [dbo].[AspNetRoles] on [dbo].[delegations_x_delegatee].role_id = [dbo].[AspNetRoles].Id
+	                    WHERE [dbo].[delegations].org_id  = @OrgID AND [dbo].[delegations].delegator = @EmpID
+                    AND  [dbo].[delegations_x_delegatee].is_deleted = 0
+                    AND  [dbo].[delegations].is_deleted = 0 ) REALDATA  
+                    ORDER BY full_name",
                 param: new { OrgID, EmpID }
             );
         }
