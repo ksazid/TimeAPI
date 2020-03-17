@@ -300,7 +300,20 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
+
         public void RemoveAdminRightByEmpID(string key)
+        {
+            Execute(
+                sql: @"UPDATE dbo.employee
+                   SET
+                   is_admin = 0,
+                   modified_date = GETDATE()
+                   WHERE id = @key",
+                param: new { key }
+            );
+        }
+
+        public void RemoveEmployeeIfZeroActivity(string key)
         {
             Execute(
                 sql: @"UPDATE dbo.employee

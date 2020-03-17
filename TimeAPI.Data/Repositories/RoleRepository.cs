@@ -16,7 +16,7 @@ namespace TimeAPI.Data.Repositories
         {
             Execute(
                 sql: @"
-                    INSERT INTO AspNetRoles(Id, ConcurrencyStamp, [Name], NormalizedName)
+                    INSERT INTO AspNetRoles(Id, ConcurrencyStamp, Name, NormalizedName)
                     VALUES(@Id, @ConcurrencyStamp, @Name, @NormalizedName)",
                 param: entity
             );

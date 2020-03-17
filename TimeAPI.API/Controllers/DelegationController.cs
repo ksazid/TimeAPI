@@ -58,76 +58,82 @@ namespace TimeAPI.API.Controllers
 
                 var Role = _unitOfWork.RoleRepository.Find(planViewModel.role_id);
 
-                foreach (var item in planViewModel.delegatee_emp_id)
+                if (planViewModel.delegatee_emp_id != null)
                 {
-                    var Delegatee = new DelegationsDelegatee()
+                    foreach (var item in planViewModel.delegatee_emp_id)
                     {
-                        id = Guid.NewGuid().ToString(),
-                        delegator_id = modal.id,
-                        delegatee_id = item,
-                        is_type_temporary = planViewModel.is_type_temporary,
-                        expires_on = planViewModel.expires_on,
-                        is_type_permanent = planViewModel.is_type_permanent,
-                        is_notify_delegator_and_delegatee = planViewModel.is_notify_delegator_and_delegatee,
-                        is_notify_delegatee = planViewModel.is_notify_delegatee,
-                        role_id = planViewModel.role_id,
-                        createdby = modal.createdby,
-                        created_date = _dateTime.ToString(),
-                        is_deleted = false
-                    };
+                        var Delegatee = new DelegationsDelegatee()
+                        {
+                            id = Guid.NewGuid().ToString(),
+                            delegator_id = modal.id,
+                            delegatee_id = item,
+                            is_type_temporary = planViewModel.is_type_temporary,
+                            expires_on = planViewModel.expires_on,
+                            is_type_permanent = planViewModel.is_type_permanent,
+                            is_notify_delegator_and_delegatee = planViewModel.is_notify_delegator_and_delegatee,
+                            is_notify_delegatee = planViewModel.is_notify_delegatee,
+                            role_id = planViewModel.role_id,
+                            createdby = modal.createdby,
+                            created_date = _dateTime.ToString(),
+                            is_deleted = false
+                        };
 
-                    if (Role.NormalizedName.Equals("ADMIN"))
-                        _unitOfWork.EmployeeRepository.SetDelegateeAsAdminByEmpID(item);
+                        if (Role.NormalizedName.Equals("ADMIN"))
+                            _unitOfWork.EmployeeRepository.SetDelegateeAsAdminByEmpID(item);
 
-                    if (Role.NormalizedName.Equals("SUPERADMIN"))
-                        _unitOfWork.EmployeeRepository.SetDelegateeAsSuperAdminByEmpID(item);
+                        if (Role.NormalizedName.Equals("SUPERADMIN"))
+                            _unitOfWork.EmployeeRepository.SetDelegateeAsSuperAdminByEmpID(item);
 
-                    _unitOfWork.DelegationsDelegateeRepository.Add(Delegatee);
+                        _unitOfWork.DelegationsDelegateeRepository.Add(Delegatee);
+                    }
                 }
 
-                foreach (var item in planViewModel.invitees)
+                if (planViewModel.invitees != null)
                 {
-                    string entityid, emp_id = string.Empty;
-                    entityid = Guid.NewGuid().ToString();
-                    emp_id = Guid.NewGuid().ToString();
-
-                    var Delegatee = new DelegationsDelegatee()
+                    foreach (var item in planViewModel.invitees)
                     {
-                        id = entityid,
-                        delegator_id = modal.id,
-                        delegatee_id = emp_id,
-                        is_type_temporary = planViewModel.is_type_temporary,
-                        expires_on = planViewModel.expires_on,
-                        is_type_permanent = planViewModel.is_type_permanent,
-                        is_notify_delegator_and_delegatee = planViewModel.is_notify_delegator_and_delegatee,
-                        is_notify_delegatee = planViewModel.is_notify_delegatee,
-                        role_id = planViewModel.role_id,
-                        createdby = modal.createdby,
-                        created_date = _dateTime.ToString(),
-                        is_deleted = false
-                    };
+                        string entityid, emp_id = string.Empty;
+                        entityid = Guid.NewGuid().ToString();
+                        emp_id = Guid.NewGuid().ToString();
 
-                    var EntityInvitation = new EntityInvitation()
-                    {
-                        id = Guid.NewGuid().ToString(),
-                        entity_id = entityid,
-                        org_id = modal.org_id,
-                        emp_id = emp_id,
-                        email = item,
-                        role_id = planViewModel.role_id,
-                        createdby = modal.createdby,
-                        created_date = _dateTime.ToString(),
-                        is_deleted = false
+                        var Delegatee = new DelegationsDelegatee()
+                        {
+                            id = entityid,
+                            delegator_id = modal.id,
+                            delegatee_id = emp_id,
+                            is_type_temporary = planViewModel.is_type_temporary,
+                            expires_on = planViewModel.expires_on,
+                            is_type_permanent = planViewModel.is_type_permanent,
+                            is_notify_delegator_and_delegatee = planViewModel.is_notify_delegator_and_delegatee,
+                            is_notify_delegatee = planViewModel.is_notify_delegatee,
+                            role_id = planViewModel.role_id,
+                            createdby = modal.createdby,
+                            created_date = _dateTime.ToString(),
+                            is_deleted = false
+                        };
 
-                    };
+                        var EntityInvitation = new EntityInvitation()
+                        {
+                            id = Guid.NewGuid().ToString(),
+                            entity_id = entityid,
+                            org_id = modal.org_id,
+                            emp_id = emp_id,
+                            email = item,
+                            role_id = planViewModel.role_id,
+                            createdby = modal.createdby,
+                            created_date = _dateTime.ToString(),
+                            is_deleted = false
 
-                    if (Role.NormalizedName.Equals("ADMIN"))
-                        _unitOfWork.EmployeeRepository.SetDelegateeAsAdminByEmpID(item);
+                        };
 
-                    if (Role.NormalizedName.Equals("SUPERADMIN"))
-                        _unitOfWork.EmployeeRepository.SetDelegateeAsSuperAdminByEmpID(item);
+                        if (Role.NormalizedName.Equals("ADMIN"))
+                            _unitOfWork.EmployeeRepository.SetDelegateeAsAdminByEmpID(item);
 
-                    _unitOfWork.EntityInvitationRepository.Add(EntityInvitation);
+                        if (Role.NormalizedName.Equals("SUPERADMIN"))
+                            _unitOfWork.EmployeeRepository.SetDelegateeAsSuperAdminByEmpID(item);
+
+                        _unitOfWork.EntityInvitationRepository.Add(EntityInvitation);
+                    }
                 }
 
                 _unitOfWork.DelegationsRepository.Add(modal);
@@ -163,77 +169,83 @@ namespace TimeAPI.API.Controllers
 
                 var Role = _unitOfWork.RoleRepository.Find(planViewModel.role_id);
 
-                foreach (var item in planViewModel.delegatee_emp_id)
+                if (planViewModel.delegatee_emp_id != null)
                 {
-                    var Delegatee = new DelegationsDelegatee()
+                    foreach (var item in planViewModel.delegatee_emp_id)
                     {
-                        delegator_id = modal.id,
-                        delegatee_id = item,
-                        is_type_temporary = planViewModel.is_type_temporary,
-                        expires_on = planViewModel.expires_on,
-                        is_type_permanent = planViewModel.is_type_permanent,
-                        is_notify_delegator_and_delegatee = planViewModel.is_notify_delegator_and_delegatee,
-                        is_notify_delegatee = planViewModel.is_notify_delegatee,
-                        role_id = planViewModel.role_id,
-                        modifiedby = modal.createdby,
-                        modified_date = _dateTime.ToString(),
-                        is_deleted = false
-                    };
+                        var Delegatee = new DelegationsDelegatee()
+                        {
+                            delegator_id = modal.id,
+                            delegatee_id = item,
+                            is_type_temporary = planViewModel.is_type_temporary,
+                            expires_on = planViewModel.expires_on,
+                            is_type_permanent = planViewModel.is_type_permanent,
+                            is_notify_delegator_and_delegatee = planViewModel.is_notify_delegator_and_delegatee,
+                            is_notify_delegatee = planViewModel.is_notify_delegatee,
+                            role_id = planViewModel.role_id,
+                            modifiedby = modal.createdby,
+                            modified_date = _dateTime.ToString(),
+                            is_deleted = false
+                        };
 
-                    if (Role.NormalizedName.Equals("ADMIN"))
-                        _unitOfWork.EmployeeRepository.SetDelegateeAsAdminByEmpID(item);
+                        if (Role.NormalizedName.Equals("ADMIN"))
+                            _unitOfWork.EmployeeRepository.SetDelegateeAsAdminByEmpID(item);
 
-                    if (Role.NormalizedName.Equals("SUPERADMIN"))
-                        _unitOfWork.EmployeeRepository.SetDelegateeAsSuperAdminByEmpID(item);
+                        if (Role.NormalizedName.Equals("SUPERADMIN"))
+                            _unitOfWork.EmployeeRepository.SetDelegateeAsSuperAdminByEmpID(item);
 
-                    _unitOfWork.DelegationsDelegateeRepository.Update(Delegatee);
+                        _unitOfWork.DelegationsDelegateeRepository.Update(Delegatee);
+                    }
                 }
 
-                foreach (var item in planViewModel.invitees)
+                if (planViewModel.invitees != null)
                 {
-                    string entityid, emp_id = string.Empty;
-                    entityid = Guid.NewGuid().ToString();
-                    emp_id = Guid.NewGuid().ToString();
 
-                    var Delegatee = new DelegationsDelegatee()
+                    foreach (var item in planViewModel.invitees)
                     {
-                        id = entityid,
-                        delegator_id = modal.id,
-                        delegatee_id = emp_id,
-                        is_type_temporary = planViewModel.is_type_temporary,
-                        expires_on = planViewModel.expires_on,
-                        is_type_permanent = planViewModel.is_type_permanent,
-                        is_notify_delegator_and_delegatee = planViewModel.is_notify_delegator_and_delegatee,
-                        is_notify_delegatee = planViewModel.is_notify_delegatee,
-                        role_id = planViewModel.role_id,
-                        createdby = modal.createdby,
-                        created_date = _dateTime.ToString(),
-                        is_deleted = false
-                    };
+                        string entityid, emp_id = string.Empty;
+                        entityid = Guid.NewGuid().ToString();
+                        emp_id = Guid.NewGuid().ToString();
 
-                    var EntityInvitation = new EntityInvitation()
-                    {
-                        id = Guid.NewGuid().ToString(),
-                        entity_id = entityid,
-                        org_id = modal.org_id,
-                        emp_id = emp_id,
-                        email = item,
-                        role_id = planViewModel.role_id,
-                        createdby = modal.createdby,
-                        created_date = _dateTime.ToString(),
-                        is_deleted = false
+                        var Delegatee = new DelegationsDelegatee()
+                        {
+                            id = entityid,
+                            delegator_id = modal.id,
+                            delegatee_id = emp_id,
+                            is_type_temporary = planViewModel.is_type_temporary,
+                            expires_on = planViewModel.expires_on,
+                            is_type_permanent = planViewModel.is_type_permanent,
+                            is_notify_delegator_and_delegatee = planViewModel.is_notify_delegator_and_delegatee,
+                            is_notify_delegatee = planViewModel.is_notify_delegatee,
+                            role_id = planViewModel.role_id,
+                            createdby = modal.createdby,
+                            created_date = _dateTime.ToString(),
+                            is_deleted = false
+                        };
 
-                    };
+                        var EntityInvitation = new EntityInvitation()
+                        {
+                            id = Guid.NewGuid().ToString(),
+                            entity_id = entityid,
+                            org_id = modal.org_id,
+                            emp_id = emp_id,
+                            email = item,
+                            role_id = planViewModel.role_id,
+                            createdby = modal.createdby,
+                            created_date = _dateTime.ToString(),
+                            is_deleted = false
 
-                    if (Role.NormalizedName.Equals("ADMIN"))
-                        _unitOfWork.EmployeeRepository.SetDelegateeAsAdminByEmpID(item);
+                        };
 
-                    if (Role.NormalizedName.Equals("SUPERADMIN"))
-                        _unitOfWork.EmployeeRepository.SetDelegateeAsSuperAdminByEmpID(item);
+                        if (Role.NormalizedName.Equals("ADMIN"))
+                            _unitOfWork.EmployeeRepository.SetDelegateeAsAdminByEmpID(item);
 
-                    _unitOfWork.EntityInvitationRepository.Add(EntityInvitation);
+                        if (Role.NormalizedName.Equals("SUPERADMIN"))
+                            _unitOfWork.EmployeeRepository.SetDelegateeAsSuperAdminByEmpID(item);
+
+                        _unitOfWork.EntityInvitationRepository.Add(EntityInvitation);
+                    }
                 }
-
                 _unitOfWork.DelegationsRepository.Update(modal);
                 if (_unitOfWork.Commit())
                 {
@@ -347,6 +359,8 @@ namespace TimeAPI.API.Controllers
 
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
+
+
 
                 _unitOfWork.DelegationsDelegateeRepository.RemoveByDelegateeID(Utils.ID);
                 _unitOfWork.EmployeeRepository.RemoveAdminRightByEmpID(Utils.ID);
