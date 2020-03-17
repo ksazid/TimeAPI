@@ -101,21 +101,24 @@ namespace TimeAPI.API.Controllers
                     modal1.is_deleted = false;
                     modal1.fiscal_year = organizationViewModel.OrganizationSetup.fiscal_year;
 
-                    foreach (var item in organizationViewModel.OrganizationSetup.weekends)
+                    if (organizationViewModel.OrganizationSetup.weekends != null)
                     {
-                        var weekend = new WeekendHours()
+                        foreach (var item in organizationViewModel.OrganizationSetup.weekends)
                         {
+                            var weekend = new WeekendHours()
+                            {
 
-                            id = Guid.NewGuid().ToString(),
-                            org_id = modal.org_id,
-                            offworkdays = item.offworkdays,
-                            start_time = item.start_time,
-                            end_time = item.end_time,
-                            created_date = _dateTime.ToString(),
-                            createdby = organizationViewModel.createdby,
-                            is_deleted = false
-                        };
-                        _unitOfWork.WeekendHoursRepository.Add(weekend);
+                                id = Guid.NewGuid().ToString(),
+                                org_id = modal.org_id,
+                                offworkdays = item.offworkdays,
+                                start_time = item.start_time,
+                                end_time = item.end_time,
+                                created_date = _dateTime.ToString(),
+                                createdby = organizationViewModel.createdby,
+                                is_deleted = false
+                            };
+                            _unitOfWork.WeekendHoursRepository.Add(weekend);
+                        }
                     }
 
                     _unitOfWork.OrganizationSetupRepository.Add(modal1);
@@ -159,22 +162,24 @@ namespace TimeAPI.API.Controllers
                 // remove weekend
                 _unitOfWork.WeekendHoursRepository.RemoveByOrgID(modal.org_id);
 
-                foreach (var item in organizationViewModel.OrganizationSetup.weekends)
+                if (organizationViewModel.OrganizationSetup.weekends != null)
                 {
-                    var weekend = new WeekendHours()
+                    foreach (var item in organizationViewModel.OrganizationSetup.weekends)
                     {
-                        id = Guid.NewGuid().ToString(),
-                        org_id = modal.org_id,
-                        offworkdays = item.offworkdays,
-                        start_time = item.start_time,
-                        end_time = item.end_time,
-                        created_date = _dateTime.ToString(),
-                        createdby = organizationViewModel.createdby,
-                        is_deleted = false
-                    };
-                    _unitOfWork.WeekendHoursRepository.Add(weekend);
+                        var weekend = new WeekendHours()
+                        {
+                            id = Guid.NewGuid().ToString(),
+                            org_id = modal.org_id,
+                            offworkdays = item.offworkdays,
+                            start_time = item.start_time,
+                            end_time = item.end_time,
+                            created_date = _dateTime.ToString(),
+                            createdby = organizationViewModel.createdby,
+                            is_deleted = false
+                        };
+                        _unitOfWork.WeekendHoursRepository.Add(weekend);
+                    }
                 }
-
 
                 //Update Branch
                 AddBranchOrg(organizationViewModel, modal.org_id);
