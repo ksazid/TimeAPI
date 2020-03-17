@@ -33,6 +33,7 @@ namespace TimeAPI.Data.Repositories
         {
             return QuerySingleOrDefault<dynamic>(
                 sql: @"SELECT top 1 delegations_x_delegatee.delegatee_id as empid,  
+						dbo.entity_invitation.email,
                         dbo.delegations.*, 
                         delegations_x_delegatee.is_type_permanent,
                         delegations_x_delegatee.is_notify_delegator_and_delegatee,
@@ -40,7 +41,9 @@ namespace TimeAPI.Data.Repositories
                         delegations_x_delegatee.expires_on
                         FROM dbo.delegations 
                         INNER JOIN  dbo.delegations_x_delegatee on dbo.delegations.id = delegations_x_delegatee.delegator_id
-                        WHERE delegations_x_delegatee.is_deleted = 0 and delegations_x_delegatee.delegatee_id =  @key",
+                        LEFT JOIN dbo.entity_invitation ON dbo.delegations_x_delegatee.delegatee_id = dbo.entity_invitation.emp_id
+                        WHERE delegations_x_delegatee.is_deleted = 0 
+						and delegations_x_delegatee.delegatee_id =  @key",
                 param: new { key }
             );
         }

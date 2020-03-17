@@ -141,10 +141,15 @@ namespace TimeAPI.API
                         x.SaveToken = false;
                         x.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
                         {
+                            ValidateIssuer = true,
+                            ValidateAudience = true,
+                            ValidAudience = "https://enforce.azurewebsites.net/",
+                            ValidIssuer = "https://enforce.azurewebsites.net/",
+
                             ValidateIssuerSigningKey = false,
                             IssuerSigningKey = new SymmetricSecurityKey(key),
-                            ValidateIssuer = false,
-                            ValidateAudience = false,
+                            //ValidateIssuer = false,
+                            //ValidateAudience = false,
                             ClockSkew = TimeSpan.Zero 
                         };
                     });
