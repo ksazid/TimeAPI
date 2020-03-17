@@ -107,7 +107,7 @@ namespace TimeAPI.Data.Repositories
 	                        [dbo].[delegations_x_delegatee].is_type_temporary as is_type_temporary, 
 	                        [dbo].[delegations_x_delegatee].is_type_permanent as is_type_permanent,
 		                    [AspNetRoles].Name as role_name,
-	                        [dbo].[delegations_x_delegatee].expires_on as expires_on,
+	                        FORMAT(CAST([dbo].[delegations_x_delegatee].expires_on  AS DATE), 'd', 'EN-US') as expires_on,
 	                        [dbo].[delegations].delegations_desc as delegations_desc
 	                    FROM [dbo].[delegations] WITH (NOLOCK)
 	                    INNER JOIN [dbo].[delegations_x_delegatee] ON [dbo].[delegations].id = [dbo].[delegations_x_delegatee].delegator_id
@@ -123,10 +123,10 @@ namespace TimeAPI.Data.Repositories
                             [dbo].[delegations].id as delegationsid,
                             [dbo].[entity_invitation].emp_id as empid,
                             [dbo].[entity_invitation].email as full_name, 
-	                            [dbo].[delegations_x_delegatee].is_type_temporary as is_type_temporary, 
+	                        [dbo].[delegations_x_delegatee].is_type_temporary as is_type_temporary, 
 	                        [dbo].[delegations_x_delegatee].is_type_permanent as is_type_permanent,
 		                    [AspNetRoles].Name as role_name,
-	                        [dbo].[delegations_x_delegatee].expires_on as expires_on,
+	                        FORMAT(CAST([dbo].[delegations_x_delegatee].expires_on  AS DATE), 'd', 'EN-US') as expires_on,
 	                        [dbo].[delegations].delegations_desc as delegations_desc
 	                    FROM [dbo].[delegations] WITH (NOLOCK)
 	                    INNER JOIN [dbo].[delegations_x_delegatee] ON [dbo].[delegations].id = [dbo].[delegations_x_delegatee].delegator_id
