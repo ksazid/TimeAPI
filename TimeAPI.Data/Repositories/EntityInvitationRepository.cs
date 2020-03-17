@@ -23,7 +23,7 @@ namespace TimeAPI.Data.Repositories
         public EntityInvitation Find(string key)
         {
             return QuerySingleOrDefault<EntityInvitation>(
-                sql: "SELECT * FROM dbo.entity_invitation WHERE is_deleted = 0 and id = @key",
+                sql: "SELECT * FROM dbo.entity_invitation WHERE is_deleted = 0 and entity_id = @key",
                 param: new { key }
             );
         }
@@ -34,7 +34,7 @@ namespace TimeAPI.Data.Repositories
                 sql: @"UPDATE dbo.entity_invitation
                    SET
                        modified_date = GETDATE(), is_deleted = 1
-                    WHERE id = @key",
+                    WHERE Find = @key",
                 param: new { key }
             );
         }

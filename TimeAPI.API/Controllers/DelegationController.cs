@@ -274,7 +274,11 @@ namespace TimeAPI.API.Controllers
 
                 _unitOfWork.DelegationsRepository.Remove(Utils.ID);
                 _unitOfWork.DelegationsDelegateeRepository.RemoveByDelegator(Utils.ID);
-                _unitOfWork.EntityInvitationRepository.RemoveByEntityID(Utils.ID);
+
+                var Entity = _unitOfWork.EntityInvitationRepository.Find(Utils.ID);
+                if (Entity != null)
+                    _unitOfWork.EntityInvitationRepository.RemoveByEntityID(Utils.ID);
+
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee removed succefully." }).ConfigureAwait(false);
