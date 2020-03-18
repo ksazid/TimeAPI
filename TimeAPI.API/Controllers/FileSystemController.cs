@@ -100,7 +100,7 @@ namespace TimeAPI.API.Controllers
 
                 //return new OkResult();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Profile image uploaded succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Profile image uploaded successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

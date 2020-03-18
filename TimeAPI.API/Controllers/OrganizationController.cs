@@ -130,7 +130,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.OrganizationRepository.Add(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Organization Added succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Organization Added successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -187,7 +187,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.OrganizationRepository.Update(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Organization Updated succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Organization Updated successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -223,7 +223,7 @@ namespace TimeAPI.API.Controllers
                 }
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Organization removed succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Organization removed successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -394,7 +394,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.OrganizationBranchRepository.Add(OrgBranch);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Organization Added succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Organization Added successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

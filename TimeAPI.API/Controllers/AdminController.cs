@@ -64,7 +64,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.PlanRepository.Add(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Plan registered succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Plan registered successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -92,7 +92,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.PlanRepository.Update(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Plan updated succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Plan updated successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -115,7 +115,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.PlanRepository.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee removed succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee removed successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -213,7 +213,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.PlanFeatureRepository.Add(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Plan Features registered succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Plan Features registered successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -241,7 +241,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.PlanFeatureRepository.Update(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Plan Feature updated succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Plan Feature updated successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -264,7 +264,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.PlanFeatureRepository.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Plan Feature removed succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Plan Feature removed successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -361,7 +361,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.PlanPriceRepository.Add(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Plan Price Added succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Plan Price Added successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -389,7 +389,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.PlanPriceRepository.Update(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Plan Price updated succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Plan Price updated successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -412,7 +412,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.PlanPriceRepository.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Plan Price removed succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Plan Price removed successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -509,7 +509,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.SubscriptionRepository.Add(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Subscription registered succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Subscription registered successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -537,7 +537,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.SubscriptionRepository.Update(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Subscription updated succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Subscription updated successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -560,7 +560,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.SubscriptionRepository.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee removed succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee removed successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -658,7 +658,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.BillingRepository.Add(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Billing registered succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Billing registered successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -686,7 +686,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.BillingRepository.Update(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Billing updated succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Billing updated successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -709,7 +709,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.BillingRepository.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee removed succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee removed successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

@@ -87,7 +87,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.TaskRepository.Add(modal);
                 _unitOfWork.Commit();
 
-                return await System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Task registered succefully." }).ConfigureAwait(false);
+                return await System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Task registered successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -138,7 +138,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.TaskRepository.Update(modal);
                 _unitOfWork.Commit();
 
-                return await System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Task updated succefully." }).ConfigureAwait(false);
+                return await System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Task updated successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -161,7 +161,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.TaskRepository.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
-                return await System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Task removed succefully." }).ConfigureAwait(false);
+                return await System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Task removed successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -257,7 +257,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.TaskRepository.UpdateTaskStatus(modal);
                 _unitOfWork.Commit();
 
-                return await System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Task updated succefully." }).ConfigureAwait(false);
+                return await System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Task updated successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

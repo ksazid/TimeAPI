@@ -102,7 +102,7 @@ namespace TimeAPI.API.Controllroers
                 _unitOfWork.CustomerRepository.Update(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Customer updated succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Customer updated successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -125,7 +125,7 @@ namespace TimeAPI.API.Controllroers
                 _unitOfWork.CustomerRepository.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Customer ID removed succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Customer ID removed successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

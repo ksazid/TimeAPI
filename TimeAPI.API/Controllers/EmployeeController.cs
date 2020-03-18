@@ -77,7 +77,7 @@ namespace TimeAPI.API.Controllers
                     if (_unitOfWork.Commit())
                         await UserVerification(user).ConfigureAwait(true);
 
-                    return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee registered succefully." }).ConfigureAwait(false);
+                    return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee registered successfully." }).ConfigureAwait(false);
                 }
                 else
                 {
@@ -123,7 +123,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.EmployeeRepository.Update(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee updated succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee updated successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -146,7 +146,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.EmployeeRepository.SetEmployeeInactiveByEmpID(Utils.ID);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee removed succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee set to inactive." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -180,7 +180,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.UserRepository.Remove(result.user_id);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee removed succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee removed successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -206,7 +206,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.UserRepository.Remove(result.user_id);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee removed succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee removed successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

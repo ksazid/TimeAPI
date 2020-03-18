@@ -131,7 +131,7 @@ namespace TimeAPI.API.Controllroers
 
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Team updated succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Team updated successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -155,7 +155,7 @@ namespace TimeAPI.API.Controllroers
                 _unitOfWork.TeamMemberRepository.RemoveByTeamID(Utils.ID);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Team removed succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Team removed successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

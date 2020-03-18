@@ -16,8 +16,8 @@ namespace TimeAPI.Data.Repositories
             entity.org_id = ExecuteScalar<string>(
                     sql: @"
                     INSERT INTO dbo.organization_setup
-                            (id, org_id, country, fiscal_year, start_of_week, working_hrs, date_format, currency, time_zome, created_date, createdby)
-                    VALUES (@id, @org_id, @country, @fiscal_year, @start_of_week, @working_hrs, @date_format, @currency, @time_zome, @created_date, @createdby);
+                            (id, org_id, country, fiscal_year, working_hrs, date_format, currency, time_zome, created_date, createdby)
+                    VALUES (@id, @org_id, @country, @fiscal_year,   @working_hrs, @date_format, @currency, @time_zome, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -56,7 +56,6 @@ namespace TimeAPI.Data.Repositories
                            SET 
                                 country = @country, 
                                 fiscal_year = @fiscal_year, 
-                                start_of_week = @start_of_week, 
                                 working_hrs = @working_hrs, 
                                 date_format = @date_format, 
                                 currency = @currency, 

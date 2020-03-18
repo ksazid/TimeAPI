@@ -89,7 +89,7 @@ namespace TimeAPI.API.Controllers
 
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Timesheet registered succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Timesheet registered successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -240,7 +240,7 @@ namespace TimeAPI.API.Controllers
 
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Timesheet updated succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Timesheet updated successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -271,7 +271,7 @@ namespace TimeAPI.API.Controllers
 
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Timesheet removed succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Timesheet removed successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -440,7 +440,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.TimesheetActivityRepository.Add(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Timesheet Activity added succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Timesheet Activity added successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -469,7 +469,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.TimesheetActivityRepository.Update(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Timesheet Activity updated succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Timesheet Activity updated successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -492,7 +492,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.TimesheetActivityRepository.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Timesheet Activity removed succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Timesheet Activity removed successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -628,7 +628,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.TimesheetAdministrativeRepository.Add(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Timesheet Activity added succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Timesheet Activity added successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -657,7 +657,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.TimesheetAdministrativeRepository.Update(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Timesheet Activity updated succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Timesheet Activity updated successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -680,7 +680,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.TimesheetAdministrativeRepository.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Timesheet Activity removed succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Timesheet Activity removed successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -755,7 +755,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.TimesheetActivityCommentRepository.Add(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Comment added succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Comment added successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -784,7 +784,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.TimesheetActivityCommentRepository.Update(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Comment updated succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Comment updated successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -807,7 +807,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.TimesheetActivityCommentRepository.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Comment removed succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Comment removed successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -861,7 +861,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.TimesheetActivityFileRepository.Add(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Comment added succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Comment added successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -890,7 +890,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.TimesheetActivityFileRepository.Update(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Comment updated succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Comment updated successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -913,7 +913,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.TimesheetActivityFileRepository.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Comment removed succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Comment removed successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

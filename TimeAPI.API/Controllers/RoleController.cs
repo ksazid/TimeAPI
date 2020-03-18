@@ -59,7 +59,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.DesignationRepositiory.Add(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Designation registered succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Designation registered successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -88,7 +88,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.DesignationRepositiory.Update(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Designation updated succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Designation updated successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -111,7 +111,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.DesignationRepositiory.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Designation removed succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Designation removed successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

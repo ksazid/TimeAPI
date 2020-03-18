@@ -60,7 +60,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.DepartmentRepository.Add(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Department registered succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Department registered successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -89,7 +89,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.DepartmentRepository.Update(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Department updated succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Department updated successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -112,7 +112,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.DepartmentRepository.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Department removed succefully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Department removed successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
