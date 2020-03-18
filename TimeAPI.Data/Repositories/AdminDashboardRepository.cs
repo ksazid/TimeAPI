@@ -599,6 +599,10 @@ namespace TimeAPI.Data.Repositories
             List<string> OffDaysDate = new List<string>();
 
             string offdays = GetWeekOffsFromOrg(org_id);
+            if (offdays == null)
+            {
+                offdays = "Friday";
+            }
             List<DateTime> Dates = Enumerable.Range(0, (Convert.ToDateTime(toDate) - Convert.ToDateTime(fromDate)).Days + 1)
                                     .Select(d => Convert.ToDateTime(fromDate).AddDays(d)).ToList();
 
@@ -616,6 +620,10 @@ namespace TimeAPI.Data.Repositories
         {
             List<DateTime> OffDaysList = new List<DateTime>();
             string offdays = GetWeekOffsFromOrg(org_id);
+            if (offdays == null)
+            {
+                offdays = "Friday";
+            }
             List<DateTime> Dates = Enumerable.Range(0, (Convert.ToDateTime(toDate) - Convert.ToDateTime(fromDate)).Days + 1)
                                    .Select(d => Convert.ToDateTime(fromDate).AddDays(d)).ToList();
 

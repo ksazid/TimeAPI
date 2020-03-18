@@ -171,7 +171,7 @@ namespace TimeAPI.API.Controllers
 
                 if (Result > 0)
                 {
-                    return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee has being attended more than one project activity. Are you sure to remove all past history of the employee." }).ConfigureAwait(false);
+                    return await Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = "Error", Desc = "Employee has being attended more than one project activity. Are you sure to remove all past history of the employee." }).ConfigureAwait(false);
                 }
 
                 var result = _unitOfWork.EmployeeRepository.Find(Utils.ID);
