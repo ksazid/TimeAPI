@@ -75,22 +75,25 @@ namespace TimeAPI.Data.Repositories
 
         public dynamic TotalDefaultEmpCountByOrgID(string org_id)
         {
+            //SELECT
+            //                ISNULL(UPPER(employee_type.employee_type_name), 'PERMANENT') AS employee_type_name,
+            //                COUNT (DISTINCT[dbo].[employee].id) AS employee_count
+            //                FROM[dbo].[employee] WITH(NOLOCK)
+
+            //                INNER JOIN superadmin_x_org ON superadmin_x_org.superadmin_empid = employee.id
+
+            //                LEFT JOIN employee_type on employee.emp_type_id = employee_type.id
+            //                WHERE[dbo].[employee].is_deleted = 0 AND[dbo].[employee].is_inactive = 0
+            //                AND superadmin_x_org.org_id = @org_id
+            //                GROUP BY
+            //                employee_type.employee_type_name
+
+            //        UNION ALL
+
             var resultsAspNetUsers = Query<dynamic>(
                 sql: @"SELECT employee_type_name, SUM(employee_count) as attandance  FROM
                         (
-                        SELECT
-                            ISNULL(UPPER(employee_type.employee_type_name), 'PERMANENT') AS employee_type_name,
-                            COUNT (DISTINCT [dbo].[employee].id) AS employee_count
-                            FROM [dbo].[employee] WITH (NOLOCK)
-	                        INNER JOIN superadmin_x_org ON superadmin_x_org.superadmin_empid = employee.id
-	                        LEFT JOIN employee_type on employee.emp_type_id = employee_type.id
-                            WHERE [dbo].[employee].is_deleted = 0 AND [dbo].[employee].is_inactive = 0
-                            AND superadmin_x_org.org_id =  @org_id
-                            GROUP BY
-                            employee_type.employee_type_name
-
-	                UNION ALL
-
+                     
                         SELECT
                             ISNULL(UPPER(employee_type.employee_type_name), 'PERMANENT') AS employee_type_name,
                             COUNT (DISTINCT [dbo].[employee].id) AS employee_count
@@ -123,6 +126,43 @@ namespace TimeAPI.Data.Repositories
         {
             string weekoffs = String.Join("','", OffDaysDates(org_id, fromDate, toDate));
 
+
+
+      //      SELECT
+      //                  timesheet_x_project_category.project_category_type,
+      //                  timesheet_x_project_category.project_or_comp_name,
+      //                  timesheet.id as timesheet_id,
+      //                  timesheet.groupid as groupid,
+      //                  employee.id as employee_id,
+      //                  eTime.lat as lat,
+      //                  eTime.lang as lang,
+      //                  eTime.is_checkout as is_checkout,
+      //                  employee.full_name,
+      //                  employee_type.employee_type_name as employee_type_name,
+      //                  employee.workemail as workemail,
+      //                  employee.emp_code as emp_code,
+      //                  employee.phone as phone,
+      //                  FORMAT(CAST(timesheet.check_in AS DATETIME2), N'hh:mm tt') as check_in,
+      //                  ISNULL(FORMAT(CAST(timesheet.check_out AS DATETIME2), N'hh:mm tt'), 'NA') as check_out,
+      //                  ISNULL(total_hrs, 'NA') as total_hrs,
+      //                  FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US') as ondate
+      //                  FROM timesheet WITH(NOLOCK)
+      //                  INNER JOIN employee ON timesheet.empid = employee.id
+      //                  LEFT JOIN employee_type ON employee.emp_type_id = employee_type.id
+      //                  INNER JOIN timesheet_x_project_category on timesheet.groupid = timesheet_x_project_category.groupid
+      //                  INNER JOIN superadmin_x_org ON superadmin_x_org.superadmin_empid = employee.id
+      //                  INNER JOIN(select distinct(groupid), location.lat, location.lang, location.is_checkout
+      //                  FROM dbo.location WHERE groupid IN (SELECT groupid FROM timesheet) and is_checkout = 0) eTime
+      //                  ON eTime.groupid = dbo.timesheet.groupid
+      //              WHERE
+      //                  superadmin_x_org.org_id = @org_id
+      //            AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
+						//BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US')
+      //                  AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
+      //                  AND timesheet.is_deleted = 0
+
+      //              UNION
+
             var resultsAspNetUsers = Query<dynamic>(
                 sql: @"SELECT
                         ROW_NUMBER() OVER (ORDER BY full_name) AS rowno,
@@ -133,40 +173,6 @@ namespace TimeAPI.Data.Repositories
 
                 FROM (
 
-                    SELECT
-                        timesheet_x_project_category.project_category_type,
-                        timesheet_x_project_category.project_or_comp_name,
-                        timesheet.id as timesheet_id,
-                        timesheet.groupid as groupid,
-                        employee.id as employee_id,
-                        eTime.lat as lat,
-                        eTime.lang as lang,
-                        eTime.is_checkout as is_checkout,
-                        employee.full_name,
-                        employee_type.employee_type_name as employee_type_name,
-                        employee.workemail as workemail,
-                        employee.emp_code as emp_code,
-                        employee.phone as phone,
-                        FORMAT(CAST(timesheet.check_in AS DATETIME2), N'hh:mm tt') as check_in,
-                        ISNULL(FORMAT(CAST(timesheet.check_out AS DATETIME2), N'hh:mm tt'), 'NA') as check_out,
-                        ISNULL(total_hrs, 'NA') as total_hrs,
-                        FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US')  as ondate
-                        FROM timesheet WITH (NOLOCK)
-                        INNER JOIN employee ON timesheet.empid = employee.id
-                        LEFT JOIN employee_type ON employee.emp_type_id = employee_type.id
-                        INNER JOIN timesheet_x_project_category on timesheet.groupid = timesheet_x_project_category.groupid
-                        INNER JOIN superadmin_x_org ON superadmin_x_org.superadmin_empid = employee.id
-                        INNER JOIN (select distinct(groupid), location.lat, location.lang, location.is_checkout
-                        FROM dbo.location WHERE groupid IN (SELECT groupid FROM timesheet) and is_checkout = 0) eTime
-                        ON eTime.groupid = dbo.timesheet.groupid
-                    WHERE
-                        superadmin_x_org.org_id = @org_id
-                  AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
-						BETWEEN FORMAT(CAST(@fromDate  AS DATE), 'd', 'EN-US')
-                        AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
-                        AND timesheet.is_deleted = 0
-
-                    UNION
 
                     SELECT
                         timesheet_x_project_category.project_category_type,
@@ -249,6 +255,42 @@ namespace TimeAPI.Data.Repositories
         {
             string weekoffs = String.Join("','", ExceptOffDaysDates(org_id, fromDate, toDate));
 
+
+      //      SELECT
+      //                  timesheet_x_project_category.project_category_type,
+      //                  timesheet_x_project_category.project_or_comp_name,
+      //                  timesheet.id as timesheet_id,
+      //                  timesheet.groupid as groupid,
+      //                  employee.id as employee_id,
+      //                  eTime.lat as lat,
+      //                  eTime.lang as lang,
+      //                  eTime.is_checkout as is_checkout,
+      //                  employee.full_name,
+      //                  employee_type.employee_type_name as employee_type_name,
+      //                  employee.workemail as workemail,
+      //                  employee.emp_code as emp_code,
+      //                  employee.phone as phone,
+      //                  FORMAT(CAST(timesheet.check_in AS DATETIME2), N'hh:mm tt') as check_in,
+      //                  ISNULL(FORMAT(CAST(timesheet.check_out AS DATETIME2), N'hh:mm tt'), 'NA') as check_out,
+      //                  ISNULL(total_hrs, 'NA') as total_hrs,
+      //                  FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US') as ondate
+      //                  FROM timesheet WITH(NOLOCK)
+      //                  INNER JOIN employee ON timesheet.empid = employee.id
+      //                  LEFT JOIN employee_type ON employee.emp_type_id = employee_type.id
+      //                  INNER JOIN timesheet_x_project_category on timesheet.groupid = timesheet_x_project_category.groupid
+      //                  INNER JOIN superadmin_x_org ON superadmin_x_org.superadmin_empid = employee.id
+      //                  INNER JOIN(select distinct(groupid), location.lat, location.lang, location.is_checkout
+      //                  FROM dbo.location WHERE groupid IN (SELECT groupid FROM timesheet) and is_checkout = 0) eTime
+      //                  ON eTime.groupid = dbo.timesheet.groupid
+      //              WHERE
+      //                  superadmin_x_org.org_id = @org_id
+      //            AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
+						//BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US')
+      //                  AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
+      //                  AND timesheet.is_deleted = 0
+
+      //              UNION
+
             var resultsAspNetUsers = Query<dynamic>(
                 sql: @"SELECT
                         ROW_NUMBER() OVER (ORDER BY full_name) AS rowno,
@@ -259,40 +301,6 @@ namespace TimeAPI.Data.Repositories
 
                 FROM (
 
-                    SELECT
-                        timesheet_x_project_category.project_category_type,
-                        timesheet_x_project_category.project_or_comp_name,
-                        timesheet.id as timesheet_id,
-                        timesheet.groupid as groupid,
-                        employee.id as employee_id,
-                        eTime.lat as lat,
-                        eTime.lang as lang,
-                        eTime.is_checkout as is_checkout,
-                        employee.full_name,
-                        employee_type.employee_type_name as employee_type_name,
-                        employee.workemail as workemail,
-                        employee.emp_code as emp_code,
-                        employee.phone as phone,
-                        FORMAT(CAST(timesheet.check_in AS DATETIME2), N'hh:mm tt') as check_in,
-                        ISNULL(FORMAT(CAST(timesheet.check_out AS DATETIME2), N'hh:mm tt'), 'NA') as check_out,
-                        ISNULL(total_hrs, 'NA') as total_hrs,
-                        FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US')  as ondate
-                        FROM timesheet WITH (NOLOCK)
-                        INNER JOIN employee ON timesheet.empid = employee.id
-                        LEFT JOIN employee_type ON employee.emp_type_id = employee_type.id
-                        INNER JOIN timesheet_x_project_category on timesheet.groupid = timesheet_x_project_category.groupid
-                        INNER JOIN superadmin_x_org ON superadmin_x_org.superadmin_empid = employee.id
-                        INNER JOIN (select distinct(groupid), location.lat, location.lang, location.is_checkout
-                        FROM dbo.location WHERE groupid IN (SELECT groupid FROM timesheet) and is_checkout = 0) eTime
-                        ON eTime.groupid = dbo.timesheet.groupid
-                    WHERE
-                        superadmin_x_org.org_id = @org_id
-                  AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
-						BETWEEN FORMAT(CAST(@fromDate  AS DATE), 'd', 'EN-US')
-                        AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
-                        AND timesheet.is_deleted = 0
-
-                    UNION
 
                     SELECT
                         timesheet_x_project_category.project_category_type,
@@ -458,41 +466,8 @@ namespace TimeAPI.Data.Repositories
 			                            AND employee.is_deleted = 0
                                         AND employee.is_superadmin = 0
                                         AND timesheet.is_deleted = 0
-	                            UNION
-		                            SELECT
-	                                    employee.id as employee
-
-                                        FROM dbo.employee WITH(NOLOCK)
-				                            INNER JOIN superadmin_x_org on  dbo.employee.id = superadmin_x_org.superadmin_empid
-				                            INNER JOIN timesheet ON  employee.id = timesheet.empid
-                                        WHERE superadmin_x_org.org_id = @OrgID
-			                            AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
-			                        BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US')
-			                            AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
-			                            AND employee.is_deleted = 0
-                                        AND employee.is_superadmin = 1
-                                        AND timesheet.is_deleted = 0
-
-                            ),
-                            TotalEmployee as
-                            (SELECT
-                                        employee.id as employee
-
-                                        FROM dbo.employee WITH(NOLOCK)
-                                    WHERE employee.org_id =  @OrgID
-                                        AND employee.is_deleted = 0
-                                 UNION
-                                    SELECT
-                                        employee.id as employee
-
-                                        FROM dbo.employee WITH(NOLOCK)
-                                    INNER JOIN superadmin_x_org on  dbo.employee.id = superadmin_x_org.superadmin_empid
-                                    WHERE superadmin_x_org.org_id =  @OrgID
-                                    AND employee.is_deleted = 0
-                            )
-                            SELECT employee
-                            FROM TotalEmployee
-                            EXCEPT
+                            ) 
+ 
                             SELECT employee
                             FROM TotalEmployeeAttended",
                    param: new { OrgID, fromDate, toDate }
@@ -524,26 +499,27 @@ namespace TimeAPI.Data.Repositories
         {
             string weekoffs = String.Join("','", OffDaysList);
 
+            //SELECT COUNT(DISTINCT(timesheet.empid)) as attandance,
+            //            ISNULL(UPPER(employee_type.employee_type_name), 'PERMANENT') AS employee_type_name,
+            //            FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US') as ondate
+            //            FROM timesheet
+            //            INNER JOIN employee ON timesheet.empid = employee.id
+            //            INNER JOIN superadmin_x_org ON superadmin_x_org.superadmin_empid = employee.id
+            //            LEFT JOIN employee_type on employee.emp_type_id = employee_type.id
+            //            WHERE
+            //            superadmin_x_org.org_id = @org_id
+            //            AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
+			         //   BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US')
+            //            AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
+            //            AND timesheet.is_deleted = 0
+            //            GROUP BY FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US'),
+            //            employee_type.employee_type_name
+
+            //        UNION ALL
             return Query<dynamic>(
                 sql: @"SELECT employee_type_name, SUM(attandance) as attandance, ondate
                 FROM (
-                    SELECT COUNT (DISTINCT(timesheet.empid)) as attandance,
-                        ISNULL(UPPER(employee_type.employee_type_name), 'PERMANENT') AS employee_type_name,
-						FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US') as ondate
-                        FROM timesheet
-                        INNER JOIN employee ON timesheet.empid = employee.id
-                        INNER JOIN superadmin_x_org ON superadmin_x_org.superadmin_empid = employee.id
-                        LEFT JOIN employee_type on employee.emp_type_id = employee_type.id
-                        WHERE
-                        superadmin_x_org.org_id = @org_id
-                        AND FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US')
-			            BETWEEN FORMAT(CAST(@fromDate  AS DATE), 'd', 'EN-US')
-                        AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
-                        AND timesheet.is_deleted = 0
-                        GROUP BY FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US'),
-                        employee_type.employee_type_name
-
-                    UNION ALL
+                   
 
                     SELECT COUNT(DISTINCT(timesheet.empid)) as attandance,
                         ISNULL(UPPER(employee_type.employee_type_name), 'PERMANENT') AS employee_type_name,
