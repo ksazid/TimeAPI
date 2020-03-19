@@ -127,7 +127,6 @@ namespace TimeAPI.Data.Repositories
             string weekoffs = String.Join("','", OffDaysDates(org_id, fromDate, toDate));
 
 
-
       //      SELECT
       //                  timesheet_x_project_category.project_category_type,
       //                  timesheet_x_project_category.project_or_comp_name,
@@ -173,6 +172,7 @@ namespace TimeAPI.Data.Repositories
 
                 FROM (
 
+                  
 
                     SELECT
                         timesheet_x_project_category.project_category_type,
@@ -301,6 +301,7 @@ namespace TimeAPI.Data.Repositories
 
                 FROM (
 
+                 
 
                     SELECT
                         timesheet_x_project_category.project_category_type,
@@ -466,8 +467,18 @@ namespace TimeAPI.Data.Repositories
 			                            AND employee.is_deleted = 0
                                         AND employee.is_superadmin = 0
                                         AND timesheet.is_deleted = 0
-                            ) 
- 
+                            ),
+                            TotalEmployee as
+                            (SELECT
+                                        employee.id as employee
+
+                                        FROM dbo.employee WITH(NOLOCK)
+                                    WHERE employee.org_id =  @OrgID
+                                        AND employee.is_deleted = 0
+                            )
+                            SELECT employee
+                            FROM TotalEmployee
+                            EXCEPT
                             SELECT employee
                             FROM TotalEmployeeAttended",
                    param: new { OrgID, fromDate, toDate }
