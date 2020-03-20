@@ -406,18 +406,19 @@ namespace TimeAPI.Data.Repositories
         {
             List<UtilsProjectAndRatio> utilsProjectAndRatios = new List<UtilsProjectAndRatio>();
 
-            var projectList = Query<dynamic>(
+            var projectList = Query<string>(
                sql: @"SELECT id from project where org_id = @OrgID and is_deleted = 0",
                param: new { OrgID }
            );
 
             foreach (var item in projectList)
             {
+                //ISNULL(UPPER(employee_type.employee_type_name), 'PERMANENT') AS employee_type_name,
                 UtilsProjectAndRatio utilsProjectAndRatio = new UtilsProjectAndRatio();
                 utilsProjectAndRatio = QuerySingleOrDefault<UtilsProjectAndRatio>(
                         sql: @"SELECT 
                             dbo.project.project_name as project_name,
-                             SUM((SELECT count(*)
+                             ISNULL(SUM((SELECT count(*)
                             FROM dbo.project_activity WITH(NOLOCK)
                             INNER JOIN dbo.project_status on dbo.project_activity.status_id = dbo.project_status.id
                             INNER JOIN dbo.project on dbo.project_activity.project_id = dbo.project.id
@@ -430,7 +431,7 @@ namespace TimeAPI.Data.Repositories
                             group by 
                             dbo.project.project_name) * 100 / COUNT(*)
 
-                            ) over() as Ratio
+                            ) over() , '0') AS ratio
                             FROM dbo.project_activity WITH(NOLOCK)
                             inner JOIN dbo.project on dbo.project_activity.project_id = dbo.project.id
                             WHERE dbo.project.org_id = @OrgID
