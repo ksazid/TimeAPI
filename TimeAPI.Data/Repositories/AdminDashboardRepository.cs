@@ -113,7 +113,8 @@ namespace TimeAPI.Data.Repositories
         {
             List<dynamic> TimesheetDashboardData = new List<dynamic>();
 
-            var DGridData = GettingTimesheetDashboardDataPerDate(org_id, fromDate, toDate, OffDaysDates(org_id, fromDate, toDate));
+            //OffDaysDates(org_id, fromDate, toDate)
+            var DGridData = GettingTimesheetDashboardDataPerDate(org_id, fromDate, toDate);
 
             if (DGridData.Count > 0)
             {
@@ -124,43 +125,46 @@ namespace TimeAPI.Data.Repositories
 
         public dynamic GetTimesheetDashboardGridDataByOrgIDAndDate(string org_id, string fromDate, string toDate)
         {
-            string weekoffs = String.Join("','", OffDaysDates(org_id, fromDate, toDate));
+            //string weekoffs = String.Join("','", OffDaysDates(org_id, fromDate, toDate));
 
 
-      //      SELECT
-      //                  timesheet_x_project_category.project_category_type,
-      //                  timesheet_x_project_category.project_or_comp_name,
-      //                  timesheet.id as timesheet_id,
-      //                  timesheet.groupid as groupid,
-      //                  employee.id as employee_id,
-      //                  eTime.lat as lat,
-      //                  eTime.lang as lang,
-      //                  eTime.is_checkout as is_checkout,
-      //                  employee.full_name,
-      //                  employee_type.employee_type_name as employee_type_name,
-      //                  employee.workemail as workemail,
-      //                  employee.emp_code as emp_code,
-      //                  employee.phone as phone,
-      //                  FORMAT(CAST(timesheet.check_in AS DATETIME2), N'hh:mm tt') as check_in,
-      //                  ISNULL(FORMAT(CAST(timesheet.check_out AS DATETIME2), N'hh:mm tt'), 'NA') as check_out,
-      //                  ISNULL(total_hrs, 'NA') as total_hrs,
-      //                  FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US') as ondate
-      //                  FROM timesheet WITH(NOLOCK)
-      //                  INNER JOIN employee ON timesheet.empid = employee.id
-      //                  LEFT JOIN employee_type ON employee.emp_type_id = employee_type.id
-      //                  INNER JOIN timesheet_x_project_category on timesheet.groupid = timesheet_x_project_category.groupid
-      //                  INNER JOIN superadmin_x_org ON superadmin_x_org.superadmin_empid = employee.id
-      //                  INNER JOIN(select distinct(groupid), location.lat, location.lang, location.is_checkout
-      //                  FROM dbo.location WHERE groupid IN (SELECT groupid FROM timesheet) and is_checkout = 0) eTime
-      //                  ON eTime.groupid = dbo.timesheet.groupid
-      //              WHERE
-      //                  superadmin_x_org.org_id = @org_id
-      //            AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
-						//BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US')
-      //                  AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
-      //                  AND timesheet.is_deleted = 0
+            //      SELECT
+            //                  timesheet_x_project_category.project_category_type,
+            //                  timesheet_x_project_category.project_or_comp_name,
+            //                  timesheet.id as timesheet_id,
+            //                  timesheet.groupid as groupid,
+            //                  employee.id as employee_id,
+            //                  eTime.lat as lat,
+            //                  eTime.lang as lang,
+            //                  eTime.is_checkout as is_checkout,
+            //                  employee.full_name,
+            //                  employee_type.employee_type_name as employee_type_name,
+            //                  employee.workemail as workemail,
+            //                  employee.emp_code as emp_code,
+            //                  employee.phone as phone,
+            //                  FORMAT(CAST(timesheet.check_in AS DATETIME2), N'hh:mm tt') as check_in,
+            //                  ISNULL(FORMAT(CAST(timesheet.check_out AS DATETIME2), N'hh:mm tt'), 'NA') as check_out,
+            //                  ISNULL(total_hrs, 'NA') as total_hrs,
+            //                  FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US') as ondate
+            //                  FROM timesheet WITH(NOLOCK)
+            //                  INNER JOIN employee ON timesheet.empid = employee.id
+            //                  LEFT JOIN employee_type ON employee.emp_type_id = employee_type.id
+            //                  INNER JOIN timesheet_x_project_category on timesheet.groupid = timesheet_x_project_category.groupid
+            //                  INNER JOIN superadmin_x_org ON superadmin_x_org.superadmin_empid = employee.id
+            //                  INNER JOIN(select distinct(groupid), location.lat, location.lang, location.is_checkout
+            //                  FROM dbo.location WHERE groupid IN (SELECT groupid FROM timesheet) and is_checkout = 0) eTime
+            //                  ON eTime.groupid = dbo.timesheet.groupid
+            //              WHERE
+            //                  superadmin_x_org.org_id = @org_id
+            //            AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
+            //BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US')
+            //                  AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
+            //                  AND timesheet.is_deleted = 0
 
-      //              UNION
+            //              UNION
+
+            //WHERE FORMAT(CAST(ondate AS DATE), 'MM/dd/yyyy', 'EN-US')
+            //            NOT IN('" + weekoffs + "')
 
             var resultsAspNetUsers = Query<dynamic>(
                 sql: @"SELECT
@@ -203,9 +207,7 @@ namespace TimeAPI.Data.Repositories
 						AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
 						BETWEEN FORMAT(CAST(@fromDate  AS DATE), 'd', 'EN-US')
                         AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
-                        AND timesheet.is_deleted = 0) REALDATA
-						WHERE FORMAT(CAST(ondate  AS DATE), 'MM/dd/yyyy', 'EN-US')
-                        NOT IN ('" + weekoffs + "')",
+                        AND timesheet.is_deleted = 0) REALDATA",
                 param: new { org_id, fromDate, toDate }
             );
             return resultsAspNetUsers;
@@ -506,9 +508,10 @@ namespace TimeAPI.Data.Repositories
                );
         }
 
-        private dynamic GettingTimesheetDashboardDataPerDate(string org_id, string fromDate, string toDate, List<string> OffDaysList)
+        private dynamic GettingTimesheetDashboardDataPerDate(string org_id, string fromDate, string toDate)
         {
-            string weekoffs = String.Join("','", OffDaysList);
+            //, List<string> OffDaysList
+            //string weekoffs = String.Join("','", OffDaysList);
 
             //SELECT COUNT(DISTINCT(timesheet.empid)) as attandance,
             //            ISNULL(UPPER(employee_type.employee_type_name), 'PERMANENT') AS employee_type_name,
@@ -527,11 +530,11 @@ namespace TimeAPI.Data.Repositories
             //            employee_type.employee_type_name
 
             //        UNION ALL
+            //WHERE FORMAT(CAST(ondate  AS DATE), 'MM/dd/yyyy', 'EN-US') NOT IN ('" + weekoffs + "')" +
+
             return Query<dynamic>(
                 sql: @"SELECT employee_type_name, SUM(attandance) as attandance, ondate
                 FROM (
-                   
-
                     SELECT COUNT(DISTINCT(timesheet.empid)) as attandance,
                         ISNULL(UPPER(employee_type.employee_type_name), 'PERMANENT') AS employee_type_name,
 						FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US') as ondate
@@ -545,9 +548,7 @@ namespace TimeAPI.Data.Repositories
                         AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
                         AND timesheet.is_deleted = 0
                         GROUP BY FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US'),
-                        employee_type.employee_type_name) X
-                        WHERE FORMAT(CAST(ondate  AS DATE), 'MM/dd/yyyy', 'EN-US') NOT IN ('" + weekoffs + "')" +
-                        "GROUP BY employee_type_name, ondate",
+                        employee_type.employee_type_name) X GROUP BY employee_type_name, ondate",
                 param: new { org_id, fromDate, toDate }
             );
         }
