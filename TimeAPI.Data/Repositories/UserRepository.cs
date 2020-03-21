@@ -287,14 +287,14 @@ namespace TimeAPI.Data.Repositories
         public dynamic LastCheckinByEmpID(string EmpID)
         {
             return Query<dynamic>(
-                sql: @"select groupid, empid, check_in, check_out, is_checkout, ondate
-                        from timesheet
-                        where groupid in (select top 1 groupid 
-                        from timesheet
-                        where empid = @EmpID
-                        and is_deleted = 0
-                        order by ondate desc)
-                        and is_deleted = 0",
+                sql: @"SELECT groupid, empid, check_in, check_out, is_checkout, ondate
+                        FROM timesheet
+                        WHERE groupid in (select top 1 groupid 
+                        FROM timesheet
+                        WHERE empid = @EmpID
+                        AND is_deleted = 0
+                        ORDER BY FORMAT(CAST( dbo.timesheet.ondate AS DATETIME2), N'MM/dd/yyyy hh:mm') DESC)  
+                        AND is_deleted = 0",
                       param: new { EmpID }
                   );
 
