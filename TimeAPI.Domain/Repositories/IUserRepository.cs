@@ -1,4 +1,5 @@
-﻿using TimeAPI.Domain.Entities;
+﻿using System.Collections.Generic;
+using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Model;
 
 namespace TimeAPI.Domain.Repositories
@@ -8,6 +9,8 @@ namespace TimeAPI.Domain.Repositories
         User FindByNormalizedUserName(string normalizedUserName);
         User FindByNormalizedEmail(string normalizedEmail);
         UserDataGroupDataSet GetUserDataGroupByUserID(string EmpID, string Date);
+
+        IEnumerable<RootTimesheetData> GetAllTimesheetByEmpID(string EmpID, string Date);
 
         //dynamic TotalEmployeeDashboardDataByOrgID(string OrgID);
         ////dynamic TotalEmployeeDashboardDataByOrgID(string OrgID, string toDate, string fromDate);

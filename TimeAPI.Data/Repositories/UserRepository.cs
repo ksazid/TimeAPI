@@ -141,9 +141,26 @@ namespace TimeAPI.Data.Repositories
             _UserDataGroupDataSet.Organization = orgList;
             _UserDataGroupDataSet.Employee = resultsEmployee;
             _UserDataGroupDataSet.Subscription = resultsSubscription;
-            _UserDataGroupDataSet.Timesheet = RootTimesheetDataList;
+
+            //_UserDataGroupDataSet.Timesheet = RootTimesheetDataList;
 
             return _UserDataGroupDataSet;
+        }
+
+        public IEnumerable<RootTimesheetData> GetAllTimesheetByEmpID(string EmpID, string Date)
+        {
+
+            var resultsTimesheetGrpID = Query<string>(
+                sql: @"SELECT distinct(groupid), FORMAT(CAST(timesheet.ondate AS DATETIME2), N'hh:mm tt')  from timesheet WITH (NOLOCK)
+                        WHERE empid = @empid
+                        AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') = FORMAT(CAST(@Date AS DATE), 'd', 'EN-US')
+                        AND timesheet.is_deleted = 0
+                        ORDER BY FORMAT(CAST(timesheet.ondate AS DATETIME2), N'hh:mm tt') DESC;",
+                param: new { empid = EmpID, Date }
+            );
+
+            List<RootTimesheetData> RootTimesheetDataList = GetTimesheetProperty(resultsTimesheetGrpID);
+            return RootTimesheetDataList;
         }
 
         private List<Organization> GetOrgAddress(IEnumerable<Organization> resultsOrganization)

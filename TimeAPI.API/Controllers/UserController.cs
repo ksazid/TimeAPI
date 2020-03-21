@@ -45,5 +45,19 @@ namespace TimeAPI.API.Controllers
             var Result = _unitOfWork.UserRepository.GetUserDataGroupByUserID(UserID.ID, _dateTime.ToString());
             return Task.FromResult<object>(Result);
         }
+
+        [HttpPost]
+        [Route("GetAllTimesheetByEmpID")]
+        public Task<object> GetAllTimesheetByEmpID([FromBody] Utils UserID, CancellationToken cancellationToken)
+        {
+            if (cancellationToken != null)
+                cancellationToken.ThrowIfCancellationRequested();
+
+            if (string.IsNullOrWhiteSpace(UserID.ID))
+                throw new ArgumentNullException(nameof(UserID.ID));
+
+            var Result = _unitOfWork.UserRepository.GetAllTimesheetByEmpID(UserID.ID, _dateTime.ToString());
+            return Task.FromResult<object>(Result);
+        }
     }
 }

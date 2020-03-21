@@ -11,7 +11,7 @@ namespace TimeAPI.Domain.Model
         public Employee Employee { get; set; }
         public Subscription Subscription { get; set; }
         public IEnumerable<Organization> Organization { get; set; }
-        public IEnumerable<RootTimesheetData> Timesheet { get; set; }
+        //public IEnumerable<RootTimesheetData> Timesheet { get; set; }
 
     }
 
