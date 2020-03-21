@@ -518,7 +518,9 @@ namespace TimeAPI.Data.Repositories
 
                                         FROM dbo.employee WITH(NOLOCK)
                                     WHERE employee.org_id =  @OrgID
-                                        AND employee.is_deleted = 0
+                                        AND employee.is_deleted = 0 AND
+                                        FORMAT(CAST(created_date AS DATE), 'd', 'EN-US') 
+                                        <= FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US')
                             )
                             SELECT employee
                             FROM TotalEmployee
