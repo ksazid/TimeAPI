@@ -286,10 +286,14 @@ namespace TimeAPI.Data.Repositories
 
         public dynamic LastCheckinByEmpID(string EmpID)
         {
-            return QuerySingleOrDefault<dynamic>(
-                sql: @"select top 1 groupid, check_in, check_out, is_checkout, ondate
+            return Query<dynamic>(
+                sql: @"select groupid, empid, check_in, check_out, is_checkout, ondate
+                        from timesheet
+                        where groupid in (select top 1 groupid 
                         from timesheet
                         where empid = @EmpID
+                        and is_deleted = 0
+                        order by ondate desc)
                         and is_deleted = 0",
                       param: new { EmpID }
                   );
