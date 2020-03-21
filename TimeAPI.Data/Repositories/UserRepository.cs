@@ -288,16 +288,15 @@ namespace TimeAPI.Data.Repositories
         {
             return Query<dynamic>(
                 sql: @"SELECT groupid, empid, check_in, check_out, is_checkout, ondate
-                        FROM timesheet
-                        WHERE groupid in (select top 1 groupid 
-                        FROM timesheet
-                        WHERE empid = @EmpID
-                        AND is_deleted = 0
-                        ORDER BY FORMAT(CAST( dbo.timesheet.ondate AS DATETIME2), N'MM/dd/yyyy hh:mm') DESC)  
-                        AND is_deleted = 0",
+                            FROM timesheet
+                            WHERE groupid IN (SELECT TOP 1 groupid 
+                            FROM timesheet
+                            WHERE empid = @EmpID
+                            AND is_deleted = 0 AND is_checkout =0
+                            ORDER BY 
+                            FORMAT(CAST( dbo.timesheet.ondate AS DATETIME), N'MM/dd/yyyy') DESC)",
                       param: new { EmpID }
                   );
-
         }
     }
 }
