@@ -29,6 +29,30 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
+        public dynamic FindByProjectActivityID(string key)
+        {
+            return Query<dynamic>(
+                   sql: @"SELECT 
+                                dbo.project_activity.id as project_activity_id,
+                                dbo.project_activity.project_id,
+                                dbo.project_activity.activity_name,
+                                dbo.project_activity.activity_desc,
+                                dbo.project_activity.unit,
+                                dbo.project_activity.qty,
+                                dbo.project_activity.is_approve_req,
+                                dbo.project_activity.approved_id,
+                                dbo.project_activity.is_approved,
+                                dbo.project_status.id as status_id,
+                                dbo.project_status.project_status_name,
+                                dbo.project_activity.start_date,
+                                dbo.project_activity.end_date
+                                FROM dbo.project_activity 
+                                LEFT JOIN  dbo.project_status on dbo.project_activity.status_id = project_status.id
+                                WHERE dbo.project_activity.is_deleted = 0 and dbo.project_activity.id = @key",
+                      param: new { key }
+               );
+        }
+
         public void Remove(string key)
         {
             Execute(

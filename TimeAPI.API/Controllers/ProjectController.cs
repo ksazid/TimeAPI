@@ -950,7 +950,7 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.ProjectActivityRepository.Find(Utils.ID);
+                var result = _unitOfWork.ProjectActivityRepository.FindByProjectActivityID(Utils.ID);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }

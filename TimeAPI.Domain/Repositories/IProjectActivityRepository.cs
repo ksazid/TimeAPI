@@ -14,6 +14,7 @@ namespace TimeAPI.Domain.Repositories
         IEnumerable<ProjectActivity> GetProjectActivityByProjectID(string ProjectID);
         void UpdateProjectActivityStatusByActivityID(ProjectActivity entity);
         dynamic GetProjectActivityRatioByProjectID(string ProjectID);
+        dynamic FindByProjectActivityID(string ProjectID);
         //IEnumerable<ProjectActivity> GetProjectActivityByProjectID(string ProjectID);
 
     }
