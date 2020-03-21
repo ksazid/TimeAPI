@@ -284,7 +284,16 @@ namespace TimeAPI.Data.Repositories
             return TimesheetSearchLocationViewModel;
         }
 
+        public dynamic LastCheckinByEmpID(string EmpID)
+        {
+            return QuerySingleOrDefault<dynamic>(
+                sql: @"select top 1 groupid, check_in, check_out, is_checkout, ondate
+                        from timesheet
+                        where empid = @EmpID
+                        and is_deleted = 0",
+                      param: new { EmpID }
+                  );
+
+        }
     }
-
-
 }

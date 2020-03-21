@@ -11,6 +11,7 @@ namespace TimeAPI.Domain.Repositories
         UserDataGroupDataSet GetUserDataGroupByUserID(string EmpID, string Date);
 
         IEnumerable<RootTimesheetData> GetAllTimesheetByEmpID(string EmpID, string Date);
+        dynamic LastCheckinByEmpID(string EmpID);
 
         //dynamic TotalEmployeeDashboardDataByOrgID(string OrgID);
         ////dynamic TotalEmployeeDashboardDataByOrgID(string OrgID, string toDate, string fromDate);

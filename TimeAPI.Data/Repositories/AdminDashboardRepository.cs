@@ -413,9 +413,7 @@ namespace TimeAPI.Data.Repositories
 
             foreach (var item in projectList)
             {
-                //ISNULL(UPPER(employee_type.employee_type_name), 'PERMANENT') AS employee_type_name,
-                UtilsProjectAndRatio utilsProjectAndRatio = new UtilsProjectAndRatio();
-                utilsProjectAndRatio = QuerySingleOrDefault<UtilsProjectAndRatio>(
+                UtilsProjectAndRatio utilsProjectAndRatio = QuerySingleOrDefault<UtilsProjectAndRatio>(
                         sql: @"SELECT 
                             dbo.project.project_name as project_name,
                              ISNULL(SUM((SELECT count(*)
@@ -449,15 +447,24 @@ namespace TimeAPI.Data.Repositories
             return utilsProjectAndRatios;
         }
 
-
+        public dynamic GetAllTimesheetRecentActivityList(string org_id, string fromDate, string toDate)
+        {
+            var resultsAspNetUsers = Query<dynamic>(
+                sql: @"SELECT DISTINCT( dbo.timesheet.groupid), 
+                            FORMAT(CAST( dbo.timesheet.ondate AS DATETIME2), N'hh:mm tt')  
+                        FROM dbo.timesheet WITH (NOLOCK)
+                            INNER JOIN dbo.employee on dbo.timesheet.empid = dbo.employee.id
+                        WHERE dbo.employee.org_id =@org_id
+                            AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
+                            BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US')
+                            AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
+                            AND  dbo.timesheet.is_deleted = 0
+                        ORDER BY FORMAT(CAST( dbo.timesheet.ondate AS DATETIME2), N'hh:mm tt') DESC;",
+                      param: new { org_id, fromDate, toDate }
+                  );
+            return resultsAspNetUsers;
+        }
         
-
-
-
-
-
-
-
 
         #region PrivateMethods
 

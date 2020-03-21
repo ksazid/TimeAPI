@@ -59,5 +59,20 @@ namespace TimeAPI.API.Controllers
             var Result = _unitOfWork.UserRepository.GetAllTimesheetByEmpID(UserID.ID, _dateTime.ToString());
             return Task.FromResult<object>(Result);
         }
+
+
+        [HttpPost]
+        [Route("LastCheckinByEmpID")]
+        public Task<object> LastCheckinByEmpID([FromBody] Utils UserID, CancellationToken cancellationToken)
+        {
+            if (cancellationToken != null)
+                cancellationToken.ThrowIfCancellationRequested();
+
+            if (string.IsNullOrWhiteSpace(UserID.ID))
+                throw new ArgumentNullException(nameof(UserID.ID));
+
+            var Result = _unitOfWork.UserRepository.LastCheckinByEmpID(UserID.ID);
+            return Task.FromResult<object>(Result);
+        }
     }
 }

@@ -17,6 +17,7 @@ namespace TimeAPI.Domain.Repositories
         dynamic GetCheckOutLocationByGroupID(string GroupID);
         dynamic GetTimesheetActivityByGroupAndDate(string GroupID, string Date);
         dynamic AllProjectRatioByOrgID(string OrgID);
+        dynamic GetAllTimesheetRecentActivityList(string OrgID, string toDate, string fromDate);
 
 
     }
