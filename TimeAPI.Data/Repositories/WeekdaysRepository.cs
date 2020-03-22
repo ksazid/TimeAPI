@@ -54,7 +54,7 @@ namespace TimeAPI.Data.Repositories
                 sql: @"UPDATE dbo.weekdays
                    SET
                        modified_date = GETDATE(), is_deleted = 1
-                    WHERE org_id = @org_id",
+                    WHERE org_id = @key",
                 param: new { key }
             );
         }
