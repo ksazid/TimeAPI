@@ -28,6 +28,15 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
+        public IEnumerable<Weekdays> FindByOrgID(string key)
+        {
+            return Query<Weekdays>(
+                sql: "SELECT * FROM dbo.weekdays WHERE is_deleted = 0 and org_id = @key",
+                param: new { key }
+            );
+        }
+
+
         public void Remove(string key)
         {
             Execute(
