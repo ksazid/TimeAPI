@@ -10,7 +10,7 @@ namespace TimeAPI.Domain.Entities
         public string org_id { get; set; }
         public string country { get; set; }
         public string fiscal_year { get; set; }
-        public List<Weekdays> Weekdays { get; set; }
+        public List<Weekdays> weekends { get; set; }
         public string working_hrs { get; set; }
         public string date_format { get; set; }
         public string currency { get; set; }

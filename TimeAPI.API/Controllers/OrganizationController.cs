@@ -101,9 +101,9 @@ namespace TimeAPI.API.Controllers
                     modal1.is_deleted = false;
                     modal1.fiscal_year = organizationViewModel.OrganizationSetup.fiscal_year;
 
-                    if (organizationViewModel.OrganizationSetup.Weekdays != null)
+                    if (organizationViewModel.OrganizationSetup.weekends != null)
                     {
-                        foreach (var item in organizationViewModel.OrganizationSetup.Weekdays)
+                        foreach (var item in organizationViewModel.OrganizationSetup.weekends)
                         {
                             var weekend = new Weekdays()
                             {
@@ -160,13 +160,13 @@ namespace TimeAPI.API.Controllers
                 AddOrUpdateSetupAndLocation(organizationViewModel, config, mapper, modal, result, result1);
 
                 // remove weekend
-                if (_unitOfWork.WeekdaysRepository.FindByOrgID(modal.org_id) != null)
+                if (_unitOfWork.WeekdaysRepository.FindByOrgID(modal.org_id).ToList().Count > 0)
                     _unitOfWork.WeekdaysRepository.RemoveByOrgID(modal.org_id);
 
 
-                if (organizationViewModel.OrganizationSetup.Weekdays != null)
+                if (organizationViewModel.OrganizationSetup.weekends != null)
                 {
-                    foreach (var item in organizationViewModel.OrganizationSetup.Weekdays)
+                    foreach (var item in organizationViewModel.OrganizationSetup.weekends)
                     {
                         var weekend = new Weekdays()
                         {
@@ -214,7 +214,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.SuperadminOrganizationRepository.RemoveByOrgID(Utils.ID);
                 _unitOfWork.OrganizationSetupRepository.RemoveByOrgID(Utils.ID);
 
-                if (_unitOfWork.WeekdaysRepository.FindByOrgID(Utils.ID) != null)
+                if (_unitOfWork.WeekdaysRepository.FindByOrgID(Utils.ID).ToList().Count > 0)
                     _unitOfWork.WeekdaysRepository.RemoveByOrgID(Utils.ID);
 
                 var ListBranch = _unitOfWork.OrganizationBranchRepository.FindByParentOrgID(Utils.ID).ToList();
@@ -263,7 +263,7 @@ namespace TimeAPI.API.Controllers
 
                 if (resultWeekdays.Count > 0)
                 {
-                    resultSetup.Weekdays.AddRange(resultWeekdays);
+                    resultSetup.weekends.AddRange(resultWeekdays);
                 }
 
                 modal.EntityLocation = resultLocation;
@@ -480,9 +480,9 @@ namespace TimeAPI.API.Controllers
 
                             _unitOfWork.WeekdaysRepository.RemoveByOrgID(modalBranch.org_id);
 
-                            if (organizationViewModel.OrganizationSetup.Weekdays != null)
+                            if (organizationViewModel.OrganizationSetup.weekends != null)
                             {
-                                foreach (var item in organizationViewModel.OrganizationSetup.Weekdays)
+                                foreach (var item in organizationViewModel.OrganizationSetup.weekends)
                                 {
                                     var weekend = new Weekdays()
                                     {
