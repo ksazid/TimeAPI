@@ -5,26 +5,26 @@ using TimeAPI.Domain.Repositories;
 
 namespace TimeAPI.Data.Repositories
 {
-    public class OrgWeekdaysRepository : RepositoryBase, IOrgWeekdaysRepository
+    public class DualApprovalRepository : RepositoryBase, IDualApprovalRepository
     {
-        public OrgWeekdaysRepository(IDbTransaction transaction) : base(transaction)
+        public DualApprovalRepository(IDbTransaction transaction) : base(transaction)
         { }
 
-        public void Add(OrgWeekdays entity)
+        public void Add(DualApproval entity)
         {
             entity.id = ExecuteScalar<string>(
-                    sql: @"INSERT INTO dbo.org_x_weekdays
-                                  (id, org_id, weekdays_id, created_date, createdby)
-                           VALUES (@id, @org_id, @weekdays_id, @created_date, @createdby);
+                    sql: @"INSERT INTO dbo.dual_approval
+                                  (id, entity_id, approver1_empid,approver2_empid, created_date, createdby)
+                           VALUES (@id, @entity_id, @approver1_empid, @approver2_empid, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
         }
 
-        public OrgWeekdays Find(string key)
+        public DualApproval Find(string key)
         {
-            return QuerySingleOrDefault<OrgWeekdays>(
-                sql: "SELECT * FROM dbo.org_x_weekdays WHERE is_deleted = 0 and entity_id = @key",
+            return QuerySingleOrDefault<DualApproval>(
+                sql: "SELECT * FROM dbo.dual_approval WHERE is_deleted = 0 and entity_id = @key",
                 param: new { key }
             );
         }
@@ -32,7 +32,7 @@ namespace TimeAPI.Data.Repositories
         public void Remove(string key)
         {
             Execute(
-                sql: @"UPDATE dbo.org_x_weekdays
+                sql: @"UPDATE dbo.dual_approval
                    SET
                        modified_date = GETDATE(), is_deleted = 1
                     WHERE Find = @key",
@@ -43,7 +43,7 @@ namespace TimeAPI.Data.Repositories
         public void RemoveByEntityID(string key)
         {
             Execute(
-                sql: @"UPDATE dbo.org_x_weekdays
+                sql: @"UPDATE dbo.dual_approval
                    SET
                        modified_date = GETDATE(), is_deleted = 1
                     WHERE entity_id = @entity_id",
@@ -51,13 +51,14 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public void Update(OrgWeekdays entity)
+        public void Update(DualApproval entity)
         {
             Execute(
-                sql: @"UPDATE dbo.org_x_weekdays
+                sql: @"UPDATE dbo.dual_approval
                    SET
-                    org_id = @org_id, 
-                    weekdays_id = @weekdays_id,
+                    entity_id = @entity_id, 
+                    approver1_empid = @approver1_empid, 
+                    approver2_empid = @approver2_empid,
                     modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE entity_id = @entity_id",
@@ -65,10 +66,10 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<OrgWeekdays> All()
+        public IEnumerable<DualApproval> All()
         {
-            return Query<OrgWeekdays>(
-                sql: "SELECT * FROM dbo.org_x_weekdays where is_deleted = 0"
+            return Query<DualApproval>(
+                sql: "SELECT * FROM dbo.dual_approval where is_deleted = 0"
             );
         }
     }

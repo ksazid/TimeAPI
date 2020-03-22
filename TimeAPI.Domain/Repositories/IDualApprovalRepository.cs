@@ -5,8 +5,8 @@ using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.Domain.Repositories
 {
-    public interface IOrgWeekdaysRepository : IRepository<OrgWeekdays, string>
+    public interface IDualApprovalRepository : IRepository<DualApproval, string>
     {
-       
+        //DualApproval FindByEntityID(EntityID);
     }
 }

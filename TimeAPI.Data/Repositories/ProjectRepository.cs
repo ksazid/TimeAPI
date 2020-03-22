@@ -14,8 +14,8 @@ namespace TimeAPI.Data.Repositories
         {
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.project
-                                  (id, user_id, org_id, project_name, project_desc, project_prefix, start_date, end_date, completed_date, project_status_id, is_private, is_public, created_date, createdby)
-                           VALUES (@id, @user_id, @org_id, @project_name, @project_desc, @project_prefix, @start_date, @end_date, @completed_date, @project_status_id, @is_private, @is_public, @created_date, @createdby);
+                                  (id, user_id, org_id, project_type_id, project_name, project_desc, project_prefix, start_date, end_date, completed_date, project_status_id, is_private, is_public, created_date, createdby)
+                           VALUES (@id, @user_id, @org_id, @project_type_id, @project_name, @project_desc, @project_prefix, @start_date, @end_date, @completed_date, @project_status_id, @is_private, @is_public, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -72,6 +72,7 @@ namespace TimeAPI.Data.Repositories
                 sql: @"UPDATE dbo.project
                    SET
                     user_id = @user_id,
+                    project_type_id = @project_type_id,
                     org_id = @org_id,
                     project_name = @project_name,
                     project_desc = @project_desc,
@@ -101,6 +102,8 @@ namespace TimeAPI.Data.Repositories
             return Query<dynamic>(
                    sql: @"SELECT
                             ROW_NUMBER() OVER (ORDER BY project.project_name) AS rowno,
+                            project_type.id as project_type_id,
+                            project_type.type_name as project_type_name,
                             project.id as project_id,
                             project.project_name,
                             project.project_prefix,
@@ -111,11 +114,12 @@ namespace TimeAPI.Data.Repositories
                             project.end_date,
                             project.completed_date
                         FROM dbo.project WITH(NOLOCK)
-                        LEFT JOIN employee e_tl ON dbo.project.user_id = e_tl.id
-                        LEFT JOIN project_status  ON dbo.project.project_status_id = project_status.id
-                        WHERE project.org_id = @key
-                        AND project.is_deleted = 0
-                        ORDER BY project.project_name ASC",
+                        LEFT JOIN dbo.employee e_tl ON dbo.project.user_id = e_tl.id
+                        LEFT JOIN dbo.project_status  ON dbo.project.project_status_id = dbo.project_status.id
+                        LEFT JOIN dbo.project_type  ON dbo.project.project_type_id = dbo.project_type.id
+                        WHERE dbo.project.org_id =@key
+                        AND dbo.project.is_deleted = 0
+                        ORDER BY dbo.project.project_name ASC",
                       param: new { key }
                );
         }

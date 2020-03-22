@@ -58,7 +58,8 @@ namespace TimeAPI.Domain
         ILocationExceptionRepository LocationExceptionRepository { get; }
         IEntityInvitationRepository EntityInvitationRepository { get; }
         IWeekdaysRepository WeekdaysRepository { get; }
-        IOrgWeekdaysRepository OrgWeekdaysRepository { get; }
+        IDualApprovalRepository OrgWeekdaysRepository { get; }
+        IProjectTypeRepository ProjectTypeRepository { get; }
 
         #region systemadmin
         IPlanRepository PlanRepository { get; }

@@ -67,7 +67,8 @@ namespace TimeAPI.Data
         private ILocationExceptionRepository _locationExceptionRepository;
         private IEntityInvitationRepository _entityInvitationRepository;
         private IWeekdaysRepository _weekdaysRepository;
-        private IOrgWeekdaysRepository _orgWeekdaysRepository;
+        private IDualApprovalRepository _orgWeekdaysRepository;
+        private IProjectTypeRepository _projectTypeRepository;
 
         #region systemadmin
         private IPlanRepository _planRepository;
@@ -601,12 +602,21 @@ namespace TimeAPI.Data
             }
         }
 
-        public IOrgWeekdaysRepository OrgWeekdaysRepository
+        public IDualApprovalRepository OrgWeekdaysRepository
         {
             get
             {
                 return _orgWeekdaysRepository
-                    ?? (_orgWeekdaysRepository = new OrgWeekdaysRepository(_transaction));
+                    ?? (_orgWeekdaysRepository = new DualApprovalRepository(_transaction));
+            }
+        }
+
+        public IProjectTypeRepository ProjectTypeRepository
+        {
+            get
+            {
+                return _projectTypeRepository
+                    ?? (_projectTypeRepository = new ProjectTypeRepository(_transaction));
             }
         }
 

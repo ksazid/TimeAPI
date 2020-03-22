@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using TimeAPI.API.Models;
 using TimeAPI.API.Models.EntityLocationViewModels;
 using TimeAPI.API.Models.ProjectActivityViewModels;
+using TimeAPI.API.Models.ProjectTypeViewModels;
 using TimeAPI.API.Models.ProjectViewModels;
 using TimeAPI.API.Models.StatusViewModels;
 using TimeAPI.API.Models.TaskViewModels;
@@ -1366,5 +1367,156 @@ namespace TimeAPI.API.Controllroers
         }
 
         #endregion ProjectActivityTask
+
+        #region ProjectType
+
+        [HttpPost]
+        [Route("AddProjectType")]
+        public async Task<object> AddProjectType([FromBody] ProjectTypeViewModel statusingViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (statusingViewModel == null)
+                    throw new ArgumentNullException(nameof(statusingViewModel));
+
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<ProjectTypeViewModel, ProjectType>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<ProjectType>(statusingViewModel);
+
+                modal.id = Guid.NewGuid().ToString();
+                modal.created_date = _dateTime.ToString();
+                modal.is_deleted = false;
+
+                _unitOfWork.ProjectTypeRepository.Add(modal);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "ProjectType registered successfully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("FindByProjectTypeID")]
+        public async Task<object> FindByProjectTypeID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                var result = _unitOfWork.ProjectTypeRepository.Find(Utils.ID);
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("GetAllProjectType")]
+        public async Task<object> GetAllProjectType(CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                var result = _unitOfWork.ProjectTypeRepository.All();
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("GetProjectTypeByOrgID")]
+        public async Task<object> GetProjectTypeByOrgID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                var result = _unitOfWork.ProjectTypeRepository.FindByOrgID(Utils.ID);
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("RemoveProjectType")]
+        public async Task<object> RemoveProjectType([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                _unitOfWork.ProjectTypeRepository.Remove(Utils.ID);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "ProjectType removed successfully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPatch]
+        [Route("UpdateProjectType")]
+        public async Task<object> UpdateProjectType([FromBody] ProjectTypeViewModel statusingViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (statusingViewModel == null)
+                    throw new ArgumentNullException(nameof(statusingViewModel));
+
+                statusingViewModel.modified_date = _dateTime.ToString();
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<ProjectTypeViewModel, ProjectType>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<ProjectType>(statusingViewModel);
+
+                modal.modified_date = _dateTime.ToString();
+
+                _unitOfWork.ProjectTypeRepository.Update(modal);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "ProjectType updated successfully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        #endregion ProjectType
     }
 }

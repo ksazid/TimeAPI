@@ -4,12 +4,12 @@ using System.Text;
 
 namespace TimeAPI.Domain.Entities
 {
-    public class OrgWeekdays
+    public class DualApproval
     {
         public string id { get; set; }
-        public string org_id { get; set; }
-        public string weekdays_id { get; set; }
-        public string created_date { get; set; }
+        public string entity_id { get; set; }
+        public string approver1_empid { get; set; }
+        public string approver2_empid { get; set; }
         public string createdby { get; set; }
         public string modified_date { get; set; }
         public string modifiedby { get; set; }
