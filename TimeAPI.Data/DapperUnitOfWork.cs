@@ -66,7 +66,8 @@ namespace TimeAPI.Data
         private IAdminDashboardRepository _adminDashboardRepository;
         private ILocationExceptionRepository _locationExceptionRepository;
         private IEntityInvitationRepository _entityInvitationRepository;
-        private IWeekendHoursRepository _weekendHoursRepository;
+        private IWeekdaysRepository _weekdaysRepository;
+        private IOrgWeekdaysRepository _orgWeekdaysRepository;
 
         #region systemadmin
         private IPlanRepository _planRepository;
@@ -421,9 +422,6 @@ namespace TimeAPI.Data
             }
         }
 
-
-        
-
         public IEntityLocationRepository EntityLocationRepository
         {
             get
@@ -594,14 +592,24 @@ namespace TimeAPI.Data
             }
         }
 
-        public IWeekendHoursRepository WeekendHoursRepository
+        public IWeekdaysRepository WeekdaysRepository
         {
             get
             {
-                return _weekendHoursRepository
-                    ?? (_weekendHoursRepository = new WeekendHoursRepository(_transaction));
+                return _weekdaysRepository
+                    ?? (_weekdaysRepository = new WeekdaysRepository(_transaction));
             }
         }
+
+        public IOrgWeekdaysRepository OrgWeekdaysRepository
+        {
+            get
+            {
+                return _orgWeekdaysRepository
+                    ?? (_orgWeekdaysRepository = new OrgWeekdaysRepository(_transaction));
+            }
+        }
+
 
 
         public bool Commit()

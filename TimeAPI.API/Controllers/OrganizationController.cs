@@ -101,23 +101,23 @@ namespace TimeAPI.API.Controllers
                     modal1.is_deleted = false;
                     modal1.fiscal_year = organizationViewModel.OrganizationSetup.fiscal_year;
 
-                    if (organizationViewModel.OrganizationSetup.weekends != null)
+                    if (organizationViewModel.OrganizationSetup.Weekdays != null)
                     {
-                        foreach (var item in organizationViewModel.OrganizationSetup.weekends)
+                        foreach (var item in organizationViewModel.OrganizationSetup.Weekdays)
                         {
-                            var weekend = new WeekendHours()
+                            var weekend = new Weekdays()
                             {
-
                                 id = Guid.NewGuid().ToString(),
                                 org_id = modal.org_id,
-                                offworkdays = item.offworkdays,
-                                start_time = item.start_time,
-                                end_time = item.end_time,
+                                day_name = item.day_name,
+                                from_time = item.from_time,
+                                to_time = item.to_time,
+                                is_off = item.is_off,
                                 created_date = _dateTime.ToString(),
                                 createdby = organizationViewModel.createdby,
                                 is_deleted = false
                             };
-                            _unitOfWork.WeekendHoursRepository.Add(weekend);
+                            _unitOfWork.WeekdaysRepository.Add(weekend);
                         }
                     }
 
@@ -160,24 +160,25 @@ namespace TimeAPI.API.Controllers
                 AddOrUpdateSetupAndLocation(organizationViewModel, config, mapper, modal, result, result1);
 
                 // remove weekend
-                _unitOfWork.WeekendHoursRepository.RemoveByOrgID(modal.org_id);
+                _unitOfWork.WeekdaysRepository.RemoveByOrgID(modal.org_id);
 
-                if (organizationViewModel.OrganizationSetup.weekends != null)
+                if (organizationViewModel.OrganizationSetup.Weekdays != null)
                 {
-                    foreach (var item in organizationViewModel.OrganizationSetup.weekends)
+                    foreach (var item in organizationViewModel.OrganizationSetup.Weekdays)
                     {
-                        var weekend = new WeekendHours()
+                        var weekend = new Weekdays()
                         {
                             id = Guid.NewGuid().ToString(),
                             org_id = modal.org_id,
-                            offworkdays = item.offworkdays,
-                            start_time = item.start_time,
-                            end_time = item.end_time,
+                            day_name = item.day_name,
+                            from_time = item.from_time,
+                            to_time = item.to_time,
+                            is_off = item.is_off,
                             created_date = _dateTime.ToString(),
                             createdby = organizationViewModel.createdby,
                             is_deleted = false
                         };
-                        _unitOfWork.WeekendHoursRepository.Add(weekend);
+                        _unitOfWork.WeekdaysRepository.Add(weekend);
                     }
                 }
 
@@ -467,38 +468,43 @@ namespace TimeAPI.API.Controllers
                             modalBranchSetup.is_deleted = false;
                             modalBranchSetup.fiscal_year = modalBranchSetup.fiscal_year;
 
-                            _unitOfWork.WeekendHoursRepository.RemoveByOrgID(modalBranch.org_id);
-                            foreach (var item in organizationViewModel.OrganizationSetup.weekends)
+                            _unitOfWork.WeekdaysRepository.RemoveByOrgID(modalBranch.org_id);
+
+                            if (organizationViewModel.OrganizationSetup.Weekdays != null)
                             {
-                                var weekend = new WeekendHours()
+                                foreach (var item in organizationViewModel.OrganizationSetup.Weekdays)
                                 {
-                                    id = Guid.NewGuid().ToString(),
-                                    org_id = modalBranch.org_id,
-                                    offworkdays = item.offworkdays,
-                                    start_time = item.start_time,
-                                    end_time = item.end_time,
-                                    created_date = _dateTime.ToString(),
-                                    createdby = organizationViewModel.createdby,
-                                    is_deleted = false
-                                };
-                                _unitOfWork.WeekendHoursRepository.Add(weekend);
+                                    var weekend = new Weekdays()
+                                    {
+                                        id = Guid.NewGuid().ToString(),
+                                        org_id = modalBranch.org_id,
+                                        day_name = item.day_name,
+                                        from_time = item.from_time,
+                                        to_time = item.to_time,
+                                        is_off = item.is_off,
+                                        created_date = _dateTime.ToString(),
+                                        createdby = organizationViewModel.createdby,
+                                        is_deleted = false
+                                    };
+                                    _unitOfWork.WeekdaysRepository.Add(weekend);
+                                }
+                                _unitOfWork.OrganizationSetupRepository.Add(modalBranchSetup);
                             }
-                            _unitOfWork.OrganizationSetupRepository.Add(modalBranchSetup);
-                        }
 
-                        //Location for branch
-                        if (ListOfBranch[i].EntityLocationViewModel != null)
-                        {
-                            var OrgLocation = SetLocationForOrg(ListOfBranch[i].EntityLocationViewModel, modalBranch.org_id.ToString());
-                            OrgLocation.id = Guid.NewGuid().ToString();
-                            OrgLocation.createdby = organizationViewModel.createdby;
-                            OrgLocation.created_date = _dateTime.ToString();
-                            OrgLocation.is_deleted = false;
-                            OrgLocation.createdby = organizationViewModel.createdby;
-                            _unitOfWork.EntityLocationRepository.Add(OrgLocation);
-                        }
+                            //Location for branch
+                            if (ListOfBranch[i].EntityLocationViewModel != null)
+                            {
+                                var OrgLocation = SetLocationForOrg(ListOfBranch[i].EntityLocationViewModel, modalBranch.org_id.ToString());
+                                OrgLocation.id = Guid.NewGuid().ToString();
+                                OrgLocation.createdby = organizationViewModel.createdby;
+                                OrgLocation.created_date = _dateTime.ToString();
+                                OrgLocation.is_deleted = false;
+                                OrgLocation.createdby = organizationViewModel.createdby;
+                                _unitOfWork.EntityLocationRepository.Add(OrgLocation);
+                            }
 
-                        _unitOfWork.OrganizationRepository.Add(modalBranch);
+                            _unitOfWork.OrganizationRepository.Add(modalBranch);
+                        }
                     }
                 }
             }
@@ -571,7 +577,7 @@ namespace TimeAPI.API.Controllers
         //}
 
         private void AddOrUpdateSetupAndLocation(OrganizationViewModel organizationViewModel, MapperConfiguration config,
-            IMapper mapper, Organization modal, EntityLocation result, OrganizationSetup result1)
+        IMapper mapper, Organization modal, EntityLocation result, OrganizationSetup result1)
         {
             if (result != null)
             {

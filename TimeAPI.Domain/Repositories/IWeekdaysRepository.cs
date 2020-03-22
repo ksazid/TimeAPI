@@ -5,8 +5,8 @@ using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.Domain.Repositories
 {
-    public interface IEntityInvitationRepository : IRepository<EntityInvitation, string>
+    public interface IWeekdaysRepository : IRepository<Weekdays, string>
     {
-        void RemoveByEntityID(string OrgID);
+        void RemoveByOrgID(string OrgID);
     }
 }
