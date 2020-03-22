@@ -263,7 +263,8 @@ namespace TimeAPI.API.Controllers
 
                 if (resultWeekdays.Count > 0)
                 {
-                    resultSetup.weekends.AddRange(resultWeekdays);
+                    List<Weekdays> weekdaysList = resultWeekdays;
+                    resultSetup.weekends = weekdaysList;
                 }
 
                 modal.EntityLocation = resultLocation;
