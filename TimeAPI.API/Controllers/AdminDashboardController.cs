@@ -207,5 +207,20 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
+
+
+        [HttpPost]
+        [Route("GetAllTaskByEmpID")]
+        public Task<object> GetAllTaskByOrgAndEmpID([FromBody] UtilsOrgAndEmpID UserID, CancellationToken cancellationToken)
+        {
+            if (cancellationToken != null)
+                cancellationToken.ThrowIfCancellationRequested();
+
+            if (string.IsNullOrWhiteSpace(UserID.OrgID))
+                throw new ArgumentNullException(nameof(UserID.OrgID));
+
+            var Result = _unitOfWork.TaskRepository.GetAllTaskByOrgAndEmpID(UserID.OrgID, UserID.EmpID);
+            return Task.FromResult<object>(Result);
+        }
     }
 }

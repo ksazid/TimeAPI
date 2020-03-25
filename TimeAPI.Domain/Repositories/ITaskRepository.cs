@@ -14,6 +14,7 @@ namespace TimeAPI.Domain.Repositories
         void UpdateTaskStatus(Tasks entity);
 
         RootEmployeeTask GetAllTaskByEmpID(string empid);
-       
+
+        RootEmployeeTask GetAllTaskByOrgAndEmpID(string key, string EmpID);
     }
 }
