@@ -552,7 +552,7 @@ namespace TimeAPI.API.Controllers
                     cancellationToken.ThrowIfCancellationRequested();
 
                 oDataTable _oDataTable = new oDataTable();
-                var result = _unitOfWork.TimesheetActivityRepository.GetTimesheetActivityByGroupAndProjectID(Utils.GroupID, Utils.ProjectID, _dateTime.ToString());
+                var result = _unitOfWork.TimesheetActivityRepository.GetTimesheetActivityByGroupAndProjectID(Utils.GroupID, Utils.ProjectID, Utils.Date.ToString());
                 var xResult = _oDataTable.ToDataTable(result);
 
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);

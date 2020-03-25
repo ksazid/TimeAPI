@@ -111,6 +111,7 @@ namespace TimeAPI.API.Models
     {
         public string GroupID { get; set; }
         public string ProjectID { get; set; }
+        public string Date { get; set; }
     }
 
     public class UtilsEmpIDAndDate
