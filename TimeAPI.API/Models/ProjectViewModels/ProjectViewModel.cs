@@ -12,6 +12,7 @@ namespace TimeAPI.API.Models.ProjectViewModels
         public string user_id { get; set; }
         public string org_id { get; set; }
         public string cst_id { get; set; }
+        public string project_type_id { get; set; }
         public string project_name { get; set; }
         public string project_desc { get; set; }
         public string start_date { get; set; }
