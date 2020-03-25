@@ -9,8 +9,10 @@ namespace TimeAPI.Domain.Repositories
         User FindByNormalizedUserName(string normalizedUserName);
         User FindByNormalizedEmail(string normalizedEmail);
         UserDataGroupDataSet GetUserDataGroupByUserID(string EmpID, string Date);
-
+       
         IEnumerable<RootTimesheetData> GetAllTimesheetByEmpID(string EmpID, string Date);
+
+        IEnumerable<RootTimesheetData> GetAllTimesheetByOrgID(string EmpID, string FromDate, string ToDate);
         dynamic LastCheckinByEmpID(string EmpID);
 
         //dynamic TotalEmployeeDashboardDataByOrgID(string OrgID);

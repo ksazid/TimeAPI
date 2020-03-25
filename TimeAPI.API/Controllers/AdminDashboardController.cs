@@ -189,7 +189,23 @@ namespace TimeAPI.API.Controllers
         }
 
 
-        
+        [HttpPost]
+        [Route("GetAllTimesheetByOrgID")]
+        public async Task<object> GetAllTimesheetByOrgID([FromBody] UtilsOrgIDAndDate Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
 
+                var result = _unitOfWork.UserRepository.GetAllTimesheetByOrgID(Utils.OrgID, Utils.fromDate, Utils.toDate);
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
     }
 }

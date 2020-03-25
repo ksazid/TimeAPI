@@ -8,5 +8,6 @@ namespace TimeAPI.Domain.Repositories
     public interface ILocationExceptionRepository : IRepository<LocationException, string>
     {
         void RemoveByGroupID(string GroupID);
+        LocationException FindByGroupID(string GroupID);
     }
 }

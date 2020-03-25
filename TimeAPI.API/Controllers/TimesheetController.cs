@@ -267,7 +267,9 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.TimesheetProjectCategoryRepository.RemoveByGroupID(Timesheet.groupid);
                 _unitOfWork.TimesheetActivityRepository.RemoveByGroupID(Timesheet.groupid);
                 _unitOfWork.TimesheetAdministrativeRepository.RemoveByGroupID(Timesheet.groupid);
-                _unitOfWork.LocationExceptionRepository.RemoveByGroupID(Timesheet.groupid);
+
+                if (_unitOfWork.LocationExceptionRepository.FindByGroupID(Timesheet.groupid) != null)
+                    _unitOfWork.LocationExceptionRepository.RemoveByGroupID(Timesheet.groupid);
 
                 _unitOfWork.Commit();
 

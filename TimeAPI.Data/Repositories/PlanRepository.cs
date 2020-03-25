@@ -70,5 +70,16 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
+
+        public string GetPlanIDByPlanName(string key)
+        {
+            return QuerySingleOrDefault<string>(
+                sql: "SELECT id FROM dbo.saas_plan WHERE is_deleted = 0 and plan_name = @key",
+                param: new { key }
+            );
+        }
+
+
+        
     }
 }

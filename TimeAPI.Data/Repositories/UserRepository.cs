@@ -147,6 +147,7 @@ namespace TimeAPI.Data.Repositories
             return _UserDataGroupDataSet;
         }
 
+
         public IEnumerable<RootTimesheetData> GetAllTimesheetByEmpID(string EmpID, string Date)
         {
 
@@ -157,6 +158,25 @@ namespace TimeAPI.Data.Repositories
                         AND timesheet.is_deleted = 0
                         ORDER BY FORMAT(CAST(timesheet.ondate AS DATETIME2), N'hh:mm tt') DESC;",
                 param: new { empid = EmpID, Date }
+            );
+
+            List<RootTimesheetData> RootTimesheetDataList = GetTimesheetProperty(resultsTimesheetGrpID);
+            return RootTimesheetDataList;
+        }
+
+        public IEnumerable<RootTimesheetData> GetAllTimesheetByOrgID(string OrgID, string fromDate, string toDate)
+        {
+
+            var resultsTimesheetGrpID = Query<string>(
+                sql: @"SELECT distinct(groupid), FORMAT(CAST(timesheet.ondate AS DATETIME2), N'hh:mm tt')  from timesheet WITH (NOLOCK)
+                            INNER JOIN employee on timesheet.empid = employee.id
+                            WHERE employee.org_id = @OrgID
+                            AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
+                            BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US')
+                            AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
+                            AND timesheet.is_deleted = 0
+                            ORDER BY FORMAT(CAST(timesheet.ondate AS DATETIME2), N'hh:mm tt') DESC;",
+                param: new { OrgID, fromDate, toDate }
             );
 
             List<RootTimesheetData> RootTimesheetDataList = GetTimesheetProperty(resultsTimesheetGrpID);

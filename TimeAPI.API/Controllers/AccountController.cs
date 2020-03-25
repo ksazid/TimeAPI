@@ -116,7 +116,8 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.EmployeeRepository.Add(employee);
 
                 //subscription
-                var subscription = SetSubscription(user, employee);
+                var PlanName = _unitOfWork.PlanRepository.GetPlanIDByPlanName("Winter");
+                var subscription = SetSubscription(user, employee, PlanName);
                 _unitOfWork.SubscriptionRepository.Add(subscription);
 
                 if (_unitOfWork.Commit())
@@ -344,14 +345,14 @@ namespace TimeAPI.API.Controllers
             };
         }
 
-        private static Subscription SetSubscription(ApplicationUser user, Employee employee)
+        private static Subscription SetSubscription(ApplicationUser user, Employee employee, string PlanName)
         {
             return new Subscription()
             {
                 id = Guid.NewGuid().ToString(),
                 user_id = user.Id,
                 api_key = Guid.NewGuid().ToString(),
-                current_plan_id = null,
+                current_plan_id = PlanName,
                 subscription_start_date = _dateTime.ToString(),
                 subscription_end_date = _dateTime.AddDays(21).ToString(),
                 on_date_subscribed = _dateTime.ToString(),

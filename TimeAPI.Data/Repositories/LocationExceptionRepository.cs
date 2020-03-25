@@ -28,6 +28,16 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
+        public LocationException FindByGroupID(string key)
+        {
+            return QuerySingleOrDefault<LocationException>(
+                sql: "SELECT * FROM dbo.location_exception WHERE is_deleted = 0 and group_id = @key",
+                param: new { key }
+            );
+        }
+
+        
+
         public void Remove(string key)
         {
             Execute(
@@ -45,7 +55,7 @@ namespace TimeAPI.Data.Repositories
                 sql: @"UPDATE dbo.location_exception
                    SET
                        modified_date = GETDATE(), is_deleted = 1
-                    WHERE group_id = @group_id",
+                    WHERE group_id = @key",
                 param: new { key }
             );
         }
