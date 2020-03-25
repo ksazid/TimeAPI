@@ -24,7 +24,7 @@ namespace TimeAPI.Data.Repositories
         public ProjectType Find(string key)
         {
             return QuerySingleOrDefault<ProjectType>(
-                sql: "SELECT * FROM dbo.project_type WHERE is_deleted = 0 and entity_id = @key",
+                sql: "SELECT * FROM dbo.project_type WHERE is_deleted = 0 and id = @key",
                 param: new { key }
             );
         }
@@ -43,7 +43,7 @@ namespace TimeAPI.Data.Repositories
                 sql: @"UPDATE dbo.project_type
                    SET
                        modified_date = GETDATE(), is_deleted = 1
-                    WHERE Find = @key",
+                    WHERE id = @key",
                 param: new { key }
             );
         }
@@ -54,7 +54,7 @@ namespace TimeAPI.Data.Repositories
                 sql: @"UPDATE dbo.project_type
                    SET
                        modified_date = GETDATE(), is_deleted = 1
-                    WHERE entity_id = @entity_id",
+                    WHERE id = @key",
                 param: new { key }
             );
         }
@@ -69,7 +69,7 @@ namespace TimeAPI.Data.Repositories
                     type_desc = @type_desc,
                     modified_date = @modified_date,
                     modifiedby = @modifiedby
-                    WHERE entity_id = @entity_id",
+                    WHERE id = @id",
                 param: entity
             );
         }
