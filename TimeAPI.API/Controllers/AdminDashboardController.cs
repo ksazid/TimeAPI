@@ -210,7 +210,7 @@ namespace TimeAPI.API.Controllers
 
 
         [HttpPost]
-        [Route("GetAllTaskByEmpID")]
+        [Route("GetAllTaskByOrgAndEmpID")]
         public Task<object> GetAllTaskByOrgAndEmpID([FromBody] UtilsOrgAndEmpID UserID, CancellationToken cancellationToken)
         {
             if (cancellationToken != null)
