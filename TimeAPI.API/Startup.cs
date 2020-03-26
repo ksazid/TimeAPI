@@ -45,20 +45,20 @@ namespace TimeAPI.API
             ////Cross Platform Enabled
             services.AddCors(options =>
             {
-                options.AddPolicy("CorsPolicy",
-                builder => builder.WithOrigins("https://enforce.azurewebsites.net", "http://localhost:4200/")
-                .AllowAnyMethod()
-                .AllowAnyHeader());
+                //options.AddPolicy("CorsPolicy",
+                //builder => builder.WithOrigins("https://enforce.azurewebsites.net", "http://localhost:4200/")
+                //.AllowAnyMethod()
+                //.AllowAnyHeader());
                 //.AllowCredentials()
                 //    .SetIsOriginAllowed((hosts) => true));
 
 
-            //options.AddPolicy("CorsPolicy",
-            //    builder =>
-            //    {
-            //        builder.AllowAnyOrigin();
-            //    });
-        });
+                options.AddPolicy("CorsPolicy",
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin();
+                    });
+            });
 
             //services.AddSignalR();
 
@@ -83,7 +83,7 @@ namespace TimeAPI.API
             services.AddIdentity<ApplicationUser, IdentityRole>()
               .AddCustomStores()
               .AddDefaultTokenProviders();
-              //.AddDefaultTokenProviders(provider => new LifetimeValidator(TimeSpan.FromDays(2)));
+            //.AddDefaultTokenProviders(provider => new LifetimeValidator(TimeSpan.FromDays(2)));
 
 
             // Add application services.
@@ -150,7 +150,7 @@ namespace TimeAPI.API
                             IssuerSigningKey = new SymmetricSecurityKey(key),
                             //ValidateIssuer = false,
                             //ValidateAudience = false,
-                            ClockSkew = TimeSpan.Zero 
+                            ClockSkew = TimeSpan.Zero
                         };
                     });
 
