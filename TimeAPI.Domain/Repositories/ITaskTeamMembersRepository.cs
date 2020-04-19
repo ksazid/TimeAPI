@@ -16,5 +16,6 @@ namespace TimeAPI.Domain.Repositories
         //DepartmentResultSet FindDepLeadByDepID(string OrgID);
 
         void RemoveByTaskID(string TaskID);
+        IEnumerable<TaskTeamMember> FindByTaskID(string TaskID);
     }
 }

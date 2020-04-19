@@ -102,7 +102,17 @@ namespace TimeAPI.Data.Repositories
         public dynamic GetAllTimesheetByOrgID(string OrgID)
         {
             return Query<dynamic>(
-           sql: "SELECT * FROM [dbo].[timesheet] where is_deleted = 0",
+           sql: "SELECT * FROM [dbo].[timesheet] where is_deleted = 0 AND timesheet.groupid = @OrgID",
+                param: new { OrgID }
+            );
+        }
+
+        public IEnumerable<string> GetAllEmpByGroupID(string OrgID)
+        {
+            return Query<string>(
+           sql: @"SELECT full_name FROM employee 
+                INNER JOIN timesheet on employee.id = timesheet.empid
+                WHERE timesheet.groupid = @OrgID",
                 param: new { OrgID }
             );
         }

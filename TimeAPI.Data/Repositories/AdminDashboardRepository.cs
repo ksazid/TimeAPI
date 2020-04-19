@@ -1,6 +1,9 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Model;
@@ -125,61 +128,19 @@ namespace TimeAPI.Data.Repositories
 
         public dynamic GetTimesheetDashboardGridDataByOrgIDAndDate(string org_id, string fromDate, string toDate)
         {
-            //string weekoffs = String.Join("','", OffDaysDates(org_id, fromDate, toDate));
-
-
-            //      SELECT
-            //                  timesheet_x_project_category.project_category_type,
-            //                  timesheet_x_project_category.project_or_comp_name,
-            //                  timesheet.id as timesheet_id,
-            //                  timesheet.groupid as groupid,
-            //                  employee.id as employee_id,
-            //                  eTime.lat as lat,
-            //                  eTime.lang as lang,
-            //                  eTime.is_checkout as is_checkout,
-            //                  employee.full_name,
-            //                  employee_type.employee_type_name as employee_type_name,
-            //                  employee.workemail as workemail,
-            //                  employee.emp_code as emp_code,
-            //                  employee.phone as phone,
-            //                  FORMAT(CAST(timesheet.check_in AS DATETIME2), N'hh:mm tt') as check_in,
-            //                  ISNULL(FORMAT(CAST(timesheet.check_out AS DATETIME2), N'hh:mm tt'), 'NA') as check_out,
-            //                  ISNULL(total_hrs, 'NA') as total_hrs,
-            //                  FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US') as ondate
-            //                  FROM timesheet WITH(NOLOCK)
-            //                  INNER JOIN employee ON timesheet.empid = employee.id
-            //                  LEFT JOIN employee_type ON employee.emp_type_id = employee_type.id
-            //                  INNER JOIN timesheet_x_project_category on timesheet.groupid = timesheet_x_project_category.groupid
-            //                  INNER JOIN superadmin_x_org ON superadmin_x_org.superadmin_empid = employee.id
-            //                  INNER JOIN(select distinct(groupid), location.lat, location.lang, location.is_checkout
-            //                  FROM dbo.location WHERE groupid IN (SELECT groupid FROM timesheet) and is_checkout = 0) eTime
-            //                  ON eTime.groupid = dbo.timesheet.groupid
-            //              WHERE
-            //                  superadmin_x_org.org_id = @org_id
-            //            AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
-            //BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US')
-            //                  AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
-            //                  AND timesheet.is_deleted = 0
-
-            //              UNION
-
-            //WHERE FORMAT(CAST(ondate AS DATE), 'MM/dd/yyyy', 'EN-US')
-            //            NOT IN('" + weekoffs + "')
-
             var resultsAspNetUsers = Query<dynamic>(
                 sql: @"SELECT
                         ROW_NUMBER() OVER (ORDER BY full_name) AS rowno,
-                        project_category_type, project_or_comp_name,
+                        project_category_type, project_or_comp_id, project_or_comp_name,
                         timesheet_id, groupid, is_checkout,
                         employee_id, full_name, check_in,
                         check_out, total_hrs, lat, lang, ondate
 
                 FROM (
 
-                  
-
                     SELECT
                         timesheet_x_project_category.project_category_type,
+                        timesheet_x_project_category.project_or_comp_id,
                         timesheet_x_project_category.project_or_comp_name,
                         timesheet.id as timesheet_id,
                         timesheet.groupid as groupid,
@@ -211,6 +172,222 @@ namespace TimeAPI.Data.Repositories
                 param: new { org_id, fromDate, toDate }
             );
             return resultsAspNetUsers;
+        }
+
+        public dynamic GetTimesheetDashboardFirstCheckInGridDataByOrgIDAndDate(string org_id, string fromDate, string toDate)
+        {
+            List<DateTime> Dates = Enumerable.Range(0, (Convert.ToDateTime(toDate) - Convert.ToDateTime(fromDate)).Days + 1)
+                              .Select(d => Convert.ToDateTime(fromDate).AddDays(d)).ToList();
+            List<DateTime> ExceptOffDays = ExceptOffDaysDates(org_id, fromDate, toDate);
+            List<string> OffDays = OffDaysDates(org_id, fromDate, toDate);
+            List<AttendedEmployee> AttendedEmployeeList = new List<AttendedEmployee>();
+
+
+            for (int i = 0; i < Dates.Count; i++)
+            {
+                var xdate = OffDays.Any(b => b.Contains(Dates[i].ToString()));
+                List<ResultSingleCheckin> ResultSingleCheckinList = new List<ResultSingleCheckin>();
+
+                var ResultSingleList = SingleFirstCheckINResult(org_id, Dates[i], xdate);
+                var ResultMultipleList = MultipleFirstCheckINResult(org_id, Dates[i], xdate);
+
+                ResultSingleCheckinList.AddRange(ResultSingleList);
+                ResultSingleCheckinList.AddRange(ResultMultipleList);
+
+                var REST = ResultSingleCheckinList.Cast<ResultSingleCheckin>().ToList();
+
+                for (int x = 0; x < REST.Count(); x++)
+                {
+
+                    var resultsAspNetUsers = Query<AttendedEmployee>(
+                        sql: @"SELECT
+                        ROW_NUMBER() OVER (ORDER BY full_name) AS rowno,
+                        project_category_type, project_or_comp_name,
+                        timesheet_id, groupid, is_checkout,
+                        employee_id, full_name, check_in,
+                        check_out, total_hrs, lat, lang, ondate
+
+                FROM (
+
+                    SELECT
+                        timesheet_x_project_category.project_category_type,
+                        timesheet_x_project_category.project_or_comp_name,
+                        timesheet.id as timesheet_id,
+                        timesheet.groupid as groupid,
+                        employee.id as employee_id,
+                        eTime.lat as lat,
+                        eTime.lang as lang,
+                        eTime.is_checkout as is_checkout,
+                        employee.full_name,
+                        employee_type.employee_type_name as employee_type_name,
+                        employee.workemail as workemail,
+                        employee.emp_code as emp_code,
+                        employee.phone as phone,
+                        FORMAT(CAST(timesheet.check_in AS DATETIME2), N'hh:mm tt') as check_in,
+                        ISNULL(FORMAT(CAST(timesheet.check_out AS DATETIME2), N'hh:mm tt'), 'NA') as check_out,
+                        ISNULL(total_hrs, 'NA') as total_hrs,
+                        FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US')  as ondate
+                        FROM timesheet WITH (NOLOCK)
+                        INNER JOIN employee ON timesheet.empid = employee.id
+                        LEFT JOIN employee_type ON employee.emp_type_id = employee_type.id
+                        INNER JOIN timesheet_x_project_category on timesheet.groupid = timesheet_x_project_category.groupid
+                        INNER JOIN (select distinct(groupid), location.lat, location.lang, location.is_checkout
+                        from dbo.location  where groupid IN (SELECT groupid FROM timesheet) and is_checkout = 0) eTime
+                        ON eTime.groupid = dbo.timesheet.groupid
+              WHERE employee.id = @emp
+						AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
+						BETWEEN FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
+                        AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US')
+                        AND timesheet.is_deleted = 0) 
+						
+						REALDATA ORDER BY  CAST(check_in as datetime)",
+                        param: new { emp = REST[x].empid, date = Dates[i] }
+                    );
+
+                    if (resultsAspNetUsers.Count() > 1)
+                    {
+                        TimeSpan TotalWorkedHrs = TimeSpan.Zero;
+
+                        var RESTAttendedEmployee = resultsAspNetUsers.Cast<AttendedEmployee>().ToList();
+                        AttendedEmployee attendedEmployee = new AttendedEmployee();
+                        attendedEmployee.rowno = RESTAttendedEmployee[0].rowno;
+                        attendedEmployee.project_category_type = RESTAttendedEmployee[0].project_category_type;
+                        attendedEmployee.project_or_comp_name = RESTAttendedEmployee[0].project_or_comp_name;
+                        attendedEmployee.timesheet_id = RESTAttendedEmployee[0].timesheet_id;
+                        attendedEmployee.groupid = RESTAttendedEmployee[0].groupid;
+                        attendedEmployee.is_checkout = RESTAttendedEmployee[0].is_checkout;
+                        attendedEmployee.employee_id = RESTAttendedEmployee[0].employee_id;
+                        attendedEmployee.workhour = RESTAttendedEmployee[0].workhour;
+                        attendedEmployee.full_name = RESTAttendedEmployee[0].full_name;
+                        attendedEmployee.check_in = RESTAttendedEmployee[0].check_in;
+                        attendedEmployee.check_out = RESTAttendedEmployee[0].check_out;
+
+                        TotalWorkedHrs = new TimeSpan(RESTAttendedEmployee.Select(item => item.total_hrs).Where(x => !x.Contains("NA")).Sum(x =>
+                         TimeSpan.ParseExact(x, "h\\:mm", CultureInfo.InvariantCulture).Ticks));
+
+                        attendedEmployee.total_hrs = TotalWorkedHrs.ToString(@"hh\:mm");
+                        attendedEmployee.lat = RESTAttendedEmployee[0].lat;
+                        attendedEmployee.lang = RESTAttendedEmployee[0].lang;
+                        attendedEmployee.ondate = RESTAttendedEmployee[0].ondate;
+
+                        AttendedEmployeeList.Add(attendedEmployee);
+                    }
+                    else
+                    {
+                        AttendedEmployeeList.AddRange(resultsAspNetUsers);
+                    }
+                }
+            }
+
+            return AttendedEmployeeList;
+        }
+
+        public dynamic GetTimesheetDashboardLastCheckoutGridDataByOrgIDAndDate(string org_id, string fromDate, string toDate)
+        {
+            List<DateTime> Dates = Enumerable.Range(0, (Convert.ToDateTime(toDate) - Convert.ToDateTime(fromDate)).Days + 1)
+                              .Select(d => Convert.ToDateTime(fromDate).AddDays(d)).ToList();
+            List<DateTime> ExceptOffDays = ExceptOffDaysDates(org_id, fromDate, toDate);
+            List<string> OffDays = OffDaysDates(org_id, fromDate, toDate);
+            List<AttendedEmployee> AttendedEmployeeList = new List<AttendedEmployee>();
+
+
+            for (int i = 0; i < Dates.Count; i++)
+            {
+                var xdate = OffDays.Any(b => b.Contains(Dates[i].ToString()));
+                List<ResultSingleCheckin> ResultSingleCheckinList = new List<ResultSingleCheckin>();
+
+                var ResultSingleList = SingleFirstCheckINResult(org_id, Dates[i], xdate);
+                var ResultMultipleList = MultipleFirstCheckINResult(org_id, Dates[i], xdate);
+
+                ResultSingleCheckinList.AddRange(ResultSingleList);
+                ResultSingleCheckinList.AddRange(ResultMultipleList);
+
+                var REST = ResultSingleCheckinList.Cast<ResultSingleCheckin>().ToList();
+
+                for (int x = 0; x < REST.Count(); x++)
+                {
+
+                    var resultsAspNetUsers = Query<AttendedEmployee>(
+                        sql: @"SELECT
+                        ROW_NUMBER() OVER (ORDER BY full_name) AS rowno,
+                        project_category_type, project_or_comp_name,
+                        timesheet_id, groupid, is_checkout,
+                        employee_id, full_name, check_in,
+                        check_out, total_hrs, lat, lang, ondate
+
+                FROM (
+
+                    SELECT
+                        timesheet_x_project_category.project_category_type,
+                        timesheet_x_project_category.project_or_comp_name,
+                        timesheet.id as timesheet_id,
+                        timesheet.groupid as groupid,
+                        employee.id as employee_id,
+                        eTime.lat as lat,
+                        eTime.lang as lang,
+                        eTime.is_checkout as is_checkout,
+                        employee.full_name,
+                        employee_type.employee_type_name as employee_type_name,
+                        employee.workemail as workemail,
+                        employee.emp_code as emp_code,
+                        employee.phone as phone,
+                        FORMAT(CAST(timesheet.check_in AS DATETIME2), N'hh:mm tt') as check_in,
+                        ISNULL(FORMAT(CAST(timesheet.check_out AS DATETIME2), N'hh:mm tt'), 'NA') as check_out,
+                        ISNULL(total_hrs, 'NA') as total_hrs,
+                        FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US')  as ondate
+                        FROM timesheet WITH (NOLOCK)
+                        INNER JOIN employee ON timesheet.empid = employee.id
+                        LEFT JOIN employee_type ON employee.emp_type_id = employee_type.id
+                        INNER JOIN timesheet_x_project_category on timesheet.groupid = timesheet_x_project_category.groupid
+                        INNER JOIN (select distinct(groupid), location.lat, location.lang, location.is_checkout
+                        from dbo.location  where groupid IN (SELECT groupid FROM timesheet) and is_checkout = 0) eTime
+                        ON eTime.groupid = dbo.timesheet.groupid
+              WHERE employee.id = @emp
+						AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
+						BETWEEN FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
+                        AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US')
+                        AND timesheet.is_deleted = 0) 
+						
+						REALDATA ORDER BY  CAST(check_in as datetime)",
+                        param: new { emp = REST[x].empid, date = Dates[i] }
+                    );
+
+                    if (resultsAspNetUsers.Count() > 1)
+                    {
+                        TimeSpan TotalWorkedHrs = TimeSpan.Zero;
+
+                        var RESTAttendedEmployee = resultsAspNetUsers.Cast<AttendedEmployee>().ToList();
+                        AttendedEmployee attendedEmployee = new AttendedEmployee();
+                        attendedEmployee.rowno = RESTAttendedEmployee[resultsAspNetUsers.Count() - 1].rowno;
+                        attendedEmployee.project_category_type = RESTAttendedEmployee[resultsAspNetUsers.Count() - 1].project_category_type;
+                        attendedEmployee.project_or_comp_name = RESTAttendedEmployee[resultsAspNetUsers.Count() - 1].project_or_comp_name;
+                        attendedEmployee.timesheet_id = RESTAttendedEmployee[resultsAspNetUsers.Count() - 1].timesheet_id;
+                        attendedEmployee.groupid = RESTAttendedEmployee[resultsAspNetUsers.Count() - 1].groupid;
+                        attendedEmployee.is_checkout = RESTAttendedEmployee[resultsAspNetUsers.Count() - 1].is_checkout;
+                        attendedEmployee.employee_id = RESTAttendedEmployee[resultsAspNetUsers.Count() - 1].employee_id;
+                        attendedEmployee.workhour = RESTAttendedEmployee[resultsAspNetUsers.Count() - 1].workhour;
+                        attendedEmployee.full_name = RESTAttendedEmployee[resultsAspNetUsers.Count() - 1].full_name;
+                        attendedEmployee.check_in = RESTAttendedEmployee[resultsAspNetUsers.Count() - 1].check_in;
+                        attendedEmployee.check_out = RESTAttendedEmployee[resultsAspNetUsers.Count() - 1].check_out;
+
+                        TotalWorkedHrs = new TimeSpan(RESTAttendedEmployee.Select(item => item.total_hrs).Where(x => !x.Contains("NA")).Sum(x =>
+                         TimeSpan.ParseExact(x, "h\\:mm", CultureInfo.InvariantCulture).Ticks));
+
+                        attendedEmployee.total_hrs = TotalWorkedHrs.ToString(@"hh\:mm");
+                        attendedEmployee.lat = RESTAttendedEmployee[resultsAspNetUsers.Count() - 1].lat;
+                        attendedEmployee.lang = RESTAttendedEmployee[resultsAspNetUsers.Count() - 1].lang;
+                        attendedEmployee.ondate = RESTAttendedEmployee[resultsAspNetUsers.Count() - 1].ondate;
+
+                        AttendedEmployeeList.Add(attendedEmployee);
+                    }
+                    else
+                    {
+                        AttendedEmployeeList.AddRange(resultsAspNetUsers);
+                    }
+                }
+            }
+
+            return AttendedEmployeeList;
         }
 
         public dynamic TotalEmpAbsentCountByOrgIDAndDate(string org_id, string fromDate, string toDate)
@@ -254,46 +431,31 @@ namespace TimeAPI.Data.Repositories
 
         public dynamic TotalEmpOverTimeCountByOrgIDAndDate(string org_id, string fromDate, string toDate)
         {
-            string weekoffs = String.Join("','", ExceptOffDaysDates(org_id, fromDate, toDate));
+            List<DateTime> Dates = Enumerable.Range(0, (Convert.ToDateTime(toDate) - Convert.ToDateTime(fromDate)).Days + 1)
+                              .Select(d => Convert.ToDateTime(fromDate).AddDays(d)).ToList();
+            List<DateTime> ExceptOffDays = ExceptOffDaysDates(org_id, fromDate, toDate);
+            List<string> OffDays = OffDaysDates(org_id, fromDate, toDate);
+            List<AttendedEmployee> AttendedEmployeeList = new List<AttendedEmployee>();
 
 
-            //      SELECT
-            //                  timesheet_x_project_category.project_category_type,
-            //                  timesheet_x_project_category.project_or_comp_name,
-            //                  timesheet.id as timesheet_id,
-            //                  timesheet.groupid as groupid,
-            //                  employee.id as employee_id,
-            //                  eTime.lat as lat,
-            //                  eTime.lang as lang,
-            //                  eTime.is_checkout as is_checkout,
-            //                  employee.full_name,
-            //                  employee_type.employee_type_name as employee_type_name,
-            //                  employee.workemail as workemail,
-            //                  employee.emp_code as emp_code,
-            //                  employee.phone as phone,
-            //                  FORMAT(CAST(timesheet.check_in AS DATETIME2), N'hh:mm tt') as check_in,
-            //                  ISNULL(FORMAT(CAST(timesheet.check_out AS DATETIME2), N'hh:mm tt'), 'NA') as check_out,
-            //                  ISNULL(total_hrs, 'NA') as total_hrs,
-            //                  FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US') as ondate
-            //                  FROM timesheet WITH(NOLOCK)
-            //                  INNER JOIN employee ON timesheet.empid = employee.id
-            //                  LEFT JOIN employee_type ON employee.emp_type_id = employee_type.id
-            //                  INNER JOIN timesheet_x_project_category on timesheet.groupid = timesheet_x_project_category.groupid
-            //                  INNER JOIN superadmin_x_org ON superadmin_x_org.superadmin_empid = employee.id
-            //                  INNER JOIN(select distinct(groupid), location.lat, location.lang, location.is_checkout
-            //                  FROM dbo.location WHERE groupid IN (SELECT groupid FROM timesheet) and is_checkout = 0) eTime
-            //                  ON eTime.groupid = dbo.timesheet.groupid
-            //              WHERE
-            //                  superadmin_x_org.org_id = @org_id
-            //            AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
-            //BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US')
-            //                  AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
-            //                  AND timesheet.is_deleted = 0
+            for (int i = 0; i < Dates.Count; i++)
+            {
+                var xdate = OffDays.Any(b => b.Contains(Dates[i].ToString()));
+                List<ResultSingleCheckin> ResultSingleCheckinList = new List<ResultSingleCheckin>();
 
-            //              UNION
+                var ResultSingleList = SingleCheckINResult(org_id, Dates[i], xdate);
+                var ResultMultipleList = MultipleCheckINResult(org_id, Dates[i], xdate);
 
-            var resultsAspNetUsers = Query<dynamic>(
-                sql: @"SELECT
+                ResultSingleCheckinList.AddRange(ResultSingleList);
+                ResultSingleCheckinList.AddRange(ResultMultipleList);
+
+                var REST = ResultSingleCheckinList.Cast<ResultSingleCheckin>().ToList();
+
+                for (int x = 0; x < REST.Count(); x++)
+                {
+
+                    var resultsAspNetUsers = Query<AttendedEmployee>(
+                        sql: @"SELECT
                         ROW_NUMBER() OVER (ORDER BY full_name) AS rowno,
                         project_category_type, project_or_comp_name,
                         timesheet_id, groupid, is_checkout,
@@ -301,8 +463,6 @@ namespace TimeAPI.Data.Repositories
                         check_out, total_hrs, lat, lang, ondate
 
                 FROM (
-
-                 
 
                     SELECT
                         timesheet_x_project_category.project_category_type,
@@ -329,16 +489,295 @@ namespace TimeAPI.Data.Repositories
                         INNER JOIN (select distinct(groupid), location.lat, location.lang, location.is_checkout
                         from dbo.location  where groupid IN (SELECT groupid FROM timesheet) and is_checkout = 0) eTime
                         ON eTime.groupid = dbo.timesheet.groupid
+              WHERE employee.id = @emp
+						AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
+						BETWEEN FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
+                        AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US')
+                        AND timesheet.is_deleted = 0) 
+						
+						REALDATA ORDER BY  CAST(check_in as datetime)",
+                        param: new { emp = REST[x].empid, date = Dates[i] }
+                    );
+
+                    if (resultsAspNetUsers.Count() > 1)
+                    {
+                        TimeSpan TotalWorkedHrs = TimeSpan.Zero;
+
+                        var RESTAttendedEmployee = resultsAspNetUsers.Cast<AttendedEmployee>().ToList();
+                        AttendedEmployee attendedEmployee = new AttendedEmployee();
+                        attendedEmployee.rowno = RESTAttendedEmployee[0].rowno;
+                        attendedEmployee.project_category_type = RESTAttendedEmployee[0].project_category_type;
+                        attendedEmployee.project_or_comp_name = RESTAttendedEmployee[0].project_or_comp_name;
+                        attendedEmployee.timesheet_id = RESTAttendedEmployee[0].timesheet_id;
+                        attendedEmployee.groupid = RESTAttendedEmployee[0].groupid;
+                        attendedEmployee.is_checkout = RESTAttendedEmployee[0].is_checkout;
+                        attendedEmployee.employee_id = RESTAttendedEmployee[0].employee_id;
+                        attendedEmployee.workhour = RESTAttendedEmployee[0].workhour;
+                        attendedEmployee.full_name = RESTAttendedEmployee[0].full_name;
+                        attendedEmployee.check_in = RESTAttendedEmployee[0].check_in;
+                        attendedEmployee.check_out = RESTAttendedEmployee[resultsAspNetUsers.Count() - 1].check_out;
+
+                        TotalWorkedHrs = new TimeSpan(RESTAttendedEmployee.Select(item => item.total_hrs).Where(x => !x.Contains("NA")).Sum(x =>
+                         TimeSpan.ParseExact(x, "h\\:mm", CultureInfo.InvariantCulture).Ticks));
+
+                        attendedEmployee.total_hrs = TotalWorkedHrs.ToString(@"hh\:mm");
+                        attendedEmployee.lat = RESTAttendedEmployee[0].lat;
+                        attendedEmployee.lang = RESTAttendedEmployee[0].lang;
+                        attendedEmployee.ondate = RESTAttendedEmployee[0].ondate;
+
+                        AttendedEmployeeList.Add(attendedEmployee);
+                    }
+                    else
+                    {
+                        AttendedEmployeeList.AddRange(resultsAspNetUsers);
+                    }
+                }
+            }
+
+            return AttendedEmployeeList;
+        }
+
+        public dynamic TotalEmpLessHoursByOrgIDAndDate(string org_id, string fromDate, string toDate)
+        {
+            List<DateTime> Dates = Enumerable.Range(0, (Convert.ToDateTime(toDate) - Convert.ToDateTime(fromDate)).Days + 1)
+                              .Select(d => Convert.ToDateTime(fromDate).AddDays(d)).ToList();
+            List<DateTime> ExceptOffDays = ExceptOffDaysDates(org_id, fromDate, toDate);
+            List<string> OffDays = OffDaysDates(org_id, fromDate, toDate);
+            List<AttendedEmployee> AttendedEmployeeList = new List<AttendedEmployee>();
+
+            try
+            {
+                for (int i = 0; i < Dates.Count; i++)
+                {
+                    var xdate = OffDays.Any(b => b.Contains(Dates[i].ToString()));
+                    List<ResultSingleCheckin> ResultSingleCheckinList = new List<ResultSingleCheckin>();
+
+                    var ResultSingleList = SingleCheckINExceptionResult(org_id, Dates[i], xdate);
+                    var ResultMultipleList = MultipleCheckINExceptionResult(org_id, Dates[i], xdate);
+
+                    ResultSingleCheckinList.AddRange(ResultSingleList);
+                    ResultSingleCheckinList.AddRange(ResultMultipleList);
+
+                    var REST = ResultSingleCheckinList.Cast<ResultSingleCheckin>().ToList();
+
+                    for (int x = 0; x < REST.Count(); x++)
+                    {
+
+                        var resultsAspNetUsers = Query<AttendedEmployee>(
+                            sql: @"SELECT
+                        ROW_NUMBER() OVER (ORDER BY full_name) AS rowno,
+                        project_category_type, project_or_comp_name,
+                        timesheet_id, groupid, is_checkout,
+                        employee_id, full_name, check_in,
+                        check_out, total_hrs, lat, lang, ondate
+
+                FROM (
+
+                    SELECT
+                        timesheet_x_project_category.project_category_type,
+                        timesheet_x_project_category.project_or_comp_name,
+                        timesheet.id as timesheet_id,
+                        timesheet.groupid as groupid,
+                        employee.id as employee_id,
+                        eTime.lat as lat,
+                        eTime.lang as lang,
+                        eTime.is_checkout as is_checkout,
+                        employee.full_name,
+                        employee_type.employee_type_name as employee_type_name,
+                        employee.workemail as workemail,
+                        employee.emp_code as emp_code,
+                        employee.phone as phone,
+                        FORMAT(CAST(timesheet.check_in AS DATETIME2), N'hh:mm tt') as check_in,
+                        ISNULL(FORMAT(CAST(timesheet.check_out AS DATETIME2), N'hh:mm tt'), 'NA') as check_out,
+                        ISNULL(total_hrs, 'NA') as total_hrs,
+                        FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US')  as ondate
+                        FROM timesheet WITH (NOLOCK)
+                        INNER JOIN employee ON timesheet.empid = employee.id
+                        LEFT JOIN employee_type ON employee.emp_type_id = employee_type.id
+                        INNER JOIN timesheet_x_project_category on timesheet.groupid = timesheet_x_project_category.groupid
+                        INNER JOIN (select distinct(groupid), location.lat, location.lang, location.is_checkout
+                        from dbo.location  where groupid IN (SELECT groupid FROM timesheet) and is_checkout = 0) eTime
+                        ON eTime.groupid = dbo.timesheet.groupid
+              WHERE employee.id = @emp
+						AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
+						BETWEEN FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
+                        AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US')
+                        AND timesheet.is_deleted = 0) 
+						
+						REALDATA ORDER BY  CAST(check_in as datetime)",
+                                  param: new { emp = REST[x].empid, date = Dates[i] }
+                        );
+
+                        if (resultsAspNetUsers.Count() > 1)
+                        {
+                            TimeSpan TotalWorkedHrs = TimeSpan.Zero;
+
+
+                            var RESTAttendedEmployee = resultsAspNetUsers.Cast<AttendedEmployee>().ToList();
+                            AttendedEmployee attendedEmployee = new AttendedEmployee();
+                            attendedEmployee.rowno = RESTAttendedEmployee[0].rowno;
+                            attendedEmployee.project_category_type = RESTAttendedEmployee[0].project_category_type;
+                            attendedEmployee.project_or_comp_name = RESTAttendedEmployee[0].project_or_comp_name;
+                            attendedEmployee.timesheet_id = RESTAttendedEmployee[0].timesheet_id;
+                            attendedEmployee.groupid = RESTAttendedEmployee[0].groupid;
+                            attendedEmployee.is_checkout = RESTAttendedEmployee[0].is_checkout;
+                            attendedEmployee.employee_id = RESTAttendedEmployee[0].employee_id;
+                            attendedEmployee.workhour = RESTAttendedEmployee[0].workhour;
+                            attendedEmployee.full_name = RESTAttendedEmployee[0].full_name;
+                            attendedEmployee.check_in = RESTAttendedEmployee[0].check_in;
+                            attendedEmployee.check_out = RESTAttendedEmployee[resultsAspNetUsers.Count() - 1].check_out;
+
+                            TotalWorkedHrs = new TimeSpan(RESTAttendedEmployee.Select(item => item.total_hrs).Where(x => !x.Contains("NA")).Sum(x =>
+                             TimeSpan.ParseExact(x, "h\\:mm", CultureInfo.InvariantCulture).Ticks));
+
+                            attendedEmployee.total_hrs = TotalWorkedHrs.ToString(@"hh\:mm");
+                            attendedEmployee.lat = RESTAttendedEmployee[0].lat;
+                            attendedEmployee.lang = RESTAttendedEmployee[0].lang;
+                            attendedEmployee.ondate = RESTAttendedEmployee[0].ondate;
+
+                            AttendedEmployeeList.Add(attendedEmployee);
+                        }
+                        else
+                        {
+                            AttendedEmployeeList.AddRange(resultsAspNetUsers);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+            return AttendedEmployeeList;
+        }
+
+        public dynamic TotalLocationExceptionByOrgIDAndDate(string org_id, string fromDate, string toDate)
+        {
+            List<DateTime> Dates = Enumerable.Range(0, (Convert.ToDateTime(toDate) - Convert.ToDateTime(fromDate)).Days + 1)
+                              .Select(d => Convert.ToDateTime(fromDate).AddDays(d)).ToList();
+            //List<DateTime> ExceptOffDays = ExceptOffDaysDates(org_id, fromDate, toDate);
+            //List<string> OffDays = OffDaysDates(org_id, fromDate, toDate);
+            List<AttendedEmployee> AttendedEmployeeList = new List<AttendedEmployee>();
+
+
+            for (int i = 0; i < Dates.Count; i++)
+            {
+                var resultsAspNetUsers = Query<AttendedEmployee>(
+                    sql: @"SELECT
+                        ROW_NUMBER() OVER (ORDER BY full_name) AS rowno,
+                        project_category_type, project_or_comp_id, project_or_comp_name,
+                        timesheet_id, groupid, is_checkout,
+                        employee_id, full_name, check_in,
+                        check_out, total_hrs, lat, lang, ondate
+
+                FROM (
+
+                    SELECT
+                        timesheet_x_project_category.project_category_type,
+                        timesheet_x_project_category.project_or_comp_id,
+                        timesheet_x_project_category.project_or_comp_name,
+                        timesheet.id as timesheet_id,
+                        timesheet.groupid as groupid,
+                        employee.id as employee_id,
+                        location_exception.checkin_lat as lat,
+                        location_exception.checkin_lang as lang,
+                        eTime.is_checkout as is_checkout,
+                        employee.full_name,
+                        employee_type.employee_type_name as employee_type_name,
+                        employee.workemail as workemail,
+                        employee.emp_code as emp_code,
+                        employee.phone as phone,
+                        FORMAT(CAST(timesheet.check_in AS DATETIME2), N'hh:mm tt') as check_in,
+                        ISNULL(FORMAT(CAST(timesheet.check_out AS DATETIME2), N'hh:mm tt'), 'NA') as check_out,
+                        ISNULL(total_hrs, 'NA') as total_hrs,
+                        FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US')  as ondate
+                        FROM timesheet WITH (NOLOCK)
+                        INNER JOIN location_exception ON timesheet.groupid = location_exception.group_id
+                        INNER JOIN employee ON timesheet.empid = employee.id
+                        LEFT JOIN employee_type ON employee.emp_type_id = employee_type.id
+                        INNER JOIN timesheet_x_project_category on timesheet.groupid = timesheet_x_project_category.groupid
+                        INNER JOIN (select distinct(groupid), location.lat, location.lang, location.is_checkout
+                        from dbo.location  where groupid IN (SELECT groupid FROM timesheet) and is_checkout = 0) eTime
+                        ON eTime.groupid = dbo.timesheet.groupid
                     WHERE employee.org_id =@org_id
 						AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
-						BETWEEN FORMAT(CAST(@fromDate  AS DATE), 'd', 'EN-US')
-                        AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
+						BETWEEN FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
+                        AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US')
+						AND location_exception.is_chkin_inrange = 0
                         AND timesheet.is_deleted = 0) REALDATA
-						WHERE FORMAT(CAST(ondate  AS DATE), 'MM/dd/yyyy', 'EN-US')
-                        NOT IN ('" + weekoffs + "')",
-                      param: new { org_id, fromDate, toDate }
-                  );
-            return resultsAspNetUsers;
+                        ORDER BY  CAST(check_in as datetime)",
+                    param: new { org_id, date = Dates[i] }
+                );
+
+                AttendedEmployeeList.AddRange(resultsAspNetUsers);
+            }
+
+            return AttendedEmployeeList;
+        }
+
+        public dynamic TotalLocationCheckOutExceptionByOrgIDAndDate(string org_id, string fromDate, string toDate)
+        {
+            List<DateTime> Dates = Enumerable.Range(0, (Convert.ToDateTime(toDate) - Convert.ToDateTime(fromDate)).Days + 1)
+                              .Select(d => Convert.ToDateTime(fromDate).AddDays(d)).ToList();
+            //List<DateTime> ExceptOffDays = ExceptOffDaysDates(org_id, fromDate, toDate);
+            //List<string> OffDays = OffDaysDates(org_id, fromDate, toDate);
+            List<AttendedEmployee> AttendedEmployeeList = new List<AttendedEmployee>();
+
+
+            for (int i = 0; i < Dates.Count; i++)
+            {
+                var resultsAspNetUsers = Query<AttendedEmployee>(
+                    sql: @"SELECT
+                        ROW_NUMBER() OVER (ORDER BY full_name) AS rowno,
+                        project_category_type, project_or_comp_id, project_or_comp_name,
+                        timesheet_id, groupid, is_checkout,
+                        employee_id, full_name, check_in,
+                        check_out, total_hrs, lat, lang, ondate
+
+                FROM (
+
+                    SELECT
+                        timesheet_x_project_category.project_category_type,
+                        timesheet_x_project_category.project_or_comp_id,
+                        timesheet_x_project_category.project_or_comp_name,
+                        timesheet.id as timesheet_id,
+                        timesheet.groupid as groupid,
+                        employee.id as employee_id,
+                        location_exception.checkout_lat as lat,
+                        location_exception.checkout_lang as lang,
+                        eTime.is_checkout as is_checkout,
+                        employee.full_name,
+                        employee_type.employee_type_name as employee_type_name,
+                        employee.workemail as workemail,
+                        employee.emp_code as emp_code,
+                        employee.phone as phone,
+                        FORMAT(CAST(timesheet.check_in AS DATETIME2), N'hh:mm tt') as check_in,
+                        ISNULL(FORMAT(CAST(timesheet.check_out AS DATETIME2), N'hh:mm tt'), 'NA') as check_out,
+                        ISNULL(total_hrs, 'NA') as total_hrs,
+                        FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US')  as ondate
+                        FROM timesheet WITH (NOLOCK)
+                        INNER JOIN location_exception ON timesheet.groupid = location_exception.group_id
+                        INNER JOIN employee ON timesheet.empid = employee.id
+                        LEFT JOIN employee_type ON employee.emp_type_id = employee_type.id
+                        INNER JOIN timesheet_x_project_category on timesheet.groupid = timesheet_x_project_category.groupid
+                        INNER JOIN (select distinct(groupid), location.lat, location.lang, location.is_checkout
+                        from dbo.location  where groupid IN (SELECT groupid FROM timesheet) and is_checkout = 0) eTime
+                        ON eTime.groupid = dbo.timesheet.groupid
+                    WHERE employee.org_id =@org_id
+						AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
+						BETWEEN FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
+                        AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US')
+						AND location_exception.is_chkout_inrange = 0
+                        AND timesheet.is_deleted = 0) REALDATA
+                        ORDER BY  CAST(check_in as datetime)",
+                    param: new { org_id, date = Dates[i] }
+                );
+
+                AttendedEmployeeList.AddRange(resultsAspNetUsers);
+            }
+
+            return AttendedEmployeeList;
         }
 
         public dynamic GetTimesheetActivityByGroupAndDate(string GroupID, string Date)
@@ -415,11 +854,12 @@ namespace TimeAPI.Data.Repositories
             {
                 UtilsProjectAndRatio utilsProjectAndRatio = QuerySingleOrDefault<UtilsProjectAndRatio>(
                         sql: @"SELECT 
+                            dbo.project.id as project_id,
                             dbo.project.project_name as project_name,
                              ISNULL(SUM((SELECT count(*)
                             FROM dbo.project_activity WITH(NOLOCK)
-                            INNER JOIN dbo.project_status on dbo.project_activity.status_id = dbo.project_status.id
-                            INNER JOIN dbo.project on dbo.project_activity.project_id = dbo.project.id
+                            LEFT JOIN dbo.project_status on dbo.project_activity.status_id = dbo.project_status.id
+                            LEFT JOIN dbo.project on dbo.project_activity.project_id = dbo.project.id
                             WHERE dbo.project.org_id = @OrgID
                             AND
                             dbo.project_activity.is_deleted = 0 and
@@ -438,9 +878,34 @@ namespace TimeAPI.Data.Repositories
                             AND
                             dbo.project_activity.is_deleted = 0
                             group by 
-                            dbo.project.project_name",
+                            dbo.project.project_name,  dbo.project.id",
                         param: new { OrgID, item }
-            );
+                      );
+
+
+
+                var utilsProjectDetails = QuerySingleOrDefault<UtilsProjectAndRatio>(
+                       sql: @"SELECT [dbo].[project_type].type_name as project_type, 
+                                dbo.status.status_name as project_status,
+                            FORMAT(dbo.project.start_date, 'dd-MM-yyyy', 'en-US') as start_date,
+                            FORMAT(dbo.project.end_date, 'dd-MM-yyyy', 'en-US') as end_date,
+                                [dbo].[customer].cst_name  from dbo.project
+                            LEFT JOIN [dbo].[project_type] on dbo.project.project_type_id =  [dbo].[project_type].id
+                            LEFT JOIN dbo.status on dbo.project.project_status_id = dbo.status.id
+                            LEFT JOIN [dbo].[customer_x_project] on dbo.project.id = [dbo].[customer_x_project].project_id
+                            LEFT JOIN [dbo].[customer] on [dbo].[customer_x_project].cst_id = [dbo].[customer].id
+                            WHERE dbo.project.id =  @item
+                            AND   dbo.project.is_deleted = 0",
+                       param: new { item }
+                    );
+
+
+                utilsProjectAndRatio.cst_name = (utilsProjectDetails.cst_name ?? string.Empty);
+                utilsProjectAndRatio.project_type = (utilsProjectDetails.project_type ?? string.Empty);
+                utilsProjectAndRatio.project_status = (utilsProjectDetails.project_status ?? string.Empty);
+                utilsProjectAndRatio.start_date = (utilsProjectDetails.start_date ?? string.Empty);
+                utilsProjectAndRatio.end_date = (utilsProjectDetails.end_date ?? string.Empty);
+
                 utilsProjectAndRatios.Add(utilsProjectAndRatio);
             }
 
@@ -465,8 +930,6 @@ namespace TimeAPI.Data.Repositories
             return resultsAspNetUsers;
         }
 
-
-   
 
         #region PrivateMethods
 
@@ -546,56 +1009,36 @@ namespace TimeAPI.Data.Repositories
             }
         }
 
-        private string GetWeekOffsFromOrg(string OrgID)
+        private IEnumerable<string> GetWeekOffsFromOrg(string OrgID)
         {
-            return QuerySingleOrDefault<string>(
-                  sql: @"SELECT start_of_week FROM [dbo].[organization_setup]
-                        WHERE org_id= @OrgID AND is_deleted = 0",
+            return Query<string>(
+                  sql: @"SELECT day_name FROM weekdays 
+                            WHERE org_id = @OrgID
+                            AND is_deleted = 0
+                            AND is_off = 1",
                    param: new { OrgID }
                );
         }
 
         private dynamic GettingTimesheetDashboardDataPerDate(string org_id, string fromDate, string toDate)
         {
-            //, List<string> OffDaysList
-            //string weekoffs = String.Join("','", OffDaysList);
-
-            //SELECT COUNT(DISTINCT(timesheet.empid)) as attandance,
-            //            ISNULL(UPPER(employee_type.employee_type_name), 'PERMANENT') AS employee_type_name,
-            //            FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US') as ondate
-            //            FROM timesheet
-            //            INNER JOIN employee ON timesheet.empid = employee.id
-            //            INNER JOIN superadmin_x_org ON superadmin_x_org.superadmin_empid = employee.id
-            //            LEFT JOIN employee_type on employee.emp_type_id = employee_type.id
-            //            WHERE
-            //            superadmin_x_org.org_id = @org_id
-            //            AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
-            //   BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US')
-            //            AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
-            //            AND timesheet.is_deleted = 0
-            //            GROUP BY FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US'),
-            //            employee_type.employee_type_name
-
-            //        UNION ALL
-            //WHERE FORMAT(CAST(ondate  AS DATE), 'MM/dd/yyyy', 'EN-US') NOT IN ('" + weekoffs + "')" +
-
             return Query<dynamic>(
                 sql: @"SELECT employee_type_name, SUM(attandance) as attandance, ondate
-                FROM (
-                    SELECT COUNT(DISTINCT(timesheet.empid)) as attandance,
-                        ISNULL(UPPER(employee_type.employee_type_name), 'PERMANENT') AS employee_type_name,
-						FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US') as ondate
-                        FROM timesheet
-                        INNER JOIN employee on timesheet.empid = employee.id
-                        LEFT JOIN employee_type on employee.emp_type_id = employee_type.id
-                        WHERE
-                        employee.org_id = @org_id
-                        AND FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US')
-			            BETWEEN FORMAT(CAST(@fromDate  AS DATE), 'd', 'EN-US')
-                        AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
-                        AND timesheet.is_deleted = 0
-                        GROUP BY FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US'),
-                        employee_type.employee_type_name) X GROUP BY employee_type_name, ondate",
+                        FROM (
+                            SELECT COUNT(DISTINCT(timesheet.empid)) as attandance,
+                                ISNULL(UPPER(employee_type.employee_type_name), 'PERMANENT') AS employee_type_name,
+			                    FORMAT(CAST(timesheet.ondate  AS DATE), 'dd/MM/yyyy', 'EN-US') as ondate
+                                FROM timesheet
+                                INNER JOIN employee on timesheet.empid = employee.id
+                                LEFT JOIN employee_type on employee.emp_type_id = employee_type.id
+                                WHERE
+                               employee.org_id = @org_id
+                                AND FORMAT(CAST(timesheet.ondate  AS DATE),'MM/dd/yyyy', 'EN-US')
+			                    BETWEEN FORMAT(CAST(@fromDate AS DATE), 'MM/dd/yyyy', 'EN-US')
+			                    AND FORMAT(CAST(@toDate AS DATE), 'MM/dd/yyyy', 'EN-US')
+                                AND timesheet.is_deleted = 0
+                                GROUP BY FORMAT(CAST(timesheet.ondate  AS DATE), 'dd/MM/yyyy', 'EN-US'),
+                                employee_type.employee_type_name) X GROUP BY employee_type_name, ondate",
                 param: new { org_id, fromDate, toDate }
             );
         }
@@ -633,8 +1076,8 @@ namespace TimeAPI.Data.Repositories
         {
             List<string> OffDaysDate = new List<string>();
 
-            string offdays = GetWeekOffsFromOrg(org_id);
-            if (offdays == null)
+            string offdays = String.Join("','", GetWeekOffsFromOrg(org_id).ToList());
+            if (offdays != null)
             {
                 offdays = "Friday";
             }
@@ -654,8 +1097,8 @@ namespace TimeAPI.Data.Repositories
         private List<DateTime> ExceptOffDaysDates(string org_id, string fromDate, string toDate)
         {
             List<DateTime> OffDaysList = new List<DateTime>();
-            string offdays = GetWeekOffsFromOrg(org_id);
-            if (offdays == null)
+            string offdays = String.Join("','", GetWeekOffsFromOrg(org_id).ToList());
+            if (offdays != null)
             {
                 offdays = "Friday";
             }
@@ -674,15 +1117,232 @@ namespace TimeAPI.Data.Repositories
             return OffDaysList;
         }
 
-        #endregion PrivateMethods
+        private IEnumerable<ResultSingleCheckin> SingleCheckINResult(string org_id, DateTime Dates, bool xdate)
+        {
+            IEnumerable<ResultSingleCheckin> ResultSingleCheckinList = Query<ResultSingleCheckin>(
+                        sql: @"select  distinct(timesheet.empid) as empid, COUNT(timesheet.empid),
+						         RIGHT('0' + CAST(SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 3600 AS VARCHAR),2) + ':' +
+							        RIGHT('0' + CAST((SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 60) % 60 AS VARCHAR),2)  as time
+                                from timesheet
+                                  INNER JOIN employee ON timesheet.empid = employee.id
+                                WHERE employee.org_id = @org_id
+						        AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
+						        BETWEEN FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
+                                AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US') AND timesheet.is_deleted = 0
+						        group by timesheet.empid
+                                having(SUM(( DATEPART(hh, total_hrs ) * 3600 ) + ( DATEPART(mi, total_hrs) * 60 )) > 32400)  
+						        and COUNT(timesheet.empid) = 1",
+                        param: new { org_id, date = Dates }
+                    );
+            if (xdate)
+                ResultSingleCheckinList = Query<ResultSingleCheckin>(
+                       sql: @"select  distinct(timesheet.empid) as empid, COUNT(timesheet.empid),
+						         RIGHT('0' + CAST(SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 3600 AS VARCHAR),2) + ':' +
+							        RIGHT('0' + CAST((SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 60) % 60 AS VARCHAR),2)  as time
+                                FROM timesheet
+                                  INNER JOIN employee ON timesheet.empid = employee.id
+                                WHERE employee.org_id = @org_id
+						        AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
+						        BETWEEN FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
+                                AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US') AND timesheet.is_deleted = 0
+						        GROUP BY timesheet.empid
+                                HAVING COUNT(timesheet.empid) = 1",
+                       param: new { org_id, date = Dates }
+                   );
 
+            return ResultSingleCheckinList;
+        }
+
+        private IEnumerable<ResultSingleCheckin> MultipleCheckINResult(string org_id, DateTime Dates, bool xdate)
+        {
+            IEnumerable<ResultSingleCheckin> ResultSingleCheckinList = Query<ResultSingleCheckin>(
+                        sql: @"select  distinct(timesheet.empid) as empid, COUNT(timesheet.empid),
+						         RIGHT('0' + CAST(SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 3600 AS VARCHAR),2) + ':' +
+							        RIGHT('0' + CAST((SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 60) % 60 AS VARCHAR),2)  as time
+                                from timesheet
+                                  INNER JOIN employee ON timesheet.empid = employee.id
+                                WHERE employee.org_id = @org_id
+						        AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
+						        BETWEEN FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
+                                AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US') AND timesheet.is_deleted = 0
+						        group by timesheet.empid
+                                having(SUM(( DATEPART(hh, total_hrs ) * 3600 ) + ( DATEPART(mi, total_hrs) * 60 )) > 32400)  
+						        and COUNT(timesheet.empid) > 1",
+                        param: new { org_id, date = Dates }
+                    );
+
+            if (xdate)
+                ResultSingleCheckinList = Query<ResultSingleCheckin>(
+                       sql: @"select  distinct(timesheet.empid) as empid, COUNT(timesheet.empid),
+						         RIGHT('0' + CAST(SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 3600 AS VARCHAR),2) + ':' +
+							        RIGHT('0' + CAST((SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 60) % 60 AS VARCHAR),2)  as time
+                                FROM timesheet
+                                  INNER JOIN employee ON timesheet.empid = employee.id
+                                WHERE employee.org_id = @org_id
+						        AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
+						        BETWEEN FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
+                                AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US') AND timesheet.is_deleted = 0
+						        GROUP BY timesheet.empid
+                                HAVING COUNT(timesheet.empid) > 1",
+                       param: new { org_id, date = Dates }
+                   );
+
+            return ResultSingleCheckinList;
+        }
+
+        private IEnumerable<ResultSingleCheckin> SingleCheckINExceptionResult(string org_id, DateTime Dates, bool xdate)
+        {
+            IEnumerable<ResultSingleCheckin> ResultSingleCheckinList = Query<ResultSingleCheckin>(
+                        sql: @"select  distinct(timesheet.empid) as empid, COUNT(timesheet.empid),
+						         RIGHT('0' + CAST(SUM((DATEPART(HOUR,isnull(total_hrs, '00:00'))*3600)+(DATEPART(MINUTE,isnull(total_hrs, '00:00'))*60)+(DATEPART(Second,isnull(total_hrs, '00:00')))) / 3600 AS VARCHAR),2) + ':' +
+							        RIGHT('0' + CAST((SUM((DATEPART(HOUR,isnull(total_hrs, '00:00'))*3600)+(DATEPART(MINUTE,isnull(total_hrs, '00:00'))*60)+(DATEPART(Second,isnull(total_hrs, '00:00')))) / 60) % 60 AS VARCHAR),2)  as time
+                                from timesheet
+                                  INNER JOIN employee ON timesheet.empid = employee.id
+                                WHERE employee.org_id = @org_id
+						        AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
+						        BETWEEN FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
+                                AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US') AND timesheet.is_deleted = 0
+						        group by timesheet.empid
+                                having(SUM(( DATEPART(hh, isnull(total_hrs, '00:00')) * 3600 ) + ( DATEPART(mi, isnull(total_hrs, '00:00')) * 60 )) < 32400)  
+						        and COUNT(timesheet.empid) = 1",
+                        param: new { org_id, date = Dates }
+                    );
+            //if (xdate)
+            //    ResultSingleCheckinList = Query<ResultSingleCheckin>(
+            //           sql: @"select  distinct(timesheet.empid) as empid, COUNT(timesheet.empid),
+            //   RIGHT('0' + CAST(SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 3600 AS VARCHAR),2) + ':' +
+            //   RIGHT('0' + CAST((SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 60) % 60 AS VARCHAR),2)  as time
+            //                    FROM timesheet
+            //                      INNER JOIN employee ON timesheet.empid = employee.id
+            //                    WHERE employee.org_id = @org_id
+            //  AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
+            //  BETWEEN FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
+            //                    AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US') AND timesheet.is_deleted = 0
+            //  GROUP BY timesheet.empid
+            //                    HAVING COUNT(timesheet.empid) = 1",
+            //           param: new { org_id, date = Dates }
+            //       );
+
+            return ResultSingleCheckinList;
+        }
+
+        private IEnumerable<ResultSingleCheckin> MultipleCheckINExceptionResult(string org_id, DateTime Dates, bool xdate)
+        {
+            IEnumerable<ResultSingleCheckin> ResultSingleCheckinList = Query<ResultSingleCheckin>(
+                        sql: @"select  distinct(timesheet.empid) as empid, COUNT(timesheet.empid),
+						         RIGHT('0' + CAST(SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 3600 AS VARCHAR),2) + ':' +
+							        RIGHT('0' + CAST((SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 60) % 60 AS VARCHAR),2)  as time
+                                from timesheet
+                                  INNER JOIN employee ON timesheet.empid = employee.id
+                                WHERE employee.org_id = @org_id
+						        AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
+						        BETWEEN FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
+                                AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US') AND timesheet.is_deleted = 0
+						        group by timesheet.empid
+                                having(SUM(( DATEPART(hh, total_hrs ) * 3600 ) + ( DATEPART(mi, total_hrs) * 60 )) < 32400)  
+						        and COUNT(timesheet.empid) > 1",
+                        param: new { org_id, date = Dates }
+                    );
+
+            //if (xdate)
+            //    ResultSingleCheckinList = Query<ResultSingleCheckin>(
+            //           sql: @"select  distinct(timesheet.empid) as empid, COUNT(timesheet.empid),
+            //   RIGHT('0' + CAST(SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 3600 AS VARCHAR),2) + ':' +
+            //   RIGHT('0' + CAST((SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 60) % 60 AS VARCHAR),2)  as time
+            //                    FROM timesheet
+            //                      INNER JOIN employee ON timesheet.empid = employee.id
+            //                    WHERE employee.org_id = @org_id
+            //  AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
+            //  BETWEEN FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
+            //                    AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US') AND timesheet.is_deleted = 0
+            //  GROUP BY timesheet.empid
+            //                    HAVING COUNT(timesheet.empid) > 1",
+            //           param: new { org_id, date = Dates }
+            //       );
+
+            return ResultSingleCheckinList;
+        }
+
+        private IEnumerable<ResultSingleCheckin> SingleFirstCheckINResult(string org_id, DateTime Dates, bool xdate)
+        {
+            IEnumerable<ResultSingleCheckin> ResultSingleCheckinList = Query<ResultSingleCheckin>(
+                        sql: @"select  distinct(timesheet.empid) as empid, COUNT(timesheet.empid),
+						         RIGHT('0' + CAST(SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 3600 AS VARCHAR),2) + ':' +
+							        RIGHT('0' + CAST((SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 60) % 60 AS VARCHAR),2)  as time
+                                from timesheet
+                                  INNER JOIN employee ON timesheet.empid = employee.id
+                                WHERE employee.org_id = @org_id
+						        AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
+						        BETWEEN FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
+                                AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US') AND timesheet.is_deleted = 0
+						        group by timesheet.empid
+                                having COUNT(timesheet.empid) = 1",
+                        param: new { org_id, date = Dates }
+                    );
+
+            return ResultSingleCheckinList;
+        }
+
+        private IEnumerable<ResultSingleCheckin> MultipleFirstCheckINResult(string org_id, DateTime Dates, bool xdate)
+        {
+            IEnumerable<ResultSingleCheckin> ResultSingleCheckinList = Query<ResultSingleCheckin>(
+                        sql: @"select  distinct(timesheet.empid) as empid, COUNT(timesheet.empid),
+						         RIGHT('0' + CAST(SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 3600 AS VARCHAR),2) + ':' +
+							        RIGHT('0' + CAST((SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 60) % 60 AS VARCHAR),2)  as time
+                                from timesheet
+                                  INNER JOIN employee ON timesheet.empid = employee.id
+                                WHERE employee.org_id = @org_id
+						        AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
+						        BETWEEN FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
+                                AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US') AND timesheet.is_deleted = 0
+						        group by timesheet.empid
+                                having COUNT(timesheet.empid) > 1",
+                        param: new { org_id, date = Dates }
+                    );
+
+            return ResultSingleCheckinList;
+        }
+
+        #endregion PrivateMethods
     }
 
 
     public class UtilsProjectAndRatio
     {
+        public string project_id { get; set; }
         public string project_name { get; set; }
         public string ratio { get; set; }
+        public string project_status { get; set; }
+        public string project_type { get; set; }
+        public string cst_name { get; set; }
+        public string start_date { get; set; }
+        public string end_date { get; set; }
     }
+
+    public class AttendedEmployee
+    {
+        public string rowno { get; set; }
+        public string project_category_type { get; set; }
+        public string project_or_comp_name { get; set; }
+        public string timesheet_id { get; set; }
+        public string groupid { get; set; }
+        public bool is_checkout { get; set; }
+        public string employee_id { get; set; }
+        public string workhour { get; set; }
+        public string full_name { get; set; }
+        public string check_in { get; set; }
+        public string check_out { get; set; }
+        public string total_hrs { get; set; }
+        public string lat { get; set; }
+        public string lang { get; set; }
+        public string ondate { get; set; }
+    }
+    public class ResultSingleCheckin
+    {
+        public string empid { get; set; }
+        public string time { get; set; }
+    }
+
+
 
 }

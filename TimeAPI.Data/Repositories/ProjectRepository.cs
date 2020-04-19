@@ -34,8 +34,8 @@ namespace TimeAPI.Data.Repositories
             return QuerySingleOrDefault<Project>(
                 sql: @"SELECT TOP 1 project_prefix 
                             FROM dbo.project 
-                        WHERE 
-                            CONTAINS(project_prefix, 'JOB')  
+                        WHERE   
+                            project_prefix like  '%JOB' 
                             AND org_id = @key 
                             AND FORMAT(CAST(created_date AS DATE), 'd', 'EN-US') = FORMAT(CAST(@date AS DATE), 'd', 'EN-US')
                             ORDER BY created_date DESC",
@@ -165,13 +165,13 @@ namespace TimeAPI.Data.Repositories
                             ISNULL(employee.full_name, 'NA') as approver, 
                             employee.id as approver_id,
                             CASE WHEN project_activity.is_approved = 0 THEN 'False' ELSE 'True' END as is_approved, 
-                            project_status.project_status_name, 
+                            status.status_name, 
                             project_activity.start_date, 
                             project_activity.end_date 
                         FROM project_activity 
                             INNER JOIN project on project_activity.project_id = project.id
                             LEFT JOIN employee on project_activity.approved_id = employee.id
-                            LEFT JOIN project_status on project_activity.status_id = project_status.id
+                            LEFT JOIN status on project_activity.status_id = status.id
                         WHERE project.id = @key
                             AND project.is_deleted = 0
                             AND project_activity.is_deleted = 0

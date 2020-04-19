@@ -112,6 +112,45 @@ namespace TimeAPI.API.Controllers
         }
 
         [HttpPost]
+        [Route("GetTimesheetDashboardFirstCheckInGridDataByOrgIDAndDate")]
+        public async Task<object> GetTimesheetDashboardFirstCheckInGridDataByOrgIDAndDate([FromBody] UtilsOrgIDAndDate Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                var result = _unitOfWork.AdminDashboardRepository.GetTimesheetDashboardFirstCheckInGridDataByOrgIDAndDate(Utils.OrgID, Utils.fromDate, Utils.toDate);
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+
+        [HttpPost]
+        [Route("GetTimesheetDashboardLastCheckoutGridDataByOrgIDAndDate")]
+        public async Task<object> GetTimesheetDashboardLastCheckoutGridDataByOrgIDAndDate([FromBody] UtilsOrgIDAndDate Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                var result = _unitOfWork.AdminDashboardRepository.GetTimesheetDashboardLastCheckoutGridDataByOrgIDAndDate(Utils.OrgID, Utils.fromDate, Utils.toDate);
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
         [Route("GetTimesheetDashboardGridAbsentDataByOrgIDAndDate")]
         public async Task<object> GetTimesheetDashboardGridAbsentDataByOrgIDAndDate([FromBody] UtilsOrgIDAndDate Utils, CancellationToken cancellationToken)
         {
@@ -180,7 +219,7 @@ namespace TimeAPI.API.Controllers
 
                 var result = _unitOfWork.AdminDashboardRepository.AllProjectRatioByOrgID(Utils.ID);
 
-                return await Task.FromResult<object>(result).ConfigureAwait(false);
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(result, Formatting.Indented)).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -208,7 +247,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpPost]
         [Route("GetAllTaskByOrgAndEmpID")]
         public Task<object> GetAllTaskByOrgAndEmpID([FromBody] UtilsOrgAndEmpID UserID, CancellationToken cancellationToken)
@@ -220,6 +258,62 @@ namespace TimeAPI.API.Controllers
                 throw new ArgumentNullException(nameof(UserID.OrgID));
 
             var Result = _unitOfWork.TaskRepository.GetAllTaskByOrgAndEmpID(UserID.OrgID, UserID.EmpID);
+            return Task.FromResult<object>(Result);
+        }
+
+        [HttpPost]
+        [Route("TotalEmpOverTimeCountByOrgIDAndDate")]
+        public Task<object> TotalEmpOverTimeCountByOrgIDAndDate([FromBody] UtilsOrgIDAndDate UserID, CancellationToken cancellationToken)
+        {
+            if (cancellationToken != null)
+                cancellationToken.ThrowIfCancellationRequested();
+
+            if (string.IsNullOrWhiteSpace(UserID.OrgID))
+                throw new ArgumentNullException(nameof(UserID.OrgID));
+
+            var Result = _unitOfWork.AdminDashboardRepository.TotalEmpOverTimeCountByOrgIDAndDate(UserID.OrgID, UserID.toDate, UserID.fromDate);
+            return Task.FromResult<object>(Result);
+        }
+
+        [HttpPost]
+        [Route("TotalEmpLessHoursByOrgIDAndDate")]
+        public Task<object> TotalEmpLessHoursByOrgIDAndDate([FromBody] UtilsOrgIDAndDate UserID, CancellationToken cancellationToken)
+        {
+            if (cancellationToken != null)
+                cancellationToken.ThrowIfCancellationRequested();
+
+            if (string.IsNullOrWhiteSpace(UserID.OrgID))
+                throw new ArgumentNullException(nameof(UserID.OrgID));
+
+            var Result = _unitOfWork.AdminDashboardRepository.TotalEmpLessHoursByOrgIDAndDate(UserID.OrgID, UserID.toDate, UserID.fromDate);
+            return Task.FromResult<object>(Result);
+        }
+
+        [HttpPost]
+        [Route("TotalLocationCheckInExceptionByOrgIDAndDate")]
+        public Task<object> TotalLocationCheckInExceptionByOrgIDAndDate([FromBody] UtilsOrgIDAndDate UserID, CancellationToken cancellationToken)
+        {
+            if (cancellationToken != null)
+                cancellationToken.ThrowIfCancellationRequested();
+
+            if (string.IsNullOrWhiteSpace(UserID.OrgID))
+                throw new ArgumentNullException(nameof(UserID.OrgID));
+
+            var Result = _unitOfWork.AdminDashboardRepository.TotalLocationExceptionByOrgIDAndDate(UserID.OrgID, UserID.toDate, UserID.fromDate);
+            return Task.FromResult<object>(Result);
+        }
+
+        [HttpPost]
+        [Route("TotalLocationCheckOutExceptionByOrgIDAndDate")]
+        public Task<object> TotalLocationCheckOutExceptionByOrgIDAndDate([FromBody] UtilsOrgIDAndDate UserID, CancellationToken cancellationToken)
+        {
+            if (cancellationToken != null)
+                cancellationToken.ThrowIfCancellationRequested();
+
+            if (string.IsNullOrWhiteSpace(UserID.OrgID))
+                throw new ArgumentNullException(nameof(UserID.OrgID));
+
+            var Result = _unitOfWork.AdminDashboardRepository.TotalLocationCheckOutExceptionByOrgIDAndDate(UserID.OrgID, UserID.toDate, UserID.fromDate);
             return Task.FromResult<object>(Result);
         }
     }

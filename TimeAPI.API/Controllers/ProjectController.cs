@@ -1045,6 +1045,17 @@ namespace TimeAPI.API.Controllroers
 
                 modal.modified_date = _dateTime.ToString();
 
+                var status = _unitOfWork.StatusRepository.Find(statusingViewModel.status_id);
+                if (status != null)
+                    if (status.status_name == "Completed")
+                    {
+                        var Result = _unitOfWork.ProjectActivityTaskRepository.GetAllTaskByActivityID(modal.id);
+                        if (Result != null)
+                        {
+                            return await Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = "Error", Desc = "There are still task for this milestone is pending." }).ConfigureAwait(false);
+                        }
+                    }
+
                 _unitOfWork.ProjectActivityRepository.Update(modal);
                 _unitOfWork.Commit();
 
@@ -1139,17 +1150,14 @@ namespace TimeAPI.API.Controllroers
 
                 if (TaskViewModel.employees != null)
                 {
-                    foreach (var item in TaskViewModel.employees.empid.Distinct())
+                    foreach (var item in TaskViewModel.employees.Distinct())
                     {
-                        modal.id = Guid.NewGuid().ToString();
-                        modal.created_date = _dateTime.ToString();
-                        modal.is_deleted = false;
 
                         var TaskTeamMembers = new TaskTeamMember()
                         {
                             id = Guid.NewGuid().ToString(),
                             task_id = modal.id,
-                            empid = item,
+                            empid = item.empid,
                             createdby = modal.createdby,
                             created_date = _dateTime.ToString(),
                             is_deleted = false
@@ -1182,6 +1190,79 @@ namespace TimeAPI.API.Controllroers
         }
 
         [HttpPost]
+        [Route("AddMultipleTask")]
+        public async Task<object> AddMultipleTask([FromBody] List<ProjectActivityTaskViewModel> TaskViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (TaskViewModel == null)
+                    throw new ArgumentNullException(nameof(TaskViewModel));
+
+                for (int i = 0; i < TaskViewModel.Count; i++)
+                {
+                    var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<ProjectActivityTaskViewModel, Domain.Entities.Tasks>());
+                    var mapper = config.CreateMapper();
+                    var modal = mapper.Map<Domain.Entities.Tasks>(TaskViewModel[i]);
+
+                    modal.id = Guid.NewGuid().ToString();
+                    modal.status_id = _unitOfWork.StatusRepository.GetStatusByOrgID("default")
+                                        .Where(s => s.status_name.Equals("Open"))
+                                        .Select(s => s.id)
+                                        .FirstOrDefault();
+
+                    modal.created_date = _dateTime.ToString();
+                    modal.is_deleted = false;
+
+                    if (TaskViewModel[i].employees != null)
+                    {
+                        foreach (var item in TaskViewModel[i].employees.Distinct())
+                        {
+
+                            var TaskTeamMembers = new TaskTeamMember()
+                            {
+                                id = Guid.NewGuid().ToString(),
+                                task_id = modal.id,
+                                empid = item.empid,
+                                createdby = modal.createdby,
+                                created_date = _dateTime.ToString(),
+                                is_deleted = false
+                            };
+                            _unitOfWork.TaskTeamMembersRepository.Add(TaskTeamMembers);
+                        }
+                    }
+
+                    var ProjectTask = new ProjectActivityTask()
+                    {
+                        id = Guid.NewGuid().ToString(),
+                        project_id = TaskViewModel[i].project_id,
+                        activity_id = TaskViewModel[i].activtity_id,
+                        task_id = modal.id,
+                        created_date = _dateTime.ToString(),
+                        createdby = TaskViewModel[i].createdby,
+                        is_deleted = false
+                    };
+
+                    _unitOfWork.TaskRepository.Add(modal);
+                    _unitOfWork.ProjectActivityTaskRepository.Add(ProjectTask);
+                }
+
+               
+                _unitOfWork.Commit();
+
+                return await System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Task registered successfully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+
+
+        [HttpPost]
         [Route("FindByTasksId")]
         public async Task<object> FindByTasksID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
@@ -1194,6 +1275,7 @@ namespace TimeAPI.API.Controllroers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 var results = _unitOfWork.TaskRepository.Find(Utils.ID);
+                results.employees = _unitOfWork.TaskTeamMembersRepository.FindByTaskID(Utils.ID).ToList();
 
                 return await System.Threading.Tasks.Task.FromResult<object>(results).ConfigureAwait(false);
             }
@@ -1267,17 +1349,15 @@ namespace TimeAPI.API.Controllroers
 
                 if (TaskViewModel.employees != null)
                 {
-                    foreach (var item in TaskViewModel.employees.empid.Distinct())
+                    foreach (var item in TaskViewModel.employees.Distinct())
                     {
-                        modal.id = Guid.NewGuid().ToString();
-                        modal.created_date = _dateTime.ToString();
-                        modal.is_deleted = false;
+
 
                         var TaskTeamMembers = new TaskTeamMember()
                         {
                             id = Guid.NewGuid().ToString(),
                             task_id = modal.id,
-                            empid = item,
+                            empid = item.empid,
                             createdby = modal.createdby,
                             created_date = _dateTime.ToString(),
                             is_deleted = false

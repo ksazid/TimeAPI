@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using TimeAPI.API.Filters;
 using TimeAPI.API.Models;
 using TimeAPI.API.Models.BillingViewModels;
 using TimeAPI.API.Models.OrganizationViewModel;
@@ -17,10 +19,10 @@ using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.API.Controllers
 {
-    //[ApiKeyAuth]
+    [Authorize]
+    [ApiKeyAuth]
     //[EnableCors("CorsPolicy")]
     [Route("[controller]")]
-    //[Authorize(Roles = "superadmin")]
     public class AdminController : Controller
     {
         private readonly IEmailSender _emailSender;

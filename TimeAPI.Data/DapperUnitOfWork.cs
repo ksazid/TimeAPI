@@ -31,6 +31,7 @@ namespace TimeAPI.Data
         private IReportingRepository _reportingRepository;
         private IDesignationRepositiory _designationRepositiory;
         private ITimesheetRepository _timesheetRepository;
+        private ITimesheetBreakRepository _timesheetBreakRepository;
         private ITaskRepository _taskRepository;
         private ITaskTeamMembersRepository _taskTeamMembersRepository;
         private ISetupRepository _setupRepository;
@@ -69,6 +70,8 @@ namespace TimeAPI.Data
         private IWeekdaysRepository _weekdaysRepository;
         private IDualApprovalRepository _orgWeekdaysRepository;
         private IProjectTypeRepository _projectTypeRepository;
+        private IMilestoneTemplateRepository _milestoneTemplateRepository;
+        private ITaskTemplateRepository _taskTemplateRepository;
 
         #region systemadmin
         private IPlanRepository _planRepository;
@@ -179,7 +182,6 @@ namespace TimeAPI.Data
             }
         }
         
-
         public IDepartmentRepository DepartmentRepository
         {
             get
@@ -576,6 +578,7 @@ namespace TimeAPI.Data
                     ?? (_superadminOrganizationRepository = new SuperadminOrganizationRepository(_transaction));
             }
         }
+
         public ILocationExceptionRepository LocationExceptionRepository
         {
             get
@@ -584,6 +587,7 @@ namespace TimeAPI.Data
                     ?? (_locationExceptionRepository = new LocationExceptionRepository(_transaction));
             }
         }
+
         public IEntityInvitationRepository EntityInvitationRepository
         {
             get
@@ -621,6 +625,33 @@ namespace TimeAPI.Data
         }
 
 
+        public ITimesheetBreakRepository TimesheetBreakRepository
+        {
+            get
+            {
+                return _timesheetBreakRepository
+                    ?? (_timesheetBreakRepository = new TimesheetBreakRepository(_transaction));
+            }
+        }
+
+
+        public IMilestoneTemplateRepository MilestoneTemplateRepository
+        {
+            get
+            {
+                return _milestoneTemplateRepository
+                    ?? (_milestoneTemplateRepository = new MilestoneTemplateRepository(_transaction));
+            }
+        }
+
+        public ITaskTemplateRepository TaskTemplateRepository
+        {
+            get
+            {
+                return _taskTemplateRepository
+                    ?? (_taskTemplateRepository = new TaskTemplateRepository(_transaction));
+            }
+        }
 
         public bool Commit()
         {

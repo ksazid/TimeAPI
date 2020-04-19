@@ -118,15 +118,18 @@ namespace TimeAPI.API.Controllroers
                 {
                     var Employee = _unitOfWork.EmployeeRepository.Find(item);
 
-                    TeamMembers teamMembers = new TeamMembers
+                    if (Employee != null)
                     {
-                        emp_id = Employee.id,
-                        modified_date = _dateTime.ToString(),
-                        modifiedby = teamViewModel.createdby,
-                        is_deleted = false
-                    };
+                        TeamMembers teamMembers = new TeamMembers
+                        {
+                            emp_id = Employee.id,
+                            modified_date = _dateTime.ToString(),
+                            modifiedby = teamViewModel.createdby,
+                            is_deleted = false
+                        };
 
-                    _unitOfWork.TeamMemberRepository.Update(teamMembers);
+                        _unitOfWork.TeamMemberRepository.Update(teamMembers);
+                    }
                 }
 
                 _unitOfWork.Commit();
@@ -236,7 +239,7 @@ namespace TimeAPI.API.Controllroers
         //        if (cancellationToken != null)
         //            cancellationToken.ThrowIfCancellationRequested();
 
-        //        if (Utils == null)
+        //        if (Utils == null)AllProjectRatioByOrgID
         //            throw new ArgumentNullException(nameof(Utils.ID));
 
         //        oDataTable _oDataTable = new oDataTable();

@@ -26,7 +26,10 @@ namespace TimeAPI.Data.Repositories
         public Tasks Find(string key)
         {
             return QuerySingleOrDefault<Tasks>(
-                sql: "SELECT * FROM dbo.task WHERE is_deleted = 0 and id = @key",
+                sql: @"SELECT dbo.project_activity_x_task.project_id as project_id, dbo.project_activity_x_task.activity_id as activtity_id, dbo.task.* 
+						FROM dbo.task
+						LEFT JOIN dbo.project_activity_x_task on dbo.task.id = dbo.project_activity_x_task.task_id
+						WHERE dbo.task.is_deleted = 0 and dbo.task.id = @key",
                 param: new { key }
             );
         }
@@ -86,7 +89,7 @@ namespace TimeAPI.Data.Repositories
                                 task.is_approver as is_approver,
                                 task.is_approver_id as is_approver_id,
 		                        et.full_name as approver_name,
-	                            task.due_date,
+	                            FORMAT(CAST(task.due_date  AS DATE), 'd', 'EN-US') as due_date,
 	                            task.created_date
 	                            FROM[dbo].[task] WITH (NOLOCK)
 			                        INNER JOIN employee on task.empid = employee.id
@@ -111,7 +114,7 @@ namespace TimeAPI.Data.Repositories
                                 task.is_approver as is_approver,
                                 task.is_approver_id as is_approver_id,
 		                        et.full_name as approver_name,
-	                            task.due_date,
+	                            FORMAT(CAST(task.due_date  AS DATE), 'd', 'EN-US') as due_date,
 	                            task.created_date
 	                           FROM [dbo].[task] WITH (NOLOCK)
 			                        INNER JOIN employee on task.empid = employee.id
@@ -138,13 +141,17 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public RootEmployeeTask GetAllTaskByEmpID(string key)
+        public RootEmployeeTask GetAllTaskByEmpID(string key,  string date)
         {
             RootEmployeeTask rootEmployeeTask = new RootEmployeeTask();
 
             var _employeeTasks = Query<EmployeeTasks>(
                          sql: @"SELECT
                                 DISTINCT(task.task_name),
+								ISNULL(project.project_name, 'NA') as project_name,
+								ISNULL(project_activity.activity_name, 'NA') as milestone_name,
+                                project.id as project_id,
+                                project_activity.id as milestone_id,
                                 task.id,
 	                            employee.id as empid,
 	                            task.task_desc,
@@ -156,10 +163,13 @@ namespace TimeAPI.Data.Repositories
                                 task.is_approver as is_approver,
                                 task.is_approver_id as is_approver_id,
 		                        et.full_name as approver_name,
-	                            task.due_date,
+                                FORMAT(CAST(task.due_date  AS DATE), 'd', 'EN-US') as due_date,
 	                            task.created_date
 	                            FROM[dbo].[task] WITH (NOLOCK)
 			                        INNER JOIN employee on task.empid = employee.id
+									LEFT JOIN project_activity_x_task on [dbo].[task].id = project_activity_x_task.task_id
+									LEFT JOIN project_activity on project_activity_x_task.activity_id = project_activity.id
+									LEFT JOIN project on project_activity_x_task.project_id = project.id
 			                        LEFT JOIN employee e on task.assigned_empid = e.id
 			                        LEFT JOIN employee et on task.is_approver_id = et.id
 			                        LEFT JOIN priority on task.priority_id = priority.id
@@ -169,7 +179,11 @@ namespace TimeAPI.Data.Repositories
 	                  UNION
 
 	                    SELECT
-                                 DISTINCT(task.task_name),
+                                DISTINCT(task.task_name),
+								ISNULL(project.project_name, 'NA') as project_name,
+								ISNULL(project_activity.activity_name, 'NA') as milestone_name,
+								project.id as project_id,
+								project_activity.id as milestone_id,
                                 task.id,
 	                            employee.id as empid,
 	                            task.task_desc,
@@ -181,10 +195,13 @@ namespace TimeAPI.Data.Repositories
                                 task.is_approver as is_approver,
                                 task.is_approver_id as is_approver_id,
 		                        et.full_name as approver_name,
-	                            task.due_date,
+	                            FORMAT(CAST(task.due_date  AS DATE), 'd', 'EN-US') as due_date,
 	                            task.created_date
 	                           FROM [dbo].[task] WITH (NOLOCK)
 			                        INNER JOIN employee on task.empid = employee.id
+									LEFT JOIN project_activity_x_task on [dbo].[task].id = project_activity_x_task.task_id
+									LEFT JOIN project_activity on project_activity_x_task.activity_id = project_activity.id
+									LEFT JOIN project on project_activity_x_task.project_id = project.id
 			                        LEFT JOIN employee e on task.assigned_empid = e.id
 			                        LEFT JOIN employee et on task.is_approver_id = et.id
 			                        LEFT JOIN priority on task.priority_id = priority.id
@@ -196,21 +213,29 @@ namespace TimeAPI.Data.Repositories
 
             var _employeeAssignedTasks = Query<EmployeeTasks>(
                    sql: @"SELECT
-                                 DISTINCT(task.task_name),
+                                DISTINCT(task.task_name),
+								ISNULL(project.project_name, 'NA') as project_name,
+								ISNULL(project_activity.activity_name, 'NA') as milestone_name,
+								project.id as project_id,
+                                project_activity.id as milestone_id,
                                 task.id,
 	                            employee.id as empid,
 	                            task.task_desc,
 	                            priority.priority_name as priority,
-	                            status.id as status,
+	                            status.id as status_id,
+	                            status.status_name as status_name,
 		                        task.assigned_empid as assigned_to,
 	                            e.full_name as assigned_to_name,
                                 task.is_approver as is_approver,
                                 task.is_approver_id as is_approver_id,
 		                        et.full_name as approver_name,
-	                            task.due_date,
+	                            FORMAT(CAST(task.due_date  AS DATE), 'd', 'EN-US'),
 	                            task.created_date
 	                           FROM [dbo].[task] WITH (NOLOCK)
 			                        INNER JOIN employee on task.empid = employee.id
+									LEFT JOIN project_activity_x_task on [dbo].[task].id = project_activity_x_task.task_id
+									LEFT JOIN project_activity on project_activity_x_task.activity_id = project_activity.id
+									LEFT JOIN project on project_activity_x_task.project_id = project.id
 			                        LEFT JOIN employee e on task.assigned_empid = e.id
 			                        LEFT JOIN employee et on task.is_approver_id = et.id
 			                        LEFT JOIN priority on task.priority_id = priority.id
@@ -220,12 +245,82 @@ namespace TimeAPI.Data.Repositories
                       param: new { key }
                );
 
-            rootEmployeeTask.EmployeeTasks = _employeeTasks;
-            rootEmployeeTask.AssignedEmployeeTasks = _employeeAssignedTasks;
+			var _overdueTasks = Query<EmployeeTasks>(
+					sql: @"SELECT
+                                DISTINCT(task.task_name),
+								ISNULL(project.project_name, 'NA') as project_name,
+								ISNULL(project_activity.activity_name, 'NA') as milestone_name,
+								project.id as project_id,
+                                project_activity.id as milestone_id,
+                                task.id,
+	                            employee.id as empid,
+	                            task.task_desc,
+	                            priority.priority_name as priority,
+	                            status.id as status_id,
+	                            status.status_name as status_name,
+		                        task.assigned_empid as assigned_to,
+	                            e.full_name as assigned_to_name,
+                                task.is_approver as is_approver,
+                                task.is_approver_id as is_approver_id,
+		                        et.full_name as approver_name,
+                                FORMAT(CAST(task.due_date  AS DATE), 'd', 'EN-US') as due_date,
+	                            task.created_date
+	                            FROM[dbo].[task] WITH (NOLOCK)
+			                        INNER JOIN employee on task.empid = employee.id
+									LEFT JOIN project_activity_x_task on [dbo].[task].id = project_activity_x_task.task_id
+									LEFT JOIN project_activity on project_activity_x_task.activity_id = project_activity.id
+									LEFT JOIN project on project_activity_x_task.project_id = project.id
+			                        LEFT JOIN employee e on task.assigned_empid = e.id
+			                        LEFT JOIN employee et on task.is_approver_id = et.id
+			                        LEFT JOIN priority on task.priority_id = priority.id
+			                        LEFT JOIN status on status.id = task.status_id
+                            WHERE task.is_deleted = 0 and task.empid =@key 
+							AND FORMAT(CAST(task.due_date  AS DATE), 'd', 'EN-US') > FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
+							AND status_name != 'Completed'
 
-            return rootEmployeeTask;
+					  UNION
+
+	                    SELECT
+                                DISTINCT(task.task_name),
+								ISNULL(project.project_name, 'NA') as project_name,
+								ISNULL(project_activity.activity_name, 'NA') as milestone_name,
+								project.id as project_id,
+                                project_activity.id as milestone_id,
+                                task.id,
+	                            employee.id as empid,
+	                            task.task_desc,
+	                            priority.priority_name as priority,
+	                            status.id as status_id,
+	                            status.status_name as status_name,
+		                        task.assigned_empid as assigned_to,
+	                            e.full_name as assigned_to_name,
+                                task.is_approver as is_approver,
+                                task.is_approver_id as is_approver_id,
+		                        et.full_name as approver_name,
+	                            FORMAT(CAST(task.due_date  AS DATE), 'd', 'EN-US') as due_date,
+	                            task.created_date
+	                           FROM [dbo].[task] WITH (NOLOCK)
+			                        INNER JOIN employee on task.empid = employee.id
+									LEFT JOIN project_activity_x_task on [dbo].[task].id = project_activity_x_task.task_id
+									LEFT JOIN project_activity on project_activity_x_task.activity_id = project_activity.id
+									LEFT JOIN project on project_activity_x_task.project_id = project.id
+			                        LEFT JOIN employee e on task.assigned_empid = e.id
+			                        LEFT JOIN employee et on task.is_approver_id = et.id
+			                        LEFT JOIN priority on task.priority_id = priority.id
+			                        LEFT JOIN status on status.id = task.status_id
+                            WHERE task.is_deleted = 0 
+	                        AND task.assigned_empid =@key
+							AND FORMAT(CAST(task.due_date  AS DATE), 'd', 'EN-US') > FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
+							AND status_name != 'Completed'",
+					param: new { key, date }
+				);
+
+			rootEmployeeTask.EmployeeTasks = _employeeTasks;
+			rootEmployeeTask.AssignedEmployeeTasks = _employeeAssignedTasks;
+			rootEmployeeTask.OverDueTasks = _overdueTasks;
+
+			return rootEmployeeTask;
         }
-
 
         public RootEmployeeTask GetAllTaskByOrgAndEmpID(string key, string EmpID)
         {
@@ -245,7 +340,7 @@ namespace TimeAPI.Data.Repositories
                                     task.is_approver as is_approver,
                                     task.is_approver_id as is_approver_id,
 		                            et.full_name as approver_name,
-	                                task.due_date,
+	                                FORMAT(CAST(task.due_date  AS DATE), 'd', 'EN-US') as due_date,
 	                                task.created_date
 	                                FROM[dbo].[task] WITH (NOLOCK)
 			                            INNER JOIN employee on task.empid = employee.id
@@ -273,7 +368,7 @@ namespace TimeAPI.Data.Repositories
                                     task.is_approver as is_approver,
                                     task.is_approver_id as is_approver_id,
 		                            et.full_name as approver_name,
-	                                task.due_date,
+	                                FORMAT(CAST(task.due_date  AS DATE), 'd', 'EN-US') as due_date,
 	                                task.created_date
 	                                FROM [dbo].[task] WITH (NOLOCK)
 			                            INNER JOIN employee on task.empid = employee.id
@@ -290,33 +385,100 @@ namespace TimeAPI.Data.Repositories
                      );
 
             var _employeeAssignedTasks = Query<EmployeeTasks>(
-                   sql: @"SELECT
-                                 DISTINCT(task.task_name),
-                                task.id,
-	                            employee.id as empid,
-	                            task.task_desc,
-	                            priority.priority_name as priority,
-	                            status.id as status,
-		                        task.assigned_empid as assigned_to,
-	                            e.full_name as assigned_to_name,
-                                task.is_approver as is_approver,
-                                task.is_approver_id as is_approver_id,
-		                        et.full_name as approver_name,
-	                            task.due_date,
-	                            task.created_date
-	                           FROM [dbo].[task] WITH (NOLOCK)
-			                        INNER JOIN employee on task.empid = employee.id
-			                        LEFT JOIN employee e on task.assigned_empid = e.id
-			                        LEFT JOIN employee et on task.is_approver_id = et.id
-			                        LEFT JOIN priority on task.priority_id = priority.id
-			                        LEFT JOIN status on status.id = task.status_id
-                            WHERE task.is_deleted = 0 
-	                        AND task.assigned_empid =@EmpID",
-                      param: new { EmpID }
-               );
+					   sql: @"SELECT
+									 DISTINCT(task.task_name),
+									task.id,
+									employee.id as empid,
+									task.task_desc,
+									priority.priority_name as priority,
+									status.id as status_id,
+									status.status_name as status_name,
+									task.assigned_empid as assigned_to,
+									e.full_name as assigned_to_name,
+									task.is_approver as is_approver,
+									task.is_approver_id as is_approver_id,
+									et.full_name as approver_name,
+									FORMAT(CAST(task.due_date  AS DATE), 'd', 'EN-US') as due_date,
+									task.created_date
+								   FROM [dbo].[task] WITH (NOLOCK)
+										INNER JOIN employee on task.empid = employee.id
+										LEFT JOIN employee e on task.assigned_empid = e.id
+										LEFT JOIN employee et on task.is_approver_id = et.id
+										LEFT JOIN priority on task.priority_id = priority.id
+										LEFT JOIN status on status.id = task.status_id
+								WHERE task.is_deleted = 0 
+								AND task.assigned_empid =@EmpID",
+						  param: new { EmpID }
+					);
+
+
+            var _overdueTasks = Query<EmployeeTasks>(
+					sql: @"SELECT
+								DISTINCT(task.task_name),
+								task.id,
+								employee.id as empid,
+								task.task_desc,
+								priority.priority_name as priority,
+								status.id as status_id,
+								status.status_name as status_name,
+								task.assigned_empid as assigned_to,
+								e.full_name as assigned_to_name,
+								task.is_approver as is_approver,
+								task.is_approver_id as is_approver_id,
+								et.full_name as approver_name,
+								FORMAT(CAST(task.due_date  AS DATE), 'd', 'EN-US') as due_date,
+								task.created_date
+								FROM[dbo].[task] WITH (NOLOCK)
+									INNER JOIN employee on task.empid = employee.id
+									LEFT JOIN employee e on task.assigned_empid = e.id
+									LEFT JOIN employee et on task.is_approver_id = et.id
+									LEFT JOIN priority on task.priority_id = priority.id
+									LEFT JOIN status on status.id = task.status_id
+							WHERE task.is_deleted = 0 and task.empid in (select employee.id from 
+							organization
+							INNER JOIN employee on organization.org_id = employee.org_id
+							WHERE organization.org_id = @key
+							AND FORMAT(CAST(task.due_date  AS DATE), 'd', 'EN-US') < FORMAT(CAST(GETDATE()  AS DATE), 'd', 'EN-US')
+							and status_name != 'Completed'
+							)  
+	
+						UNION
+
+						SELECT
+									DISTINCT(task.task_name),
+								task.id,
+								employee.id as empid,
+								task.task_desc,
+								priority.priority_name as priority,
+								status.id as status_id,
+								status.status_name as status_name,
+								task.assigned_empid as assigned_to,
+								e.full_name as assigned_to_name,
+								task.is_approver as is_approver,
+								task.is_approver_id as is_approver_id,
+								et.full_name as approver_name,
+								FORMAT(CAST(task.due_date  AS DATE), 'd', 'EN-US') as due_date,
+								task.created_date
+								FROM [dbo].[task] WITH (NOLOCK)
+									INNER JOIN employee on task.empid = employee.id
+									LEFT JOIN employee e on task.assigned_empid = e.id
+									LEFT JOIN employee et on task.is_approver_id = et.id
+									LEFT JOIN priority on task.priority_id = priority.id
+									LEFT JOIN status on status.id = task.status_id
+							WHERE task.is_deleted = 0 
+							AND task.assigned_empid in (select employee.id from 
+							organization
+							INNER JOIN employee on organization.org_id = employee.org_id
+							where organization.org_id = @key
+							AND FORMAT(CAST(task.due_date  AS DATE), 'd', 'EN-US') < FORMAT(CAST(GETDATE()  AS DATE), 'd', 'EN-US')
+							and status_name != 'Completed')",
+					  param: new { key }
+					);
 
             rootEmployeeTask.EmployeeTasks = _employeeTasks;
             rootEmployeeTask.AssignedEmployeeTasks = _employeeAssignedTasks;
+            rootEmployeeTask.OverDueTasks = _overdueTasks;
+
 
             return rootEmployeeTask;
         }

@@ -11,6 +11,7 @@ namespace TimeAPI.Domain.Repositories
         Timesheet FindTimeSheetByEmpID(string empid, string groupid);
         void RemoveByGroupID(string GroupID);
         dynamic GetAllTimesheetByOrgID(string OrgID);
+        IEnumerable<string> GetAllEmpByGroupID(string GroupID);
 
     }
 }

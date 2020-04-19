@@ -28,6 +28,14 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
+        public IEnumerable<TaskTeamMember> FindByTaskID(string key)
+        {
+            return Query<TaskTeamMember>(
+                sql: "SELECT * FROM dbo.task_team_members WHERE is_deleted = 0 and task_id = @key",
+                param: new { key }
+            );
+        }
+        
 
         public void Remove(string key)
         {

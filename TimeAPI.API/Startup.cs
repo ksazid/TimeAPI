@@ -25,7 +25,8 @@ using System.IO;
 using TimeAPI.API.Filters;
 using System.Linq;
 using Newtonsoft.Json.Serialization;
-using Hangfire;
+//using Hangfire;
+//using Hangfire.MemoryStorage;
 
 namespace TimeAPI.API
 {
@@ -41,23 +42,26 @@ namespace TimeAPI.API
         public void ConfigureServices(IServiceCollection services)
         {
 
+
             services.AddHealthChecks();
             ////Cross Platform Enabled
             services.AddCors(options =>
             {
-                //options.AddPolicy("CorsPolicy",
-                //builder => builder.WithOrigins("https://enforce.azurewebsites.net", "http://localhost:4200/")
-                //.AllowAnyMethod()
-                //.AllowAnyHeader());
-                //.AllowCredentials()
-                //    .SetIsOriginAllowed((hosts) => true));
-
-
                 options.AddPolicy("CorsPolicy",
-                    builder =>
-                    {
-                        builder.AllowAnyOrigin();
-                    });
+                builder => builder.WithOrigins("*", "*", "*", "http://208.109.13.140:8080/", "http://208.109.13.140:9090/", "http://localhost:4200/", "https://enforcesolutions.com/", "http://enforcesolutions.com/")
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials()
+                .SetIsOriginAllowed((hosts) => true));
+                //            .AllowCredentials()
+                //                .SetIsOriginAllowed((hosts) => true));
+
+
+                //options.AddPolicy("CorsPolicy",
+                //        builder =>
+                //        {
+                //            builder.AllowAnyOrigin();
+                //        });
             });
 
             //services.AddSignalR();
@@ -70,7 +74,21 @@ namespace TimeAPI.API
 
             services.AddAuthentication();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
-            services.AddMvc().AddNewtonsoftJson(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
+            //services.AddMvc().AddNewtonsoftJson(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
+            services.AddMvc().AddNewtonsoftJson();
+            //services.AddMvc().AddJsonOptions(o =>
+            //{
+            //    o.JsonSerializerOptions.PropertyNamingPolicy = null;
+            //    o.JsonSerializerOptions.DictionaryKeyPolicy = null;
+            //    o.JsonSerializerOptions.PropertyNameCaseInsensitive = false;
+            //});
+            //services.AddControllers().AddJsonOptions(o =>
+            //{
+            //    o.JsonSerializerOptions.PropertyNamingPolicy = null;
+            //    o.JsonSerializerOptions.DictionaryKeyPolicy = null;
+            //    o.JsonSerializerOptions.PropertyNameCaseInsensitive = false;
+            //});
+
 
             services.AddControllers().AddNewtonsoftJson();
             services.AddMvcCore().AddApiExplorer();
@@ -136,28 +154,44 @@ namespace TimeAPI.API
                 x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(x =>
-                    {
-                        x.RequireHttpsMetadata = false;
-                        x.SaveToken = false;
-                        x.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-                        {
-                            ValidateIssuer = true,
-                            ValidateAudience = true,
-                            ValidAudience = "https://enforce.azurewebsites.net/",
-                            ValidIssuer = "https://enforce.azurewebsites.net/",
+            {
+                //x.RequireHttpsMetadata = false;
+                //x.SaveToken = false;
+                //x.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                //{
+                //    ValidateIssuer = true,
+                //    ValidateAudience = true,
+                //    ValidAudience = "https://enforce.azurewebsites.net/",
+                //    ValidIssuer = "https://enforce.azurewebsites.net/",
 
-                            ValidateIssuerSigningKey = false,
-                            IssuerSigningKey = new SymmetricSecurityKey(key),
-                            //ValidateIssuer = false,
-                            //ValidateAudience = false,
-                            ClockSkew = TimeSpan.Zero
-                        };
-                    });
+                //    ValidateIssuerSigningKey = false,
+                //    IssuerSigningKey = new SymmetricSecurityKey(key),
+                //    //ValidateIssuer = false,
+                //    //ValidateAudience = false,
+                //    ClockSkew = TimeSpan.Zero
+                //};
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
 
             services.Configure<SecurityStampValidatorOptions>(o => o.ValidationInterval = TimeSpan.FromDays(5));
 
             //services.AddHangfire(x => x.UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnection")));
+            //services.AddHangfire(config=>
+            //        config.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+            //        .UseSimpleAssemblyNameTypeSerializer()
+            //        .UseDefaultTypeSerializer()
+            //        .UseMemoryStorage());
+
             //services.AddHangfireServer();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -173,7 +207,12 @@ namespace TimeAPI.API
             {
                 app.UseExceptionHandler("/Home/Error");
             }
+
+            app.UseDeveloperExceptionPage();
             app.UseCors("CorsPolicy");
+
+
+
 
             //app.UseSignalR((options) =>
             //{
@@ -206,6 +245,11 @@ namespace TimeAPI.API
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Time API");
 
             });
+
+            //app.UseHangfireDashboard();
+            //backgroundJobClient.Enqueue(() => Console.WriteLine("Hello World"));
+
+
         }
     }
 }

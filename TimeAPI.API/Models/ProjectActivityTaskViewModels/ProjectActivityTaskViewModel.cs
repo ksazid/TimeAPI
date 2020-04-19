@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.API.Models.TaskViewModels
 {
@@ -20,6 +21,6 @@ namespace TimeAPI.API.Models.TaskViewModels
         public string createdby { get; set; }
         public bool is_approver { get; set; }
         public string is_approver_id { get; set; }
-        public Employees employees { get; set; }
+        public IEnumerable<TaskTeamMember> employees { get; set; }
     }
 }

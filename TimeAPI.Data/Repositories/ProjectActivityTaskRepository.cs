@@ -90,7 +90,9 @@ namespace TimeAPI.Data.Repositories
                    sql: @"SELECT
                             dbo.task.id,
                             dbo.task.task_name,
-                            dbo.task.task_desc
+                            dbo.task.task_desc,
+			                dbo.task.assigned_empid,
+			                dbo.task.status_id
                         FROM dbo.task WITH(NOLOCK)
                         INNER JOIN  dbo.project_activity_x_task on task.id = dbo.project_activity_x_task.task_id
                         WHERE dbo.project_activity_x_task.activity_id = @key
@@ -109,6 +111,7 @@ namespace TimeAPI.Data.Repositories
                             FORMAT(CAST(dbo.task.due_date AS DATE), 'd', 'EN-US') as due_date,
                             dbo.project_activity.id as project_activity_id,
                             dbo.project_activity.activity_name,
+                            task.assigned_empid as assigned_empid,
                             x.first_name as assignedto,
                             dbo.priority.priority_name,
                             dbo.status.status_name
@@ -116,7 +119,7 @@ namespace TimeAPI.Data.Repositories
                             INNER join dbo.project_activity_x_task on task.id = dbo.project_activity_x_task.task_id
                             INNER JOIN dbo.project_activity on [project_activity_x_task].activity_id = dbo.project_activity.id
                             INNER JOIN dbo.project on [project_activity_x_task].project_id = dbo.project.id
-                            INNER JOIN dbo.employee x on task.assigned_empid = x.id
+                            LEFT JOIN dbo.employee x on task.assigned_empid = x.id
                             LEFT JOIN dbo.priority on task.priority_id = dbo.priority.id
                             INNER JOIN dbo.status on task.status_id = dbo.status.id
                         WHERE project.id = @key

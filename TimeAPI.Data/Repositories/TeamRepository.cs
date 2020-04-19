@@ -80,11 +80,15 @@ namespace TimeAPI.Data.Repositories
 		                        team.id as team_id,
 		                        team.team_name,
 		                        team.team_by,
+		                        e_tl.id as team_lead_id,
 		                        e_tl.full_name as team_lead,
 		                        e_tl.workemail,
-		                        e_tl.emp_code
+		                        e_tl.emp_code,
+								d_tl.id as dep_id,
+								d_tl.dep_name as dep_name
 	                        FROM dbo.team WITH(NOLOCK)
 	                        LEFT JOIN employee e_tl ON team.team_lead_empid = e_tl.id
+	                        LEFT JOIN department d_tl ON e_tl.deptid = d_tl.id
 	                        WHERE team.id =  @key
 							AND team.is_deleted = 0
                             ORDER BY team.team_name ASC",

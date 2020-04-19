@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using TimeAPI.Domain.Entities;
+using TimeAPI.Domain.Model;
 
 namespace TimeAPI.Domain.Repositories
 {
@@ -12,9 +13,9 @@ namespace TimeAPI.Domain.Repositories
 
         dynamic GetTop10TimesheetActivityOnTaskID(string TaskID);
 
-        dynamic GetTimesheetActivityByGroupAndProjectID(string GroupID, string ProjectID, string Date);
+        IEnumerable<ViewLogDataModel> GetTimesheetActivityByGroupAndProjectID(string GroupID, string ProjectID, string Date);
 
-        dynamic GetTimesheetActivityByEmpID(string EmpID, string StartDate, string EndDate);
+        IEnumerable<ViewLogDataModel> GetTimesheetActivityByEmpID(string EmpID, string StartDate, string EndDate);
 
     }
 }

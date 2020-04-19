@@ -23,6 +23,7 @@ namespace TimeAPI.Domain
         IAdministrativeRepository AdministrativeRepository { get; }
         IDesignationRepositiory DesignationRepositiory { get; }
         ITimesheetRepository TimesheetRepository { get; }
+        ITimesheetBreakRepository TimesheetBreakRepository { get; }
         ITaskRepository TaskRepository { get; }
         ITaskTeamMembersRepository TaskTeamMembersRepository { get; }
         ISetupRepository SetupRepository { get; }
@@ -60,6 +61,8 @@ namespace TimeAPI.Domain
         IWeekdaysRepository WeekdaysRepository { get; }
         IDualApprovalRepository OrgWeekdaysRepository { get; }
         IProjectTypeRepository ProjectTypeRepository { get; }
+        IMilestoneTemplateRepository MilestoneTemplateRepository { get; }
+        ITaskTemplateRepository TaskTemplateRepository { get; }
 
         #region systemadmin
         IPlanRepository PlanRepository { get; }

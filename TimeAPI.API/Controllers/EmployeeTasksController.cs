@@ -65,17 +65,14 @@ namespace TimeAPI.API.Controllers
 
                 if (TaskViewModel.employees != null)
                 {
-                    foreach (var item in TaskViewModel.employees.empid.Distinct())
+                    foreach (var item in TaskViewModel.employees.Distinct())
                     {
-                        modal.id = Guid.NewGuid().ToString();
-                        modal.created_date = _dateTime.ToString();
-                        modal.is_deleted = false;
 
                         var TaskTeamMembers = new TaskTeamMember()
                         {
                             id = Guid.NewGuid().ToString(),
                             task_id = modal.id,
-                            empid = item,
+                            empid = item.empid,
                             createdby = modal.createdby,
                             created_date = _dateTime.ToString(),
                             is_deleted = false
@@ -110,23 +107,23 @@ namespace TimeAPI.API.Controllers
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TaskViewModel, Domain.Entities.Tasks>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Domain.Entities.Tasks>(TaskViewModel);
-                modal.modified_date = _dateTime.ToString();
 
+                modal.modified_date = _dateTime.ToString();
+                modal.is_deleted = false;
                 _unitOfWork.TaskTeamMembersRepository.RemoveByTaskID(modal.id);
 
                 if (TaskViewModel.employees != null)
                 {
-                    foreach (var item in TaskViewModel.employees.empid.Distinct())
+                    foreach (var item in TaskViewModel.employees.Distinct())
                     {
-                        modal.id = Guid.NewGuid().ToString();
-                        modal.created_date = _dateTime.ToString();
-                        modal.is_deleted = false;
+
+
 
                         var TaskTeamMembers = new TaskTeamMember()
                         {
                             id = Guid.NewGuid().ToString(),
                             task_id = modal.id,
-                            empid = item,
+                            empid = item.empid,
                             createdby = modal.createdby,
                             created_date = _dateTime.ToString(),
                             is_deleted = false
@@ -201,6 +198,7 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 var results = _unitOfWork.TaskRepository.Find(Utils.ID);
+                results.employees = _unitOfWork.TaskTeamMembersRepository.FindByTaskID(Utils.ID).ToList();
 
                 return await System.Threading.Tasks.Task.FromResult<object>(results).ConfigureAwait(false);
             }
@@ -275,9 +273,9 @@ namespace TimeAPI.API.Controllers
             if (string.IsNullOrWhiteSpace(UserID.ID))
                 throw new ArgumentNullException(nameof(UserID.ID));
 
-            var Result = _unitOfWork.TaskRepository.GetAllTaskByEmpID(UserID.ID);
+            var Result = _unitOfWork.TaskRepository.GetAllTaskByEmpID(UserID.ID, _dateTime.ToString());
             return Task.FromResult<object>(Result);
         }
-        
+
     }
 }

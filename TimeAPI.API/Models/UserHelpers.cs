@@ -18,11 +18,14 @@ using Twilio.Rest.Lookups.V1;
 using System.Text.RegularExpressions;
 using System.Text.Encodings.Web;
 using System.Net.Http;
+using TimeAPI.Domain.Entities;
+using TimeAPI.Domain.Repositories;
 
 namespace TimeAPI
 {
     public static class UserHelpers
     {
+
         public static string GetUserId(this IPrincipal principal)
         {
             var claimsIdentity = (ClaimsIdentity)principal.Identity;
@@ -297,6 +300,13 @@ namespace TimeAPI
 
             return Result;
         }
+
+        //public static IEnumerable<Subscription> GetApiKeyByUserID( string user_id)
+        //{
+        //    ISubscriptionRepository subscriptionRepository = null;
+        //    return subscriptionRepository.FindByApiKeyByUserID("da59e4af-6e4d-4818-a169-d74a90b1c2d9");
+        //}
+
     }
 
     public static class InternetTime

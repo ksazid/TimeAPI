@@ -22,7 +22,8 @@ namespace TimeAPI.Domain.Model
         //public IEnumerable<TimesheetAdministrativeDataModel> TimesheetAdministrativeDataModel { get; set; }
         public TimesheetProjectCategoryDataModel TimesheetProjectCategoryDataModel { get; set; }
         public TimesheetSearchLocationViewModel TimesheetSearchLocationViewModel { get; set; }
-        public IEnumerable<TimesheetCurrentLocationViewModel>  TimesheetCurrentLocationViewModels { get; set; }
+        public IEnumerable<TimesheetCurrentLocationViewModel> TimesheetCurrentLocationViewModels { get; set; }
+        public IEnumerable<string> Members { get; set; }
     }
 
     public class TimesheetDataModel
@@ -43,6 +44,8 @@ namespace TimeAPI.Domain.Model
         public string modified_date { get; set; }
         public string modifiedby { get; set; }
         public bool is_deleted { get; set; }
+
+        public List<ViewLogDataModel> viewLogDataModels { get; set; }
 
     }
 
@@ -114,7 +117,7 @@ namespace TimeAPI.Domain.Model
         public bool is_checkout { get; set; }
     }
 
-    public  class TimesheetAbsent
+    public class TimesheetAbsent
     {
         public string id { get; set; }
         public string full_name { get; set; }

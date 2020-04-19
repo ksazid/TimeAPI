@@ -122,18 +122,18 @@ namespace TimeAPI.Data.Repositories
                    param: new { UserID }
             );
 
-            var resultsTimesheetGrpID = Query<string>(
-                sql: @"SELECT distinct(groupid), FORMAT(CAST(timesheet.ondate AS DATETIME2), N'hh:mm tt')  from timesheet WITH (NOLOCK)
-                        WHERE empid = @empid
-                        AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') = FORMAT(CAST(@Date AS DATE), 'd', 'EN-US')
-                        AND timesheet.is_deleted = 0
-                        ORDER BY FORMAT(CAST(timesheet.ondate AS DATETIME2), N'hh:mm tt') DESC;",
-                param: new { empid = resultsEmployee.id, Date }
-            );
+            //var resultsTimesheetGrpID = Query<string>(
+            //    sql: @"SELECT distinct(groupid), FORMAT(CAST(timesheet.ondate AS DATETIME2), N'hh:mm tt')  from timesheet WITH (NOLOCK)
+            //            WHERE empid = @empid
+            //            AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') = FORMAT(CAST(@Date AS DATE), 'd', 'EN-US')
+            //            AND timesheet.is_deleted = 0
+            //            ORDER BY FORMAT(CAST(timesheet.ondate AS DATETIME2), N'hh:mm tt') DESC;",
+            //    param: new { empid = resultsEmployee.id, Date }
+            //);
 
             List<Organization> orgList = GetOrgAddress(resultsOrganization);
 
-            var RootTimesheetDataList = GetTimesheetProperty(resultsTimesheetGrpID);
+            //var RootTimesheetDataList = GetTimesheetProperty(resultsTimesheetGrpID);
 
             UserDataGroupDataSet _UserDataGroupDataSet = new UserDataGroupDataSet();
 
@@ -168,14 +168,14 @@ namespace TimeAPI.Data.Repositories
         {
 
             var resultsTimesheetGrpID = Query<string>(
-                sql: @"SELECT distinct(groupid), FORMAT(CAST(timesheet.ondate AS DATETIME2), N'hh:mm tt')  from timesheet WITH (NOLOCK)
+                sql: @"SELECT distinct(groupid), FORMAT(CAST(timesheet.ondate AS DATE), 'dd/MM/yyyy'), FORMAT(CAST(timesheet.ondate AS DATETIME2), N'hh:mm tt')  from timesheet WITH (NOLOCK)
                             INNER JOIN employee on timesheet.empid = employee.id
                             WHERE employee.org_id = @OrgID
-                            AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
-                            BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US')
-                            AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
+                            AND FORMAT(CAST(timesheet.ondate AS DATE), 'MM/dd/yyyy', 'EN-US')
+                            BETWEEN FORMAT(CAST(@fromDate AS DATE), 'MM/dd/yyyy', 'EN-US')
+                            AND FORMAT(CAST(@toDate AS DATE), 'MM/dd/yyyy', 'EN-US')
                             AND timesheet.is_deleted = 0
-                            ORDER BY FORMAT(CAST(timesheet.ondate AS DATETIME2), N'hh:mm tt') DESC;",
+                            ORDER BY FORMAT(CAST(timesheet.ondate AS DATE), 'dd/MM/yyyy') DESC;",
                 param: new { OrgID, fromDate, toDate }
             );
 
@@ -206,6 +206,7 @@ namespace TimeAPI.Data.Repositories
             foreach (var item in resultsTimesheetGrpID)
             {
                 RootTimesheetData rootTimesheetData = new RootTimesheetData();
+                List<string> MembersList = new List<string>();
 
                 //lists
                 List<TimesheetDataModel> TimesheetDataModelList = new List<TimesheetDataModel>();
@@ -213,6 +214,11 @@ namespace TimeAPI.Data.Repositories
                 List<TimesheetCurrentLocationViewModel> TimesheetCurrentLocationViewModelList = new List<TimesheetCurrentLocationViewModel>();
 
                 TimesheetDataModelList.AddRange(GetTimesheetDataModel(item));
+
+                TimesheetDataModelList.Select(d => d.viewLogDataModels = GetTimesheetActivityByGroupAndProjectID(d.groupid, "", d.ondate).ToList())
+                                            .ToList();
+
+                MembersList.AddRange(TimesheetDataModelList.Select(x => x.emp_name));
                 TimesheetTeamDataModelList.AddRange(GetTimesheetTeamDataModel(item));
                 TimesheetCurrentLocationViewModelList.AddRange(GetTimesheetCurrentLocationViewModel(item));
 
@@ -220,6 +226,7 @@ namespace TimeAPI.Data.Repositories
                 rootTimesheetData.TimesheetDataModels = TimesheetDataModelList;
                 rootTimesheetData.TimesheetProjectCategoryDataModel = GetTimesheetProjectCategoryDataModel(item);
                 rootTimesheetData.TimesheetTeamDataModels = TimesheetTeamDataModelList;
+                rootTimesheetData.Members = MembersList;
                 rootTimesheetData.TimesheetSearchLocationViewModel = GetTimesheetSearchLocationViewModel(item);
                 rootTimesheetData.TimesheetCurrentLocationViewModels = TimesheetCurrentLocationViewModelList;
                 #endregion PrivateMethods
@@ -318,6 +325,75 @@ namespace TimeAPI.Data.Repositories
                             CONVERT(CHAR(30),timesheet.ondate,131) DESC)",
                       param: new { EmpID }
                   );
+        }
+
+        public IEnumerable<ViewLogDataModel> GetTimesheetActivityByGroupAndProjectID(string GroupID, string ProjectID, string Date)
+        {
+            return Query<ViewLogDataModel>(
+                sql: @"SELECT  project_type, project_name, milestone_name, task_name, remarks, total_hrs, is_billable, ondate, start_time, end_time, groupid FROM
+					    (
+                        SELECT  
+
+								ISNULL(NULLIF(FORMAT(CAST(dbo.timesheet_activity.start_time AS DATETIME2), N'hh:mm tt'), ' '), 'NA') as start_time,  
+		                        ISNULL(NULLIF(FORMAT(CAST(dbo.timesheet_activity.end_time AS DATETIME2), N'hh:mm tt'), ' '), 'NA')   as end_time,
+								UPPER(dbo.timesheet_x_project_category.project_category_type) as project_type,
+								ISNULL(dbo.project.project_name, 'Activity') as project_name,
+								ISNULL(dbo.project_activity.activity_name, ISNULL(dbo.timesheet_activity.milestone_name, dbo.timesheet_activity.task_name)) as milestone_name,
+								ISNULL(dbo.timesheet_activity.task_name, dbo.timesheet_activity.milestone_name) as task_name,
+								remarks= dbo.timesheet_activity.remarks,
+								timesheet_activity.total_hrs,
+		                        timesheet_activity.is_billable,
+		                        FORMAT(dbo.timesheet_activity.ondate, 'dd-MM-yyyy', 'en-US') AS ondate ,
+
+								--dbo.timesheet_activity.start_time as start_time,
+								--dbo.timesheet_activity.end_time as end_time,
+								dbo.timesheet_activity.groupid as groupid
+
+								
+                                    FROM
+                                        [dbo].[timesheet_activity] WITH (NOLOCK)
+										LEFT JOIN project on project.id = [timesheet_activity].project_id 
+										LEFT JOIN project_activity on project_activity.id =[timesheet_activity].milestone_id 
+                                        LEFT JOIN task on dbo.timesheet_activity.task_id = task.id
+										INNER JOIN (select top 1 * from dbo.timesheet   where groupid IN (SELECT groupid FROM timesheet_activity 
+                                        WHERE dbo.timesheet_activity.groupid = @GroupID)) eTime
+				                        on eTime.groupid = dbo.timesheet_activity.groupid
+				                        INNER JOIN timesheet_x_project_category on timesheet_x_project_category.groupid = dbo.timesheet_activity.groupid
+                                        WHERE dbo.timesheet_activity.groupid =@GroupID
+				                        AND [dbo].[timesheet_activity].is_deleted  = 0
+                                        AND FORMAT(CAST(timesheet_activity.ondate AS DATE), 'MM/dd/yyyy', 'EN-US') = FORMAT(CAST(@Date AS DATE),  'MM/dd/yyyy', 'EN-US')
+							UNION ALL
+
+						    SELECT   
+		          
+								ISNULL(NULLIF(FORMAT(CAST(dbo.timesheet_administrative_activity.start_time AS DATETIME2), N'hh:mm tt'), ' '), 'NA') as start_time,  
+		                        ISNULL(NULLIF(FORMAT(CAST(dbo.timesheet_administrative_activity.end_time AS DATETIME2), N'hh:mm tt'), ' '), 'NA')   as end_time,
+								UPPER(dbo.timesheet_x_project_category.project_category_type) as project_type,
+								ISNULL([dbo].[administrative].administrative_name, 'NA') as project_name,
+								ISNULL( [dbo].[administrative].administrative_name, 'NA') as milestone_name,
+								ISNULL(dbo.timesheet_administrative_activity.purpose, 'NA') as task_name,
+								remarks= dbo.timesheet_administrative_activity.remarks,
+								timesheet_administrative_activity.total_hrs,
+		                        timesheet_administrative_activity.is_billable,
+		                        FORMAT(dbo.timesheet_administrative_activity.ondate, 'dd-MM-yyyy', 'en-US') AS ondate,
+								 
+								dbo.timesheet_administrative_activity.groupid as groupid
+
+                        FROM
+                            dbo.timesheet_administrative_activity WITH (NOLOCK)
+							LEFT JOIN (select top 1 * from dbo.timesheet   where groupid IN (SELECT groupid FROM timesheet_activity 
+                            WHERE dbo.timesheet_activity.groupid = @GroupID)) eTime
+	                        on eTime.groupid = dbo.timesheet_administrative_activity.groupid
+	                        inner JOIN timesheet_x_project_category on timesheet_x_project_category.groupid = dbo.timesheet_administrative_activity.groupid
+	                        left JOIN (select top 1 * from dbo.timesheet_location  WHERE groupid IN (SELECT groupid FROM timesheet_activity 
+                            WHERE dbo.timesheet_activity.groupid = @GroupID)) eTimeLocation
+	                        ON eTimeLocation.groupid = dbo.timesheet_administrative_activity.groupid
+	                        INNER JOIN  [dbo].[administrative] on   [dbo].[timesheet_administrative_activity].administrative_id = [dbo].[administrative].id 
+                            WHERE dbo.timesheet_administrative_activity.groupid =@GroupID
+	                        AND [dbo].timesheet_administrative_activity.is_deleted  = 0
+						) xDATA ORDER BY start_time ASC",
+                param: new { GroupID, ProjectID, Date }
+            );
         }
     }
 }

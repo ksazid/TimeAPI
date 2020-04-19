@@ -13,6 +13,7 @@ using TimeAPI.API.Models.TimesheetActivityCommentViewModels;
 using TimeAPI.API.Models.TimesheetActivityFileViewModels;
 using TimeAPI.API.Models.TimesheetActivityViewModels;
 using TimeAPI.API.Models.TimesheetViewModels;
+using TimeAPI.API.Models.TimesheetBreakPostViewModels;
 using TimeAPI.API.Services;
 using TimeAPI.Domain;
 using TimeAPI.Domain.Entities;
@@ -267,6 +268,7 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.TimesheetProjectCategoryRepository.RemoveByGroupID(Timesheet.groupid);
                 _unitOfWork.TimesheetActivityRepository.RemoveByGroupID(Timesheet.groupid);
                 _unitOfWork.TimesheetAdministrativeRepository.RemoveByGroupID(Timesheet.groupid);
+                _unitOfWork.TimesheetBreakRepository.RemoveByGroupID(Timesheet.groupid);
 
                 if (_unitOfWork.LocationExceptionRepository.FindByGroupID(Timesheet.groupid) != null)
                     _unitOfWork.LocationExceptionRepository.RemoveByGroupID(Timesheet.groupid);
@@ -403,6 +405,288 @@ namespace TimeAPI.API.Controllers
 
         #endregion Timesheet
 
+        #region TimesheetBreak
+
+        [HttpPost]
+        [Route("AddTimesheetBreak")]
+        public async Task<object> AddTimesheetBreak([FromBody] TimesheetBreakPostViewModel TimesheetBreakViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (TimesheetBreakViewModel == null)
+                    throw new ArgumentNullException(nameof(TimesheetBreakViewModel));
+
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetBreakPostViewModel, TimesheetBreak>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<TimesheetBreak>(TimesheetBreakViewModel);
+
+                if (TimesheetBreakViewModel.team_member_empid != null)
+                {
+                    foreach (var item in TimesheetBreakViewModel.team_member_empid.Distinct())
+                    {
+                        modal.id = Guid.NewGuid().ToString();
+                        modal.empid = item;
+                        modal.ondate = _dateTime.ToString();
+                        modal.created_date = _dateTime.ToString();
+                        modal.break_in = _dateTime.ToString();
+                        modal.is_deleted = false;
+                        modal.is_breakout = false;
+                        modal.break_out = null;
+                        modal.total_hrs = null;
+
+                        _unitOfWork.TimesheetBreakRepository.Add(modal);
+                    }
+                }
+
+                //Adding TimesheetBreak Location BreakIN
+                AddTimesheetBreakCurrentLocation(TimesheetBreakViewModel, modal);
+
+              
+
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "TimesheetBreak registered successfully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPatch]
+        [Route("UpdateTimesheetBreak")]
+        public async Task<object> UpdateAddTimesheetBreak([FromBody] TimesheetBreakPostViewModel TimesheetBreakViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (TimesheetBreakViewModel == null)
+                    throw new ArgumentNullException(nameof(TimesheetBreakViewModel));
+
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetBreakPostViewModel, TimesheetBreak>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<TimesheetBreak>(TimesheetBreakViewModel);
+                modal.modified_date = _dateTime.ToString();
+
+                #region TimesheetBreakWithTeamMembers
+
+                //Remove TeamMembers with this CurrentGroupID
+                _unitOfWork.TimesheetBreakRepository.RemoveByGroupID(modal.groupid);
+
+                foreach (var item in TimesheetBreakViewModel.team_member_empid.Distinct())
+                {
+                    modal.id = Guid.NewGuid().ToString();
+                    modal.empid = item;
+                    modal.created_date = _dateTime.ToString();
+                    modal.is_deleted = false;
+                    modal.groupid = TimesheetBreakViewModel.groupid;
+
+                    modal.modified_date = _dateTime.ToString();
+                    modal.modifiedby = modal.createdby;
+
+                    _unitOfWork.TimesheetBreakRepository.Add(modal);
+                }
+
+                #endregion TimesheetBreakWithTeamMembers
+
+                #region CurrentLocation
+
+                if (TimesheetBreakViewModel.TimesheetCurrentLocationViewModel != null)
+                {
+                    var Location = new Location
+                    {
+                        id = Guid.NewGuid().ToString(),
+                        groupid = modal.groupid,
+                        formatted_address = TimesheetBreakViewModel.TimesheetCurrentLocationViewModel.formatted_address,
+                        lat = TimesheetBreakViewModel.TimesheetCurrentLocationViewModel.lat,
+                        lang = TimesheetBreakViewModel.TimesheetCurrentLocationViewModel.lang,
+                        street_number = TimesheetBreakViewModel.TimesheetCurrentLocationViewModel.street_number,
+                        route = TimesheetBreakViewModel.TimesheetCurrentLocationViewModel.route,
+                        locality = TimesheetBreakViewModel.TimesheetCurrentLocationViewModel.locality,
+                        administrative_area_level_2 = TimesheetBreakViewModel.TimesheetCurrentLocationViewModel.administrative_area_level_2,
+                        administrative_area_level_1 = TimesheetBreakViewModel.TimesheetCurrentLocationViewModel.administrative_area_level_1,
+                        postal_code = TimesheetBreakViewModel.TimesheetCurrentLocationViewModel.postal_code,
+                        country = TimesheetBreakViewModel.TimesheetCurrentLocationViewModel.country,
+                        modified_date = _dateTime.ToString(),
+                        modifiedby = modal.createdby
+                    };
+                    _unitOfWork.LocationRepository.Add(Location);
+                }
+
+                #endregion CurrentLocation
+
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "TimesheetBreak updated successfully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("RemoveTimesheetBreak")]
+        public async Task<object> RemoveTimesheetBreak([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(paramName: nameof(Utils.ID));
+
+                var TimesheetBreak = _unitOfWork.TimesheetBreakRepository.Find(Utils.ID);
+                _unitOfWork.TimesheetBreakRepository.Remove(Utils.ID);
+                _unitOfWork.TimesheetBreakRepository.RemoveByGroupID(TimesheetBreak.groupid);
+                
+                if (_unitOfWork.LocationExceptionRepository.FindByGroupID(TimesheetBreak.groupid) != null)
+                    _unitOfWork.LocationExceptionRepository.RemoveByGroupID(TimesheetBreak.groupid);
+
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "TimesheetBreak removed successfully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("GetAllTimesheetBreaks")]
+        public async Task<object> GetAllTimesheetBreaks(CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                var result = _unitOfWork.TimesheetBreakRepository.All();
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("BreakOutByEmpIDAndGrpID")]
+        public async Task<object> BreakOutByEmpIDAndGrpID([FromBody] TimesheetBreakOutViewModel TimesheetBreakOutViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (TimesheetBreakOutViewModel == null)
+                    throw new ArgumentNullException(nameof(TimesheetBreakOutViewModel));
+
+                foreach (var item in TimesheetBreakOutViewModel.team_member_empid.Distinct())
+                {
+                    TimesheetBreak modal = new TimesheetBreak();
+
+                    modal.empid = item;
+                    modal.groupid = TimesheetBreakOutViewModel.groupid;
+
+                    var TimesheetBreak = _unitOfWork.TimesheetBreakRepository.FindTimeSheetBreakByEmpID(modal.empid, modal.groupid);
+                    if (TimesheetBreak == null)
+                    {
+                        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = "Not a valid employee", Desc = modal.empid });
+                    }
+
+                    modal.break_out = _dateTime.ToString();
+                    modal.is_deleted = false;
+
+                    var _TotalMinutes = (Convert.ToDateTime(modal.break_out) - Convert.ToDateTime(TimesheetBreak.break_in)).Ticks;
+                    TimeSpan elapsedSpan = new TimeSpan(_TotalMinutes);
+
+                    string TotalHours;
+                    string TotalMinutes;
+                    ConvertHoursAndMinutes(elapsedSpan, out TotalHours, out TotalMinutes);
+
+                    modal.total_hrs = string.Format(@"{0}:{1}", TotalHours, TotalMinutes);
+                    modal.modified_date = _dateTime.ToString();
+                    modal.is_breakout = true;
+                    modal.break_out = _dateTime.ToString();
+                    modal.modifiedby = _dateTime.ToString();
+
+                    _unitOfWork.TimesheetBreakRepository.BreakOutByEmpIDAndGrpID(modal);
+                }
+
+                #region Location
+
+                if (TimesheetBreakOutViewModel.TimesheetCurrentLocationViewModel != null)
+                {
+                    var Location = new Location
+                    {
+                        id = Guid.NewGuid().ToString(),
+                        groupid = TimesheetBreakOutViewModel.groupid,
+                        formatted_address = TimesheetBreakOutViewModel.TimesheetCurrentLocationViewModel.formatted_address,
+                        lat = TimesheetBreakOutViewModel.TimesheetCurrentLocationViewModel.lat,
+                        lang = TimesheetBreakOutViewModel.TimesheetCurrentLocationViewModel.lang,
+                        street_number = TimesheetBreakOutViewModel.TimesheetCurrentLocationViewModel.street_number,
+                        route = TimesheetBreakOutViewModel.TimesheetCurrentLocationViewModel.route,
+                        locality = TimesheetBreakOutViewModel.TimesheetCurrentLocationViewModel.locality,
+                        administrative_area_level_2 = TimesheetBreakOutViewModel.TimesheetCurrentLocationViewModel.administrative_area_level_2,
+                        administrative_area_level_1 = TimesheetBreakOutViewModel.TimesheetCurrentLocationViewModel.administrative_area_level_1,
+                        postal_code = TimesheetBreakOutViewModel.TimesheetCurrentLocationViewModel.postal_code,
+                        country = TimesheetBreakOutViewModel.TimesheetCurrentLocationViewModel.country,
+                        is_checkout = true,
+                        created_date = _dateTime.ToString(),
+                        createdby = TimesheetBreakOutViewModel.modifiedby
+                    };
+
+                    _unitOfWork.LocationRepository.Add(Location);
+                }
+
+            
+
+                #endregion Location
+
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Checkout Successfully", Desc = "Checkout Successfully" }).ConfigureAwait(true);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("FindLastTimeSheetBreakByEmpIDAndGrpID")]
+        public async Task<object> FindLastTimeSheetBreakByEmpIDAndGrpID([FromBody] UtilsEmpIDAndGrpID utils ,CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+
+                if (utils == null)
+                    throw new ArgumentNullException(nameof(utils));
+
+                var result = _unitOfWork.TimesheetBreakRepository.FindLastTimeSheetBreakByEmpIDAndGrpID(utils.EmpID, utils.GrpID);
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+        
+        #endregion TimesheetBreak
+
         #region TimesheetActivity
 
         [HttpPost]
@@ -439,6 +723,20 @@ namespace TimeAPI.API.Controllers
                 ConvertHoursAndMinutes(elapsedSpan, out TotalHours, out TotalMinutes);
 
                 modal.total_hrs = string.Format(@"{0}:{1}", TotalHours, TotalMinutes);
+
+                //update status
+                if (timesheetActivityViewModel.status_id != null)
+                {
+                    var modalTasks = new Domain.Entities.Tasks()
+                    {
+                        id = timesheetActivityViewModel.task_id,
+                        status_id = timesheetActivityViewModel.status_id,
+                        modifiedby = timesheetActivityViewModel.modifiedby,
+                        modified_date = _dateTime.ToString()
+                    };
+                    _unitOfWork.TaskRepository.UpdateTaskStatus(modalTasks);
+                }
+
                 _unitOfWork.TimesheetActivityRepository.Add(modal);
                 _unitOfWork.Commit();
 
@@ -551,11 +849,19 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                oDataTable _oDataTable = new oDataTable();
                 var result = _unitOfWork.TimesheetActivityRepository.GetTimesheetActivityByGroupAndProjectID(Utils.GroupID, Utils.ProjectID, Utils.Date.ToString());
-                var xResult = _oDataTable.ToDataTable(result);
+                var GroupID = result.Select(x => x.groupid).ToList();
 
-                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
+                for (int i = 0; i < GroupID.Count(); i++)
+                {
+                    var Members = String.Join(", ", _unitOfWork.TimesheetRepository.GetAllEmpByGroupID(GroupID[i]));
+                        
+                        result.Where(usr => usr.groupid == GroupID[i])
+                       .Select(usr => { usr.members = Members; return usr; })
+                       .ToList();
+                }
+
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(result, Formatting.Indented)).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -574,9 +880,18 @@ namespace TimeAPI.API.Controllers
 
                 oDataTable _oDataTable = new oDataTable();
                 var result = _unitOfWork.TimesheetActivityRepository.GetTimesheetActivityByEmpID(Utils.EmpID, Utils.StartDate, Utils.EndDate);
-                var xResult = _oDataTable.ToDataTable(result);
 
-                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
+                var GroupID = result.Select(x => x.groupid).ToList();
+                for (int i = 0; i < GroupID.Count; i++)
+                {
+                    var Members = String.Join(", ", _unitOfWork.TimesheetRepository.GetAllEmpByGroupID(GroupID[i]));
+
+                    result.Where(usr => usr.groupid == GroupID[i])
+                   .Select(usr => { usr.members = Members; return usr; })
+                   .ToList();
+                }
+
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(result, Formatting.Indented)).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -1086,6 +1401,38 @@ namespace TimeAPI.API.Controllers
             #endregion CurrentLocation
         }
 
+        private void AddTimesheetBreakCurrentLocation(TimesheetBreakPostViewModel timesheetViewModel, TimesheetBreak modal)
+        {
+            #region CurrentLocation
+
+            if (timesheetViewModel.TimesheetCurrentLocationViewModel != null)
+            {
+                var Location = new Location
+                {
+                    id = Guid.NewGuid().ToString(),
+                    groupid = modal.groupid,
+                    geo_address = timesheetViewModel.TimesheetCurrentLocationViewModel.geo_address,
+                    formatted_address = timesheetViewModel.TimesheetCurrentLocationViewModel.formatted_address,
+                    lat = timesheetViewModel.TimesheetCurrentLocationViewModel.lat,
+                    lang = timesheetViewModel.TimesheetCurrentLocationViewModel.lang,
+                    street_number = timesheetViewModel.TimesheetCurrentLocationViewModel.street_number,
+                    route = timesheetViewModel.TimesheetCurrentLocationViewModel.route,
+                    locality = timesheetViewModel.TimesheetCurrentLocationViewModel.locality,
+                    administrative_area_level_2 = timesheetViewModel.TimesheetCurrentLocationViewModel.administrative_area_level_2,
+                    administrative_area_level_1 = timesheetViewModel.TimesheetCurrentLocationViewModel.administrative_area_level_1,
+                    postal_code = timesheetViewModel.TimesheetCurrentLocationViewModel.postal_code,
+                    country = timesheetViewModel.TimesheetCurrentLocationViewModel.country,
+                    is_deleted = false,
+                    is_checkout = false,
+                    created_date = _dateTime.ToString(),
+                    createdby = modal.createdby
+                };
+                _unitOfWork.LocationRepository.Add(Location);
+            }
+
+            #endregion CurrentLocation
+        }
+
         private void AddTimesheetLocationException(TimesheetPostViewModel timesheetViewModel, Timesheet modal)
         {
             #region CurrentLocationException
@@ -1163,5 +1510,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
+
     }
 }
