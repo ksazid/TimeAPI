@@ -72,6 +72,11 @@ namespace TimeAPI.Data
         private IProjectTypeRepository _projectTypeRepository;
         private IMilestoneTemplateRepository _milestoneTemplateRepository;
         private ITaskTemplateRepository _taskTemplateRepository;
+        private ICostProjectRepository _costProjectRepository;
+        private ICostProjectMilestoneRepository _costProjectMilestoneRepository;
+        private ICostProjectTaskRepository _costProjectTaskRepository;
+
+
 
         #region systemadmin
         private IPlanRepository _planRepository;
@@ -551,7 +556,6 @@ namespace TimeAPI.Data
             }
         }
 
-
         public IDelegationsRepository DelegationsRepository
         {
             get
@@ -624,7 +628,6 @@ namespace TimeAPI.Data
             }
         }
 
-
         public ITimesheetBreakRepository TimesheetBreakRepository
         {
             get
@@ -633,7 +636,6 @@ namespace TimeAPI.Data
                     ?? (_timesheetBreakRepository = new TimesheetBreakRepository(_transaction));
             }
         }
-
 
         public IMilestoneTemplateRepository MilestoneTemplateRepository
         {
@@ -652,6 +654,35 @@ namespace TimeAPI.Data
                     ?? (_taskTemplateRepository = new TaskTemplateRepository(_transaction));
             }
         }
+
+        public ICostProjectRepository CostProjectRepository
+        {
+            get
+            {
+                return _costProjectRepository
+                    ?? (_costProjectRepository = new CostProjectRepository(_transaction));
+            }
+        }
+
+        public ICostProjectMilestoneRepository CostProjectMilestoneRepository
+        {
+            get
+            {
+                return _costProjectMilestoneRepository
+                    ?? (_costProjectMilestoneRepository = new CostProjectMilestoneRepository(_transaction));
+            }
+        }
+
+        public ICostProjectTaskRepository CostProjectTaskRepository
+        {
+            get
+            {
+                return _costProjectTaskRepository
+                    ?? (_costProjectTaskRepository = new CostProjectTaskRepository(_transaction));
+            }
+        }
+ 
+
 
         public bool Commit()
         {
@@ -680,6 +711,7 @@ namespace TimeAPI.Data
             dispose(true);
             GC.SuppressFinalize(this);
         }
+
         #endregion
 
         #region Private Methods

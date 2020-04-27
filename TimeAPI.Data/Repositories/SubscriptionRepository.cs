@@ -82,6 +82,33 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
+        public Subscription GetByApiKeyByUserID(string user_id)
+        {
+            Subscription _Subscription = new Subscription();
+            var result = QuerySingleOrDefault<Subscription>(
+                sql: "SELECT * FROM dbo.subscription WHERE user_id = @user_id and is_deleted = 0",
+                param: new { user_id }
+                );
+            _Subscription = result;
+
+            if (result == null)
+            {
+                var xresult =  QuerySingleOrDefault<Subscription>(
+                    sql: @"SELECT subscription.* FROM subscription
+                            INNER JOIN organization on  subscription.api_key = organization.subscription_key
+                            INNER JOIN employee on  organization.org_id = employee.org_id
+                            WHERE employee.user_id = @user_id
+                            AND subscription.is_deleted = 0
+                            AND organization.is_deleted = 0
+                            AND employee.is_deleted = 0",
+                    param: new { user_id }
+                    );
+                _Subscription = xresult;
+            }
+
+            return _Subscription;
+        }
+
         //public Subscription FindByApiKeyOrgID(string org_id)
         //{
         //    return QuerySingleOrDefault<Subscription>(

@@ -1,4 +1,5 @@
-﻿using TimeAPI.Domain.Entities;
+﻿using System.Collections.Generic;
+using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Model;
 
 namespace TimeAPI.Domain.Repositories
@@ -20,7 +21,7 @@ namespace TimeAPI.Domain.Repositories
         dynamic GetTimesheetActivityByGroupAndDate(string GroupID, string Date);
         dynamic AllProjectRatioByOrgID(string OrgID);
         dynamic GetAllTimesheetRecentActivityList(string OrgID, string toDate, string fromDate);
-
+        dynamic GetAllSingleCheckInEmployeesForHangFireJobs(string OrgID, string toDate, string fromDate);
 
     }
 }

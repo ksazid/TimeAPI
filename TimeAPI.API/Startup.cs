@@ -25,6 +25,9 @@ using System.IO;
 using TimeAPI.API.Filters;
 using System.Linq;
 using Newtonsoft.Json.Serialization;
+using Hangfire;
+using Hangfire.MemoryStorage;
+using TimeAPI.API.HangfireJobs;
 //using Hangfire;
 //using Hangfire.MemoryStorage;
 
@@ -108,6 +111,7 @@ namespace TimeAPI.API
             services.AddScoped<IUnitOfWork, DapperUnitOfWork>(provider => new DapperUnitOfWork(Configuration.GetConnectionString("DefaultConnection")));
             services.AddTransient<IEmailSender, EmailSender>();
             services.AddTransient<ISmsSender, SmsSender>();
+            services.AddSingleton<IJobVerification, JobVerification>();
 
             services.AddSwaggerGen(c =>
             {
@@ -184,18 +188,20 @@ namespace TimeAPI.API
             services.Configure<SecurityStampValidatorOptions>(o => o.ValidationInterval = TimeSpan.FromDays(5));
 
             //services.AddHangfire(x => x.UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnection")));
-            //services.AddHangfire(config=>
-            //        config.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-            //        .UseSimpleAssemblyNameTypeSerializer()
-            //        .UseDefaultTypeSerializer()
-            //        .UseMemoryStorage());
+            services.AddHangfire(config =>
+                    config.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                    .UseSimpleAssemblyNameTypeSerializer()
+                    .UseDefaultTypeSerializer()
+                    .UseMemoryStorage());
 
-            //services.AddHangfireServer();
+            services.AddHangfireServer();
 
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, 
+                            IRecurringJobManager recurringJobManager, 
+                            IServiceProvider  serviceProvider )
         {
             //app.UseHangfireDashboard();
 
@@ -246,8 +252,12 @@ namespace TimeAPI.API
 
             });
 
-            //app.UseHangfireDashboard();
-            //backgroundJobClient.Enqueue(() => Console.WriteLine("Hello World"));
+            app.UseHangfireDashboard();
+            //recurringJobManager.AddOrUpdate("run every minute", 
+            //    ()=> serviceProvider.GetService<IJobVerification>().SendVerficationEmailConfirmationAsync(),
+            //    "* * * * *"
+                
+            //    );
 
 
         }

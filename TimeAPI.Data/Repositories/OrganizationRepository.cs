@@ -17,9 +17,9 @@ namespace TimeAPI.Data.Repositories
             entity.org_id = ExecuteScalar<string>(
                     sql: @"
                     INSERT INTO dbo.organization
-                            (org_id, user_id, org_name, type, other_type, summary, img_url, img_name, country_id, adr1, adr2, city, primary_cont_name,
+                            (org_id, user_id, subscription_key, org_name, type, other_type, summary, img_url, img_name, country_id, adr1, adr2, city, primary_cont_name,
                                 primary_cont_type, time_zone_id, created_date, createdby)
-                    VALUES (@org_id, @user_id, @org_name, @type, @other_type, @summary, @img_url, @img_name, @country_id, @adr1, @adr2, @city, @primary_cont_name,
+                    VALUES (@org_id, @user_id, @subscription_key, @org_name, @type, @other_type, @summary, @img_url, @img_name, @country_id, @adr1, @adr2, @city, @primary_cont_name,
                                @primary_cont_type, @time_zone_id, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
@@ -33,6 +33,7 @@ namespace TimeAPI.Data.Repositories
                             dbo.organization.org_id
                           , organization_branch.parent_org_id
                           , dbo.organization.user_id
+                          , dbo.organization.subscription_key
                           , dbo.organization.org_name
                           , dbo.organization.type
                           , dbo.organization.other_type

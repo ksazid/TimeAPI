@@ -114,7 +114,8 @@ namespace TimeAPI.Data.Repositories
                             task.assigned_empid as assigned_empid,
                             x.first_name as assignedto,
                             dbo.priority.priority_name,
-                            dbo.status.status_name
+                            dbo.status.status_name,
+                            dbo.status.id as status_id
                         FROM dbo.task WITH (NOLOCK)
                             INNER join dbo.project_activity_x_task on task.id = dbo.project_activity_x_task.task_id
                             INNER JOIN dbo.project_activity on [project_activity_x_task].activity_id = dbo.project_activity.id

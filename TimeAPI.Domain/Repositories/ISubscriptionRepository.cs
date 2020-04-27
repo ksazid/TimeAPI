@@ -9,5 +9,7 @@ namespace TimeAPI.Domain.Repositories
     {
         IEnumerable<Subscription> FindByApiKeyByUserID(string user_id);
         //Subscription FindByApiKeyOrgID(string org_id);
+        Subscription GetByApiKeyByUserID(string user_id);
     }
+
 }

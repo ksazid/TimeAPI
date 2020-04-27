@@ -59,6 +59,7 @@ namespace TimeAPI.API.Controllers
                 modal.createdby = organizationViewModel.createdby;
                 modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
+                modal.subscription_key = organizationViewModel.subscription_key;
 
                 //SuperAdminXOrg
                 var result = _unitOfWork.EmployeeRepository.FindByEmpUserID(modal.user_id);
@@ -365,54 +366,54 @@ namespace TimeAPI.API.Controllers
         #region helper
 
         //not in use
-        [HttpPost]
-        [Route("AddOrganizationBranch")]
-        public async Task<object> AddOrganizationBranch([FromBody] OrganizationBranchViewModel organizationBranchViewModel, CancellationToken cancellationToken)
-        {
-            try
-            {
-                if (cancellationToken != null)
-                    cancellationToken.ThrowIfCancellationRequested();
+        //[HttpPost]
+        //[Route("AddOrganizationBranch")]
+        //public async Task<object> AddOrganizationBranch([FromBody] OrganizationBranchViewModel organizationBranchViewModel, CancellationToken cancellationToken)
+        //{
+        //    try
+        //    {
+        //        if (cancellationToken != null)
+        //            cancellationToken.ThrowIfCancellationRequested();
 
-                if (organizationBranchViewModel == null)
-                    throw new ArgumentNullException(nameof(organizationBranchViewModel));
+        //        if (organizationBranchViewModel == null)
+        //            throw new ArgumentNullException(nameof(organizationBranchViewModel));
 
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationBranchViewModel, Organization>());
-                var mapper = config.CreateMapper();
-                var modal = mapper.Map<Organization>(organizationBranchViewModel);
+        //        var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationBranchViewModel, Organization>());
+        //        var mapper = config.CreateMapper();
+        //        var modal = mapper.Map<Organization>(organizationBranchViewModel);
 
-                modal.org_id = Guid.NewGuid().ToString();
-                modal.created_date = _dateTime.ToString();
-                modal.is_deleted = false;
+        //        modal.org_id = Guid.NewGuid().ToString();
+        //        modal.created_date = _dateTime.ToString();
+        //        modal.is_deleted = false;
 
-                if (organizationBranchViewModel.EntityLocationViewModel != null)
-                {
-                    var OrgLocation = SetLocationForOrg(organizationBranchViewModel.EntityLocationViewModel, modal.org_id.ToString());
-                    OrgLocation.createdby = organizationBranchViewModel.createdby;
-                    _unitOfWork.EntityLocationRepository.Add(OrgLocation);
-                }
+        //        if (organizationBranchViewModel.EntityLocationViewModel != null)
+        //        {
+        //            var OrgLocation = SetLocationForOrg(organizationBranchViewModel.EntityLocationViewModel, modal.org_id.ToString());
+        //            OrgLocation.createdby = organizationBranchViewModel.createdby;
+        //            _unitOfWork.EntityLocationRepository.Add(OrgLocation);
+        //        }
 
-                var OrgBranch = new OrganizationBranch()
-                {
-                    id = Guid.NewGuid().ToString(),
-                    parent_org_id = organizationBranchViewModel.parent_org_id,
-                    org_id = modal.org_id,
-                    createdby = organizationBranchViewModel.createdby,
-                    created_date = _dateTime.ToString(),
-                    is_deleted = false
-                };
+        //        var OrgBranch = new OrganizationBranch()
+        //        {
+        //            id = Guid.NewGuid().ToString(),
+        //            parent_org_id = organizationBranchViewModel.parent_org_id,
+        //            org_id = modal.org_id,
+        //            createdby = organizationBranchViewModel.createdby,
+        //            created_date = _dateTime.ToString(),
+        //            is_deleted = false
+        //        };
 
-                _unitOfWork.OrganizationRepository.Add(modal);
-                _unitOfWork.OrganizationBranchRepository.Add(OrgBranch);
-                _unitOfWork.Commit();
+        //        _unitOfWork.OrganizationRepository.Add(modal);
+        //        _unitOfWork.OrganizationBranchRepository.Add(OrgBranch);
+        //        _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Organization Added successfully." }).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-            }
-        }
+        //        return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Organization Added successfully." }).ConfigureAwait(false);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+        //    }
+        //}
 
         private EntityLocation SetLocationForOrg(EntityLocation OrgLocation, string OrgID)
         {
@@ -449,6 +450,7 @@ namespace TimeAPI.API.Controllers
                     if (modalBranch.org_id == null)
                     {
                         modalBranch.org_id = Guid.NewGuid().ToString();
+                        modalBranch.subscription_key = organizationViewModel.subscription_key;
                         modalBranch.createdby = organizationViewModel.createdby;
                         modalBranch.created_date = _dateTime.ToString();
                         modalBranch.is_deleted = false;

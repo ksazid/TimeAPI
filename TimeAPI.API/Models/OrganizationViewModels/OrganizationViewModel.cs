@@ -12,6 +12,7 @@ namespace TimeAPI.API.Models.OrganizationViewModels
     {
         public string org_id { get; set; }
         public string user_id { get; set; }
+        public string subscription_key { get; set; }
         public string org_name { get; set; }
         public string type { get; set; }
         public string other_type { get; set; }

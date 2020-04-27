@@ -15,6 +15,10 @@ namespace TimeAPI.Domain.Entities
         public string date_format { get; set; }
         public string currency { get; set; }
         public string time_zome { get; set; }
+        public bool is_location_validation_req { get; set; }
+        public string hours_frequency { get; set; }
+        public bool is_autocheckout_allowed { get; set; }
+        public string hours_after_working_hours { get; set; }
         public string created_date { get; set; }
         public string createdby { get; set; }
         public string modified_date { get; set; }

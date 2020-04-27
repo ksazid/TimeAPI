@@ -930,6 +930,79 @@ namespace TimeAPI.Data.Repositories
             return resultsAspNetUsers;
         }
 
+        public dynamic GetAllSingleCheckInEmployeesForHangFireJobs(string org_id, string fromDate, string toDate)
+        {
+            List<DateTime> Dates = Enumerable.Range(0, (Convert.ToDateTime(toDate) - Convert.ToDateTime(fromDate)).Days + 1)
+                              .Select(d => Convert.ToDateTime(fromDate).AddDays(d)).ToList();
+            List<DateTime> ExceptOffDays = ExceptOffDaysDates(org_id, fromDate, toDate);
+            List<string> OffDays = OffDaysDates(org_id, fromDate, toDate);
+            List<AttendedEmployee> AttendedEmployeeList = new List<AttendedEmployee>();
+
+            for (int i = 0; i < Dates.Count; i++)
+            {
+                var xdate = OffDays.Any(b => b.Contains(Dates[i].ToString()));
+                List<ResultSingleCheckin> ResultSingleCheckinList = new List<ResultSingleCheckin>();
+
+                var ResultSingleList = SingleFirstCheckINResult(org_id, Dates[i], xdate);
+                ResultSingleCheckinList.AddRange(ResultSingleList);
+
+                var REST = ResultSingleCheckinList.Cast<ResultSingleCheckin>().ToList();
+
+                for (int x = 0; x < REST.Count(); x++)
+                {
+
+                    var resultsAspNetUsers = Query<AttendedEmployee>(
+                        sql: @"SELECT
+                        ROW_NUMBER() OVER (ORDER BY full_name) AS rowno,
+                        project_category_type, project_or_comp_name,
+                        timesheet_id, groupid, is_checkout,
+                        employee_id, full_name, check_in,
+                        check_out, total_hrs, lat, lang, ondate
+
+                FROM (
+
+                    SELECT
+                        timesheet_x_project_category.project_category_type,
+                        timesheet_x_project_category.project_or_comp_name,
+                        timesheet.id as timesheet_id,
+                        timesheet.groupid as groupid,
+                        employee.id as employee_id,
+                        eTime.lat as lat,
+                        eTime.lang as lang,
+                        eTime.is_checkout as is_checkout,
+                        employee.full_name,
+                        employee_type.employee_type_name as employee_type_name,
+                        employee.workemail as workemail,
+                        employee.emp_code as emp_code,
+                        employee.phone as phone,
+                        FORMAT(CAST(timesheet.check_in AS DATETIME2), N'hh:mm tt') as check_in,
+                        ISNULL(FORMAT(CAST(timesheet.check_out AS DATETIME2), N'hh:mm tt'), 'NA') as check_out,
+                        ISNULL(total_hrs, 'NA') as total_hrs,
+                        FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US')  as ondate
+                        FROM timesheet WITH (NOLOCK)
+                        INNER JOIN employee ON timesheet.empid = employee.id
+                        LEFT JOIN employee_type ON employee.emp_type_id = employee_type.id
+                        INNER JOIN timesheet_x_project_category on timesheet.groupid = timesheet_x_project_category.groupid
+                        INNER JOIN (select distinct(groupid), location.lat, location.lang, location.is_checkout
+                        from dbo.location  where groupid IN (SELECT groupid FROM timesheet) and is_checkout = 0) eTime
+                        ON eTime.groupid = dbo.timesheet.groupid
+              WHERE employee.id = @emp
+						AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
+						BETWEEN FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
+                        AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US')
+                        AND timesheet.is_deleted = 0) 
+						
+						REALDATA ORDER BY  CAST(check_in as datetime)",
+                        param: new { emp = REST[x].empid, date = Dates[i] }
+                    );
+
+                    AttendedEmployeeList.AddRange(resultsAspNetUsers);
+                }
+            }
+
+            return AttendedEmployeeList;
+        }
+
 
         #region PrivateMethods
 
@@ -1342,7 +1415,5 @@ namespace TimeAPI.Data.Repositories
         public string empid { get; set; }
         public string time { get; set; }
     }
-
-
 
 }
