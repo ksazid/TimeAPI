@@ -28,6 +28,8 @@ using Newtonsoft.Json.Serialization;
 using Hangfire;
 using Hangfire.MemoryStorage;
 using TimeAPI.API.HangfireJobs;
+using Microsoft.AspNetCore.ResponseCompression;
+using System.IO.Compression;
 //using Hangfire;
 //using Hangfire.MemoryStorage;
 
@@ -106,6 +108,29 @@ namespace TimeAPI.API
               .AddDefaultTokenProviders();
             //.AddDefaultTokenProviders(provider => new LifetimeValidator(TimeSpan.FromDays(2)));
 
+
+            services.Configure<GzipCompressionProviderOptions>(options => options.Level = CompressionLevel.Optimal);
+            services.AddResponseCompression(options =>
+            {
+                options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[]
+                            {
+                                "text/plain",
+                                "text/css",
+                                "application/javascript",
+                                "text/html",
+                                "application/xml",
+                                "text/xml",
+                                "application/json",
+                                "text/json",
+                                // Custom
+                                "image/svg+xml"
+                            });
+
+                options.Providers.Add<GzipCompressionProvider>();
+
+            });
+            services.AddMemoryCache();
+            services.AddSession();
 
             // Add application services.
             services.AddScoped<IUnitOfWork, DapperUnitOfWork>(provider => new DapperUnitOfWork(Configuration.GetConnectionString("DefaultConnection")));
@@ -253,10 +278,9 @@ namespace TimeAPI.API
             });
 
             app.UseHangfireDashboard();
-            //recurringJobManager.AddOrUpdate("run every minute", 
-            //    ()=> serviceProvider.GetService<IJobVerification>().SendVerficationEmailConfirmationAsync(),
+            //recurringJobManager.AddOrUpdate("run every minute",
+            //    () => serviceProvider.GetService<IJobVerification>().SendVerficationEmailConfirmationAsync(),
             //    "* * * * *"
-                
             //    );
 
 

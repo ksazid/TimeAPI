@@ -62,6 +62,15 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
+
+        public IEnumerable<PlanFeature> GetPlanFeatureByPlanID(string plan_id)
+        {
+            return Query<PlanFeature>(
+                sql: "SELECT * FROM dbo.saas_plan_features where is_deleted = 0 and plan_id = @plan_id",
+                  param: new { plan_id }
+            );
+        }
+
         public dynamic GetAllPlanFeatures()
         {
             return Query<dynamic>(

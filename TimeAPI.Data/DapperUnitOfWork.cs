@@ -76,7 +76,16 @@ namespace TimeAPI.Data
         private ICostProjectMilestoneRepository _costProjectMilestoneRepository;
         private ICostProjectTaskRepository _costProjectTaskRepository;
 
+        private ITypeOfDesignRepository _typeOfDesignRepository;
+        private ISpecifiationRepository _specifiationRepository;
+        private IUnitDescriptionRepository _unitDescriptionRepository;
+        private ITypeOfUnitRepository _typeOfUnitRepository;
 
+
+        private IProjectTagsRepository _projectTagsRepository;
+        private IProjectUnitRepository _projectUnitRepository;
+        private IProjectDesignTypeRepository _projectDesignTypeRepository;
+        
 
         #region systemadmin
         private IPlanRepository _planRepository;
@@ -681,8 +690,69 @@ namespace TimeAPI.Data
                     ?? (_costProjectTaskRepository = new CostProjectTaskRepository(_transaction));
             }
         }
- 
 
+        public ITypeOfDesignRepository TypeOfDesignRepository
+        {
+            get
+            {
+                return _typeOfDesignRepository
+                    ?? (_typeOfDesignRepository = new TypeOfDesignRepository(_transaction));
+            }
+        }
+
+        public ISpecifiationRepository SpecifiationRepository
+        {
+            get
+            {
+                return _specifiationRepository
+                    ?? (_specifiationRepository = new SpecifiationRepository(_transaction));
+            }
+        }
+
+        public IUnitDescriptionRepository UnitDescriptionRepository
+        {
+            get
+            {
+                return _unitDescriptionRepository
+                    ?? (_unitDescriptionRepository = new UnitDescriptionRepository(_transaction));
+            }
+        }
+
+        public ITypeOfUnitRepository TypeOfUnitRepository
+        {
+            get
+            {
+                return _typeOfUnitRepository
+                    ?? (_typeOfUnitRepository = new TypeOfUnitRepository(_transaction));
+            }
+        }
+
+        public IProjectTagsRepository ProjectTagsRepository
+        {
+            get
+            {
+                return _projectTagsRepository
+                    ?? (_projectTagsRepository = new ProjectTagsRepository(_transaction));
+            }
+        }
+
+        public IProjectUnitRepository ProjectUnitRepository
+        {
+            get
+            {
+                return _projectUnitRepository
+                    ?? (_projectUnitRepository = new ProjectUnitRepository(_transaction));
+            }
+        }
+
+        public IProjectDesignTypeRepository ProjectDesignTypeRepository
+        {
+            get
+            {
+                return _projectDesignTypeRepository
+                    ?? (_projectDesignTypeRepository = new ProjectDesignTypeRepository(_transaction));
+            }
+        }
 
         public bool Commit()
         {

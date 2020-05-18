@@ -9,5 +9,6 @@ namespace TimeAPI.Domain.Repositories
     {
         IEnumerable<PlanPrice>  FindPlanPriceByPlanID(string PlanID);
         string  GetPlanIDByPlanName(string PlanName);
+
     }
 }

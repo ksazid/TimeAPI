@@ -6,6 +6,10 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using TimeAPI.API.Models.PlanFeatureViewModels;
+using TimeAPI.API.Models.PlanPriceViewModels;
+using TimeAPI.API.Models.PlanViewModels;
+using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.API.Models
 {
@@ -19,6 +23,19 @@ namespace TimeAPI.API.Models
         public string ID { get; set; }
         public string Date { get; set; }
 
+    }
+
+    public class RootPlanDetails
+    {
+        public List<RootPlanViewModel> PlanViewModel { get; set; }
+    }
+    public class RootPlanViewModel
+    {
+        public string id { get; set; }
+        public string plan_name { get; set; }
+        public string plan_desc { get; set; }
+        public List<PlanPrice> _PlanPriceViewModel { get; set; }
+        public List<PlanFeature> _PlanFeatureViewModel { get; set; }
     }
 
     public class UtilsOrgID
@@ -99,7 +116,7 @@ namespace TimeAPI.API.Models
     }
 
 
-   
+
 
     public class UtilPhoneResult
     {
@@ -188,7 +205,7 @@ namespace TimeAPI.API.Models
 
 }
 
-namespace TimeAPI.API 
+namespace TimeAPI.API
 {
     public static class StaticUtils
     {

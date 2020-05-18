@@ -62,6 +62,16 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
+        public IEnumerable<PlanPrice> GetPlanPriceByPlanID(string plan_id)
+        {
+            return Query<PlanPrice>(
+                sql: "SELECT * FROM dbo.saas_plan_price where is_deleted = 0 and plan_id = @plan_id",
+                  param: new { plan_id }
+            );
+        }
+
+
+
         public dynamic GetAllPlanPrice()
         {
             return Query<dynamic>(

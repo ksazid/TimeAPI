@@ -7,7 +7,7 @@ using TimeAPI.Domain.Model;
 
 namespace TimeAPI.Domain.Repositories
 {
-    public interface ICostProjectTaskRepository : IRepository<CostProjectTask, string>
+    public interface IUnitDescriptionRepository : IRepository<UnitDescription, string>
     {
         //dynamic FindByTaskDetailsByEmpID(string empid);
 
@@ -16,7 +16,6 @@ namespace TimeAPI.Domain.Repositories
         //RootEmployeeTask GetAllTaskByEmpID(string empid, string date);
 
         //RootEmployeeTask GetAllTaskByOrgAndEmpID(string key, string EmpID);
-        IEnumerable<CostProjectTask> GetAllStaticMilestoneTasksByMilestoneID(string MilestoneID);
-        IEnumerable<CostProjectTask> GetAllMilestoneTasksByMilestoneID(string MilestoneID);
+        IEnumerable<UnitDescription> FetchAllUnitDescriptionByOrgID(string OrgID);
     }
 }

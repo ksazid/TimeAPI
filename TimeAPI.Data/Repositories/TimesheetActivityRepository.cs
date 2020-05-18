@@ -146,7 +146,7 @@ namespace TimeAPI.Data.Repositories
 				                        INNER JOIN timesheet_x_project_category on timesheet_x_project_category.groupid = dbo.timesheet_activity.groupid
                                         WHERE dbo.timesheet_activity.groupid =@GroupID
 				                        AND [dbo].[timesheet_activity].is_deleted  = 0
-                                        AND FORMAT(CAST(timesheet_activity.ondate AS DATE), 'd', 'EN-US') = FORMAT(CAST(@Date AS DATE), 'd', 'EN-US')
+                                        AND FORMAT(CAST(timesheet_activity.ondate AS DATE), 'MM/dd/yyyy', 'EN-US') = FORMAT(CAST(@Date AS DATE), 'MM/dd/yyyy', 'EN-US')
 							UNION ALL
 
 						    SELECT   
@@ -189,9 +189,9 @@ namespace TimeAPI.Data.Repositories
             var List = Query<string>(
               sql: @"select distinct(groupid) from timesheet
                         WHERE empid = @EmpID
-                        AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
-                        BETWEEN FORMAT(CAST(@StartDate AS DATE), 'd', 'EN-US') 
-                        AND FORMAT(CAST(@EndDate AS DATE), 'd', 'EN-US')",
+                        AND FORMAT(CAST(timesheet.ondate AS DATE), 'MM/dd/yyyy', 'EN-US')
+                        BETWEEN FORMAT(CAST(@StartDate AS DATE), 'MM/dd/yyyy', 'EN-US') 
+                        AND FORMAT(CAST(@EndDate AS DATE), 'MM/dd/yyyy', 'EN-US')",
                         param: new { EmpID, StartDate, EndDate }
               );
 

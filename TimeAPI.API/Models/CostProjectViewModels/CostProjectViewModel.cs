@@ -14,18 +14,21 @@ namespace TimeAPI.API.Models.CostProjectViewModels
         public string cst_id { get; set; }
         public string project_type_id { get; set; }
         public string project_name { get; set; }
-        public string project_desc { get; set; }
-        public string start_date { get; set; }
-        public string end_date { get; set; }
-        public string completed_date { get; set; }
-        public string project_status_id { get; set; }
+
+        //public string project_desc { get; set; }
+        //public string start_date { get; set; }
+        //public string end_date { get; set; }
+        //public string completed_date { get; set; }
+        //public string project_status_id { get; set; }
         public string project_prefix { get; set; }
-        public bool is_private { get; set; }
-        public bool is_public { get; set; }
-        public bool is_inactive { get; set; }
+        public bool is_site_visit { get; set; }
+        public string no_of_floors { get; set; }
+        public bool is_boq { get; set; }
         public string createdby { get; set; }
-        public List<CostProjectMilestone> CostProjectMilestone { get; set; }
+        public IEnumerable<TypeOfDesign> TypeOfDesign { get; set; }
+        public List<ProjectUnit> ProjectUnit { get; set; }
         public EntityContact EntityContact { get; set; }
+        public List<CostProjectMilestone> CostProjectMilestone { get; set; }
         //public EntityLocation EntityLocation { get; set; }
     }
 

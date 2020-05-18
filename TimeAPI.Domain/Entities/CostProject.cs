@@ -20,6 +20,9 @@ namespace TimeAPI.Domain.Entities
         public bool is_private { get; set; }
         public bool is_public { get; set; }
         public bool is_inactive { get; set; }
+        public bool is_site_visit { get; set; }
+        public string no_of_floors { get; set; }
+        public bool is_boq { get; set; }
         public string createdby { get; set; }
         public string created_date { get; set; }
         public string modified_date { get; set; }

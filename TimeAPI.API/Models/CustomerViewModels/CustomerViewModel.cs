@@ -17,6 +17,7 @@ namespace TimeAPI.API.Models.CustomerViewModels
         public string phone { get; set; }
         public string adr { get; set; }
         public string street { get; set; }
+        public string country { get; set; }
         public string city { get; set; }
         public string created_date { get; set; }
         public string createdby { get; set; }

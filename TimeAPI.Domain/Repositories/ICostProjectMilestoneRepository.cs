@@ -9,8 +9,8 @@ namespace TimeAPI.Domain.Repositories
     {
         
         IEnumerable<CostProjectMilestone> GetCostProjectMilestoneByProjectID(string ProjectID);
-        void UpdateCostProjectMilestoneStatusByActivityID(CostProjectMilestone entity);
-        dynamic GetCostProjectMilestoneRatioByProjectID(string ProjectID);
-        dynamic FindByCostProjectMilestoneID(string ProjectID);
+        //void UpdateCostProjectMilestoneStatusByActivityID(CostProjectMilestone entity);
+        //dynamic GetCostProjectMilestoneRatioByProjectID(string ProjectID);
+        IEnumerable<CostProjectMilestone> GetAllStaticMilestoneByOrgID(string OrgID);
     }
 }

@@ -63,9 +63,18 @@ namespace TimeAPI.Domain
         IProjectTypeRepository ProjectTypeRepository { get; }
         IMilestoneTemplateRepository MilestoneTemplateRepository { get; }
         ITaskTemplateRepository TaskTemplateRepository { get; }
+
+        //cost binsalem design
         ICostProjectRepository CostProjectRepository { get; }
         ICostProjectMilestoneRepository CostProjectMilestoneRepository { get; }
         ICostProjectTaskRepository CostProjectTaskRepository { get; }
+        ITypeOfDesignRepository TypeOfDesignRepository { get; }
+        ISpecifiationRepository SpecifiationRepository { get; }
+        IUnitDescriptionRepository UnitDescriptionRepository{ get; }
+        ITypeOfUnitRepository TypeOfUnitRepository { get; }
+        IProjectUnitRepository ProjectUnitRepository { get; }
+        IProjectTagsRepository ProjectTagsRepository { get; }
+        IProjectDesignTypeRepository ProjectDesignTypeRepository { get; }
 
         #region systemadmin
         IPlanRepository PlanRepository { get; }

@@ -30,6 +30,16 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
+        public CustomerProject FindByProjectID(string key)
+        {
+            return QuerySingleOrDefault<CustomerProject>(
+                sql: "SELECT * FROM dbo.customer_x_project WHERE project_id = @key and is_deleted = 0",
+                param: new { key }
+            );
+        }
+
+        
+
         public IEnumerable<CustomerProject> All()
         {
             return Query<CustomerProject>(
@@ -61,13 +71,13 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        //public IEnumerable<Customer> FindCustomerByOrgID(string key)
-        //{
-        //    return Query<Customer>(
-        //        sql: "SELECT * FROM dbo.customer_x_project where is_deleted = 0 AND org_id = @key",
-        //         param: new { key }
-        //    );
-        //}
+        public IEnumerable<Customer> FindCustomerByOrgID(string key)
+        {
+            return Query<Customer>(
+                sql: "SELECT * FROM dbo.customer_x_project where is_deleted = 0 AND org_id = @key",
+                 param: new { key }
+            );
+        }
 
     }
 }

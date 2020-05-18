@@ -29,32 +29,45 @@ namespace TimeAPI.API.HangfireJobs
             using (var unitOfWork = new DapperUnitOfWork(_configuration.GetConnectionString("DefaultConnection")))
             {
                 List<AttendedEmployee> AttendedEmployeeList = new List<AttendedEmployee>();
-                var xResult = unitOfWork.AdminDashboardRepository
-                    .GetAllSingleCheckInEmployeesForHangFireJobs("44919b38-176e-45ce-9b12-db5faef620d6",
-                                                                dateTime.ToString(), dateTime.ToString());
+                List<string> OrgList = new List<string>();
 
-                AttendedEmployeeList.AddRange(xResult);
-                var REST = AttendedEmployeeList.Cast<AttendedEmployee>().ToList();
 
-                for (int i = 0; i < REST.Count; i++)
+                try
                 {
-                    DateTime workingHours =  Convert.ToDateTime(REST[i].check_in).AddHours(9).AddMinutes(-30);
+                    var xResultOrg = unitOfWork.AdminDashboardRepository.GetAllOrgSetupForHangFireJobs();
 
-                    if ((DateTime.Now.Hour == workingHours.Hour && DateTime.Now.Minute == workingHours.Minute) || DateTime.Now == workingHours)
+                    foreach (var item in xResultOrg)
                     {
-                        //send mail
-                        var code = "stsdfgsdgf";
-                        var xcode = Base64UrlEncoder.Encode(code);
-                        return System.Threading.Tasks.Task.FromResult<object>(_emailSender.SendEmailAsync(REST[i].groupid, "Reset Password", $"Please reset your password by clicking here: <a href='{xcode}'>link</a>")).ConfigureAwait(true);
+                        var xResult = await unitOfWork.AdminDashboardRepository
+                                                .GetAllSingleCheckInEmployeesForHangFireJobs
+                                                ("44919b38-176e-45ce-9b12-db5faef620d6",
+                                                dateTime.ToString(), dateTime.ToString());
+
+                        AttendedEmployeeList.AddRange(xResult);
+                        var REST = AttendedEmployeeList.Cast<AttendedEmployee>().ToList();
+
+                        for (int i = 0; i < REST.Count; i++)
+                        {
+                            DateTime workingHours = Convert.ToDateTime(REST[i].check_in).AddHours(9).AddMinutes(-30);
+
+                            if ((DateTime.Now.Hour == workingHours.Hour && DateTime.Now.Minute == workingHours.Minute) || DateTime.Now == workingHours)
+                            {
+                                //send mail
+                                var code = "stsdfgsdgf";
+                                var xcode = Base64UrlEncoder.Encode(code);
+                                return System.Threading.Tasks.Task.FromResult<object>(_emailSender.SendEmailAsync(REST[i].groupid, "Reset Password", $"Please reset your password by clicking here: <a href='{xcode}'>link</a>")).ConfigureAwait(true);
+                            }
+                        }
+                        //var data = System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
+                        return null;
                     }
                 }
-                //var data = System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
-                return null;
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
             }
+            return null;
         }
-
-
-
-
     }
 }

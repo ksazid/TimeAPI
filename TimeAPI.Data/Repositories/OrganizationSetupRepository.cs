@@ -17,7 +17,7 @@ namespace TimeAPI.Data.Repositories
                     sql: @"
                     INSERT INTO dbo.organization_setup
                             (id, org_id, country, fiscal_year, working_hrs, date_format, currency, time_zome, is_location_validation_req, hours_frequency, is_autocheckout_allowed, hours_after_working_hours, created_date, createdby)
-                    VALUES (@id, @org_id, @country, @fiscal_year,   @working_hrs, @date_format, @currency, @time_zome, @is_location_validation_req, @hours_frequency, @is_autocheckout_allowed, @hours_after_working_hours, @created_date, @createdby);
+                    VALUES (@id, @org_id, @country, @fiscal_year,  @working_hrs, @date_format, @currency, @time_zome, @is_location_validation_req, @hours_frequency, @is_autocheckout_allowed, @hours_after_working_hours, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -61,7 +61,7 @@ namespace TimeAPI.Data.Repositories
                                 currency = @currency, 
                                 time_zome = @time_zome,
                                 is_location_validation_req = @is_location_validation_req, 
-                                hours_frequency - @hours_frequency, 
+                                hours_frequency = @hours_frequency, 
                                 is_autocheckout_allowed = @is_autocheckout_allowed, 
                                 hours_after_working_hours = @hours_after_working_hours,
                                 modified_date = @modified_date,

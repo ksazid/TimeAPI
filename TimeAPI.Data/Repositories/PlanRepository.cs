@@ -78,8 +78,6 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
-
-
-        
+     
     }
 }

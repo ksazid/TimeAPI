@@ -15,9 +15,9 @@ namespace TimeAPI.Data.Repositories
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.saas_billing
                                   (id, user_id, user_email, current_plan_id, billing_cycle, total_user, total_cost, first_name, last_name, 
-                                    card_no, expire_month, expire_year, cvv, adr1, zip, state, country, created_date createdby)
+                                    card_no, expire_month, expire_year, cvv, adr1, zip, state, country, created_date, createdby)
                            VALUES (@id, @user_id, @user_email, @current_plan_id, @billing_cycle, @total_user, @total_cost, @first_name, @last_name,
-                                    @card_no, @expire_month, @expire_year, @cvv, @adr1, @zip, @state, @country, @created_date @createdby);
+                                    @card_no, @expire_month, @expire_year, @cvv, @adr1, @zip, @state, @country, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );

@@ -14,8 +14,8 @@ namespace TimeAPI.Data.Repositories
         {
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.cost_project
-                                  (id, user_id, org_id, project_type_id, project_name, project_desc, project_prefix, start_date, end_date, completed_date, project_status_id, is_private, is_public, created_date, createdby)
-                           VALUES (@id, @user_id, @org_id, @project_type_id, @project_name, @project_desc, @project_prefix, @start_date, @end_date, @completed_date, @project_status_id, @is_private, @is_public, @created_date, @createdby);
+                                  (id, user_id, org_id, project_type_id, project_name, project_desc, project_prefix, start_date, end_date, completed_date, project_status_id, is_private, is_public, is_site_visit, no_of_floors, is_boq, created_date, createdby)
+                           VALUES (@id, @user_id, @org_id, @project_type_id, @project_name, @project_desc, @project_prefix, @start_date, @end_date, @completed_date, @project_status_id, @is_private, @is_public, @is_site_visit, @no_of_floors, @is_boq, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -83,6 +83,9 @@ namespace TimeAPI.Data.Repositories
                     project_status_id = @project_status_id,
                     is_private = @is_private,
                     is_public = @is_public,
+                    is_site_visit = @is_site_visit, 
+                    no_of_floors = @no_of_floors, 
+                    is_boq = @is_boq,
                     modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE id = @id",
@@ -101,22 +104,22 @@ namespace TimeAPI.Data.Repositories
         {
             return Query<dynamic>(
                    sql: @"SELECT
-                            ROW_NUMBER() OVER (ORDER BY project.project_name) AS rowno,
+                            ROW_NUMBER() OVER (ORDER BY cost_project.project_name) AS rowno,
                             project_type.id as project_type_id,
                             project_type.type_name as project_type_name,
-                            project.id as project_id,
-                            project.project_name,
-                            project.project_prefix,
+                            cost_project.id as project_id,
+                            cost_project.project_name,
+                            cost_project.project_prefix,
                             e_tl.full_name as project_owner,
                             e_tl.workemail,
                             project_status.project_status_name ,
-		                    project.start_date,
-                            project.end_date,
-                            project.completed_date
-                        FROM dbo.cost_project WITH(NOLOCK)
+		                    cost_project.start_date,
+                            cost_project.end_date,
+                            cost_project.completed_date
+                        FROM dbo.cost_project WITH (NOLOCK)
                         LEFT JOIN dbo.employee e_tl ON dbo.cost_project.user_id = e_tl.id
-                        LEFT JOIN dbo.cost_project_status  ON dbo.cost_project.project_status_id = dbo.cost_project_status.id
-                        LEFT JOIN dbo.cost_project_type  ON dbo.cost_project.project_type_id = dbo.cost_project_type.id
+                        LEFT JOIN dbo.project_status  ON dbo.cost_project.project_status_id = dbo.project_status.id
+                        LEFT JOIN dbo.project_type  ON dbo.cost_project.project_type_id = dbo.project_type.id
                         WHERE dbo.cost_project.org_id =@key
                         AND dbo.cost_project.is_deleted = 0
                         ORDER BY dbo.cost_project.project_name ASC",

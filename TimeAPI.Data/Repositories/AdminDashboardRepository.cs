@@ -156,7 +156,7 @@ namespace TimeAPI.Data.Repositories
                         FORMAT(CAST(timesheet.check_in AS DATETIME2), N'hh:mm tt') as check_in,
                         ISNULL(FORMAT(CAST(timesheet.check_out AS DATETIME2), N'hh:mm tt'), 'NA') as check_out,
                         ISNULL(total_hrs, 'NA') as total_hrs,
-                        FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US')  as ondate
+                        FORMAT(CAST(timesheet.ondate  AS DATE), 'MM/dd/yyyy', 'EN-US')  as ondate
                         FROM timesheet WITH (NOLOCK)
                         INNER JOIN employee ON timesheet.empid = employee.id
                         LEFT JOIN employee_type ON employee.emp_type_id = employee_type.id
@@ -165,9 +165,9 @@ namespace TimeAPI.Data.Repositories
                         from dbo.location  where groupid IN (SELECT groupid FROM timesheet) and is_checkout = 0) eTime
                         ON eTime.groupid = dbo.timesheet.groupid
                     WHERE employee.org_id =@org_id
-						AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
-						BETWEEN FORMAT(CAST(@fromDate  AS DATE), 'd', 'EN-US')
-                        AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
+						AND FORMAT(CAST(timesheet.ondate AS DATE), 'MM/dd/yyyy', 'EN-US')
+						BETWEEN FORMAT(CAST(@fromDate  AS DATE), 'MM/dd/yyyy', 'EN-US')
+                        AND FORMAT(CAST(@toDate AS DATE), 'MM/dd/yyyy', 'EN-US')
                         AND timesheet.is_deleted = 0) REALDATA",
                 param: new { org_id, fromDate, toDate }
             );
@@ -226,7 +226,7 @@ namespace TimeAPI.Data.Repositories
                         FORMAT(CAST(timesheet.check_in AS DATETIME2), N'hh:mm tt') as check_in,
                         ISNULL(FORMAT(CAST(timesheet.check_out AS DATETIME2), N'hh:mm tt'), 'NA') as check_out,
                         ISNULL(total_hrs, 'NA') as total_hrs,
-                        FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US')  as ondate
+                        FORMAT(CAST(timesheet.ondate  AS DATE), 'MM/dd/yyyy', 'EN-US')  as ondate
                         FROM timesheet WITH (NOLOCK)
                         INNER JOIN employee ON timesheet.empid = employee.id
                         LEFT JOIN employee_type ON employee.emp_type_id = employee_type.id
@@ -235,9 +235,9 @@ namespace TimeAPI.Data.Repositories
                         from dbo.location  where groupid IN (SELECT groupid FROM timesheet) and is_checkout = 0) eTime
                         ON eTime.groupid = dbo.timesheet.groupid
               WHERE employee.id = @emp
-						AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
-						BETWEEN FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
-                        AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US')
+						AND FORMAT(CAST(timesheet.ondate AS DATE), 'MM/dd/yyyy', 'EN-US')
+						BETWEEN FORMAT(CAST(@date  AS DATE), 'MM/dd/yyyy', 'EN-US')
+                        AND FORMAT(CAST(@date AS DATE), 'MM/dd/yyyy', 'EN-US')
                         AND timesheet.is_deleted = 0) 
 						
 						REALDATA ORDER BY  CAST(check_in as datetime)",
@@ -334,7 +334,7 @@ namespace TimeAPI.Data.Repositories
                         FORMAT(CAST(timesheet.check_in AS DATETIME2), N'hh:mm tt') as check_in,
                         ISNULL(FORMAT(CAST(timesheet.check_out AS DATETIME2), N'hh:mm tt'), 'NA') as check_out,
                         ISNULL(total_hrs, 'NA') as total_hrs,
-                        FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US')  as ondate
+                        FORMAT(CAST(timesheet.ondate  AS DATE), 'MM/dd/yyyy', 'EN-US')  as ondate
                         FROM timesheet WITH (NOLOCK)
                         INNER JOIN employee ON timesheet.empid = employee.id
                         LEFT JOIN employee_type ON employee.emp_type_id = employee_type.id
@@ -343,9 +343,9 @@ namespace TimeAPI.Data.Repositories
                         from dbo.location  where groupid IN (SELECT groupid FROM timesheet) and is_checkout = 0) eTime
                         ON eTime.groupid = dbo.timesheet.groupid
               WHERE employee.id = @emp
-						AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
-						BETWEEN FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
-                        AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US')
+						AND FORMAT(CAST(timesheet.ondate AS DATE), 'MM/dd/yyyy', 'EN-US')
+						BETWEEN FORMAT(CAST(@date  AS DATE), 'MM/dd/yyyy', 'EN-US')
+                        AND FORMAT(CAST(@date AS DATE), 'MM/dd/yyyy', 'EN-US')
                         AND timesheet.is_deleted = 0) 
 						
 						REALDATA ORDER BY  CAST(check_in as datetime)",
@@ -481,7 +481,7 @@ namespace TimeAPI.Data.Repositories
                         FORMAT(CAST(timesheet.check_in AS DATETIME2), N'hh:mm tt') as check_in,
                         ISNULL(FORMAT(CAST(timesheet.check_out AS DATETIME2), N'hh:mm tt'), 'NA') as check_out,
                         ISNULL(total_hrs, 'NA') as total_hrs,
-                        FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US')  as ondate
+                        FORMAT(CAST(timesheet.ondate  AS DATE), 'MM/dd/yyyy', 'EN-US')  as ondate
                         FROM timesheet WITH (NOLOCK)
                         INNER JOIN employee ON timesheet.empid = employee.id
                         LEFT JOIN employee_type ON employee.emp_type_id = employee_type.id
@@ -490,9 +490,9 @@ namespace TimeAPI.Data.Repositories
                         from dbo.location  where groupid IN (SELECT groupid FROM timesheet) and is_checkout = 0) eTime
                         ON eTime.groupid = dbo.timesheet.groupid
               WHERE employee.id = @emp
-						AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
-						BETWEEN FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
-                        AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US')
+						AND FORMAT(CAST(timesheet.ondate AS DATE), 'MM/dd/yyyy', 'EN-US')
+						BETWEEN FORMAT(CAST(@date  AS DATE), 'MM/dd/yyyy', 'EN-US')
+                        AND FORMAT(CAST(@date AS DATE), 'MM/dd/yyyy', 'EN-US')
                         AND timesheet.is_deleted = 0) 
 						
 						REALDATA ORDER BY  CAST(check_in as datetime)",
@@ -590,7 +590,7 @@ namespace TimeAPI.Data.Repositories
                         FORMAT(CAST(timesheet.check_in AS DATETIME2), N'hh:mm tt') as check_in,
                         ISNULL(FORMAT(CAST(timesheet.check_out AS DATETIME2), N'hh:mm tt'), 'NA') as check_out,
                         ISNULL(total_hrs, 'NA') as total_hrs,
-                        FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US')  as ondate
+                        FORMAT(CAST(timesheet.ondate  AS DATE), 'MM/dd/yyyy', 'EN-US')  as ondate
                         FROM timesheet WITH (NOLOCK)
                         INNER JOIN employee ON timesheet.empid = employee.id
                         LEFT JOIN employee_type ON employee.emp_type_id = employee_type.id
@@ -599,9 +599,9 @@ namespace TimeAPI.Data.Repositories
                         from dbo.location  where groupid IN (SELECT groupid FROM timesheet) and is_checkout = 0) eTime
                         ON eTime.groupid = dbo.timesheet.groupid
               WHERE employee.id = @emp
-						AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
-						BETWEEN FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
-                        AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US')
+						AND FORMAT(CAST(timesheet.ondate AS DATE), 'MM/dd/yyyy', 'EN-US')
+						BETWEEN FORMAT(CAST(@date  AS DATE), 'MM/dd/yyyy', 'EN-US')
+                        AND FORMAT(CAST(@date AS DATE), 'MM/dd/yyyy', 'EN-US')
                         AND timesheet.is_deleted = 0) 
 						
 						REALDATA ORDER BY  CAST(check_in as datetime)",
@@ -691,7 +691,7 @@ namespace TimeAPI.Data.Repositories
                         FORMAT(CAST(timesheet.check_in AS DATETIME2), N'hh:mm tt') as check_in,
                         ISNULL(FORMAT(CAST(timesheet.check_out AS DATETIME2), N'hh:mm tt'), 'NA') as check_out,
                         ISNULL(total_hrs, 'NA') as total_hrs,
-                        FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US')  as ondate
+                        FORMAT(CAST(timesheet.ondate  AS DATE), 'MM/dd/yyyy', 'EN-US')  as ondate
                         FROM timesheet WITH (NOLOCK)
                         INNER JOIN location_exception ON timesheet.groupid = location_exception.group_id
                         INNER JOIN employee ON timesheet.empid = employee.id
@@ -701,9 +701,9 @@ namespace TimeAPI.Data.Repositories
                         from dbo.location  where groupid IN (SELECT groupid FROM timesheet) and is_checkout = 0) eTime
                         ON eTime.groupid = dbo.timesheet.groupid
                     WHERE employee.org_id =@org_id
-						AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
-						BETWEEN FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
-                        AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US')
+						AND FORMAT(CAST(timesheet.ondate AS DATE), 'MM/dd/yyyy', 'EN-US')
+						BETWEEN FORMAT(CAST(@date  AS DATE), 'MM/dd/yyyy', 'EN-US')
+                        AND FORMAT(CAST(@date AS DATE), 'MM/dd/yyyy', 'EN-US')
 						AND location_exception.is_chkin_inrange = 0
                         AND timesheet.is_deleted = 0) REALDATA
                         ORDER BY  CAST(check_in as datetime)",
@@ -755,7 +755,7 @@ namespace TimeAPI.Data.Repositories
                         FORMAT(CAST(timesheet.check_in AS DATETIME2), N'hh:mm tt') as check_in,
                         ISNULL(FORMAT(CAST(timesheet.check_out AS DATETIME2), N'hh:mm tt'), 'NA') as check_out,
                         ISNULL(total_hrs, 'NA') as total_hrs,
-                        FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US')  as ondate
+                        FORMAT(CAST(timesheet.ondate  AS DATE), 'MM/dd/yyyy', 'EN-US')  as ondate
                         FROM timesheet WITH (NOLOCK)
                         INNER JOIN location_exception ON timesheet.groupid = location_exception.group_id
                         INNER JOIN employee ON timesheet.empid = employee.id
@@ -765,9 +765,9 @@ namespace TimeAPI.Data.Repositories
                         from dbo.location  where groupid IN (SELECT groupid FROM timesheet) and is_checkout = 0) eTime
                         ON eTime.groupid = dbo.timesheet.groupid
                     WHERE employee.org_id =@org_id
-						AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
-						BETWEEN FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
-                        AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US')
+						AND FORMAT(CAST(timesheet.ondate AS DATE), 'MM/dd/yyyy', 'EN-US')
+						BETWEEN FORMAT(CAST(@date  AS DATE), 'MM/dd/yyyy', 'EN-US')
+                        AND FORMAT(CAST(@date AS DATE), 'MM/dd/yyyy', 'EN-US')
 						AND location_exception.is_chkout_inrange = 0
                         AND timesheet.is_deleted = 0) REALDATA
                         ORDER BY  CAST(check_in as datetime)",
@@ -920,9 +920,9 @@ namespace TimeAPI.Data.Repositories
                         FROM dbo.timesheet WITH (NOLOCK)
                             INNER JOIN dbo.employee on dbo.timesheet.empid = dbo.employee.id
                         WHERE dbo.employee.org_id =@org_id
-                            AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
-                            BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US')
-                            AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
+                            AND FORMAT(CAST(timesheet.ondate AS DATE), 'MM/dd/yyyy', 'EN-US')
+                            BETWEEN FORMAT(CAST(@fromDate AS DATE), 'MM/dd/yyyy', 'EN-US')
+                            AND FORMAT(CAST(@toDate AS DATE), 'MM/dd/yyyy', 'EN-US')
                             AND  dbo.timesheet.is_deleted = 0
                         ORDER BY FORMAT(CAST( dbo.timesheet.ondate AS DATETIME2), N'hh:mm tt') DESC;",
                       param: new { org_id, fromDate, toDate }
@@ -978,7 +978,7 @@ namespace TimeAPI.Data.Repositories
                         FORMAT(CAST(timesheet.check_in AS DATETIME2), N'hh:mm tt') as check_in,
                         ISNULL(FORMAT(CAST(timesheet.check_out AS DATETIME2), N'hh:mm tt'), 'NA') as check_out,
                         ISNULL(total_hrs, 'NA') as total_hrs,
-                        FORMAT(CAST(timesheet.ondate  AS DATE), 'd', 'EN-US')  as ondate
+                        FORMAT(CAST(timesheet.ondate  AS DATE), 'MM/dd/yyyy', 'EN-US')  as ondate
                         FROM timesheet WITH (NOLOCK)
                         INNER JOIN employee ON timesheet.empid = employee.id
                         LEFT JOIN employee_type ON employee.emp_type_id = employee_type.id
@@ -987,9 +987,9 @@ namespace TimeAPI.Data.Repositories
                         from dbo.location  where groupid IN (SELECT groupid FROM timesheet) and is_checkout = 0) eTime
                         ON eTime.groupid = dbo.timesheet.groupid
               WHERE employee.id = @emp
-						AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
-						BETWEEN FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
-                        AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US')
+						AND FORMAT(CAST(timesheet.ondate AS DATE), 'MM/dd/yyyy', 'EN-US')
+						BETWEEN FORMAT(CAST(@date  AS DATE), 'MM/dd/yyyy', 'EN-US')
+                        AND FORMAT(CAST(@date AS DATE), 'MM/dd/yyyy', 'EN-US')
                         AND timesheet.is_deleted = 0) 
 						
 						REALDATA ORDER BY  CAST(check_in as datetime)",
@@ -1002,6 +1002,19 @@ namespace TimeAPI.Data.Repositories
 
             return AttendedEmployeeList;
         }
+
+        public IEnumerable<string> GetAllOrgSetupForHangFireJobs()
+        {
+            return Query<string>(
+               sql: @"SELECT org_id FROM organization_setup 
+                                    WHERE is_location_validation_req = 1 
+                                    OR is_autocheckout_allowed = 1 
+                                    AND is_deleted = 0"
+           );
+        }
+
+
+
 
 
         #region PrivateMethods
@@ -1043,9 +1056,9 @@ namespace TimeAPI.Data.Repositories
                                         FROM dbo.employee WITH(NOLOCK)
 				                            INNER JOIN timesheet ON  employee.id = timesheet.empid
                                         WHERE employee.org_id = @OrgID
-			                            AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
-			                         BETWEEN FORMAT(CAST(@fromDate AS DATE), 'd', 'EN-US')
-			                            AND FORMAT(CAST(@toDate AS DATE), 'd', 'EN-US')
+			                            AND FORMAT(CAST(timesheet.ondate AS DATE), 'MM/dd/yyyy', 'EN-US')
+			                         BETWEEN FORMAT(CAST(@fromDate AS DATE), 'MM/dd/yyyy', 'EN-US')
+			                            AND FORMAT(CAST(@toDate AS DATE), 'MM/dd/yyyy', 'EN-US')
 			                            AND employee.is_deleted = 0
                                         AND employee.is_superadmin = 0
                                         AND timesheet.is_deleted = 0
@@ -1133,7 +1146,7 @@ namespace TimeAPI.Data.Repositories
 	                        department.dep_name,
                             department.id as department_id,
 	                        designation.designation_name,
-							ondate = FORMAT(CAST(@Date AS DATE), 'd', 'EN-US')
+							ondate = FORMAT(CAST(@Date AS DATE), 'MM/dd/yyyy', 'EN-US')
                           FROM dbo.employee WITH(NOLOCK)
 	                          LEFT JOIN employee_status ON employee.emp_status_id = employee_status.id
 	                          LEFT JOIN employee_type ON employee.emp_type_id = employee_type.id
@@ -1193,32 +1206,32 @@ namespace TimeAPI.Data.Repositories
         private IEnumerable<ResultSingleCheckin> SingleCheckINResult(string org_id, DateTime Dates, bool xdate)
         {
             IEnumerable<ResultSingleCheckin> ResultSingleCheckinList = Query<ResultSingleCheckin>(
-                        sql: @"select  distinct(timesheet.empid) as empid, COUNT(timesheet.empid),
+                        sql: @"select  distinct(employee.id) as empid, COUNT(employee.id),
 						         RIGHT('0' + CAST(SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 3600 AS VARCHAR),2) + ':' +
 							        RIGHT('0' + CAST((SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 60) % 60 AS VARCHAR),2)  as time
                                 from timesheet
                                   INNER JOIN employee ON timesheet.empid = employee.id
                                 WHERE employee.org_id = @org_id
-						        AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
-						        BETWEEN FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
-                                AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US') AND timesheet.is_deleted = 0
-						        group by timesheet.empid
+						        AND FORMAT(CAST(timesheet.ondate AS DATE), 'MM/dd/yyyy', 'EN-US')
+						        BETWEEN FORMAT(CAST(@date  AS DATE), 'MM/dd/yyyy', 'EN-US')
+                                AND FORMAT(CAST(@date AS DATE), 'MM/dd/yyyy', 'EN-US') AND timesheet.is_deleted = 0
+						        group by employee.id
                                 having(SUM(( DATEPART(hh, total_hrs ) * 3600 ) + ( DATEPART(mi, total_hrs) * 60 )) > 32400)  
 						        and COUNT(timesheet.empid) = 1",
                         param: new { org_id, date = Dates }
                     );
             if (xdate)
                 ResultSingleCheckinList = Query<ResultSingleCheckin>(
-                       sql: @"select  distinct(timesheet.empid) as empid, COUNT(timesheet.empid),
+                       sql: @"select  distinct(employee.id) as empid, COUNT(employee.id),
 						         RIGHT('0' + CAST(SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 3600 AS VARCHAR),2) + ':' +
 							        RIGHT('0' + CAST((SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 60) % 60 AS VARCHAR),2)  as time
                                 FROM timesheet
                                   INNER JOIN employee ON timesheet.empid = employee.id
                                 WHERE employee.org_id = @org_id
-						        AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
-						        BETWEEN FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
-                                AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US') AND timesheet.is_deleted = 0
-						        GROUP BY timesheet.empid
+						        AND FORMAT(CAST(timesheet.ondate AS DATE), 'MM/dd/yyyy', 'EN-US')
+						        BETWEEN FORMAT(CAST(@date  AS DATE), 'MM/dd/yyyy', 'EN-US')
+                                AND FORMAT(CAST(@date AS DATE), 'MM/dd/yyyy', 'EN-US') AND timesheet.is_deleted = 0
+						        GROUP BY employee.id
                                 HAVING COUNT(timesheet.empid) = 1",
                        param: new { org_id, date = Dates }
                    );
@@ -1229,16 +1242,16 @@ namespace TimeAPI.Data.Repositories
         private IEnumerable<ResultSingleCheckin> MultipleCheckINResult(string org_id, DateTime Dates, bool xdate)
         {
             IEnumerable<ResultSingleCheckin> ResultSingleCheckinList = Query<ResultSingleCheckin>(
-                        sql: @"select  distinct(timesheet.empid) as empid, COUNT(timesheet.empid),
+                        sql: @"select  distinct(employee.id) as empid, COUNT(employee.id),
 						         RIGHT('0' + CAST(SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 3600 AS VARCHAR),2) + ':' +
 							        RIGHT('0' + CAST((SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 60) % 60 AS VARCHAR),2)  as time
                                 from timesheet
                                   INNER JOIN employee ON timesheet.empid = employee.id
                                 WHERE employee.org_id = @org_id
-						        AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
-						        BETWEEN FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
-                                AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US') AND timesheet.is_deleted = 0
-						        group by timesheet.empid
+						        AND FORMAT(CAST(timesheet.ondate AS DATE), 'MM/dd/yyyy', 'EN-US')
+						        BETWEEN FORMAT(CAST(@date  AS DATE), 'MM/dd/yyyy', 'EN-US')
+                                AND FORMAT(CAST(@date AS DATE), 'MM/dd/yyyy', 'EN-US') AND timesheet.is_deleted = 0
+						        group by employee.id
                                 having(SUM(( DATEPART(hh, total_hrs ) * 3600 ) + ( DATEPART(mi, total_hrs) * 60 )) > 32400)  
 						        and COUNT(timesheet.empid) > 1",
                         param: new { org_id, date = Dates }
@@ -1246,16 +1259,16 @@ namespace TimeAPI.Data.Repositories
 
             if (xdate)
                 ResultSingleCheckinList = Query<ResultSingleCheckin>(
-                       sql: @"select  distinct(timesheet.empid) as empid, COUNT(timesheet.empid),
+                       sql: @"select  distinct(employee.id) as empid, COUNT(employee.id),
 						         RIGHT('0' + CAST(SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 3600 AS VARCHAR),2) + ':' +
 							        RIGHT('0' + CAST((SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 60) % 60 AS VARCHAR),2)  as time
                                 FROM timesheet
                                   INNER JOIN employee ON timesheet.empid = employee.id
                                 WHERE employee.org_id = @org_id
-						        AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
-						        BETWEEN FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
-                                AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US') AND timesheet.is_deleted = 0
-						        GROUP BY timesheet.empid
+						        AND FORMAT(CAST(timesheet.ondate AS DATE), 'MM/dd/yyyy', 'EN-US')
+						        BETWEEN FORMAT(CAST(@date  AS DATE), 'MM/dd/yyyy', 'EN-US')
+                                AND FORMAT(CAST(@date AS DATE), 'MM/dd/yyyy', 'EN-US') AND timesheet.is_deleted = 0
+						        GROUP BY employee.id
                                 HAVING COUNT(timesheet.empid) > 1",
                        param: new { org_id, date = Dates }
                    );
@@ -1266,35 +1279,20 @@ namespace TimeAPI.Data.Repositories
         private IEnumerable<ResultSingleCheckin> SingleCheckINExceptionResult(string org_id, DateTime Dates, bool xdate)
         {
             IEnumerable<ResultSingleCheckin> ResultSingleCheckinList = Query<ResultSingleCheckin>(
-                        sql: @"select  distinct(timesheet.empid) as empid, COUNT(timesheet.empid),
+                        sql: @"select  distinct(employee.id) as empid, COUNT(employee.id),
 						         RIGHT('0' + CAST(SUM((DATEPART(HOUR,isnull(total_hrs, '00:00'))*3600)+(DATEPART(MINUTE,isnull(total_hrs, '00:00'))*60)+(DATEPART(Second,isnull(total_hrs, '00:00')))) / 3600 AS VARCHAR),2) + ':' +
 							        RIGHT('0' + CAST((SUM((DATEPART(HOUR,isnull(total_hrs, '00:00'))*3600)+(DATEPART(MINUTE,isnull(total_hrs, '00:00'))*60)+(DATEPART(Second,isnull(total_hrs, '00:00')))) / 60) % 60 AS VARCHAR),2)  as time
                                 from timesheet
                                   INNER JOIN employee ON timesheet.empid = employee.id
                                 WHERE employee.org_id = @org_id
-						        AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
-						        BETWEEN FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
-                                AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US') AND timesheet.is_deleted = 0
-						        group by timesheet.empid
+						        AND FORMAT(CAST(timesheet.ondate AS DATE), 'MM/dd/yyyy', 'EN-US')
+						        BETWEEN FORMAT(CAST(@date  AS DATE), 'MM/dd/yyyy', 'EN-US')
+                                AND FORMAT(CAST(@date AS DATE), 'MM/dd/yyyy', 'EN-US') AND timesheet.is_deleted = 0
+						        group by employee.id
                                 having(SUM(( DATEPART(hh, isnull(total_hrs, '00:00')) * 3600 ) + ( DATEPART(mi, isnull(total_hrs, '00:00')) * 60 )) < 32400)  
 						        and COUNT(timesheet.empid) = 1",
                         param: new { org_id, date = Dates }
                     );
-            //if (xdate)
-            //    ResultSingleCheckinList = Query<ResultSingleCheckin>(
-            //           sql: @"select  distinct(timesheet.empid) as empid, COUNT(timesheet.empid),
-            //   RIGHT('0' + CAST(SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 3600 AS VARCHAR),2) + ':' +
-            //   RIGHT('0' + CAST((SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 60) % 60 AS VARCHAR),2)  as time
-            //                    FROM timesheet
-            //                      INNER JOIN employee ON timesheet.empid = employee.id
-            //                    WHERE employee.org_id = @org_id
-            //  AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
-            //  BETWEEN FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
-            //                    AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US') AND timesheet.is_deleted = 0
-            //  GROUP BY timesheet.empid
-            //                    HAVING COUNT(timesheet.empid) = 1",
-            //           param: new { org_id, date = Dates }
-            //       );
 
             return ResultSingleCheckinList;
         }
@@ -1302,53 +1300,37 @@ namespace TimeAPI.Data.Repositories
         private IEnumerable<ResultSingleCheckin> MultipleCheckINExceptionResult(string org_id, DateTime Dates, bool xdate)
         {
             IEnumerable<ResultSingleCheckin> ResultSingleCheckinList = Query<ResultSingleCheckin>(
-                        sql: @"select  distinct(timesheet.empid) as empid, COUNT(timesheet.empid),
+                        sql: @"select   distinct(employee.id) as empid, COUNT(employee.id),
 						         RIGHT('0' + CAST(SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 3600 AS VARCHAR),2) + ':' +
 							        RIGHT('0' + CAST((SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 60) % 60 AS VARCHAR),2)  as time
                                 from timesheet
                                   INNER JOIN employee ON timesheet.empid = employee.id
                                 WHERE employee.org_id = @org_id
-						        AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
-						        BETWEEN FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
-                                AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US') AND timesheet.is_deleted = 0
-						        group by timesheet.empid
+						        AND FORMAT(CAST(timesheet.ondate AS DATE), 'MM/dd/yyyy', 'EN-US')
+						        BETWEEN FORMAT(CAST(@date  AS DATE), 'MM/dd/yyyy', 'EN-US')
+                                AND FORMAT(CAST(@date AS DATE), 'MM/dd/yyyy', 'EN-US') AND timesheet.is_deleted = 0
+						        group by employee.id
                                 having(SUM(( DATEPART(hh, total_hrs ) * 3600 ) + ( DATEPART(mi, total_hrs) * 60 )) < 32400)  
 						        and COUNT(timesheet.empid) > 1",
                         param: new { org_id, date = Dates }
                     );
-
-            //if (xdate)
-            //    ResultSingleCheckinList = Query<ResultSingleCheckin>(
-            //           sql: @"select  distinct(timesheet.empid) as empid, COUNT(timesheet.empid),
-            //   RIGHT('0' + CAST(SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 3600 AS VARCHAR),2) + ':' +
-            //   RIGHT('0' + CAST((SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 60) % 60 AS VARCHAR),2)  as time
-            //                    FROM timesheet
-            //                      INNER JOIN employee ON timesheet.empid = employee.id
-            //                    WHERE employee.org_id = @org_id
-            //  AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
-            //  BETWEEN FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
-            //                    AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US') AND timesheet.is_deleted = 0
-            //  GROUP BY timesheet.empid
-            //                    HAVING COUNT(timesheet.empid) > 1",
-            //           param: new { org_id, date = Dates }
-            //       );
-
+ 
             return ResultSingleCheckinList;
         }
 
         private IEnumerable<ResultSingleCheckin> SingleFirstCheckINResult(string org_id, DateTime Dates, bool xdate)
         {
             IEnumerable<ResultSingleCheckin> ResultSingleCheckinList = Query<ResultSingleCheckin>(
-                        sql: @"select  distinct(timesheet.empid) as empid, COUNT(timesheet.empid),
+                        sql: @"select   distinct(employee.id) as empid, COUNT(employee.id),
 						         RIGHT('0' + CAST(SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 3600 AS VARCHAR),2) + ':' +
 							        RIGHT('0' + CAST((SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 60) % 60 AS VARCHAR),2)  as time
                                 from timesheet
                                   INNER JOIN employee ON timesheet.empid = employee.id
                                 WHERE employee.org_id = @org_id
-						        AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
-						        BETWEEN FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
-                                AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US') AND timesheet.is_deleted = 0
-						        group by timesheet.empid
+						        AND FORMAT(CAST(timesheet.ondate AS DATE), 'MM/dd/yyyy', 'EN-US')
+						        BETWEEN FORMAT(CAST(@date  AS DATE), 'MM/dd/yyyy', 'EN-US')
+                                AND FORMAT(CAST(@date AS DATE), 'MM/dd/yyyy', 'EN-US') AND timesheet.is_deleted = 0
+						        group by employee.id
                                 having COUNT(timesheet.empid) = 1",
                         param: new { org_id, date = Dates }
                     );
@@ -1359,16 +1341,16 @@ namespace TimeAPI.Data.Repositories
         private IEnumerable<ResultSingleCheckin> MultipleFirstCheckINResult(string org_id, DateTime Dates, bool xdate)
         {
             IEnumerable<ResultSingleCheckin> ResultSingleCheckinList = Query<ResultSingleCheckin>(
-                        sql: @"select  distinct(timesheet.empid) as empid, COUNT(timesheet.empid),
+                        sql: @"select  distinct(employee.id) as empid, COUNT(employee.id),
 						         RIGHT('0' + CAST(SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 3600 AS VARCHAR),2) + ':' +
 							        RIGHT('0' + CAST((SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 60) % 60 AS VARCHAR),2)  as time
                                 from timesheet
                                   INNER JOIN employee ON timesheet.empid = employee.id
                                 WHERE employee.org_id = @org_id
-						        AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US')
-						        BETWEEN FORMAT(CAST(@date  AS DATE), 'd', 'EN-US')
-                                AND FORMAT(CAST(@date AS DATE), 'd', 'EN-US') AND timesheet.is_deleted = 0
-						        group by timesheet.empid
+						        AND FORMAT(CAST(timesheet.ondate AS DATE), 'MM/dd/yyyy', 'EN-US')
+						        BETWEEN FORMAT(CAST(@date  AS DATE), 'MM/dd/yyyy', 'EN-US')
+                                AND FORMAT(CAST(@date AS DATE), 'MM/dd/yyyy', 'EN-US') AND timesheet.is_deleted = 0
+						        group by employee.id
                                 having COUNT(timesheet.empid) > 1",
                         param: new { org_id, date = Dates }
                     );

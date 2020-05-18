@@ -22,6 +22,7 @@ namespace TimeAPI.Domain.Repositories
         dynamic AllProjectRatioByOrgID(string OrgID);
         dynamic GetAllTimesheetRecentActivityList(string OrgID, string toDate, string fromDate);
         dynamic GetAllSingleCheckInEmployeesForHangFireJobs(string OrgID, string toDate, string fromDate);
+        IEnumerable<string> GetAllOrgSetupForHangFireJobs();
 
     }
 }

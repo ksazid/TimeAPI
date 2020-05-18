@@ -4,6 +4,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using TimeAPI.API.Filters;
@@ -181,6 +183,46 @@ namespace TimeAPI.API.Controllers
                 var result = _unitOfWork.PlanRepository.FindPlanPriceByPlanID(Utils.ID);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("GetPlanDetail")]
+        public async Task<object> GetPlanDetail(CancellationToken cancellationToken)
+        {
+            try
+            {
+                RootPlanDetails rootPlanDetails = new RootPlanDetails();
+                List<RootPlanViewModel> rootPlanViewModels = new List<RootPlanViewModel>();
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                var result = _unitOfWork.PlanRepository.All();
+
+                foreach (var item in result)
+                {
+                    RootPlanViewModel rootPlanViewModel = new RootPlanViewModel();
+                    List<PlanPrice> planPrices = new List<PlanPrice>();
+                    List<PlanFeature> planFeatures = new List<PlanFeature>();
+
+                    rootPlanViewModel.id = item.id;
+                    rootPlanViewModel.plan_name = item.plan_name;
+                    rootPlanViewModel.plan_desc = item.plan_desc;
+                    planPrices = _unitOfWork.PlanPriceRepository.GetPlanPriceByPlanID(item.id).ToList();
+                    if (planPrices.Any())
+                        rootPlanViewModel._PlanPriceViewModel = planPrices;
+
+                    planFeatures = _unitOfWork.PlanFeatureRepository.GetPlanFeatureByPlanID(item.id).ToList();
+                    if (planFeatures.Any())
+                        rootPlanViewModel._PlanFeatureViewModel = planFeatures;
+
+                    rootPlanViewModels.Add(rootPlanViewModel);
+                }
+                return await Task.FromResult<object>(rootPlanViewModels).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

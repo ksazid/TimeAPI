@@ -15,8 +15,8 @@ namespace TimeAPI.Data.Repositories
         {
             entity.id = ExecuteScalar<string>(
                         sql: @"
-                    INSERT INTO dbo.customer (id, org_id, cst_name, cst_type, email, phone, adr,street, city, created_date, createdby)
-                    VALUES (@id, @org_id, @cst_name, @cst_type, @email, @phone, @adr, @street, @city, @created_date, @createdby);
+                    INSERT INTO dbo.customer (id, org_id, cst_name, cst_type, email, phone, adr, street, country, city, created_date, createdby)
+                    VALUES (@id, @org_id, @cst_name, @cst_type, @email, @phone, @adr, @street, @country, @city, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                         param: entity
                     );
@@ -67,6 +67,7 @@ namespace TimeAPI.Data.Repositories
                     phone = @phone, 
                     adr = @adr, 
                     street = @street, 
+                    country = @country,
                     city = @city, 
                     modified_date = @modified_date, 
                     modifiedby = @modifiedby
