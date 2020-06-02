@@ -18,5 +18,13 @@ namespace TimeAPI.Domain.Repositories
         //RootEmployeeTask GetAllTaskByOrgAndEmpID(string key, string EmpID);
         IEnumerable<CostProjectTask> GetAllStaticMilestoneTasksByMilestoneID(string MilestoneID);
         IEnumerable<CostProjectTask> GetAllMilestoneTasksByMilestoneID(string MilestoneID);
+
+        //IEnumerable<CostProjectTask> GetAllStaticMilestoneByOrgID(string MilestoneID);
+
+        void UpdateStaticCostProjectTask(CostProjectTask entity);
+
+        void RemoveByProjectID(string ProjectID);
+        void UpdateIsSelectedByTaskID(CostProjectTask entity);
+        void UpdateCostProjectTaskQtyTaskID(CostProjectTask entity);
     }
 }

@@ -10,5 +10,6 @@ namespace TimeAPI.Domain.Repositories
     public interface IProjectTagsRepository : IRepository<ProjectTags, string>
     {
         IEnumerable<ProjectTags> GetProjectTagsByUnitID(string UnitID);
+        void RemoveByUnitID(string UnitID);
     }
 }

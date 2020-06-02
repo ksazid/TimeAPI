@@ -116,9 +116,6 @@ namespace TimeAPI.API.Controllers
                 {
                     foreach (var item in TaskViewModel.employees.Distinct())
                     {
-
-
-
                         var TaskTeamMembers = new TaskTeamMember()
                         {
                             id = Guid.NewGuid().ToString(),

@@ -164,7 +164,7 @@ namespace TimeAPI.Data.Repositories
                         INNER JOIN (select distinct(groupid), location.lat, location.lang, location.is_checkout
                         from dbo.location  where groupid IN (SELECT groupid FROM timesheet) and is_checkout = 0) eTime
                         ON eTime.groupid = dbo.timesheet.groupid
-                    WHERE employee.org_id =@org_id
+                    WHERE employee.org_id = @org_id
 						AND FORMAT(CAST(timesheet.ondate AS DATE), 'MM/dd/yyyy', 'EN-US')
 						BETWEEN FORMAT(CAST(@fromDate  AS DATE), 'MM/dd/yyyy', 'EN-US')
                         AND FORMAT(CAST(@toDate AS DATE), 'MM/dd/yyyy', 'EN-US')

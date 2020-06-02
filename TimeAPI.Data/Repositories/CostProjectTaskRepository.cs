@@ -44,6 +44,16 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
+        public void RemoveByProjectID(string key)
+        {
+            Execute(
+                sql: @"UPDATE dbo.cost_task
+                   SET
+                       modified_date = GETDATE(), is_deleted = 1
+                    WHERE project_id = @key",
+                param: new { key }
+            );
+        }
 
         public void Update(CostProjectTask entity)
         {
@@ -58,6 +68,46 @@ namespace TimeAPI.Data.Repositories
 					qty = @qty,
                     modified_date = @modified_date,
                     modifiedby = @modifiedby,
+                    WHERE id =  @id",
+                param: entity
+            );
+        }
+
+        public void UpdateStaticCostProjectTask(CostProjectTask entity)
+        {
+            Execute(
+                sql: @"UPDATE dbo.static_tasks
+                   SET
+					unit = @unit, 
+					qty = @qty,
+                    modified_date = @modified_date,
+                    modifiedby = @modifiedby
+                    WHERE id =  @id",
+                param: entity
+            );
+        }
+
+        public void UpdateCostProjectTaskQtyTaskID(CostProjectTask entity)
+        {
+            Execute(
+                sql: @"UPDATE dbo.cost_task
+                   SET
+					qty = @qty,
+                    modified_date = @modified_date,
+                    modifiedby = @modifiedby
+                    WHERE id =  @id",
+                param: entity
+            );
+        }
+
+        public void UpdateIsSelectedByTaskID(CostProjectTask entity)
+        {
+            Execute(
+                sql: @"UPDATE dbo.cost_task
+                   SET
+					is_selected  = @is_selected, 
+                    modified_date = @modified_date,
+                    modifiedby = @modifiedby
                     WHERE id =  @id",
                 param: entity
             );
@@ -81,7 +131,7 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<CostProjectTask> GetAllMilestoneTasksByMilestoneID(string MilestoneID)
         {
             return Query<CostProjectTask>(
-                sql: "SELECT * FROM [dbo].[cost_task] where is_deleted = 0 and  milestone_id = @MilestoneID",
+                sql: "SELECT * FROM [dbo].[cost_task] where is_deleted = 0 and  milestone_id = @MilestoneID and is_selected = 1",
                  param: new { MilestoneID }
             );
         }

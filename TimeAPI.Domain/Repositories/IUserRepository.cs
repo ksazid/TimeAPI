@@ -13,7 +13,7 @@ namespace TimeAPI.Domain.Repositories
         IEnumerable<RootTimesheetData> GetAllTimesheetByEmpID(string EmpID, string Date);
 
         IEnumerable<RootTimesheetData> GetAllTimesheetByOrgID(string EmpID, string FromDate, string ToDate);
-        dynamic LastCheckinByEmpID(string EmpID);
+        dynamic LastCheckinByEmpID(string EmpID, string Date);
 
         //dynamic TotalEmployeeDashboardDataByOrgID(string OrgID);
         ////dynamic TotalEmployeeDashboardDataByOrgID(string OrgID, string toDate, string fromDate);

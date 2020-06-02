@@ -53,6 +53,17 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
+        public void RemoveByProjectID(string key)
+        {
+            Execute(
+                sql: @"UPDATE dbo.cost_project_milestone
+                   SET
+                       modified_date = GETDATE(), is_deleted = 1
+                    WHERE project_id = @key",
+                param: new { key }
+            );
+        }
+        
         public void Update(CostProjectMilestone  entity)
         {
             Execute(

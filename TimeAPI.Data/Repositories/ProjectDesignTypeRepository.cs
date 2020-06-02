@@ -36,7 +36,17 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
+
+        public IEnumerable<ProjectDesignType> GetProjectDesignTypeByUnitIDAndProjectTypeID(string key, string ProjectTypeID)
+        {
+            return Query<ProjectDesignType>(
+                sql: "SELECT * FROM dbo.project_design_type WHERE unit_id = @key and is_deleted = 0 and design_type_id = @ProjectTypeID",
+                param: new { key, ProjectTypeID }
+            );
+        }
+
         
+
         public IEnumerable<ProjectDesignType> All()
         {
             return Query<ProjectDesignType>(
@@ -54,6 +64,19 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
+
+        public void RemoveByUnitID(string key)
+        {
+            Execute(
+                sql: @"UPDATE dbo.project_design_type
+                   SET
+                       modified_date = GETDATE(), is_deleted = 1
+                    WHERE unit_id = @key",
+                param: new { key }
+            );
+        }
+
+        
 
         public void Update(ProjectDesignType entity)
         {

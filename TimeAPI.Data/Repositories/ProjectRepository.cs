@@ -35,9 +35,10 @@ namespace TimeAPI.Data.Repositories
                 sql: @"SELECT TOP 1 project_prefix 
                             FROM dbo.project 
                         WHERE   
-                            project_prefix like  '%JOB' 
+                            project_prefix like  '%JOB%' 
                             AND org_id = @key 
                             AND FORMAT(CAST(created_date AS DATE), 'd', 'EN-US') = FORMAT(CAST(@date AS DATE), 'd', 'EN-US')
+                            AND dbo.project.is_deleted = 0
                             ORDER BY created_date DESC",
                 param: new { key, date }
             );

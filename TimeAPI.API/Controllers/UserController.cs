@@ -71,7 +71,7 @@ namespace TimeAPI.API.Controllers
             if (string.IsNullOrWhiteSpace(UserID.ID))
                 throw new ArgumentNullException(nameof(UserID.ID));
 
-            var Result = _unitOfWork.UserRepository.LastCheckinByEmpID(UserID.ID);
+            var Result = _unitOfWork.UserRepository.LastCheckinByEmpID(UserID.ID, _dateTime.ToString());
             return Task.FromResult<object>(Result);
         }
     }

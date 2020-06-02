@@ -16,8 +16,8 @@ namespace TimeAPI.Data.Repositories
         {
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.task
-                                  (id, empid, task_name, task_desc, priority_id, status_id, assigned_empid, due_date, created_date, createdby, is_approver, is_approver_id)
-                           VALUES (@id, @empid, @task_name, @task_desc, @priority_id, @status_id, @assigned_empid, @due_date, @created_date, @createdby, @is_approver, @is_approver_id);
+                                  (id, empid, task_name, task_desc, priority_id, status_id, assigned_empid, due_date, unit, qty, created_date, createdby, is_approver, is_approver_id)
+                           VALUES (@id, @empid, @task_name, @task_desc, @priority_id, @status_id, @assigned_empid, @due_date, @unit, @qty, @created_date, @createdby, @is_approver, @is_approver_id);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -57,6 +57,8 @@ namespace TimeAPI.Data.Repositories
                     status_id = @status_id,
                     assigned_empid = @assigned_empid,
                     due_date = @due_date,
+					unit = @unit, 
+					qty = @qty,
                     modified_date = @modified_date,
                     modifiedby = @modifiedby,
                     is_approver = @is_approver,
@@ -329,6 +331,7 @@ namespace TimeAPI.Data.Repositories
             var _employeeTasks = Query<EmployeeTasks>(
                          sql: @"SELECT
                                     DISTINCT(task.task_name),
+									project_activity.activity_name as milestone_name,
                                     task.id,
 	                                employee.id as empid,
 	                                task.task_desc,
@@ -342,8 +345,11 @@ namespace TimeAPI.Data.Repositories
 		                            et.full_name as approver_name,
 	                                FORMAT(CAST(task.due_date  AS DATE), 'd', 'EN-US') as due_date,
 	                                task.created_date
-	                                FROM[dbo].[task] WITH (NOLOCK)
+	                                FROM [dbo].[task] WITH (NOLOCK)
+										
 			                            INNER JOIN employee on task.empid = employee.id
+										LEFT JOIN project_activity_x_task ON task.id = project_activity_x_task.task_id
+										LEFT JOIN project_activity ON project_activity_x_task.activity_id = project_activity.id
 			                            LEFT JOIN employee e on task.assigned_empid = e.id
 			                            LEFT JOIN employee et on task.is_approver_id = et.id
 			                            LEFT JOIN priority on task.priority_id = priority.id
@@ -357,6 +363,7 @@ namespace TimeAPI.Data.Repositories
 
 	                        SELECT
                                         DISTINCT(task.task_name),
+									project_activity.activity_name as milestone_name,
                                     task.id,
 	                                employee.id as empid,
 	                                task.task_desc,
@@ -372,6 +379,8 @@ namespace TimeAPI.Data.Repositories
 	                                task.created_date
 	                                FROM [dbo].[task] WITH (NOLOCK)
 			                            INNER JOIN employee on task.empid = employee.id
+										LEFT JOIN project_activity_x_task ON task.id = project_activity_x_task.task_id
+										LEFT JOIN project_activity ON project_activity_x_task.activity_id = project_activity.id
 			                            LEFT JOIN employee e on task.assigned_empid = e.id
 			                            LEFT JOIN employee et on task.is_approver_id = et.id
 			                            LEFT JOIN priority on task.priority_id = priority.id
@@ -387,6 +396,7 @@ namespace TimeAPI.Data.Repositories
             var _employeeAssignedTasks = Query<EmployeeTasks>(
 					   sql: @"SELECT
 									 DISTINCT(task.task_name),
+										project_activity.activity_name as milestone_name,
 									task.id,
 									employee.id as empid,
 									task.task_desc,
@@ -402,6 +412,8 @@ namespace TimeAPI.Data.Repositories
 									task.created_date
 								   FROM [dbo].[task] WITH (NOLOCK)
 										INNER JOIN employee on task.empid = employee.id
+										LEFT JOIN project_activity_x_task ON task.id = project_activity_x_task.task_id
+										LEFT JOIN project_activity ON project_activity_x_task.activity_id = project_activity.id
 										LEFT JOIN employee e on task.assigned_empid = e.id
 										LEFT JOIN employee et on task.is_approver_id = et.id
 										LEFT JOIN priority on task.priority_id = priority.id
@@ -415,6 +427,7 @@ namespace TimeAPI.Data.Repositories
             var _overdueTasks = Query<EmployeeTasks>(
 					sql: @"SELECT
 								DISTINCT(task.task_name),
+								project_activity.activity_name as milestone_name,
 								task.id,
 								employee.id as empid,
 								task.task_desc,
@@ -430,6 +443,8 @@ namespace TimeAPI.Data.Repositories
 								task.created_date
 								FROM[dbo].[task] WITH (NOLOCK)
 									INNER JOIN employee on task.empid = employee.id
+										LEFT JOIN project_activity_x_task ON task.id = project_activity_x_task.task_id
+										LEFT JOIN project_activity ON project_activity_x_task.activity_id = project_activity.id
 									LEFT JOIN employee e on task.assigned_empid = e.id
 									LEFT JOIN employee et on task.is_approver_id = et.id
 									LEFT JOIN priority on task.priority_id = priority.id
@@ -446,6 +461,7 @@ namespace TimeAPI.Data.Repositories
 
 						SELECT
 									DISTINCT(task.task_name),
+project_activity.activity_name as milestone_name,
 								task.id,
 								employee.id as empid,
 								task.task_desc,
@@ -461,6 +477,8 @@ namespace TimeAPI.Data.Repositories
 								task.created_date
 								FROM [dbo].[task] WITH (NOLOCK)
 									INNER JOIN employee on task.empid = employee.id
+									LEFT JOIN project_activity_x_task ON task.id = project_activity_x_task.task_id
+									LEFT JOIN project_activity ON project_activity_x_task.activity_id = project_activity.id
 									LEFT JOIN employee e on task.assigned_empid = e.id
 									LEFT JOIN employee et on task.is_approver_id = et.id
 									LEFT JOIN priority on task.priority_id = priority.id

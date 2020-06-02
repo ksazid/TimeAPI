@@ -15,7 +15,7 @@ namespace TimeAPI.API.Controllers
     //[EnableCors("CorsPolicy")]
     [Route("[controller]")]
     //[Authorize(Roles = "superadmin")]
-    public class AdminDashboardController : Controller
+    public class ActivityDashboardController : Controller
     {
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
@@ -23,7 +23,7 @@ namespace TimeAPI.API.Controllers
         private readonly IUnitOfWork _unitOfWork;
         private static DateTime _dateTime;
 
-        public AdminDashboardController(IUnitOfWork unitOfWork, ILogger<AdminDashboardController> logger,
+        public ActivityDashboardController(IUnitOfWork unitOfWork, ILogger<ActivityDashboardController> logger,
             IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings)
         {
             _emailSender = emailSender;
@@ -33,6 +33,17 @@ namespace TimeAPI.API.Controllers
             _dateTime = InternetTime.GetCurrentTimeFromTimeZone().Value.DateTime;
         }
 
+
+
+
+
+
+        /// <summary>
+        /// /
+        /// </summary>
+        /// <param name="Utils"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("GetTimesheetDashboardDataByOrgIDAndDate")]
         public async Task<object> GetTimesheetDashboardDataByOrgIDAndDate([FromBody] UtilsOrgIDAndDate Utils, CancellationToken cancellationToken)
@@ -129,7 +140,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
 
         [HttpPost]
         [Route("GetTimesheetDashboardLastCheckoutGridDataByOrgIDAndDate")]

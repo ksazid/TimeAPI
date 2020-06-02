@@ -56,6 +56,18 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
+        public void RemoveByUnitID(string key)
+        {
+            Execute(
+                sql: @"UPDATE dbo.project_tags
+                   SET
+                       modified_date = GETDATE(), is_deleted = 1
+                    WHERE unit_id = @key",
+                param: new { key }
+            );
+        }
+
+        
         public void Update(ProjectTags entity)
         {
             Execute(

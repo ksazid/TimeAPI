@@ -19,7 +19,7 @@ namespace TimeAPI.Domain.Entities
         public string modified_date { get; set; }
         public string modifiedby { get; set; }
         public bool is_deleted { get; set; }
-        public List<ProjectDesignType> ProjectDesignType { get; set; }
+        public List<string> ProjectDesignType_ID { get; set; }
         public List<ProjectTags> ProjectTags { get; set; }
     }
 }

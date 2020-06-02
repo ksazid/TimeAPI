@@ -65,6 +65,7 @@ namespace TimeAPI.Data
         private IDelegationsDelegateeRepository _delegationsDelegateeRepository;
         private ISuperadminOrganizationRepository _superadminOrganizationRepository;
         private IAdminDashboardRepository _adminDashboardRepository;
+        private IActivityDashboardRepository _activityDashboardRepository;
         private ILocationExceptionRepository _locationExceptionRepository;
         private IEntityInvitationRepository _entityInvitationRepository;
         private IWeekdaysRepository _weekdaysRepository;
@@ -430,12 +431,12 @@ namespace TimeAPI.Data
             }
         }
 
-        public IAdminDashboardRepository AdminDashboardRepository
+        public IActivityDashboardRepository ActivityDashboardRepository
         {
             get
             {
-                return _adminDashboardRepository
-                    ?? (_adminDashboardRepository = new AdminDashboardRepository(_transaction));
+                return _activityDashboardRepository
+                    ?? (_activityDashboardRepository = new ActivityDashboardRepository(_transaction));
             }
         }
 
@@ -591,7 +592,15 @@ namespace TimeAPI.Data
                     ?? (_superadminOrganizationRepository = new SuperadminOrganizationRepository(_transaction));
             }
         }
-
+        public IAdminDashboardRepository AdminDashboardRepository
+        {
+            get
+            {
+                return _adminDashboardRepository
+                    ?? (_adminDashboardRepository = new AdminDashboardRepository(_transaction));
+            }
+        }
+        
         public ILocationExceptionRepository LocationExceptionRepository
         {
             get
