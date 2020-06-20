@@ -13,6 +13,8 @@ namespace TimeAPI.Domain.Entities
         public string phone { get; set; }
         public string mobile { get; set; }
         public string email { get; set; }
+        public string city { get; set; }
+        public string country { get; set; }
         public string createdby { get; set; }
         public string created_date { get; set; }
         public string modified_date { get; set; }

@@ -230,30 +230,6 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
-        //[HttpPost]
-        //[Route("FetchByAllTeamMembersTeamID")]
-        //public async Task<object> FetchByAllTeamMembersTeamID([FromBody] Utils Utils, CancellationToken cancellationToken)
-        //{
-        //    try
-        //    {
-        //        if (cancellationToken != null)
-        //            cancellationToken.ThrowIfCancellationRequested();
-
-        //        if (Utils == null)AllProjectRatioByOrgID
-        //            throw new ArgumentNullException(nameof(Utils.ID));
-
-        //        oDataTable _oDataTable = new oDataTable();
-        //        IEnumerable<dynamic> results = _unitOfWork.TeamRepository.FetchByAllTeamMembersTeamID(Utils.ID);
-        //        var xResult = _oDataTable.ToDataTable(results);
-
-        //        return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-        //    }
-        //}
-
         [HttpPost]
         [Route("FetchAllTeamsByOrgID")]
         public async Task<object> FetchAllTeamsByOrgID([FromBody] UtilsOrgID Utils, CancellationToken cancellationToken)

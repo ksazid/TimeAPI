@@ -14,12 +14,12 @@ namespace TimeAPI.Domain.Repositories
         void UpdateCostProjectStatusByID(CostProject entity);
 
         //CostProject FindAutoCostProjectPrefixByOrgID(string key, string key1);
-
         //CostProject FindCustomCostProjectPrefixByOrgIDAndPrefix(string key, string key1);
-       
         //IEnumerable<dynamic> FindAllCostProjectActivityByCostProjectID(string ProjectID);
         //string ProjectActivityCount(string key);
         //string CostProjectTaskCount(string key);
+        void UpdateCostProjectDiscountAndProfitMarginByID(CostProject entity);
+        
 
     }
 }

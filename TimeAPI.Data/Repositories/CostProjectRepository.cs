@@ -14,8 +14,8 @@ namespace TimeAPI.Data.Repositories
         {
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.cost_project
-                                  (id, user_id, org_id, project_type_id, project_name, project_desc, project_prefix, start_date, end_date, completed_date, project_status_id, is_private, is_public, is_site_visit, no_of_floors, is_boq, created_date, createdby)
-                           VALUES (@id, @user_id, @org_id, @project_type_id, @project_name, @project_desc, @project_prefix, @start_date, @end_date, @completed_date, @project_status_id, @is_private, @is_public, @is_site_visit, @no_of_floors, @is_boq, @created_date, @createdby);
+                                  (id, user_id, org_id, package_id, project_type_id, project_name, project_desc, project_prefix, start_date, end_date, completed_date, project_status_id, is_private, is_public, no_of_floors, plot_size, buildup_area, discount_amount, profit_margin_amount, created_date, createdby)
+                           VALUES (@id, @user_id, @org_id, @package_id, @project_type_id, @project_name, @project_desc, @project_prefix, @start_date, @end_date, @completed_date, @project_status_id, @is_private, @is_public, @no_of_floors, @plot_size, @buildup_area, @discount_amount, @profit_margin_amount, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -72,6 +72,7 @@ namespace TimeAPI.Data.Repositories
                 sql: @"UPDATE dbo.cost_project
                    SET
                     user_id = @user_id,
+                    package_id = @package_id,
                     project_type_id = @project_type_id,
                     org_id = @org_id,
                     project_name = @project_name,
@@ -83,9 +84,11 @@ namespace TimeAPI.Data.Repositories
                     project_status_id = @project_status_id,
                     is_private = @is_private,
                     is_public = @is_public,
-                    is_site_visit = @is_site_visit, 
                     no_of_floors = @no_of_floors, 
-                    is_boq = @is_boq,
+                    plot_size = @plot_size, 
+                    buildup_area = @buildup_area,
+                    discount_amount = @discount_amount,
+                    profit_margin_amount = @profit_margin_amount,
                     modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE id = @id",
@@ -110,9 +113,11 @@ namespace TimeAPI.Data.Repositories
                             cost_project.id as project_id,
                             cost_project.project_name,
                             cost_project.project_prefix,
-                            cost_project.is_site_visit, 
                             cost_project.no_of_floors, 
-                            cost_project.is_boq,
+                            cost_project.plot_size, 
+                            cost_project.buildup_area, 
+                            cost_project.discount_amount, 
+                            cost_project.profit_margin_amount, 
                             e_tl.full_name as project_owner,
                             e_tl.workemail,
                             project_status.project_status_name ,
@@ -143,47 +148,20 @@ namespace TimeAPI.Data.Repositories
            );
         }
 
-        //public string CostProjectTaskCount(string entity)
-        //{
-        //    return QuerySingleOrDefault<string>(
-        //             sql: @"SELECT 
-        //                    TaskCount = COUNT (task.id) FROM dbo.cost_project
-        //                    INNER JOIN project_activity_x_task on project.id = project_activity_x_task.project_id
-        //                    INNER JOIN project_activity on project_activity_x_task.activity_id = project_activity.id
-        //                    INNER JOIN task on task.id = project_activity_x_task.task_id
-        //                WHERE project.id = @entity
-        //                    AND project.is_deleted = 0
-        //                    AND project_activity.is_deleted = 0
-        //                    AND task.is_deleted = 0",
-        //       param: new { entity }
-        //   );
-        //}
 
-        //public IEnumerable<dynamic> FindAllCostProjectActivityByCostProjectID(string key)
-        //{
-        //    return Query<dynamic>(
-        //           sql: @"SELECT 
-        //                    project_activity.project_id, 
-        //                    project_activity.id as project_activity_id,
-        //                    project_activity.activity_name,
-        //                    project_activity.activity_desc, 
-        //                    CASE WHEN project_activity.is_approve_req = 0 THEN 'False' ELSE 'True' END as is_approve_req, 
-        //                    ISNULL(employee.full_name, 'NA') as approver, 
-        //                    employee.id as approver_id,
-        //                    CASE WHEN project_activity.is_approved = 0 THEN 'False' ELSE 'True' END as is_approved, 
-        //                    status.status_name, 
-        //                    project_activity.start_date, 
-        //                    project_activity.end_date 
-        //                FROM project_activity 
-        //                    INNER JOIN project on project_activity.project_id = project.id
-        //                    LEFT JOIN employee on project_activity.approved_id = employee.id
-        //                    LEFT JOIN status on project_activity.status_id = status.id
-        //                WHERE project.id = @key
-        //                    AND project.is_deleted = 0
-        //                    AND project_activity.is_deleted = 0
-        //                    ORDER BY project_activity.activity_name ASC",
-        //              param: new { key }
-        //       );
-        //}
+        public void UpdateCostProjectDiscountAndProfitMarginByID(CostProject entity)
+        {
+            Execute(
+               sql: @"UPDATE dbo.cost_project
+                   SET
+                    discount_amount = @discount_amount,
+                    profit_margin_amount = @profit_margin_amount,
+                    modified_date = @modified_date,
+                    modifiedby = @modifiedby
+                    WHERE id = @id",
+               param: entity
+           );
+        }
+
     }
 }

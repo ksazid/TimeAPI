@@ -9,6 +9,7 @@ namespace TimeAPI.Domain.Entities
         public string id { get; set; }
         public string user_id { get; set; }
         public string org_id { get; set; }
+        public string package_id { get; set; }
         public string project_type_id { get; set; }
         public string project_name { get; set; }
         public string project_desc { get; set; }

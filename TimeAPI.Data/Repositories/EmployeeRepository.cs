@@ -334,5 +334,31 @@ namespace TimeAPI.Data.Repositories
               param: new { key }
           );
         }
+
+        public dynamic GetOrganizationScreenshotDetails(string key)
+        {
+            return Query<dynamic>(
+                   sql: @" 	SELECT
+				                employee.id,
+				                employee.full_name,
+				                employee.workemail,
+				                employee.emp_code,
+				                employee_type.employee_type_name,
+				                department.dep_name,
+				                designation.designation_name,
+				                organization.org_name,
+				                organization_screenshot_setup.screenshot_time
+			                FROM dbo.employee WITH(NOLOCK)
+ 				                INNER JOIN organization ON employee.org_id = organization.org_id
+ 				                LEFT JOIN organization_screenshot_setup ON organization.org_id = organization_screenshot_setup.org_id
+				                LEFT JOIN employee_type ON employee.emp_type_id = employee_type.id
+ 				                LEFT JOIN department ON employee.deptid = department.id
+				                LEFT JOIN designation ON employee.designation_id = designation.id
+ 				                WHERE dbo.employee.user_id =  @key and employee.is_deleted = 0
+				                ORDER BY employee.full_name ASC",
+                      param: new { key }
+               );
+        }
+        
     }
 }

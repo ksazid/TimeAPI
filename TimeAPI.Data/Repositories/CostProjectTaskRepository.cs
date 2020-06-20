@@ -16,8 +16,8 @@ namespace TimeAPI.Data.Repositories
         {
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.cost_task
-                                  (id, project_id, is_selected, milestone_id, task_name, unit, qty, created_date, createdby)
-                           VALUES (@id, @project_id, @is_selected, @milestone_id, @task_name, @unit, @qty, @created_date, @createdby);
+                                  (id, project_id, is_selected, milestone_id, task_name, total_unit, default_unit_hours, unit, qty, created_date, createdby)
+                           VALUES (@id, @project_id, @is_selected, @milestone_id, @task_name, @total_unit, @default_unit_hours, @unit, @qty, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -64,6 +64,8 @@ namespace TimeAPI.Data.Repositories
 					is_selected  = @is_selected, 
 					milestone_id = @milestone_id, 
 					task_name = @task_name, 
+                    total_unit = @total_unit,
+                    default_unit_hours = @default_unit_hours,
 					unit = @unit, 
 					qty = @qty,
                     modified_date = @modified_date,
@@ -99,6 +101,36 @@ namespace TimeAPI.Data.Repositories
                 param: entity
             );
         }
+
+        public void UpdateCostProjectNotesQtyTaskID(CostProjectTask entity)
+        {
+            Execute(
+                sql: @"UPDATE dbo.cost_task
+                   SET
+					notes = @notes,
+                    modified_date = @modified_date,
+                    modifiedby = @modifiedby
+                    WHERE id =  @id",
+                param: entity
+            );
+        }
+
+
+        public void UpdateCostProjectDiscountAndTotalCostTaskID(CostProjectTask entity)
+        {
+            Execute(
+                sql: @"UPDATE dbo.cost_task
+                   SET
+					discount_amount = @discount_amount,
+					total_cost_amount = @total_cost_amount,
+                    modified_date = @modified_date,
+                    modifiedby = @modifiedby
+                    WHERE id =  @id",
+                param: entity
+            );
+        }
+
+        
 
         public void UpdateIsSelectedByTaskID(CostProjectTask entity)
         {

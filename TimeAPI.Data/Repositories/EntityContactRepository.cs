@@ -14,8 +14,8 @@ namespace TimeAPI.Data.Repositories
         {
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO entity_contact
-                                  (id, entity_id, name, position, phone, mobile, email, created_date, createdby)
-                           VALUES (@id, @entity_id, @name, @position, @phone, @mobile, @email, @created_date, @createdby);
+                                  (id, entity_id, name, position, phone, mobile, email, city, country, created_date, createdby)
+                           VALUES (@id, @entity_id, @name, @position, @phone, @mobile, @email, @city, @country, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -59,6 +59,8 @@ namespace TimeAPI.Data.Repositories
                     phone = @phone,
                     mobile = @mobile,
                     email = @email,
+                    city = @city, 
+                    country = @country,
                     modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE id = @id",
@@ -77,6 +79,8 @@ namespace TimeAPI.Data.Repositories
                     phone = @phone,
                     mobile = @mobile,
                     email = @email,
+                    city = @city, 
+                    country = @country,
                     modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE entity_id = @entity_id",

@@ -26,5 +26,7 @@ namespace TimeAPI.Domain.Repositories
         void RemoveByProjectID(string ProjectID);
         void UpdateIsSelectedByTaskID(CostProjectTask entity);
         void UpdateCostProjectTaskQtyTaskID(CostProjectTask entity);
+        void UpdateCostProjectNotesQtyTaskID(CostProjectTask entity);
+        void UpdateCostProjectDiscountAndTotalCostTaskID(CostProjectTask entity);
     }
 }

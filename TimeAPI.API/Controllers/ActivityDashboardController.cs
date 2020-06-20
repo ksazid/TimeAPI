@@ -36,8 +36,6 @@ namespace TimeAPI.API.Controllers
 
 
 
-
-
         /// <summary>
         /// /
         /// </summary>

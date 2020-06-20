@@ -13,7 +13,10 @@ namespace TimeAPI.Domain.Entities
         public string unit_name { get; set; }
         public string no_of_unit { get; set; }
         public string unit_qty { get; set; }
+        public string unit_qty_all { get; set; }
+        public string total_unit { get; set; }
         public string note { get; set; }
+        public bool is_extra { get; set; }
         public string created_date { get; set; }
         public string createdby { get; set; }
         public string modified_date { get; set; }

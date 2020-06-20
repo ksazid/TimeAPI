@@ -40,7 +40,16 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<UnitDescription> FetchAllUnitDescriptionByOrgID(string key)
         {
             return Query<UnitDescription>(
-                sql: "SELECT * FROM dbo.unit_desc WHERE is_deleted = 0 AND org_id = @key ORDER BY unit_name ASC",
+                sql: "SELECT * FROM dbo.unit_desc WHERE is_deleted = 0 AND org_id = @key AND is_extra = 0 ORDER BY unit_name ASC",
+                   param: new { key }
+            );
+        }
+
+
+        public IEnumerable<UnitDescription> FetchAllUnitDescriptionExtraByOrgID(string key)
+        {
+            return Query<UnitDescription>(
+                sql: "SELECT * FROM dbo.unit_desc WHERE is_deleted = 0 AND org_id = @key AND is_extra = 1 ORDER BY unit_name ASC",
                    param: new { key }
             );
         }

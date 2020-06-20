@@ -9,6 +9,7 @@ namespace TimeAPI.Domain.Entities
         public string id { get; set; }
         public string user_id { get; set; }
         public string org_id { get; set; }
+        public string package_id { get; set; }
         public string project_type_id { get; set; }
         public string project_name { get; set; }
         public string project_desc { get; set; }
@@ -20,15 +21,16 @@ namespace TimeAPI.Domain.Entities
         public bool is_private { get; set; }
         public bool is_public { get; set; }
         public bool is_inactive { get; set; }
-        public bool is_site_visit { get; set; }
         public string no_of_floors { get; set; }
-        public bool is_boq { get; set; }
+        public string plot_size { get; set; }
+        public string buildup_area { get; set; }
+        public string discount_amount { get; set; }
+        public string profit_margin_amount { get; set; }
         public string createdby { get; set; }
         public string created_date { get; set; }
         public string modified_date { get; set; }
         public string modifiedby { get; set; }
         public bool is_deleted { get; set; }
-
         public EntityContact EntityContact { get; set; }
         //public EntityLocation EntityLocation { get; set; }
         public Customer EntityCustomer { get; set; }

@@ -86,7 +86,18 @@ namespace TimeAPI.Data
         private IProjectTagsRepository _projectTagsRepository;
         private IProjectUnitRepository _projectUnitRepository;
         private IProjectDesignTypeRepository _projectDesignTypeRepository;
-        
+        private IPackagesRepository _packagesRepository;
+        private ICostPerHourRepository _costPerHourRepository;
+        private IProfitMarginRepository _profitMarginRepository;
+
+        private ILeaveSetupRepository _leaveSetupRepository;
+        private ILeaveTypeRepository _leaveTypeRepository;
+        private ITimeoffTypeRepository _timeoffTypeRepository;
+        private IEmployeeLeaveRepository _employeeLeaveRepository;
+        private ILeaveStatusRepository _leaveStatusRepository;
+        private IEmployeeScreenshotRepository _employeeScreenshotRepository;
+
+
 
         #region systemadmin
         private IPlanRepository _planRepository;
@@ -762,6 +773,87 @@ namespace TimeAPI.Data
                     ?? (_projectDesignTypeRepository = new ProjectDesignTypeRepository(_transaction));
             }
         }
+
+        public IPackagesRepository PackagesRepository
+        {
+            get
+            {
+                return _packagesRepository
+                    ?? (_packagesRepository = new PackagesRepository(_transaction));
+            }
+        }
+        public ICostPerHourRepository CostPerHourRepository
+        {
+            get
+            {
+                return _costPerHourRepository
+                    ?? (_costPerHourRepository = new CostPerHourRepository(_transaction));
+            }
+        }
+        public IProfitMarginRepository ProfitMarginRepository
+        {
+            get
+            {
+                return _profitMarginRepository
+                    ?? (_profitMarginRepository = new ProfitMarginRepository(_transaction));
+            }
+        }
+
+        public ILeaveSetupRepository LeaveSetupRepository
+        {
+            get
+            {
+                return _leaveSetupRepository
+                    ?? (_leaveSetupRepository = new LeaveSetupRepository(_transaction));
+            }
+        }
+
+        public ILeaveTypeRepository LeaveTypeRepository
+        {
+            get
+            {
+                return _leaveTypeRepository
+                    ?? (_leaveTypeRepository = new LeaveTypeRepository(_transaction));
+            }
+        }
+
+        public ITimeoffTypeRepository TimeoffTypeRepository
+        {
+            get
+            {
+                return _timeoffTypeRepository
+                    ?? (_timeoffTypeRepository = new TimeoffTypeRepository(_transaction));
+            }
+        }
+        public IEmployeeLeaveRepository EmployeeLeaveRepository
+        {
+            get
+            {
+                return _employeeLeaveRepository
+                    ?? (_employeeLeaveRepository = new EmployeeLeaveRepository(_transaction));
+            }
+        }
+
+        public ILeaveStatusRepository LeaveStatusRepository
+        {
+            get
+            {
+                return _leaveStatusRepository
+                    ?? (_leaveStatusRepository = new LeaveStatusRepository(_transaction));
+            }
+        }
+
+        public IEmployeeScreenshotRepository EmployeeScreenshotRepository
+        {
+            get
+            {
+                return _employeeScreenshotRepository
+                    ?? (_employeeScreenshotRepository = new EmployeeScreenshotRepository(_transaction));
+            }
+        }
+
+
+
 
         public bool Commit()
         {

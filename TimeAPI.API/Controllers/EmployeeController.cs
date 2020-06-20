@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using TimeAPI.API.Extensions;
 using TimeAPI.API.Models;
+using TimeAPI.API.Models.EmployeeLeaveViewModels;
 using TimeAPI.API.Models.EmployeeViewModels;
 using TimeAPI.API.Services;
 using TimeAPI.Domain;
@@ -45,6 +46,7 @@ namespace TimeAPI.API.Controllers
             _userManager = userManager;
             _dateTime = InternetTime.GetCurrentTimeFromTimeZone().Value.DateTime;
         }
+        #region Employee
 
         [HttpPost]
         [Route("AddEmployee")]
@@ -181,6 +183,28 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee removed successfully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("GetOrganizationScreenshotDetails")]
+        public async Task<object> GetOrganizationScreenshotDetails([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                var result = _unitOfWork.EmployeeRepository.GetOrganizationScreenshotDetails(Utils.ID);
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -512,6 +536,193 @@ namespace TimeAPI.API.Controllers
                 return System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
+
+        #endregion Employee
+
+        #region EmployeeLeave
+
+        [HttpPost]
+        [Route("AddEmployeeLeave")]
+        public async Task<object> AddEmployeeLeave([FromBody] EmployeeLeaveViewModel employeeViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (employeeViewModel == null)
+                    throw new ArgumentNullException(nameof(employeeViewModel));
+
+
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeLeaveViewModel, EmployeeLeave>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<EmployeeLeave>(employeeViewModel);
+                modal.id = Guid.NewGuid().ToString();
+                modal.created_date = _dateTime.ToString();
+
+                _unitOfWork.EmployeeLeaveRepository.Add(modal);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee Leave added successfully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPatch]
+        [Route("UpdateEmployeeLeave")]
+        public async Task<object> UpdateEmployeeLeave([FromBody] EmployeeLeaveViewModel employeeViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (employeeViewModel == null)
+                    throw new ArgumentNullException(nameof(employeeViewModel));
+
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeLeaveViewModel, EmployeeLeave>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<EmployeeLeave>(employeeViewModel);
+                modal.modified_date = _dateTime.ToString();
+
+                _unitOfWork.EmployeeLeaveRepository.Update(modal);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee Leave updated successfully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("RemoveEmployeeLeave")]
+        public async Task<object> RemoveEmployeeLeave([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+
+                _unitOfWork.EmployeeLeaveRepository.Remove(Utils.ID);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "EmployeeLeave removed successfully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("FindEmployeeLeaveByID")]
+        public async Task<object> FindEmployeeLeaveByID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                var result = _unitOfWork.EmployeeLeaveRepository.FetchEmployeeLeaveID(Utils.ID);
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("FetchEmployeeLeaveOrgID")]
+        public async Task<object> FetchEmployeeLeaveOrgID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+               
+
+                oDataTable _oDataTable = new oDataTable();
+                var result = _unitOfWork.EmployeeLeaveRepository.FetchEmployeeLeaveOrgID(Utils.ID);
+                //var xResult = _oDataTable.ToDataTable(result);
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+
+        [HttpPost]
+        [Route("FetchEmployeeLeaveEmpID")]
+        public async Task<object> FetchEmployeeLeaveEmpID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                var result = _unitOfWork.EmployeeLeaveRepository.FetchEmployeeLeaveEmpID(Utils.ID);
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+
+        [HttpPatch]
+        [Route("UpdateApprovedByID")]
+        public async Task<object> UpdateApprovedByID([FromBody] EmployeeLeaveViewModel employeeViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (employeeViewModel == null)
+                    throw new ArgumentNullException(nameof(employeeViewModel));
+
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeLeaveViewModel, EmployeeLeave>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<EmployeeLeave>(employeeViewModel);
+                modal.modified_date = _dateTime.ToString();
+
+                _unitOfWork.EmployeeLeaveRepository.UpdateApprovedByID(modal);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee Leave updated successfully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        #endregion EmployeeLeave
 
         #region Helpers
 

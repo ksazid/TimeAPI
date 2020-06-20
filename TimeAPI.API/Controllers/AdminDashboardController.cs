@@ -121,7 +121,6 @@ namespace TimeAPI.API.Controllers
                     cancellationToken.ThrowIfCancellationRequested();
 
                 var result = _unitOfWork.AdminDashboardRepository.GetTimesheetDashboardFirstCheckInGridDataByOrgIDAndDate(Utils.OrgID, Utils.fromDate, Utils.toDate);
-
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)

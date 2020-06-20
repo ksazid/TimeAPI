@@ -76,6 +76,16 @@ namespace TimeAPI.Domain
         IProjectUnitRepository ProjectUnitRepository { get; }
         IProjectTagsRepository ProjectTagsRepository { get; }
         IProjectDesignTypeRepository ProjectDesignTypeRepository { get; }
+        IPackagesRepository PackagesRepository { get; }
+        ICostPerHourRepository CostPerHourRepository { get; }
+        IProfitMarginRepository ProfitMarginRepository { get; }
+        ILeaveSetupRepository LeaveSetupRepository { get; }
+        ILeaveTypeRepository LeaveTypeRepository { get; }
+        ITimeoffTypeRepository TimeoffTypeRepository { get; }
+        IEmployeeLeaveRepository EmployeeLeaveRepository { get; }
+        ILeaveStatusRepository LeaveStatusRepository { get; }
+
+        IEmployeeScreenshotRepository EmployeeScreenshotRepository { get; }
 
         #region systemadmin
         IPlanRepository PlanRepository { get; }

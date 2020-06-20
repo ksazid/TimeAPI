@@ -14,8 +14,8 @@ namespace TimeAPI.Data.Repositories
         {
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.cost_project_milestone
-                                  (id, org_id, project_id, milestone_name, created_date, createdby)
-                           VALUES (@id, @org_id, @project_id, @milestone_name, @created_date, @createdby);
+                                  (id, org_id, project_id, milestone_name, alias_name, created_date, createdby)
+                           VALUES (@id, @org_id, @project_id, @milestone_name, @alias_name, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -72,6 +72,7 @@ namespace TimeAPI.Data.Repositories
                     org_id = @org_id,
                     project_id = @project_id,
                     milestone_name = @milestone_name,
+                    alias_name = @alias_name,
                     modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE id = @id",
@@ -86,9 +87,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<CostProjectMilestone > GetCostProjectMilestoneByProjectID(string key)
+        public IEnumerable<CostProjectMilestone> GetCostProjectMilestoneByProjectID(string key)
         {
-            return Query<CostProjectMilestone >(
+            return Query<CostProjectMilestone>(
                 sql: @"SELECT dbo.cost_project_milestone.*
                         FROM dbo.cost_project_milestone 
                     WHERE dbo.cost_project_milestone.is_deleted = 0 
