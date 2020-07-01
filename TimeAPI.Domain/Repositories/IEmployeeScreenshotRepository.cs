@@ -7,6 +7,6 @@ namespace TimeAPI.Domain.Repositories
 {
     public interface IEmployeeScreenshotRepository : IRepository<EmployeeScreenshot, string>
     {
-        public EmployeeScreenshot FindByProfileEmpiID(string key);
+        public EmployeeScreenshot FindEmployeeScreenshotEmpID(string key);
     }
 }

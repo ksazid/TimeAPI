@@ -84,8 +84,17 @@ namespace TimeAPI.Domain
         ITimeoffTypeRepository TimeoffTypeRepository { get; }
         IEmployeeLeaveRepository EmployeeLeaveRepository { get; }
         ILeaveStatusRepository LeaveStatusRepository { get; }
-
         IEmployeeScreenshotRepository EmployeeScreenshotRepository { get; }
+        IEmployeeAppUsageRepository EmployeeAppUsageRepository { get; }
+        IEmployeeAppTrackedRepository EmployeeAppTrackedRepository { get; }
+        IEmployeeLeaveLogRepository EmployeeLeaveLogRepository { get; }
+        ILeadCompanyRepository LeadCompanyRepository { get; }
+        ILeadRepository LeadRepository { get; }
+        ILeadProjectRepository LeadProjectRepository { get; }
+        ILeadSourceRepository LeadSourceRepository { get; }
+        ILeadStatusRepository LeadStatusRepository { get; }
+        ILeadRatingRepository LeadRatingRepository { get; }
+        ITimesheetDeskRepository TimesheetDeskRepository { get; }
 
         #region systemadmin
         IPlanRepository PlanRepository { get; }

@@ -29,10 +29,15 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<LeaveSetup> FetchLeaveSetupOrgID(string key)
+        public dynamic FetchLeaveSetupOrgID(string key)
         {
-            return Query<LeaveSetup>(
-                sql: "SELECT * FROM dbo.leave_setup WHERE org_id = @key and is_deleted = 0",
+            return Query<dynamic>(
+                sql: @"SELECT 
+                        [dbo].[leave_type].leave_type_name, dbo.leave_setup .* 
+                    FROM dbo.leave_setup 
+                        INNER JOIN [dbo].[leave_type] on dbo.leave_setup.leave_type_id = [dbo].[leave_type].id
+                    WHERE dbo.leave_setup.org_id = @key
+                        AND dbo.leave_setup.is_deleted = 0",
                 param: new { key }
             );
         }

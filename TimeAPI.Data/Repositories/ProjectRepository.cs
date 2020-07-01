@@ -44,6 +44,21 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
+        public Project FindAutoCostProjectPrefixByOrgID(string key, string date)
+        {
+            return QuerySingleOrDefault<Project>(
+                sql: @"SELECT TOP 1 project_prefix 
+                            FROM dbo.cost_project 
+                        WHERE   
+                            project_prefix like  '%JOB%' 
+                            AND org_id = @key 
+                            AND FORMAT(CAST(created_date AS DATE), 'd', 'EN-US') = FORMAT(CAST(@date AS DATE), 'd', 'EN-US')
+                            AND dbo.cost_project.is_deleted = 0
+                            ORDER BY created_date DESC",
+                param: new { key, date }
+            );
+        }
+
         public Project FindCustomProjectPrefixByOrgIDAndPrefix(string key, string project_prefix)
         {
             return QuerySingleOrDefault<Project>(

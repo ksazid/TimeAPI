@@ -7,10 +7,14 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using TimeAPI.API.Extensions;
 using TimeAPI.API.Models;
+using TimeAPI.API.Models.EmployeeAppUsageViewModels;
 using TimeAPI.API.Models.EmployeeLeaveViewModels;
 using TimeAPI.API.Models.EmployeeViewModels;
 using TimeAPI.API.Services;
@@ -46,6 +50,7 @@ namespace TimeAPI.API.Controllers
             _userManager = userManager;
             _dateTime = InternetTime.GetCurrentTimeFromTimeZone().Value.DateTime;
         }
+
         #region Employee
 
         [HttpPost]
@@ -183,28 +188,6 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee removed successfully." }).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-            }
-        }
-
-        [HttpPost]
-        [Route("GetOrganizationScreenshotDetails")]
-        public async Task<object> GetOrganizationScreenshotDetails([FromBody] Utils Utils, CancellationToken cancellationToken)
-        {
-            try
-            {
-                if (cancellationToken != null)
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                if (Utils == null)
-                    throw new ArgumentNullException(nameof(Utils.ID));
-
-                var result = _unitOfWork.EmployeeRepository.GetOrganizationScreenshotDetails(Utils.ID);
-
-                return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -537,6 +520,85 @@ namespace TimeAPI.API.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("GetOrgScreenshotDetailByUserID")]
+        public async Task<object> GetOrgScreenshotDetailByUserID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                var result = _unitOfWork.EmployeeRepository.GetOrganizationScreenshotDetails(Utils.ID);
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("AddEmployeeAppUsage")]
+        public async Task<object> AddEmployeeAppUsage([FromBody] EmployeeAppUsageViewModel employeeViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (employeeViewModel == null)
+                    throw new ArgumentNullException(nameof(employeeViewModel));
+
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeAppUsageViewModel, EmployeeAppUsage>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<EmployeeAppUsage>(employeeViewModel);
+
+                modal.id = Guid.NewGuid().ToString();
+                modal.created_date = _dateTime.ToString();
+                modal.is_deleted = false;
+                modal.ondate = _dateTime.ToString();
+
+                for (int i = 0; i < employeeViewModel.AppUsedViewModel.Count; i++)
+                {
+                    var AppTrackedViewModel = new EmployeeAppTracked
+                    {
+                        id = Guid.NewGuid().ToString(),
+                        emp_app_usage_id = modal.id,
+                        emp_id = modal.emp_id,
+                        app_name = employeeViewModel.AppUsedViewModel[i].app_name,
+                        time_spend = employeeViewModel.AppUsedViewModel[i].time_spend,
+                        icon = employeeViewModel.AppUsedViewModel[i].icon,
+                        is_productive = false,
+                        is_unproductive = false,
+                        is_neutral = false,
+                        created_date = _dateTime.ToString(),
+                        is_deleted = false
+                    };
+                    _unitOfWork.EmployeeAppTrackedRepository.Add(AppTrackedViewModel);
+                }
+
+                _unitOfWork.EmployeeAppUsageRepository.Add(modal);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Record Added Successfully." }).ConfigureAwait(false);
+
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel
+                {
+                    Status = "201",
+                    Code = ex.Message,
+                    Desc = ex.Message
+                });
+            }
+        }
+
         #endregion Employee
 
         #region EmployeeLeave
@@ -560,6 +622,27 @@ namespace TimeAPI.API.Controllers
                 modal.id = Guid.NewGuid().ToString();
                 modal.created_date = _dateTime.ToString();
 
+                var LeaveName = _unitOfWork.LeaveSetupRepository.Find(modal.leave_setup_id).leave_name;
+                var FromName = _unitOfWork.EmployeeRepository.Find(modal.emp_id).full_name;
+                var ToName = _unitOfWork.EmployeeRepository.Find(modal.approver_emp_id).full_name;
+
+                var EmployeeLeaveLog = new EmployeeLeaveLog
+                {
+                    id = Guid.NewGuid().ToString(),
+                    leave_type = LeaveName,
+                    emp_id = modal.emp_id,
+                    emp_leave_id = modal.id,
+                    no_of_days = modal.leave_days,
+                    start_date = modal.leave_start_date,
+                    end_date = modal.leave_end_date,
+                    ondate = _dateTime.ToString(),
+                    from_user = FromName,
+                    to_user = ToName,
+                    createdby = modal.createdby,
+                    created_date = _dateTime.ToString()
+                };
+
+                _unitOfWork.EmployeeLeaveLogRepository.Add(EmployeeLeaveLog);
                 _unitOfWork.EmployeeLeaveRepository.Add(modal);
                 _unitOfWork.Commit();
 
@@ -657,8 +740,6 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-               
-
                 oDataTable _oDataTable = new oDataTable();
                 var result = _unitOfWork.EmployeeLeaveRepository.FetchEmployeeLeaveOrgID(Utils.ID);
                 //var xResult = _oDataTable.ToDataTable(result);
@@ -670,7 +751,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
 
         [HttpPost]
         [Route("FetchEmployeeLeaveEmpID")]
@@ -693,7 +773,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpPatch]
         [Route("UpdateApprovedByID")]
         public async Task<object> UpdateApprovedByID([FromBody] EmployeeLeaveViewModel employeeViewModel, CancellationToken cancellationToken)
@@ -711,10 +790,170 @@ namespace TimeAPI.API.Controllers
                 var modal = mapper.Map<EmployeeLeave>(employeeViewModel);
                 modal.modified_date = _dateTime.ToString();
 
+                var LeaveName = _unitOfWork.LeaveSetupRepository.Find(modal.leave_setup_id).leave_name;
+                var ToName = _unitOfWork.EmployeeRepository.Find(modal.emp_id).full_name;
+                var FromName = _unitOfWork.EmployeeRepository.Find(modal.approver_emp_id).full_name;
+
+                var EmployeeLeaveLog = new EmployeeLeaveLog
+                {
+                    id = Guid.NewGuid().ToString(),
+                    leave_type = LeaveName,
+                    emp_id = modal.emp_id,
+                    emp_leave_id = modal.id,
+                    no_of_days = modal.approved_days,
+                    start_date = modal.approve_start_date,
+                    end_date = modal.approve_end_date,
+                    ondate = _dateTime.ToString(),
+                    from_user = FromName,
+                    to_user = ToName,
+                    createdby = modal.createdby,
+                    created_date = _dateTime.ToString()
+                };
+
+                _unitOfWork.EmployeeLeaveLogRepository.Add(EmployeeLeaveLog);
                 _unitOfWork.EmployeeLeaveRepository.UpdateApprovedByID(modal);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee Leave updated successfully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("FetchEmployeeLeaveHistoryEmpID")]
+        public async Task<object> FetchEmployeeLeaveHistoryEmpID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                var result = _unitOfWork.EmployeeLeaveRepository.FetchEmployeeLeaveHistoryEmpID(Utils.ID);
+                var json = JsonConvert.SerializeObject(result);
+                DataTable dataTable = (DataTable)JsonConvert.DeserializeObject(json, (typeof(DataTable)));
+
+                List<UtilLeaveGridData> LeaveGridData = new List<UtilLeaveGridData>();
+
+                for (int i = 0; i < dataTable.Rows.Count; i++)
+                {
+                    var LeaveDays = _unitOfWork.EmployeeLeaveRepository.GetDaysOfMonth
+                                                                        (dataTable.Rows[i]["leave_start_date"].ToString(),
+                                                                        dataTable.Rows[i]["leave_end_date"].ToString());
+
+                    var json2 = JsonConvert.SerializeObject(LeaveDays);
+                    DataTable dataTable2 = (DataTable)JsonConvert.DeserializeObject(json2, (typeof(DataTable)));
+
+                    foreach (DataRow item in dataTable2.Rows)
+                    {
+                        LeaveGridData.Add(new UtilLeaveGridData
+                        {
+                            emp_id = dataTable.Rows[i]["emp_id"].ToString(),
+                            leave_status_name = dataTable.Rows[i]["leave_status_name"].ToString(),
+                            leave_type_name = dataTable.Rows[i]["leave_type_name"].ToString(),
+                            leave_name = dataTable.Rows[i]["leave_name"].ToString(),
+                            leave_start_date = dataTable.Rows[i]["leave_start_date"].ToString(),
+                            leave_end_date = dataTable.Rows[i]["leave_end_date"].ToString(),
+                            month = item["month"].ToString(),
+                            days = item["days"].ToString(),
+                        });
+                    }
+                }
+
+                var results = from line in LeaveGridData
+                              let k = new
+                              {
+                                  leave_status_name = line.leave_status_name,
+                                  month = line.month
+                              }
+                              group line by k into t
+                              select new UtilLeaveGridData
+                              {
+                                  emp_id = t.First().emp_id,
+                                  leave_status_name = t.First().leave_status_name,
+                                  leave_type_name = t.First().leave_type_name,
+                                  leave_name = t.First().leave_name,
+                                  leave_start_date = t.First().leave_start_date,
+                                  leave_end_date = t.First().leave_end_date,
+                                  month = t.First().month,
+                                  days = t.Sum(pc => Convert.ToInt32(pc.days)).ToString()
+                              };
+
+                return await Task.FromResult<object>(results).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel
+                {
+                    Status = "201",
+                    Code = ex.Message,
+                    Desc = ex.Message
+                });
+            }
+        }
+
+        [HttpPost]
+        [Route("FetchEmployeeLeaveHistoryOrgID")]
+        public async Task<object> FetchEmployeeLeaveHistoryOrgID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                var result = _unitOfWork.EmployeeLeaveRepository.FetchEmployeeLeaveHistoryOrgID(Utils.ID);
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+
+        [HttpPost]
+        [Route("FetchEmployeeLeaveHistoryApproverID")]
+        public async Task<object> FetchEmployeeLeaveHistoryApproverID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                var result = _unitOfWork.EmployeeLeaveRepository.FetchEmployeeLeaveHistoryApproverID(Utils.ID);
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("FetchEmployeeLeaveLogEmpID")]
+        public async Task<object> FetchEmployeeLeaveLogEmpID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                var result = _unitOfWork.EmployeeLeaveLogRepository.FetchEmployeeLeaveLogHistoryEmpID(Utils.ID);
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

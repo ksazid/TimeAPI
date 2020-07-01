@@ -14,8 +14,8 @@ namespace TimeAPI.Data.Repositories
         {
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO entity_contact
-                                  (id, entity_id, name, position, phone, mobile, email, city, country, created_date, createdby)
-                           VALUES (@id, @entity_id, @name, @position, @phone, @mobile, @email, @city, @country, @created_date, @createdby);
+                                  (id, entity_id, name, first_name, last_name, position, phone, mobile, email, adr_1, adr_2, city, country, is_primary, created_date, createdby)
+                           VALUES (@id, @entity_id, @name, @first_name, @last_name, @position, @phone, @mobile, @email, @adr_1, @adr_2, @city, @country, @is_primary, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -35,7 +35,16 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
+
+        public IEnumerable<EntityContact> FindByEntityListID(string key)
+        {
+            return Query<EntityContact>(
+                sql: "SELECT * FROM [dbo].[entity_contact] where is_deleted = 0 AND entity_id = @key",
+                param: new { key }
+            );
+        }
         
+
 
         public void Remove(string key)
         {
@@ -53,14 +62,18 @@ namespace TimeAPI.Data.Repositories
             Execute(
                 sql: @"UPDATE entity_contact
                    SET
-                    entity_id = @entity_id,
                     name = @name,
+                    first_name = @first_name, 
+                    last_name = @last_name,
                     position = @position,
                     phone = @phone,
                     mobile = @mobile,
                     email = @email,
+                    adr_1 = @adr_1, 
+                    adr_2 = @adr_2,
                     city = @city, 
                     country = @country,
+                    is_primary = @is_primary,
                     modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE id = @id",
@@ -75,10 +88,14 @@ namespace TimeAPI.Data.Repositories
                 sql: @"UPDATE entity_contact
                    SET
                     name = @name,
+                    first_name = @first_name, 
+                    last_name = @last_name,
                     position = @position,
                     phone = @phone,
                     mobile = @mobile,
                     email = @email,
+                    adr_1 = @adr_1, 
+                    adr_2 = @adr_2,
                     city = @city, 
                     country = @country,
                     modified_date = @modified_date,

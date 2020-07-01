@@ -9,6 +9,6 @@ namespace TimeAPI.Domain.Repositories
 {
     public interface ILeaveSetupRepository : IRepository<LeaveSetup, string>
     {
-        IEnumerable<LeaveSetup> FetchLeaveSetupOrgID(string OrgID);
+        dynamic FetchLeaveSetupOrgID(string OrgID);
     }
 }

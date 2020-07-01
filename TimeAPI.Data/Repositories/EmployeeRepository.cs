@@ -132,6 +132,7 @@ namespace TimeAPI.Data.Repositories
                    sql: @"SELECT
                             ROW_NUMBER() OVER (ORDER BY employee.full_name) AS rowno,
 	                        employee.id,
+	                        employee.org_id,
 	                        employee.full_name,
 	                        employee.workemail,
 	                        employee.emp_code,
@@ -151,7 +152,7 @@ namespace TimeAPI.Data.Repositories
                           WHERE employee.org_id =  @key AND employee.is_deleted = 0
                           AND employee.is_superadmin = 0
                           ORDER BY employee.full_name ASC",
-                      param: new { key }
+                   param: new { key }
                );
         }
 
@@ -339,7 +340,8 @@ namespace TimeAPI.Data.Repositories
         {
             return Query<dynamic>(
                    sql: @" 	SELECT
-				                employee.id,
+				                employee.id as empid,
+				                employee.org_id,
 				                employee.full_name,
 				                employee.workemail,
 				                employee.emp_code,
@@ -347,10 +349,13 @@ namespace TimeAPI.Data.Repositories
 				                department.dep_name,
 				                designation.designation_name,
 				                organization.org_name,
-				                organization_screenshot_setup.screenshot_time
+				                organization_setup.screenshot_time,
+				                organization_setup.is_screenshot,
+				                organization_setup.is_track_app,
+				                organization_setup.track_app_time
 			                FROM dbo.employee WITH(NOLOCK)
  				                INNER JOIN organization ON employee.org_id = organization.org_id
- 				                LEFT JOIN organization_screenshot_setup ON organization.org_id = organization_screenshot_setup.org_id
+ 				                LEFT JOIN organization_setup ON organization.org_id = organization_setup.org_id
 				                LEFT JOIN employee_type ON employee.emp_type_id = employee_type.id
  				                LEFT JOIN department ON employee.deptid = department.id
 				                LEFT JOIN designation ON employee.designation_id = designation.id

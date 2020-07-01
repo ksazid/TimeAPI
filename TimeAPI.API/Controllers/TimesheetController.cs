@@ -444,7 +444,7 @@ namespace TimeAPI.API.Controllers
                 //Adding TimesheetBreak Location BreakIN
                 AddTimesheetBreakCurrentLocation(TimesheetBreakViewModel, modal);
 
-              
+
 
                 _unitOfWork.Commit();
 
@@ -545,7 +545,7 @@ namespace TimeAPI.API.Controllers
                 var TimesheetBreak = _unitOfWork.TimesheetBreakRepository.Find(Utils.ID);
                 _unitOfWork.TimesheetBreakRepository.Remove(Utils.ID);
                 _unitOfWork.TimesheetBreakRepository.RemoveByGroupID(TimesheetBreak.groupid);
-                
+
                 if (_unitOfWork.LocationExceptionRepository.FindByGroupID(TimesheetBreak.groupid) != null)
                     _unitOfWork.LocationExceptionRepository.RemoveByGroupID(TimesheetBreak.groupid);
 
@@ -648,7 +648,7 @@ namespace TimeAPI.API.Controllers
                     _unitOfWork.LocationRepository.Add(Location);
                 }
 
-            
+
 
                 #endregion Location
 
@@ -664,7 +664,7 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("FindLastTimeSheetBreakByEmpIDAndGrpID")]
-        public async Task<object> FindLastTimeSheetBreakByEmpIDAndGrpID([FromBody] UtilsEmpIDAndGrpID utils ,CancellationToken cancellationToken)
+        public async Task<object> FindLastTimeSheetBreakByEmpIDAndGrpID([FromBody] UtilsEmpIDAndGrpID utils, CancellationToken cancellationToken)
         {
             try
             {
@@ -684,7 +684,7 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-        
+
         #endregion TimesheetBreak
 
         #region TimesheetActivity
@@ -855,10 +855,10 @@ namespace TimeAPI.API.Controllers
                 for (int i = 0; i < GroupID.Count(); i++)
                 {
                     var Members = String.Join(", ", _unitOfWork.TimesheetRepository.GetAllEmpByGroupID(GroupID[i]));
-                        
-                        result.Where(usr => usr.groupid == GroupID[i])
-                       .Select(usr => { usr.members = Members; return usr; })
-                       .ToList();
+
+                    result.Where(usr => usr.groupid == GroupID[i])
+                   .Select(usr => { usr.members = Members; return usr; })
+                   .ToList();
                 }
 
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(result, Formatting.Indented)).ConfigureAwait(false);
@@ -1511,5 +1511,204 @@ namespace TimeAPI.API.Controllers
             }
         }
 
+
+        #region TimesheetDesk
+
+        [HttpPost]
+        [Route("AddTimesheetDesk")]
+        public async Task<object> AddTimesheetDesk([FromBody] TimesheetDeskPostViewModel timesheetViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (timesheetViewModel == null)
+                    throw new ArgumentNullException(nameof(timesheetViewModel));
+
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetDeskPostViewModel, TimesheetDesk>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<TimesheetDesk>(timesheetViewModel);
+
+                var _groupid = modal.groupid = Guid.NewGuid().ToString();
+                modal.id = Guid.NewGuid().ToString();
+                modal.created_date = _dateTime.ToString();
+                modal.check_in = _dateTime.ToString();
+                modal.ondate = _dateTime.ToString();
+                modal.is_checkout = false;
+                modal.is_deleted = false;
+
+                _unitOfWork.TimesheetDeskRepository.Add(modal);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(_groupid).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPatch]
+        [Route("UpdateTimesheetDesk")]
+        public async Task<object> UpdateTimesheetDesk([FromBody] TimesheetDeskViewModel timesheetViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (timesheetViewModel == null)
+                    throw new ArgumentNullException(nameof(timesheetViewModel));
+
+                timesheetViewModel.modified_date = _dateTime.ToString();
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetDeskViewModel, TimesheetDesk>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<TimesheetDesk>(timesheetViewModel);
+                modal.modified_date = _dateTime.ToString();
+
+                _unitOfWork.TimesheetDeskRepository.Update(modal);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "TimesheetDesk updated successfully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("RemoveTimesheetDesk")]
+        public async Task<object> RemoveTimesheetDesk([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(paramName: nameof(Utils.ID));
+
+                var TimesheetDesk = _unitOfWork.TimesheetDeskRepository.Find(Utils.ID);
+                _unitOfWork.TimesheetDeskRepository.Remove(Utils.ID);
+                _unitOfWork.TimesheetDeskRepository.RemoveByGroupID(TimesheetDesk.groupid);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "TimesheetDesk removed successfully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("GetAllTimesheetDesksDesk")]
+        public async Task<object> GetAllTimesheetDesksDesk(CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                var result = _unitOfWork.TimesheetDeskRepository.All();
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("CheckOutByEmpIDAndGroupID")]
+        public async Task<object> CheckOutByEmpIDAndGroupID([FromBody] TimesheetDeskCheckoutViewModel timesheetViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (timesheetViewModel == null)
+                    throw new ArgumentNullException(nameof(timesheetViewModel));
+
+                TimesheetDesk modal = new TimesheetDesk();
+
+                modal.empid = timesheetViewModel.empid;
+                modal.groupid = timesheetViewModel.groupid;
+
+                var TimesheetDesk = _unitOfWork.TimesheetDeskRepository.FindTimeSheetDeskByEmpID(modal.empid, modal.groupid);
+                if (TimesheetDesk == null)
+                {
+                    return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = "Not a valid employee", Desc = modal.empid });
+                }
+
+                modal.check_out = _dateTime.ToString();
+                modal.is_deleted = false;
+
+                var _TotalMinutes = (Convert.ToDateTime(modal.check_out) - Convert.ToDateTime(TimesheetDesk.check_in)).Ticks;
+                TimeSpan elapsedSpan = new TimeSpan(_TotalMinutes);
+
+                string TotalHours;
+                string TotalMinutes;
+                ConvertHoursAndMinutes(elapsedSpan, out TotalHours, out TotalMinutes);
+
+                modal.total_hrs = string.Format(@"{0}:{1}", TotalHours, TotalMinutes);
+                modal.modified_date = _dateTime.ToString();
+                modal.is_checkout = true;
+                modal.check_out = _dateTime.ToString();
+                modal.modifiedby = _dateTime.ToString();
+
+                _unitOfWork.TimesheetDeskRepository.CheckOutByEmpID(modal);
+
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Checkout Successfully", Desc = "Checkout Successfully" }).ConfigureAwait(true);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("AddOfflineTimesheetDesk")]
+        public async Task<object> AddOfflineTimesheetDesk([FromBody] IEnumerable<TimesheetDesk> timesheetViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (timesheetViewModel == null)
+                    throw new ArgumentNullException(nameof(timesheetViewModel));
+
+                foreach (var item in timesheetViewModel)
+                {
+                    var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<TimesheetDesk, TimesheetDesk>());
+                    var mapper = config.CreateMapper();
+                    var modal = mapper.Map<TimesheetDesk>(item);
+                    modal.id = Guid.NewGuid().ToString();
+                    //modal.created_date = _dateTime.ToString();
+                    //modal.check_in = _dateTime.ToString();
+                    //modal.ondate = _dateTime.ToString();
+                    //modal.is_checkout = false;
+                    modal.is_deleted = false;
+
+                    _unitOfWork.TimesheetDeskRepository.Add(modal);
+                    _unitOfWork.Commit();
+                }
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Added Successfully", Desc = "Added Successfully" }).ConfigureAwait(true);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        #endregion TimesheetDesk
     }
 }

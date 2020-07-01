@@ -12,6 +12,10 @@ namespace TimeAPI.Domain.Repositories
         dynamic FetchEmployeeLeaveOrgID(string OrgID);
         dynamic FetchEmployeeLeaveEmpID(string EmpID);
         dynamic FetchEmployeeLeaveID(string EmpID);
+        dynamic FetchEmployeeLeaveHistoryEmpID(string EmpID);
+        dynamic GetDaysOfMonth(string startdate, string enddate);
+        dynamic FetchEmployeeLeaveHistoryOrgID(string OrgID);
+        dynamic FetchEmployeeLeaveHistoryApproverID(string ApproverID);
         void UpdateApprovedByID(EmployeeLeave employeeLeave);
     }
 }

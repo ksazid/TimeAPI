@@ -96,6 +96,17 @@ namespace TimeAPI.Data
         private IEmployeeLeaveRepository _employeeLeaveRepository;
         private ILeaveStatusRepository _leaveStatusRepository;
         private IEmployeeScreenshotRepository _employeeScreenshotRepository;
+        private IEmployeeAppUsageRepository _employeeAppUsageRepository;
+        private IEmployeeAppTrackedRepository _employeeAppTrackedRepository;
+        private IEmployeeLeaveLogRepository _employeeLeaveLogRepository;
+        private ILeadCompanyRepository _leadCompanyRepository;
+        private ILeadRepository _leadRepository;
+        private ILeadProjectRepository _leadProjectRepository;
+        private ILeadSourceRepository _leadSourceRepository;
+        private ILeadStatusRepository _leadStatusRepository;
+        private ILeadRatingRepository _leadRatingRepository;
+        private ITimesheetDeskRepository _timesheetDeskRepository;
+
 
 
 
@@ -825,6 +836,7 @@ namespace TimeAPI.Data
                     ?? (_timeoffTypeRepository = new TimeoffTypeRepository(_transaction));
             }
         }
+
         public IEmployeeLeaveRepository EmployeeLeaveRepository
         {
             get
@@ -852,8 +864,96 @@ namespace TimeAPI.Data
             }
         }
 
+        public IEmployeeAppUsageRepository EmployeeAppUsageRepository
+        {
+            get
+            {
+                return _employeeAppUsageRepository
+                    ?? (_employeeAppUsageRepository = new EmployeeAppUsageRepository(_transaction));
+            }
+        }
+
+        public IEmployeeAppTrackedRepository EmployeeAppTrackedRepository
+        {
+            get
+            {
+                return _employeeAppTrackedRepository
+                    ?? (_employeeAppTrackedRepository = new EmployeeAppTrackedRepository(_transaction));
+            }
+        }
+
+        public IEmployeeLeaveLogRepository EmployeeLeaveLogRepository
+        {
+            get
+            {
+                return _employeeLeaveLogRepository
+                    ?? (_employeeLeaveLogRepository = new EmployeeLeaveLogRepository(_transaction));
+            }
+        }
+
+        public ILeadCompanyRepository LeadCompanyRepository
+        {
+            get
+            {
+                return _leadCompanyRepository
+                    ?? (_leadCompanyRepository = new LeadCompanyRepository(_transaction));
+            }
+        }
+
+        public ILeadRepository LeadRepository
+        {
+            get
+            {
+                return _leadRepository
+                    ?? (_leadRepository = new LeadRepository(_transaction));
+            }
+        }
+
+        public ILeadProjectRepository LeadProjectRepository
+        {
+            get
+            {
+                return _leadProjectRepository
+                    ?? (_leadProjectRepository = new LeadProjectRepository(_transaction));
+            }
+        }
 
 
+        public ILeadSourceRepository LeadSourceRepository
+        {
+            get
+            {
+                return _leadSourceRepository
+                    ?? (_leadSourceRepository = new LeadSourceRepository(_transaction));
+            }
+        }
+
+        public ILeadStatusRepository LeadStatusRepository
+        {
+            get
+            {
+                return _leadStatusRepository
+                    ?? (_leadStatusRepository = new LeadStatusRepository(_transaction));
+            }
+        }
+
+        public ILeadRatingRepository LeadRatingRepository
+        {
+            get
+            {
+                return _leadRatingRepository
+                    ?? (_leadRatingRepository = new LeadRatingRepository(_transaction));
+            }
+        }
+
+        public ITimesheetDeskRepository TimesheetDeskRepository
+        {
+            get
+            {
+                return _timesheetDeskRepository
+                    ?? (_timesheetDeskRepository = new TimesheetDeskRepository(_transaction));
+            }
+        }
 
         public bool Commit()
         {

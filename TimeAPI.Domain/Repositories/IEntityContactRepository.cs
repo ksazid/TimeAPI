@@ -10,6 +10,7 @@ namespace TimeAPI.Domain.Repositories
         void RemoveByEntityID(string EntityID);
         void UpdateByEntityID(EntityContact entity);
         EntityContact FindByEntityID(string EntityID);
+        IEnumerable<EntityContact> FindByEntityListID(string EntityID);
 
     }
 }

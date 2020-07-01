@@ -33,9 +33,6 @@ namespace TimeAPI.API.Controllers
             _dateTime = InternetTime.GetCurrentTimeFromTimeZone().Value.DateTime;
         }
 
-
-
-
         /// <summary>
         /// /
         /// </summary>
@@ -234,7 +231,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
 
         [HttpPost]
         [Route("GetAllTimesheetByOrgID")]

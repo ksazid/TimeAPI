@@ -106,7 +106,8 @@ namespace TimeAPI.API.Controllroers
                         country = projectViewModel.EntityContact.country,
                         createdby = projectViewModel.createdby,
                         created_date = _dateTime.ToString(),
-                        is_deleted = false
+                        is_deleted = false,
+                        is_primary = projectViewModel.EntityContact.is_primary
                     };
                     _unitOfWork.EntityContactRepository.Add(entityContact);
                 }
@@ -205,10 +206,13 @@ namespace TimeAPI.API.Controllroers
 
                                 foreach (var itemStaticCostProjectMilestoneTasks in StaticCostProjectMilestoneTasks)
                                 {
-                                    string numberofunit = "";
-                                    numberofunit = (Convert.ToInt32(1) * Convert.ToInt32(itemStaticCostProjectMilestoneTasks.qty)).ToString();
+                                    double numberofunit = (Convert.ToInt32(1) * Convert.ToInt32(itemStaticCostProjectMilestoneTasks.qty));
                                     if (Convert.ToInt32(item.unit_qty_all) > 0)
-                                        numberofunit = ((Convert.ToInt32(item.unit_qty_all) + 1) * Convert.ToInt32(numberofunit)).ToString();
+                                    {
+                                        double percent = Convert.ToDouble(item.unit_qty_all);
+                                        double PercentValue = Math.Round(percent / 100 * numberofunit, 2);
+                                        numberofunit = numberofunit + PercentValue;
+                                    }
 
                                     if (tableCostMilestoneTask.Rows.Count > 0)
                                     {
@@ -219,7 +223,7 @@ namespace TimeAPI.API.Controllroers
                                                                             .Where(c => c.Field<string>("task_name") == itemStaticCostProjectMilestoneTasks.task_name)
                                                                             .Sum(x => x.Field<int>("qty"));
 
-                                            if (numberofunit.Length > 0)
+                                            if (numberofunit > 0)
                                                 tableCostMilestoneTask.AsEnumerable()
                                                                                 .Where(c => c.Field<string>("task_name") == itemStaticCostProjectMilestoneTasks.task_name)
                                                                                 .ToList()
@@ -260,10 +264,13 @@ namespace TimeAPI.API.Controllroers
                                     //convert the no_of_unit into interger.
                                     if (itemStaticCostProjectMilestoneTasks.task_name == item.unit_name)
                                     {
-                                        string numberofunit = "";
-                                        numberofunit = (Convert.ToInt32(item.total_unit) * Convert.ToInt32(itemStaticCostProjectMilestoneTasks.qty)).ToString();
+                                        double numberofunit = (Convert.ToInt32(item.total_unit) * Convert.ToInt32(itemStaticCostProjectMilestoneTasks.qty));
                                         if (Convert.ToInt32(item.unit_qty_all) > 0)
-                                            numberofunit = ((Convert.ToInt32(item.unit_qty_all) + 1) * Convert.ToInt32(numberofunit)).ToString();
+                                        {
+                                            double percent = Convert.ToDouble(item.unit_qty_all);
+                                            double PercentValue = Math.Round(percent / 100 * numberofunit, 2);
+                                            numberofunit = numberofunit + PercentValue;
+                                        }
 
                                         if (tableCostMilestoneTask.Rows.Count > 0)
                                         {
@@ -274,7 +281,7 @@ namespace TimeAPI.API.Controllroers
                                                                                 .Where(c => c.Field<string>("task_name") == itemStaticCostProjectMilestoneTasks.task_name)
                                                                                 .Sum(x => x.Field<int>("qty"));
 
-                                                if (numberofunit.Length > 0)
+                                                if (numberofunit > 0)
                                                     tableCostMilestoneTask.AsEnumerable()
                                                                                     .Where(c => c.Field<string>("task_name") == itemStaticCostProjectMilestoneTasks.task_name)
                                                                                     .ToList()
@@ -313,19 +320,26 @@ namespace TimeAPI.API.Controllroers
                                     //convert the no_of_unit into interger.
                                     if (itemStaticCostProjectMilestoneTasks.task_name == item.unit_name)
                                     {
-                                        string numberofunit = "";
-
+                                        double numberofunit = 0;
                                         if (itemStaticCostProjectMilestoneTasks.task_name == "BOQ")
                                         {
-                                            numberofunit = (Convert.ToInt32(item.total_unit) * Convert.ToInt32(itemStaticCostProjectMilestoneTasks.qty)).ToString();
+                                            numberofunit = (Convert.ToInt32(item.total_unit) * Convert.ToInt32(itemStaticCostProjectMilestoneTasks.qty));
                                             if (Convert.ToInt32(item.unit_qty_all) > 0)
-                                                numberofunit = ((Convert.ToInt32(item.unit_qty_all) + 1) * Convert.ToInt32(numberofunit)).ToString();
+                                            {
+                                                double percent = Convert.ToDouble(item.unit_qty_all);
+                                                double PercentValue = Math.Round(percent / 100 * numberofunit, 2);
+                                                numberofunit = numberofunit + PercentValue;
+                                            }
                                         }
                                         else
                                         {
-                                            numberofunit = (Convert.ToInt32(1) * Convert.ToInt32(itemStaticCostProjectMilestoneTasks.qty)).ToString();
+                                            numberofunit = (Convert.ToInt32(1) * Convert.ToInt32(itemStaticCostProjectMilestoneTasks.qty));
                                             if (Convert.ToInt32(item.unit_qty_all) > 0)
-                                                numberofunit = ((Convert.ToInt32(item.unit_qty_all) + 1) * Convert.ToInt32(numberofunit)).ToString();
+                                            {
+                                                double percent = Convert.ToDouble(item.unit_qty_all);
+                                                double PercentValue = Math.Round(percent / 100 * numberofunit, 2);
+                                                numberofunit = numberofunit + PercentValue;
+                                            }
                                         }
                                         if (tableCostMilestoneTask.Rows.Count > 0)
                                         {
@@ -336,7 +350,7 @@ namespace TimeAPI.API.Controllroers
                                                                                 .Where(c => c.Field<string>("task_name") == itemStaticCostProjectMilestoneTasks.task_name)
                                                                                 .Sum(x => x.Field<int>("qty"));
 
-                                                if (numberofunit.Length > 0)
+                                                if (numberofunit > 0)
                                                     tableCostMilestoneTask.AsEnumerable()
                                                                                     .Where(c => c.Field<string>("task_name") == itemStaticCostProjectMilestoneTasks.task_name)
                                                                                     .ToList()
@@ -375,11 +389,15 @@ namespace TimeAPI.API.Controllroers
                                     {
 
                                         //convert the no_of_unit into interger.
-                                        string numberofunit = "";
-                                        numberofunit = (Convert.ToInt32(item.total_unit) * Convert.ToInt32(itemStaticCostProjectMilestoneTasks.qty)).ToString();
-                                        numberofunit = (Convert.ToInt32(numberofunit) * Convert.ToInt32(modal.no_of_floors)).ToString();
+                                        double numberofunit = 0;
+                                        numberofunit = (Convert.ToInt32(item.total_unit) * Convert.ToInt32(itemStaticCostProjectMilestoneTasks.qty));
+                                        numberofunit = (Convert.ToInt32(numberofunit) * Convert.ToInt32(modal.no_of_floors));
                                         if (Convert.ToInt32(item.unit_qty_all) > 0)
-                                            numberofunit = ((Convert.ToInt32(item.unit_qty_all) + 1) * Convert.ToInt32(numberofunit)).ToString();
+                                        {
+                                            double percent = Convert.ToDouble(item.unit_qty_all);
+                                            double PercentValue = Math.Round(percent / 100 * numberofunit, 2);
+                                            numberofunit = numberofunit + PercentValue;
+                                        }
 
                                         if (tableCostMilestoneTask.Rows.Count > 0)
                                         {
@@ -390,7 +408,7 @@ namespace TimeAPI.API.Controllroers
                                                                                 .Where(c => c.Field<string>("task_name") == itemStaticCostProjectMilestoneTasks.task_name)
                                                                                 .Sum(x => x.Field<int>("qty"));
 
-                                                if (numberofunit.Length > 0)
+                                                if (numberofunit > 0)
                                                     tableCostMilestoneTask.AsEnumerable()
                                                                                     .Where(c => c.Field<string>("task_name") == itemStaticCostProjectMilestoneTasks.task_name)
                                                                                     .ToList()
@@ -506,7 +524,9 @@ namespace TimeAPI.API.Controllroers
                         country = projectViewModel.EntityContact.country,
                         createdby = projectViewModel.createdby,
                         created_date = _dateTime.ToString(),
+                        is_primary = projectViewModel.EntityContact.is_primary,
                         is_deleted = false
+
                     };
                     _unitOfWork.EntityContactRepository.UpdateByEntityID(entityContact);
                 }
@@ -989,7 +1009,7 @@ namespace TimeAPI.API.Controllroers
 
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils));
- 
+
                 List<CostProjectMilestone> CostProjectMilestone = new List<CostProjectMilestone>();
                 CostProjectMilestone = _unitOfWork.CostProjectMilestoneRepository.GetCostProjectMilestoneByProjectID(Utils.ID).ToList();
 
@@ -1269,7 +1289,7 @@ namespace TimeAPI.API.Controllroers
                         modalMilestone.created_date = _dateTime.ToString();
                         modalMilestone.is_deleted = false;
                         modalMilestone.start_date = projectViewModel.start_date;
-                        modalMilestone.end_date = projectViewModel.end_date; 
+                        modalMilestone.end_date = projectViewModel.end_date;
 
                         modalMilestone.status_id = _unitOfWork.ProjectStatusRepository.GetProjectStatusByOrgID("default")
                                               .Where(s => s.project_status_name.Equals("Open"))
@@ -1400,7 +1420,7 @@ namespace TimeAPI.API.Controllroers
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<CostProject>(projectViewModel);
                 modal.modified_date = _dateTime.ToString();
- 
+
                 _unitOfWork.CostProjectRepository.UpdateCostProjectDiscountAndProfitMarginByID(modal);
                 _unitOfWork.Commit();
 

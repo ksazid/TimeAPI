@@ -180,9 +180,6 @@ namespace TimeAPI.API.Controllers
                 //return new OkResult();
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
-
-
-
         }
     } 
 

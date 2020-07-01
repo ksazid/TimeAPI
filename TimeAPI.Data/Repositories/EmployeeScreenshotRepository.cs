@@ -15,8 +15,8 @@ namespace TimeAPI.Data.Repositories
         {
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.employee_screenshot
-                                   (id, org_id, emp_id, img_name, img_url, created_date, createdby)
-                           VALUES (@id, @org_id, @emp_id, @img_name, @img_url, @created_date, @createdby);
+                                   (id, org_id, emp_id, img_name, img_url, ondate, created_date, createdby)
+                           VALUES (@id, @org_id, @emp_id, @img_name, @img_url, @ondate, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -64,7 +64,7 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public EmployeeScreenshot FindByProfileEmpiID(string key)
+        public EmployeeScreenshot FindEmployeeScreenshotEmpID(string key)
         {
             return QuerySingleOrDefault<EmployeeScreenshot>(
                 sql: "SELECT * FROM dbo.employee_screenshot WHERE emp_id = @key and  is_deleted = 0",

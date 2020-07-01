@@ -27,7 +27,6 @@ namespace TimeAPI.Domain.Repositories
         void RemoveAdminRightByEmpID(string key);
         void RemoveSuperAdminRightByEmpID(string key);
         int RemoveEmployeeIfZeroActivity(string key);
-
         dynamic GetOrganizationScreenshotDetails(string userid);
     }
 }

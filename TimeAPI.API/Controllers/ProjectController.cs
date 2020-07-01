@@ -84,6 +84,7 @@ namespace TimeAPI.API.Controllroers
                         email = projectViewModel.EntityContact.email,
                         createdby = projectViewModel.createdby,
                         created_date = _dateTime.ToString(),
+                        is_primary = projectViewModel.EntityContact.is_primary,
                         is_deleted = false
                     };
                     _unitOfWork.EntityContactRepository.Add(entityContact);
@@ -269,7 +270,8 @@ namespace TimeAPI.API.Controllroers
                         mobile = projectViewModel.EntityContact.mobile,
                         email = projectViewModel.EntityContact.email,
                         modifiedby = projectViewModel.createdby,
-                        modified_date = _dateTime.ToString()
+                        modified_date = _dateTime.ToString(),
+                        is_primary = projectViewModel.EntityContact.is_primary
                     };
                     _unitOfWork.EntityContactRepository.Update(entityContact);
                 }
@@ -366,6 +368,30 @@ namespace TimeAPI.API.Controllroers
                     throw new ArgumentNullException(nameof(Utils.OrgID));
 
                 var results = _unitOfWork.ProjectRepository.FindAutoProjectPrefixByOrgID(Utils.OrgID, _dateTime.ToString());
+
+                return await Task.FromResult<object>(results).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("FindAutoCostProjectPrefixByOrgID")]
+        public async Task<object> FindAutoCostProjectPrefixByOrgID([FromBody] UtilsOrgID Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                ProjectViewModel projectViewModel = new ProjectViewModel();
+
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.OrgID));
+
+                var results = _unitOfWork.ProjectRepository.FindAutoCostProjectPrefixByOrgID(Utils.OrgID, _dateTime.ToString());
 
                 return await Task.FromResult<object>(results).ConfigureAwait(false);
             }
@@ -1152,7 +1178,6 @@ namespace TimeAPI.API.Controllroers
                 {
                     foreach (var item in TaskViewModel.employees.Distinct())
                     {
-
                         var TaskTeamMembers = new TaskTeamMember()
                         {
                             id = Guid.NewGuid().ToString(),
@@ -1220,7 +1245,6 @@ namespace TimeAPI.API.Controllroers
                     {
                         foreach (var item in TaskViewModel[i].employees.Distinct())
                         {
-
                             var TaskTeamMembers = new TaskTeamMember()
                             {
                                 id = Guid.NewGuid().ToString(),
@@ -1249,7 +1273,6 @@ namespace TimeAPI.API.Controllroers
                     _unitOfWork.ProjectActivityTaskRepository.Add(ProjectTask);
                 }
 
-               
                 _unitOfWork.Commit();
 
                 return await System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Task registered successfully." }).ConfigureAwait(false);
@@ -1259,8 +1282,6 @@ namespace TimeAPI.API.Controllroers
                 return System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
-
 
         [HttpPost]
         [Route("FindByTasksId")]
@@ -1351,8 +1372,6 @@ namespace TimeAPI.API.Controllroers
                 {
                     foreach (var item in TaskViewModel.employees.Distinct())
                     {
-
-
                         var TaskTeamMembers = new TaskTeamMember()
                         {
                             id = Guid.NewGuid().ToString(),

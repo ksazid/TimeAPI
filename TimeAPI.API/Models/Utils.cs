@@ -115,9 +115,6 @@ namespace TimeAPI.API.Models
 
     }
 
-
-
-
     public class UtilPhoneResult
     {
         public string Code { get; set; }
@@ -144,9 +141,6 @@ namespace TimeAPI.API.Models
         public string StartDate { get; set; }
         public string EndDate { get; set; }
     }
-
-
-
     public class UtilPhone
     {
         public string PhoneNumber { get; set; }
@@ -157,7 +151,6 @@ namespace TimeAPI.API.Models
         public string Type { get; set; }
         public string Payload { get; set; }
     }
-
 
     public class UtilDepartmentChecked
     {
@@ -181,6 +174,17 @@ namespace TimeAPI.API.Models
         public bool is_sales { get; set; }
     }
 
+    public class UtilLeaveGridData
+    {
+        public string emp_id { get; set; }
+        public string leave_status_name { get; set; }
+        public string leave_name { get; set; }
+        public string leave_start_date { get; set; }
+        public string leave_end_date { get; set; }
+        public string leave_type_name { get; set; }
+        public string month { get; set; }
+        public string days { get; set; }
+    }
 
 
     //internal sealed class MyComparer : IEqualityComparer<T>
@@ -200,8 +204,6 @@ namespace TimeAPI.API.Models
     //        return obj.id.GetHashCode();
     //    }
     //}
-
-
 
 }
 

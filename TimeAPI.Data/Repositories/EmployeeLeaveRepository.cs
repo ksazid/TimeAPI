@@ -58,10 +58,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-
         public dynamic FetchEmployeeLeaveID(string key)
         {
-          var Xresult =  Query<dynamic>(
+            return Query<dynamic>(
                 sql: @"SELECT 
 	                        dbo.employee_leave.id as employee_leave_id, 
 		                    dbo.employee_leave.org_id, dbo.employee_leave.emp_id, 
@@ -83,13 +82,11 @@ namespace TimeAPI.Data.Repositories
                         WHERE dbo.employee_leave.id = @key and dbo.employee_leave.is_deleted = 0",
                 param: new { key }
             );
-
-            return Xresult;
         }
 
         public dynamic FetchEmployeeLeaveEmpID(string key)
         {
-            var Xresult =  Query<dynamic>(
+            return Query<dynamic>(
                 sql: @"SELECT 
 	                        dbo.employee_leave.id as employee_leave_id, 
 		                    dbo.employee_leave.org_id, dbo.employee_leave.emp_id, 
@@ -112,9 +109,113 @@ namespace TimeAPI.Data.Repositories
 	                and dbo.employee_leave.is_deleted = 0",
                 param: new { key }
             );
-
-            return Xresult;
         }
+
+        public dynamic FetchEmployeeLeaveHistoryEmpID(string key)
+        {
+            return Query<dynamic>(
+                sql: @"SELECT 
+                            (leave_start_date) AS leave_start_date,
+                            (leave_end_date) AS leave_end_date,
+                            dbo.employee_leave.emp_id,  
+                            dbo.leave_status.leave_status_name,
+                            dbo.leave_type.leave_type_name,
+                            dbo.leave_setup.leave_name
+                            FROM dbo.employee_leave
+                            LEFT JOIN dbo.leave_setup on dbo.employee_leave.leave_setup_id = dbo.leave_setup.id
+                            LEFT JOIN dbo.leave_type on dbo.leave_setup.leave_type_id = dbo.leave_type.id
+                            LEFT JOIN dbo.employee on dbo.employee_leave.emp_id =  dbo.employee.id
+                            LEFT JOIN dbo.leave_status on dbo.employee_leave.leave_status_id =  dbo.leave_status.id
+                        WHERE dbo.employee_leave.emp_id = @key AND dbo.leave_status.leave_status_name <> 'Declined'
+                        AND dbo.employee_leave.is_deleted = 0 AND dbo.leave_setup.is_deleted = 0
+                        group by  (leave_start_date),  (leave_end_date), dbo.employee_leave.emp_id, 
+                        dbo.leave_status.leave_status_name,    
+                        dbo.leave_type.leave_type_name, dbo.leave_setup.leave_name",
+                param: new { key }
+            );
+        }
+
+        public dynamic GetDaysOfMonth(string startdate, string enddate)
+        {
+            return Query<dynamic>(
+                sql: @";WITH n(n) AS
+                            (
+                              SELECT TOP (DATEDIFF(MONTH, CAST(@startdate AS SMALLDATETIME), CAST(@enddate AS SMALLDATETIME))+1) ROW_NUMBER() OVER 
+                              (ORDER BY [object_id])-1 FROM sys.all_objects
+                            ),
+                            x(n,fd,ld) AS 
+                            (
+                              SELECT n.n, DATEADD(MONTH, n.n, m.m), DATEADD(MONTH, n.n+1, m.m)
+                              FROM n, (SELECT DATEADD(DAY, 1-DAY(CAST(@startdate AS SMALLDATETIME)), CAST(@startdate AS SMALLDATETIME))) AS m(m)
+                            )
+                            SELECT [Month] = DATENAME(MONTH, fd), [Days] = DATEDIFF(DAY, fd, ld) 
+                              - CASE WHEN CAST(@startdate AS SMALLDATETIME) > fd THEN (DATEDIFF(DAY, fd, CAST(@startdate AS SMALLDATETIME))) ELSE 0 END
+                              - CASE WHEN CAST(@enddate AS SMALLDATETIME) < ld THEN (DATEDIFF(DAY, CAST(@enddate AS SMALLDATETIME), ld)-1) ELSE 0 END
+                              FROM x;",
+                param: new { startdate, enddate }
+            );
+        }
+
+        public dynamic FetchEmployeeLeaveHistoryOrgID(string key)
+        {
+            return Query<dynamic>(
+                sql: @"SELECT 
+		                    SUM(CAST(leave_days AS int)) as leave_days,
+		                    MONTH(ondate_applied) AS month,
+			                FORMAT(CAST(approve_start_date AS DATE), 'MM/dd/yyyy', 'EN-US') AS leave_start_date,
+			                FORMAT(CAST(approve_end_date AS DATE), 'MM/dd/yyyy', 'EN-US') AS leave_end_date,
+		                    dbo.employee_leave.emp_id,  
+		                    dbo.employee.full_name,
+		                    dbo.leave_status.id as leave_status_id,
+		                    dbo.leave_status.leave_status_name,
+		                    dbo.leave_type.leave_type_name,
+		                    dbo.leave_setup.leave_name
+	                    FROM dbo.employee_leave
+	                    LEFT JOIN dbo.leave_setup on dbo.employee_leave.leave_setup_id = dbo.leave_setup.id
+	                    LEFT JOIN dbo.leave_type on dbo.leave_setup.leave_type_id = dbo.leave_type.id
+	                    LEFT JOIN dbo.employee on dbo.employee_leave.emp_id =  dbo.employee.id
+	                    LEFT JOIN dbo.leave_status on dbo.employee_leave.leave_status_id =  dbo.leave_status.id
+                    WHERE dbo.employee_leave.org_id = @key
+                    AND dbo.employee_leave.is_deleted = 0 AND dbo.leave_setup.is_deleted = 0
+                    group by MONTH(ondate_applied), dbo.employee_leave.emp_id, 
+                    dbo.leave_status.leave_status_name, dbo.leave_status.id, dbo.employee.full_name,
+                    dbo.leave_type.leave_type_name, dbo.leave_setup.leave_name,
+	                FORMAT(CAST(approve_start_date AS DATE), 'MM/dd/yyyy', 'EN-US'),
+	                FORMAT(CAST(approve_end_date AS DATE), 'MM/dd/yyyy', 'EN-US') ",
+                param: new { key }
+            );
+        }
+
+        public dynamic FetchEmployeeLeaveHistoryApproverID(string key)
+        {
+            return Query<dynamic>(
+                sql: @"SELECT 
+		                    SUM(CAST(leave_days AS int)) as leave_days,
+		                    MONTH(ondate_applied) AS month,
+                            FORMAT(CAST(approve_start_date AS DATE), 'MM/dd/yyyy', 'EN-US') AS leave_start_date,
+			                FORMAT(CAST(approve_end_date AS DATE), 'MM/dd/yyyy', 'EN-US') AS leave_end_date,
+		                    dbo.employee_leave.emp_id,  
+		                    dbo.employee.full_name,
+		                    dbo.leave_status.id as leave_status_id,
+		                    dbo.leave_status.leave_status_name,
+		                    dbo.leave_type.leave_type_name,
+		                    dbo.leave_setup.leave_name
+	                    FROM dbo.employee_leave
+	                    LEFT JOIN dbo.leave_setup on dbo.employee_leave.leave_setup_id = dbo.leave_setup.id
+	                    LEFT JOIN dbo.leave_type on dbo.leave_setup.leave_type_id = dbo.leave_type.id
+	                    LEFT JOIN dbo.employee on dbo.employee_leave.emp_id =  dbo.employee.id
+	                    LEFT JOIN dbo.leave_status on dbo.employee_leave.leave_status_id =  dbo.leave_status.id
+                    WHERE dbo.employee_leave.approver_emp_id = @key
+                    AND dbo.employee_leave.is_deleted = 0 AND dbo.leave_setup.is_deleted = 0
+                    group by MONTH(ondate_applied), dbo.employee_leave.emp_id, 
+                    dbo.leave_status.leave_status_name, dbo.leave_status.id, dbo.employee.full_name,
+                    dbo.leave_type.leave_type_name, dbo.leave_setup.leave_name,    
+                    FORMAT(CAST(approve_start_date AS DATE), 'MM/dd/yyyy', 'EN-US'),
+			        FORMAT(CAST(approve_end_date AS DATE), 'MM/dd/yyyy', 'EN-US')",
+                param: new { key }
+            );
+        }
+        
 
         public IEnumerable<EmployeeLeave> All()
         {
