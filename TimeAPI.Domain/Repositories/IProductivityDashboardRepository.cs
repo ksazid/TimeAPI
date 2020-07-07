@@ -4,10 +4,14 @@ using TimeAPI.Domain.Model;
 
 namespace TimeAPI.Domain.Repositories
 {
-    public interface IActivityDashboardRepository : IRepository<ActivityDashboard, string>
+    public interface IProductivityDashboardRepository : IRepository<ProductivityDashboard, string>
     {
-        //dynamic TotalDefaultEmpCountByOrgID(string OrgID);
-        //dynamic TotalEmpAbsentCountByOrgIDAndDate(string OrgID, string toDate, string fromDate);
+        dynamic EmployeeProductivityPerDateByEmpIDAndDate(string EmpID, string StartDate, string EndDate);
+        dynamic DesktopEmployeeProductivityPerDateByEmpIDAndDate(string EmpID, string StartDate, string EndDate);
+        dynamic EmployeeProductivityTimeFrequencyByEmpIDAndDate(string EmpID, string StartDate, string EndDate);
+       // dynamic EmployeeProductivityTimeFrequencyByEmpIDAndDate(string EmpID, string StartDate, string EndDate);
+
+        //dynamic EmployeeProductivityTimeGraphFrequencyByUsageID(string UsageID);
         //dynamic TotalEmpAttentedCountByOrgIDAndDate(string OrgID, string toDate, string fromDate);
         //dynamic TotalEmpOverTimeCountByOrgIDAndDate(string OrgID, string toDate, string fromDate);
         //dynamic TotalEmpLessHoursByOrgIDAndDate(string OrgID, string toDate, string fromDate);

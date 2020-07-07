@@ -205,7 +205,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpPost]
         [Route("AllProjectRatioByOrgID")]
         public async Task<object> AllProjectRatioByOrgID([FromBody] Utils Utils, CancellationToken cancellationToken)
@@ -224,7 +223,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
 
         [HttpPost]
         [Route("GetAllTimesheetByOrgID")]

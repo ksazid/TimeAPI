@@ -10,6 +10,7 @@ namespace TimeAPI.Domain.Entities
         public string emp_app_usage_id { get; set; }
         public string emp_id { get; set; }
         public string app_name { get; set; }
+        public string app_category_name { get; set; }
         public string time_spend { get; set; }
         public string icon { get; set; }
         public bool is_productive { get; set; }

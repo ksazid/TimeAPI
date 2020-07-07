@@ -15,8 +15,8 @@ namespace TimeAPI.Data.Repositories
         {
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.employee_app_tracked
-                                   (id, emp_app_usage_id, emp_id, app_name, time_spend, icon, is_productive, is_unproductive, is_neutral, created_date, createdby)
-                           VALUES (@id, @emp_app_usage_id, @emp_id, @app_name, @time_spend, @icon, @is_productive, @is_unproductive, @is_neutral, @created_date, @createdby);
+                                   (id, emp_app_usage_id, emp_id, app_name, app_category_name, time_spend, icon, is_productive, is_unproductive, is_neutral, created_date, createdby)
+                           VALUES (@id, @emp_app_usage_id, @emp_id, @app_name, @app_category_name, @time_spend, @icon, @is_productive, @is_unproductive, @is_neutral, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -49,6 +49,7 @@ namespace TimeAPI.Data.Repositories
                         emp_app_usage_id = @emp_app_usage_id,
                         emp_id = @emp_id,
                         app_name = @app_name, 
+                        app_category_name = @app_category_name,
                         time_spend = @time_spend, 
                         icon = @icon,
                         is_productive = @is_productive, 

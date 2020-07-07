@@ -186,7 +186,6 @@ namespace TimeAPI.API.Models
         public string days { get; set; }
     }
 
-
     //internal sealed class MyComparer : IEqualityComparer<T>
     //{
     //    public bool Equals(T x, Y y)

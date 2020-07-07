@@ -28,6 +28,7 @@ namespace TimeAPI.API.Models.EmployeeAppUsageViewModels
     public class AppUsedViewModel
     {
         public string app_name { get; set; }
+        public string app_category_name { get; set; }
         public string time_spend { get; set; }
         public string icon { get; set; }
     }

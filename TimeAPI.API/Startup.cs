@@ -30,6 +30,7 @@ using Hangfire.MemoryStorage;
 using TimeAPI.API.HangfireJobs;
 using Microsoft.AspNetCore.ResponseCompression;
 using System.IO.Compression;
+using Microsoft.AspNetCore.Http;
 //using Hangfire;
 //using Hangfire.MemoryStorage;
 
@@ -46,6 +47,13 @@ namespace TimeAPI.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
 
 
             services.AddHealthChecks();

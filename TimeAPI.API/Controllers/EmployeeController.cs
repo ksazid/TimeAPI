@@ -571,6 +571,7 @@ namespace TimeAPI.API.Controllers
                         emp_app_usage_id = modal.id,
                         emp_id = modal.emp_id,
                         app_name = employeeViewModel.AppUsedViewModel[i].app_name,
+                        app_category_name = employeeViewModel.AppUsedViewModel[i].app_category_name,
                         time_spend = employeeViewModel.AppUsedViewModel[i].time_spend,
                         icon = employeeViewModel.AppUsedViewModel[i].icon,
                         is_productive = false,

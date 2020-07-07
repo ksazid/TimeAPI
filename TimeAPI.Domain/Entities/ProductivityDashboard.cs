@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TimeAPI.Domain.Entities
 {
-    public class ActivityDashboard
+    public class ProductivityDashboard
     {
         public int MyProperty { get; set; }
     }
