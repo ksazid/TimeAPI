@@ -198,8 +198,8 @@ namespace TimeAPI.API
                 //{
                 //    ValidateIssuer = true,
                 //    ValidateAudience = true,
-                //    ValidAudience = "https://enforce.azurewebsites.net/",
-                //    ValidIssuer = "https://enforce.azurewebsites.net/",
+                //    ValidAudience = "http://www.enforcesolutions.com//",
+                //    ValidIssuer = "http://www.enforcesolutions.com//",
 
                 //    ValidateIssuerSigningKey = false,
                 //    IssuerSigningKey = new SymmetricSecurityKey(key),

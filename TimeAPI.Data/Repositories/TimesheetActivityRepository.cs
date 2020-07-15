@@ -198,7 +198,7 @@ namespace TimeAPI.Data.Repositories
             string GroupID = String.Join("','", List);
 
             return Query<ViewLogDataModel>(
-                sql: @"SELECT total_time, project_type, project_name, milestone_name, task_name, remarks, total_hrs, is_billable, ondate, start_time, groupid FROM
+                sql: @"SELECT total_time, project_type, project_name, milestone_name, task_name, remarks, total_hrs, is_billable, ondate, start_time, end_time, groupid FROM
 					    (
                         SELECT  
 
@@ -213,6 +213,7 @@ namespace TimeAPI.Data.Repositories
 		                        timesheet_activity.is_billable,
 		                        FORMAT(dbo.timesheet_activity.ondate, 'dd-MM-yyyy', 'en-US') AS ondate ,
 								dbo.timesheet_activity.start_time as start_time,
+								dbo.timesheet_activity.end_time as end_time,
 								dbo.timesheet_activity.groupid as groupid
 
 								
@@ -243,6 +244,7 @@ namespace TimeAPI.Data.Repositories
 		                        timesheet_administrative_activity.is_billable,
 		                        FORMAT(dbo.timesheet_administrative_activity.ondate, 'dd-MM-yyyy', 'en-US') AS ondate,
 								dbo.timesheet_administrative_activity.start_time as start_time,
+								dbo.timesheet_administrative_activity.end_time as end_time,
 								dbo.timesheet_administrative_activity.groupid as groupid
 
 

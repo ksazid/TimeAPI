@@ -9,7 +9,7 @@ namespace TimeAPI.Domain.Repositories
         dynamic EmployeeProductivityPerDateByEmpIDAndDate(string EmpID, string StartDate, string EndDate);
         dynamic DesktopEmployeeProductivityPerDateByEmpIDAndDate(string EmpID, string StartDate, string EndDate);
         dynamic EmployeeProductivityTimeFrequencyByEmpIDAndDate(string EmpID, string StartDate, string EndDate);
-       // dynamic EmployeeProductivityTimeFrequencyByEmpIDAndDate(string EmpID, string StartDate, string EndDate);
+        dynamic EmployeeAppTrackedByEmpIDAndDate(string EmpID, string StartDate, string EndDate);
 
         //dynamic EmployeeProductivityTimeGraphFrequencyByUsageID(string UsageID);
         //dynamic TotalEmpAttentedCountByOrgIDAndDate(string OrgID, string toDate, string fromDate);

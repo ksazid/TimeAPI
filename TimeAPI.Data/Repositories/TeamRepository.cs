@@ -143,21 +143,22 @@ namespace TimeAPI.Data.Repositories
         {
             return Query<dynamic>(
                    sql: @"SELECT
-		                        team_members.id as team_members_id,
-		                        team_members.emp_id,
-			                    department.id as team_department_id,
-		                        e_tl.full_name as name,
-		                        department.dep_name,
-			                    designation.designation_name,
-		                        e_tl.workemail,
-		                        e_tl.emp_code
-	                        FROM dbo.team_members WITH(NOLOCK)
-	                        LEFT JOIN employee e_tl ON team_members.emp_id = e_tl.id
-		                    LEFT JOIN department on e_tl.deptid = department.id
-		                    LEFT JOIN designation on e_tl.designation_id = designation.id
-	                        WHERE team_members.team_id =  @key
-		                    AND team_members.is_deleted = 0
-                            ORDER BY e_tl.full_name ASC",
+		                    team_members.team_id as team_id,
+		                    team_members.id as team_members_id,
+		                    team_members.emp_id,
+		                    department.id as team_department_id,
+		                    employee.full_name as name,
+		                    department.dep_name,
+		                    designation.designation_name,
+		                    employee.workemail,
+		                    employee.emp_code
+	                    FROM dbo.team_members WITH(NOLOCK)
+	                    LEFT JOIN employee ON team_members.emp_id = employee.id
+	                    LEFT JOIN department on employee.deptid = department.id
+	                    LEFT JOIN designation on employee.designation_id = designation.id
+	                    WHERE team_members.team_id =  '81145216-62fd-4cfb-a5bc-bf6d271f3d56'
+	                    AND team_members.is_deleted = 0 AND employee.is_deleted = 0  AND team_members.emp_id is not null
+                        ORDER BY employee.full_name ASC",
                       param: new { key }
                );
         }

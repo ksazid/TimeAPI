@@ -7,13 +7,18 @@ namespace TimeAPI.Domain.Repositories
     public interface IUserRepository : IRepository<User, string>
     {
         User FindByNormalizedUserName(string normalizedUserName);
+
         User FindByNormalizedEmail(string normalizedEmail);
+
         UserDataGroupDataSet GetUserDataGroupByUserID(string EmpID, string Date);
-       
+
         IEnumerable<RootTimesheetData> GetAllTimesheetByEmpID(string EmpID, string Date);
 
         IEnumerable<RootTimesheetData> GetAllTimesheetByOrgID(string EmpID, string FromDate, string ToDate);
+
         dynamic LastCheckinByEmpID(string EmpID, string Date);
+
+        IEnumerable<RootTimesheetData> GetEmployeeTasksTimesheetByEmpID(string EmpID, string FromDate, string ToDate);
 
         //dynamic TotalEmployeeDashboardDataByOrgID(string OrgID);
         ////dynamic TotalEmployeeDashboardDataByOrgID(string OrgID, string toDate, string fromDate);

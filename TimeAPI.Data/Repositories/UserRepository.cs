@@ -164,11 +164,31 @@ namespace TimeAPI.Data.Repositories
             return RootTimesheetDataList;
         }
 
+        public IEnumerable<RootTimesheetData> GetEmployeeTasksTimesheetByEmpID(string EmpID, string fromDate, string toDate)
+        {
+
+            var resultsTimesheetGrpID = Query<string>(
+                sql: @"SELECT distinct(groupid), FORMAT(CAST(timesheet.ondate AS datetime2), N'dd-MMM-yyyy HH:mm:ss', 'EN-US')  from timesheet WITH (NOLOCK)
+                        WHERE empid = @empid
+                        AND FORMAT(CAST(timesheet.ondate AS DATE), 'MM/dd/yyyy', 'EN-US')
+                            BETWEEN FORMAT(CAST(@fromDate AS DATE), 'MM/dd/yyyy', 'EN-US')
+                            AND FORMAT(CAST(@toDate AS DATE), 'MM/dd/yyyy', 'EN-US')
+                        AND timesheet.is_deleted = 0
+						
+                        ORDER BY FORMAT(CAST(timesheet.ondate AS datetime2), N'dd-MMM-yyyy HH:mm:ss', 'EN-US') ASC",
+                param: new { empid = EmpID, fromDate , toDate }
+            );
+
+            List<RootTimesheetData> RootTimesheetDataList = GetTimesheetProperty(resultsTimesheetGrpID);
+            return RootTimesheetDataList;
+        }
+
         public IEnumerable<RootTimesheetData> GetAllTimesheetByOrgID(string OrgID, string fromDate, string toDate)
         {
 
             var resultsTimesheetGrpID = Query<string>(
-                sql: @"SELECT distinct(groupid), FORMAT(CAST(timesheet.ondate AS DATE), 'dd/MM/yyyy'), FORMAT(CAST(timesheet.ondate AS DATETIME2), N'hh:mm tt')  from timesheet WITH (NOLOCK)
+                sql: @"SELECT distinct(groupid), FORMAT(CAST(timesheet.ondate AS DATE), 'dd/MM/yyyy'), FORMAT(CAST(timesheet.ondate AS DATETIME2), N'hh:mm tt')  
+                            from timesheet WITH (NOLOCK)
                             INNER JOIN employee on timesheet.empid = employee.id
                             WHERE employee.org_id = @OrgID
                             AND FORMAT(CAST(timesheet.ondate AS DATE), 'MM/dd/yyyy', 'EN-US')
@@ -335,8 +355,8 @@ namespace TimeAPI.Data.Repositories
 					    (
                         SELECT  
 
-								ISNULL(NULLIF(FORMAT(CAST(dbo.timesheet_activity.start_time AS DATETIME2), N'hh:mm tt'), ' '), 'NA') as start_time,  
-		                        ISNULL(NULLIF(FORMAT(CAST(dbo.timesheet_activity.end_time AS DATETIME2), N'hh:mm tt'), ' '), 'NA')   as end_time,
+								ISNULL(NULLIF(FORMAT(CAST(dbo.timesheet_activity.start_time AS DATETIME2), N'MM/dd/yyyy hh:mm tt'), ' '), 'NA') as start_time,  
+		                        ISNULL(NULLIF(FORMAT(CAST(dbo.timesheet_activity.end_time AS DATETIME2), N' MM/dd/yyyy hh:mm tt'), ' '), 'NA')   as end_time,
 								UPPER(dbo.timesheet_x_project_category.project_category_type) as project_type,
 								ISNULL(dbo.project.project_name, 'Activity') as project_name,
 								ISNULL(dbo.project_activity.activity_name, ISNULL(dbo.timesheet_activity.milestone_name, dbo.timesheet_activity.task_name)) as milestone_name,
@@ -367,8 +387,8 @@ namespace TimeAPI.Data.Repositories
 
 						    SELECT   
 		          
-								ISNULL(NULLIF(FORMAT(CAST(dbo.timesheet_administrative_activity.start_time AS DATETIME2), N'hh:mm tt'), ' '), 'NA') as start_time,  
-		                        ISNULL(NULLIF(FORMAT(CAST(dbo.timesheet_administrative_activity.end_time AS DATETIME2), N'hh:mm tt'), ' '), 'NA')   as end_time,
+								ISNULL(NULLIF(FORMAT(CAST(dbo.timesheet_administrative_activity.start_time AS DATETIME2), N'MM/dd/yyyy hh:mm tt'), ' '), 'NA') as start_time,  
+		                        ISNULL(NULLIF(FORMAT(CAST(dbo.timesheet_administrative_activity.end_time AS DATETIME2), N'MM/dd/yyyy hh:mm tt'), ' '), 'NA')   as end_time,
 								UPPER(dbo.timesheet_x_project_category.project_category_type) as project_type,
 								ISNULL([dbo].[administrative].administrative_name, 'NA') as project_name,
 								ISNULL( [dbo].[administrative].administrative_name, 'NA') as milestone_name,
