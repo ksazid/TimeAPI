@@ -238,7 +238,6 @@ namespace TimeAPI.API.Controllers
                             createdby = modal.createdby,
                             created_date = _dateTime.ToString(),
                             is_deleted = false
-
                         };
 
                         if (Role.NormalizedName.Equals("ADMIN"))
@@ -370,8 +369,6 @@ namespace TimeAPI.API.Controllers
 
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
-
-
 
                 _unitOfWork.DelegationsDelegateeRepository.RemoveByDelegateeID(Utils.ID);
                 _unitOfWork.EmployeeRepository.RemoveAdminRightByEmpID(Utils.ID);

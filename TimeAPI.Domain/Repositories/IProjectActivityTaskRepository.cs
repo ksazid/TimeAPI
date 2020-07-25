@@ -11,6 +11,7 @@ namespace TimeAPI.Domain.Repositories
         void RemoveByProjectID(string ProjectID);
         IEnumerable<dynamic> GetAllTaskByActivityID(string ActivityID);
         IEnumerable<dynamic> GetAllTaskByProjectID(string ProjectID);
+        IEnumerable<ProjectActivityTaskEntityViewModel> GetAllTaskForAssignByProjectID(string ProjectID);
         dynamic GetProjectActivityTaskRatioByProjectID(string ProjectID);
     }
 }

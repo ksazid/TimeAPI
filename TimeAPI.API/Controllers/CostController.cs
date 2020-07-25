@@ -85,7 +85,6 @@ namespace TimeAPI.API.Controllroers
                             createdby = projectViewModel.createdby,
                             created_date = _dateTime.ToString(),
                             is_deleted = false
-
                         };
                         _unitOfWork.ProjectDesignTypeRepository.Add(projectDesignType);
                     }
@@ -153,7 +152,6 @@ namespace TimeAPI.API.Controllroers
                 tableCostMilestoneTask.Columns.Add("total_unit", typeof(string));
                 tableCostMilestoneTask.Columns.Add("default_unit_hours", typeof(string));
 
-
                 #endregion RegionStatic
 
                 #region ProjectUnit
@@ -198,6 +196,7 @@ namespace TimeAPI.API.Controllroers
                         if (projectUnit.is_extra == false)
                         {
                             #region Study
+
                             foreach (DataRow itemStaticCostProjectMilestone in tableCostProjectMilestone.Select("milestone_name = 'Study'"))
                             {
                                 var StaticCostProjectMilestoneTasks = _unitOfWork.CostProjectTaskRepository
@@ -234,7 +233,6 @@ namespace TimeAPI.API.Controllroers
                                             tableCostMilestoneTask.Rows.Add(itemStaticCostProjectMilestone["id"],
                                                modal.id, itemStaticCostProjectMilestoneTasks.task_name,
                                                numberofunit, item.unit_id, projectViewModel.total_unit, itemStaticCostProjectMilestoneTasks.qty);
-
                                         }
                                     }
                                     else
@@ -245,12 +243,14 @@ namespace TimeAPI.API.Controllroers
                                     }
                                 }
                             }
+
                             #endregion Study
                         }
 
                         if (projectUnit.is_extra == true)
                         {
                             #region Design
+
                             foreach (DataRow itemStaticCostProjectMilestone in tableCostProjectMilestone.Select("milestone_name = 'Design'"))
                             {
                                 //get all static milestone tasks and save it with projectid in cost_milestone_tasks
@@ -260,7 +260,6 @@ namespace TimeAPI.API.Controllroers
 
                                 foreach (var itemStaticCostProjectMilestoneTasks in StaticCostProjectMilestoneTasks)
                                 {
-
                                     //convert the no_of_unit into interger.
                                     if (itemStaticCostProjectMilestoneTasks.task_name == item.unit_name)
                                     {
@@ -292,7 +291,6 @@ namespace TimeAPI.API.Controllroers
                                                 tableCostMilestoneTask.Rows.Add(itemStaticCostProjectMilestone["id"],
                                                    modal.id, itemStaticCostProjectMilestoneTasks.task_name,
                                                    numberofunit, item.unit_id, item.total_unit, itemStaticCostProjectMilestoneTasks.qty);
-
                                             }
                                         }
                                         else
@@ -304,9 +302,11 @@ namespace TimeAPI.API.Controllroers
                                     }
                                 }
                             }
+
                             #endregion Design
 
                             #region ExtraServices
+
                             foreach (DataRow itemStaticCostProjectMilestone in tableCostProjectMilestone.Select("milestone_name = 'Extra Services'"))
                             {
                                 //get all static milestone tasks and save it with projectid in cost_milestone_tasks
@@ -316,7 +316,6 @@ namespace TimeAPI.API.Controllroers
 
                                 foreach (var itemStaticCostProjectMilestoneTasks in StaticCostProjectMilestoneTasks)
                                 {
-
                                     //convert the no_of_unit into interger.
                                     if (itemStaticCostProjectMilestoneTasks.task_name == item.unit_name)
                                     {
@@ -361,7 +360,6 @@ namespace TimeAPI.API.Controllroers
                                                 tableCostMilestoneTask.Rows.Add(itemStaticCostProjectMilestone["id"],
                                                    modal.id, itemStaticCostProjectMilestoneTasks.task_name,
                                                    numberofunit, item.unit_id, item.total_unit, itemStaticCostProjectMilestoneTasks.qty);
-
                                             }
                                         }
                                         else
@@ -373,9 +371,11 @@ namespace TimeAPI.API.Controllroers
                                     }
                                 }
                             }
+
                             #endregion ExtraServices
 
                             #region ShopDrawing
+
                             if (item.unit_name == "Shop Drawing")
                             {
                                 foreach (DataRow itemStaticCostProjectMilestone in tableCostProjectMilestone.Select("milestone_name = 'Shop Drawing'"))
@@ -387,7 +387,6 @@ namespace TimeAPI.API.Controllroers
 
                                     foreach (var itemStaticCostProjectMilestoneTasks in StaticCostProjectMilestoneTasks)
                                     {
-
                                         //convert the no_of_unit into interger.
                                         double numberofunit = 0;
                                         numberofunit = (Convert.ToInt32(item.total_unit) * Convert.ToInt32(itemStaticCostProjectMilestoneTasks.qty));
@@ -419,7 +418,6 @@ namespace TimeAPI.API.Controllroers
                                                 tableCostMilestoneTask.Rows.Add(itemStaticCostProjectMilestone["id"],
                                                    modal.id, itemStaticCostProjectMilestoneTasks.task_name,
                                                    numberofunit, item.unit_id, item.total_unit, itemStaticCostProjectMilestoneTasks.qty);
-
                                             }
                                         }
                                         else
@@ -431,6 +429,7 @@ namespace TimeAPI.API.Controllroers
                                     }
                                 }
                             }
+
                             #endregion ShopDrawing
                         }
 
@@ -508,7 +507,6 @@ namespace TimeAPI.API.Controllroers
                 var modal = mapper.Map<CostProject>(projectViewModel);
                 modal.modified_date = _dateTime.ToString();
 
-
                 //contact
                 if (projectViewModel.EntityContact != null)
                 {
@@ -526,7 +524,6 @@ namespace TimeAPI.API.Controllroers
                         created_date = _dateTime.ToString(),
                         is_primary = projectViewModel.EntityContact.is_primary,
                         is_deleted = false
-
                     };
                     _unitOfWork.EntityContactRepository.UpdateByEntityID(entityContact);
                 }
@@ -564,7 +561,6 @@ namespace TimeAPI.API.Controllroers
                             createdby = projectViewModel.createdby,
                             created_date = _dateTime.ToString(),
                             is_deleted = false
-
                         };
                         _unitOfWork.ProjectDesignTypeRepository.Add(projectDesignType);
                     }
@@ -624,7 +620,6 @@ namespace TimeAPI.API.Controllroers
                         if ((_ProjectDesignType.Count > 0))
                             _unitOfWork.ProjectTagsRepository.RemoveByUnitID(projectUnit.id);
 
-
                         if (item.ProjectTags != null)
                             foreach (var itemProjectTags in item.ProjectTags)
                             {
@@ -641,11 +636,11 @@ namespace TimeAPI.API.Controllroers
                                 _unitOfWork.ProjectTagsRepository.Add(projectTags);
                             }
 
-
                         //DEFAULT MILESTONE FOR ALL (Study)
                         if (projectUnit.is_extra == false)
                         {
                             #region Study
+
                             foreach (DataRow itemStaticCostProjectMilestone in tableCostProjectMilestone.Select("milestone_name = 'Study'"))
                             {
                                 var StaticCostProjectMilestoneTasks = _unitOfWork.CostProjectTaskRepository
@@ -679,7 +674,6 @@ namespace TimeAPI.API.Controllroers
                                             tableCostMilestoneTask.Rows.Add(itemStaticCostProjectMilestone["id"],
                                                modal.id, itemStaticCostProjectMilestoneTasks.task_name,
                                                numberofunit, item.unit_id, projectViewModel.total_unit, itemStaticCostProjectMilestoneTasks.qty);
-
                                         }
                                     }
                                     else
@@ -690,12 +684,14 @@ namespace TimeAPI.API.Controllroers
                                     }
                                 }
                             }
+
                             #endregion Study
                         }
 
                         if (projectUnit.is_extra == true)
                         {
                             #region Design
+
                             foreach (DataRow itemStaticCostProjectMilestone in tableCostProjectMilestone.Select("milestone_name = 'Design'"))
                             {
                                 //get all static milestone tasks and save it with projectid in cost_milestone_tasks
@@ -705,7 +701,6 @@ namespace TimeAPI.API.Controllroers
 
                                 foreach (var itemStaticCostProjectMilestoneTasks in StaticCostProjectMilestoneTasks)
                                 {
-
                                     //convert the no_of_unit into interger.
                                     if (itemStaticCostProjectMilestoneTasks.task_name == item.unit_name)
                                     {
@@ -734,7 +729,6 @@ namespace TimeAPI.API.Controllroers
                                                 tableCostMilestoneTask.Rows.Add(itemStaticCostProjectMilestone["id"],
                                                    modal.id, itemStaticCostProjectMilestoneTasks.task_name,
                                                    numberofunit, item.unit_id, item.total_unit, itemStaticCostProjectMilestoneTasks.qty);
-
                                             }
                                         }
                                         else
@@ -746,9 +740,11 @@ namespace TimeAPI.API.Controllroers
                                     }
                                 }
                             }
+
                             #endregion Design
 
                             #region ExtraServices
+
                             foreach (DataRow itemStaticCostProjectMilestone in tableCostProjectMilestone.Select("milestone_name = 'Extra Services'"))
                             {
                                 //get all static milestone tasks and save it with projectid in cost_milestone_tasks
@@ -758,7 +754,6 @@ namespace TimeAPI.API.Controllroers
 
                                 foreach (var itemStaticCostProjectMilestoneTasks in StaticCostProjectMilestoneTasks)
                                 {
-
                                     //convert the no_of_unit into interger.
                                     if (itemStaticCostProjectMilestoneTasks.task_name == item.unit_name)
                                     {
@@ -796,7 +791,6 @@ namespace TimeAPI.API.Controllroers
                                                 tableCostMilestoneTask.Rows.Add(itemStaticCostProjectMilestone["id"],
                                                    modal.id, itemStaticCostProjectMilestoneTasks.task_name,
                                                    numberofunit, item.unit_id, item.total_unit, itemStaticCostProjectMilestoneTasks.qty);
-
                                             }
                                         }
                                         else
@@ -808,9 +802,11 @@ namespace TimeAPI.API.Controllroers
                                     }
                                 }
                             }
+
                             #endregion ExtraServices
 
                             #region ShopDrawing
+
                             if (item.unit_name == "Shop Drawing")
                             {
                                 foreach (DataRow itemStaticCostProjectMilestone in tableCostProjectMilestone.Select("milestone_name = 'Shop Drawing'"))
@@ -822,7 +818,6 @@ namespace TimeAPI.API.Controllroers
 
                                     foreach (var itemStaticCostProjectMilestoneTasks in StaticCostProjectMilestoneTasks)
                                     {
-
                                         //convert the no_of_unit into interger.
                                         string numberofunit = "";
                                         numberofunit = (Convert.ToInt32(item.total_unit) * Convert.ToInt32(itemStaticCostProjectMilestoneTasks.qty)).ToString();
@@ -850,7 +845,6 @@ namespace TimeAPI.API.Controllroers
                                                 tableCostMilestoneTask.Rows.Add(itemStaticCostProjectMilestone["id"],
                                                    modal.id, itemStaticCostProjectMilestoneTasks.task_name,
                                                    numberofunit, item.unit_id, item.total_unit, itemStaticCostProjectMilestoneTasks.qty);
-
                                             }
                                         }
                                         else
@@ -862,6 +856,7 @@ namespace TimeAPI.API.Controllroers
                                     }
                                 }
                             }
+
                             #endregion ShopDrawing
                         }
 
@@ -981,7 +976,6 @@ namespace TimeAPI.API.Controllroers
                     List<CostProjectTask> costProjectTasks = new List<CostProjectTask>();
                     costProjectTasks = _unitOfWork.CostProjectTaskRepository.GetAllMilestoneTasksByMilestoneID(CostProjectMilestone[i].id).ToList();
                     CostProjectMilestone[i].CostProjectTask = costProjectTasks;
-
                 }
 
                 modalCostProject.TypeOfDesign = (typeOfDesign1);
@@ -1018,7 +1012,6 @@ namespace TimeAPI.API.Controllroers
                     List<CostProjectTask> costProjectTasks = new List<CostProjectTask>();
                     costProjectTasks = _unitOfWork.CostProjectTaskRepository.GetAllMilestoneTasksByMilestoneID(CostProjectMilestone[i].id).ToList();
                     CostProjectMilestone[i].CostProjectTask = costProjectTasks;
-
                 }
 
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(CostProjectMilestone, Formatting.Indented)).ConfigureAwait(false);
@@ -1097,7 +1090,6 @@ namespace TimeAPI.API.Controllroers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
 
         [HttpPost]
         [Route("UpdateCostProjectDiscountAndTotalCostTaskID")]
@@ -1252,7 +1244,6 @@ namespace TimeAPI.API.Controllroers
                     modal.project_status_id = status.id;
                     modal.start_date = projectViewModel.start_date;
                     modal.end_date = projectViewModel.end_date;
-
 
                     if (projectViewModel.EntityLocation != null)
                     {
@@ -1456,7 +1447,6 @@ namespace TimeAPI.API.Controllroers
                 modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
-
                 _unitOfWork.TypeOfDesignRepository.Add(modal);
                 _unitOfWork.Commit();
 
@@ -1496,8 +1486,6 @@ namespace TimeAPI.API.Controllroers
         {
             try
             {
-
-
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
@@ -1606,7 +1594,6 @@ namespace TimeAPI.API.Controllroers
                 modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
-
                 _unitOfWork.SpecifiationRepository.Add(modal);
                 _unitOfWork.Commit();
 
@@ -1646,8 +1633,6 @@ namespace TimeAPI.API.Controllroers
         {
             try
             {
-
-
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
@@ -1756,7 +1741,6 @@ namespace TimeAPI.API.Controllroers
                 modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
-
                 _unitOfWork.UnitDescriptionRepository.Add(modal);
                 _unitOfWork.Commit();
 
@@ -1818,8 +1802,6 @@ namespace TimeAPI.API.Controllroers
         {
             try
             {
-
-
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
@@ -1946,7 +1928,6 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-
                 var StaticCostProjectMilestoneTasks = _unitOfWork.CostProjectTaskRepository
                                                        .GetAllStaticMilestoneTasksByMilestoneID
                                                        (Utils.ID);
@@ -1965,7 +1946,6 @@ namespace TimeAPI.API.Controllroers
         {
             try
             {
-
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
@@ -1980,7 +1960,6 @@ namespace TimeAPI.API.Controllroers
                     modal.modified_date = _dateTime.ToString();
 
                     _unitOfWork.CostProjectTaskRepository.UpdateStaticCostProjectTask(modal);
-
                 }
                 _unitOfWork.Commit();
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Quantity updated successfully." }).ConfigureAwait(false);
@@ -2014,7 +1993,6 @@ namespace TimeAPI.API.Controllroers
                 modal.id = Guid.NewGuid().ToString();
                 modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
-
 
                 _unitOfWork.PackagesRepository.Add(modal);
                 _unitOfWork.Commit();
@@ -2055,8 +2033,6 @@ namespace TimeAPI.API.Controllroers
         {
             try
             {
-
-
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
@@ -2165,7 +2141,6 @@ namespace TimeAPI.API.Controllroers
                 modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
-
                 _unitOfWork.CostPerHourRepository.Add(modal);
                 _unitOfWork.Commit();
 
@@ -2205,8 +2180,6 @@ namespace TimeAPI.API.Controllroers
         {
             try
             {
-
-
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
@@ -2315,7 +2288,6 @@ namespace TimeAPI.API.Controllroers
                 modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
-
                 _unitOfWork.ProfitMarginRepository.Add(modal);
                 _unitOfWork.Commit();
 
@@ -2355,8 +2327,6 @@ namespace TimeAPI.API.Controllroers
         {
             try
             {
-
-
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
@@ -2442,6 +2412,5 @@ namespace TimeAPI.API.Controllroers
         }
 
         #endregion ProfitMargin
-
     }
 }

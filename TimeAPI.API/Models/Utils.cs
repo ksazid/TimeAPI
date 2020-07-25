@@ -141,6 +141,17 @@ namespace TimeAPI.API.Models
         public string StartDate { get; set; }
         public string EndDate { get; set; }
     }
+
+    public class UtilsEmpIDAndDateWithoutWeek
+    {
+        public string EmpID { get; set; }
+        public string StartDate { get; set; }
+        public string EndDate { get; set; }
+        public bool? isWeek { get; set; }
+    }
+
+
+
     public class UtilPhone
     {
         public string PhoneNumber { get; set; }

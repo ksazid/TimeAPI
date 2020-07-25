@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -172,7 +171,6 @@ namespace TimeAPI.API.Controllers
 
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
-
 
                 int Result = _unitOfWork.EmployeeRepository.RemoveEmployeeIfZeroActivity(Utils.ID);
 
@@ -565,29 +563,36 @@ namespace TimeAPI.API.Controllers
 
                 for (int i = 0; i < employeeViewModel.AppUsedViewModel.Count; i++)
                 {
-                    var AppTrackedViewModel = new EmployeeAppTracked
+                    string Url = string.Empty;
+                    if (employeeViewModel.AppUsedViewModel[i].app_name != "unknown"
+                        && employeeViewModel.AppUsedViewModel[i].app_name != " "
+                        && !String.IsNullOrEmpty(employeeViewModel.AppUsedViewModel[i].app_name.Trim())
+                        && !String.IsNullOrWhiteSpace(employeeViewModel.AppUsedViewModel[i].app_name))
                     {
-                        id = Guid.NewGuid().ToString(),
-                        emp_app_usage_id = modal.id,
-                        emp_id = modal.emp_id,
-                        app_name = employeeViewModel.AppUsedViewModel[i].app_name,
-                        app_category_name = employeeViewModel.AppUsedViewModel[i].app_category_name,
-                        time_spend = employeeViewModel.AppUsedViewModel[i].time_spend,
-                        icon = employeeViewModel.AppUsedViewModel[i].icon,
-                        is_productive = false,
-                        is_unproductive = false,
-                        is_neutral = false,
-                        created_date = _dateTime.ToString(),
-                        is_deleted = false
-                    };
-                    _unitOfWork.EmployeeAppTrackedRepository.Add(AppTrackedViewModel);
+                        Url = VerifyURL(employeeViewModel.AppUsedViewModel[i].app_name);
+                        var AppTrackedViewModel = new EmployeeAppTracked
+                        {
+                            id = Guid.NewGuid().ToString(),
+                            emp_app_usage_id = modal.id,
+                            emp_id = modal.emp_id,
+                            app_name = Url,
+                            app_category_name = employeeViewModel.AppUsedViewModel[i].app_category_name,
+                            time_spend = employeeViewModel.AppUsedViewModel[i].time_spend,
+                            icon = employeeViewModel.AppUsedViewModel[i].icon,
+                            is_productive = false,
+                            is_unproductive = false,
+                            is_neutral = false,
+                            created_date = _dateTime.ToString(),
+                            is_deleted = false
+                        };
+                        _unitOfWork.EmployeeAppTrackedRepository.Add(AppTrackedViewModel);
+                    }
                 }
 
                 _unitOfWork.EmployeeAppUsageRepository.Add(modal);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Record Added Successfully." }).ConfigureAwait(false);
-
             }
             catch (Exception ex)
             {
@@ -597,6 +602,50 @@ namespace TimeAPI.API.Controllers
                     Code = ex.Message,
                     Desc = ex.Message
                 });
+            }
+
+            static string VerifyURL(string _app_name)
+            {
+                string Url;
+                if (_app_name.Contains(".com/"))
+                {
+                    Url = _app_name.Split(".com/")[0].ToString() + ".com";
+                }
+                else if (_app_name.Contains(".io/"))
+                {
+                    Url = _app_name.Split(".io/")[0].ToString() + ".io";
+                }
+                else if (_app_name.Contains(".info/"))
+                {
+                    Url = _app_name.Split(".info/")[0].ToString() + ".info";
+                }
+                else if (_app_name.Contains(".net/"))
+                {
+                    Url = _app_name.Split(".net/")[0].ToString() + ".net";
+                }
+                else if (_app_name.Contains(".gov/"))
+                {
+                    Url = _app_name.Split(".gov/")[0].ToString() + ".gov";
+                }
+                else if (_app_name.Contains(".edu/"))
+                {
+                    Url = _app_name.Split(".edu/")[0].ToString() + ".edu";
+                }
+                else if (_app_name.Contains(".ai/"))
+                {
+                    Url = _app_name.Split(".ai/")[0].ToString() + ".ai";
+                }
+                else if (_app_name.Contains(".ae/"))
+                {
+                    Url = _app_name.Split(".ae/")[0].ToString() + ".ae";
+                }
+                else if (_app_name.Contains(".org/"))
+                {
+                    Url = _app_name.Split(".org/")[0].ToString() + ".org";
+                }
+                else
+                    Url = _app_name;
+                return Url;
             }
         }
 
@@ -615,7 +664,6 @@ namespace TimeAPI.API.Controllers
 
                 if (employeeViewModel == null)
                     throw new ArgumentNullException(nameof(employeeViewModel));
-
 
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EmployeeLeaveViewModel, EmployeeLeave>());
                 var mapper = config.CreateMapper();
@@ -694,7 +742,6 @@ namespace TimeAPI.API.Controllers
 
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
-
 
                 _unitOfWork.EmployeeLeaveRepository.Remove(Utils.ID);
                 _unitOfWork.Commit();
@@ -918,7 +965,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
 
         [HttpPost]
         [Route("FetchEmployeeLeaveHistoryApproverID")]

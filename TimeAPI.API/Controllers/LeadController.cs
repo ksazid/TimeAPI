@@ -6,9 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using TimeAPI.API.Filters;
 using TimeAPI.API.Models;
-using TimeAPI.API.Models.CustomerViewModels;
 using TimeAPI.API.Models.LeadCompanyViewModels;
 using TimeAPI.API.Models.LeadProjectViewModels;
 using TimeAPI.API.Models.LeadRatingViewModels;
@@ -83,7 +81,6 @@ namespace TimeAPI.API.Controllroers
                 modal2.id = Guid.NewGuid().ToString();
                 modal2.lead_id = modal.id;
 
-
                 _unitOfWork.LeadProjectRepository.Add(modal2);
                 _unitOfWork.LeadRepository.Add(modal);
 
@@ -133,7 +130,6 @@ namespace TimeAPI.API.Controllroers
                 var modal2 = mapper2.Map<LeadProject>(LeadViewModel.LeadProject);
                 modal2.modified_date = _dateTime.ToString();
                 modal2.lead_id = modal.id;
-
 
                 _unitOfWork.LeadRepository.Update(modal);
                 _unitOfWork.LeadProjectRepository.Update(modal2);
@@ -197,7 +193,6 @@ namespace TimeAPI.API.Controllroers
             {
                 LeadViewModel customerViewModel = new LeadViewModel();
                 List<EntityContact> ListEntityContact = new List<EntityContact>();
-
 
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
@@ -975,6 +970,5 @@ namespace TimeAPI.API.Controllroers
         }
 
         #endregion LeadRating
-
     }
 }

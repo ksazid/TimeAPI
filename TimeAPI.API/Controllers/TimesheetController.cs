@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -12,12 +11,11 @@ using TimeAPI.API.Models;
 using TimeAPI.API.Models.TimesheetActivityCommentViewModels;
 using TimeAPI.API.Models.TimesheetActivityFileViewModels;
 using TimeAPI.API.Models.TimesheetActivityViewModels;
-using TimeAPI.API.Models.TimesheetViewModels;
 using TimeAPI.API.Models.TimesheetBreakPostViewModels;
+using TimeAPI.API.Models.TimesheetViewModels;
 using TimeAPI.API.Services;
 using TimeAPI.Domain;
 using TimeAPI.Domain.Entities;
-using TimeAPI.Domain.Repositories;
 
 namespace TimeAPI.API.Controllers
 {
@@ -444,8 +442,6 @@ namespace TimeAPI.API.Controllers
                 //Adding TimesheetBreak Location BreakIN
                 AddTimesheetBreakCurrentLocation(TimesheetBreakViewModel, modal);
 
-
-
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "TimesheetBreak registered successfully." }).ConfigureAwait(false);
@@ -648,8 +644,6 @@ namespace TimeAPI.API.Controllers
                     _unitOfWork.LocationRepository.Add(Location);
                 }
 
-
-
                 #endregion Location
 
                 _unitOfWork.Commit();
@@ -670,7 +664,6 @@ namespace TimeAPI.API.Controllers
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
-
 
                 if (utils == null)
                     throw new ArgumentNullException(nameof(utils));
@@ -1510,7 +1503,6 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
 
         #region TimesheetDesk
 

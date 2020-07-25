@@ -25,4 +25,12 @@ namespace TimeAPI.API.Models.TaskViewModels
         public string qty { get; set; }
         public IEnumerable<TaskTeamMember> employees { get; set; }
     }
+
+
+    public class AssignEmployeeTaskViewModel
+    {
+        public string id { get; set; }
+        public string empid { get; set; }
+        public string createdby { get; set; }
+    }
 }

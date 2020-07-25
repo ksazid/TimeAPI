@@ -147,7 +147,6 @@ namespace TimeAPI.Data.Repositories
             return _UserDataGroupDataSet;
         }
 
-
         public IEnumerable<RootTimesheetData> GetAllTimesheetByEmpID(string EmpID, string Date)
         {
 
@@ -176,10 +175,11 @@ namespace TimeAPI.Data.Repositories
                         AND timesheet.is_deleted = 0
 						
                         ORDER BY FORMAT(CAST(timesheet.ondate AS datetime2), N'dd-MMM-yyyy HH:mm:ss', 'EN-US') ASC",
-                param: new { empid = EmpID, fromDate , toDate }
+                param: new { empid = EmpID, fromDate, toDate }
             );
 
-            List<RootTimesheetData> RootTimesheetDataList = GetTimesheetProperty(resultsTimesheetGrpID);
+            List<RootTimesheetData> RootTimesheetDataList = GetTimesheetPropertyForEmployeeActivitesDashboard(resultsTimesheetGrpID);
+          
             return RootTimesheetDataList;
         }
 
@@ -232,6 +232,7 @@ namespace TimeAPI.Data.Repositories
                 List<TimesheetDataModel> TimesheetDataModelList = new List<TimesheetDataModel>();
                 List<TimesheetTeamDataModel> TimesheetTeamDataModelList = new List<TimesheetTeamDataModel>();
                 List<TimesheetCurrentLocationViewModel> TimesheetCurrentLocationViewModelList = new List<TimesheetCurrentLocationViewModel>();
+                List<FirstCheckInLastCheckout> FirstCheckInLastCheckoutList = new List<FirstCheckInLastCheckout>();
 
                 TimesheetDataModelList.AddRange(GetTimesheetDataModel(item));
 
@@ -243,6 +244,44 @@ namespace TimeAPI.Data.Repositories
                 TimesheetCurrentLocationViewModelList.AddRange(GetTimesheetCurrentLocationViewModel(item));
 
                 #region
+                rootTimesheetData.TimesheetDataModels = TimesheetDataModelList;
+                rootTimesheetData.TimesheetProjectCategoryDataModel = GetTimesheetProjectCategoryDataModel(item);
+                rootTimesheetData.TimesheetTeamDataModels = TimesheetTeamDataModelList;
+                rootTimesheetData.Members = MembersList;
+                rootTimesheetData.TimesheetSearchLocationViewModel = GetTimesheetSearchLocationViewModel(item);
+                rootTimesheetData.TimesheetCurrentLocationViewModels = TimesheetCurrentLocationViewModelList;
+                #endregion PrivateMethods
+
+                RootTimesheetDataList.Add(rootTimesheetData);
+            }
+
+            return RootTimesheetDataList;
+        }
+
+        private List<RootTimesheetData> GetTimesheetPropertyForEmployeeActivitesDashboard(IEnumerable<string> resultsTimesheetGrpID)
+        {
+            List<RootTimesheetData> RootTimesheetDataList = new List<RootTimesheetData>();
+
+            foreach (var item in resultsTimesheetGrpID)
+            {
+                RootTimesheetData rootTimesheetData = new RootTimesheetData();
+                List<string> MembersList = new List<string>();
+
+                //lists
+                List<TimesheetDataModel> TimesheetDataModelList = new List<TimesheetDataModel>();
+                List<TimesheetTeamDataModel> TimesheetTeamDataModelList = new List<TimesheetTeamDataModel>();
+                List<TimesheetCurrentLocationViewModel> TimesheetCurrentLocationViewModelList = new List<TimesheetCurrentLocationViewModel>();
+                
+                TimesheetDataModelList.AddRange(GetTimesheetDataModel(item));
+
+                TimesheetDataModelList.Select(d => d.viewLogDataModels = GetTimesheetActivityByGroupAndProjectID(d.groupid, "", d.ondate).ToList()).ToList();
+                TimesheetDataModelList.Select(d => d.FirstCheckInLastCheckout = FirstCheckInLastCheckout(d.emp_id, d.ondate, d.ondate)).ToList();
+
+                MembersList.AddRange(TimesheetDataModelList.Select(x => x.emp_name));
+                TimesheetTeamDataModelList.AddRange(GetTimesheetTeamDataModel(item));
+                TimesheetCurrentLocationViewModelList.AddRange(GetTimesheetCurrentLocationViewModel(item));
+
+                #region PrivateMethods
                 rootTimesheetData.TimesheetDataModels = TimesheetDataModelList;
                 rootTimesheetData.TimesheetProjectCategoryDataModel = GetTimesheetProjectCategoryDataModel(item);
                 rootTimesheetData.TimesheetTeamDataModels = TimesheetTeamDataModelList;
@@ -415,6 +454,60 @@ namespace TimeAPI.Data.Repositories
 						) xDATA ORDER BY start_time ASC",
                 param: new { GroupID, ProjectID, Date }
             );
+        }
+
+        public FirstCheckInLastCheckout FirstCheckInLastCheckout(string EmpID, string StartDate, string EndDate)
+        {
+            return QuerySingleOrDefault<FirstCheckInLastCheckout>(
+                 sql: @"SELECT
+                            timesheet.empid AS emp_id,
+                            FORMAT(CAST(timesheetFirst.check_in AS DATETIME2), N'hh:mm tt') AS checkin,
+                            ISNULL(FORMAT(CAST(timesheetLast.check_out AS DATETIME2), N'hh:mm tt'), '-') AS checkout,
+                            CONVERT(VARCHAR(5), DATEADD (MINUTE, (DATEDIFF(MINUTE, timesheetFirst.check_in, timesheetLast.check_out)), 0), 114) AS desk_time,
+                            FORMAT(CAST(timesheet.ondate AS date), 'MM/dd/yyyy', 'EN-US') AS ondate
+                                        
+                                    FROM timesheet
+                                        INNER JOIN (SELECT
+                                            timesheet.id,
+                                            timesheet.groupid,
+                                            ISNULL(FORMAT(CAST(check_in AS datetime2), N'hh:mm tt'), '00:00') AS check_in,
+                                            FORMAT(CAST(ondate AS date), 'MM/dd/yyyy', 'EN-US') AS ondate,
+                                            empid
+                                        FROM timesheet
+                                        WHERE FORMAT(CAST(ondate AS datetime2), N'dd-MMM-yyyy HH:mm:ss', 'EN-US') IN (SELECT
+                                            MIN(FORMAT(CAST(ondate AS datetime2), N'dd-MMM-yyyy HH:mm:ss', 'EN-US'))
+                                        FROM timesheet
+                                        WHERE FORMAT(CAST(ondate AS date), 'MM/dd/yyyy', 'EN-US')
+                                        BETWEEN FORMAT(CAST(@StartDate AS date), 'MM/dd/yyyy', 'EN-US')
+                                        AND FORMAT(CAST(@EndDate AS date), 'MM/dd/yyyy', 'EN-US')
+                                        AND empid = @EmpID
+                                        AND timesheet.is_deleted = 0
+                                        GROUP BY FORMAT(CAST(ondate AS date), 'MM/dd/yyyy', 'EN-US'))) AS timesheetFirst
+                                            ON dbo.timesheet.groupid = timesheetFirst.groupid
+                                        LEFT JOIN (SELECT
+                                            timesheet.id,
+                                            timesheet.groupid,
+                                            ISNULL(FORMAT(CAST(check_out AS datetime2), N'hh:mm tt'), NULL) AS check_out,
+                                            FORMAT(CAST(ondate AS date), 'MM/dd/yyyy', 'EN-US') AS ondate,
+                                            empid
+                                        FROM timesheet
+                                        WHERE ondate IN (SELECT
+                                            MAX(ondate)
+                                        FROM timesheet
+                                        WHERE FORMAT(CAST(ondate AS date), 'MM/dd/yyyy', 'EN-US')
+                                        BETWEEN FORMAT(CAST(@StartDate AS date), 'MM/dd/yyyy', 'EN-US')
+                                        AND FORMAT(CAST(@EndDate AS date), 'MM/dd/yyyy', 'EN-US')
+                                        AND empid = @EmpID
+                                        AND timesheet.is_deleted = 0
+                                        GROUP BY FORMAT(CAST(ondate AS date), 'MM/dd/yyyy', 'EN-US'))) AS timesheetLast
+                                            ON timesheetFirst.ondate = timesheetLast.ondate
+                                        WHERE timesheet.empid = @EmpID
+                                        AND FORMAT(CAST(timesheet.ondate AS date), 'MM/dd/yyyy', 'EN-US')
+                                        BETWEEN FORMAT(CAST(@StartDate AS date), 'MM/dd/yyyy', 'EN-US')
+                                        AND FORMAT(CAST(@EndDate AS date), 'MM/dd/yyyy', 'EN-US')
+                                        AND timesheet.is_deleted = 0",
+                 param: new { EmpID, StartDate, EndDate }
+             );
         }
     }
 }

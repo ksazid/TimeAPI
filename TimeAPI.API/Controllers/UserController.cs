@@ -60,7 +60,6 @@ namespace TimeAPI.API.Controllers
             return Task.FromResult<object>(Result);
         }
 
-
         [HttpPost]
         [Route("LastCheckinByEmpID")]
         public Task<object> LastCheckinByEmpID([FromBody] Utils UserID, CancellationToken cancellationToken)

@@ -8,7 +8,6 @@ using TimeAPI.API.Models;
 using TimeAPI.API.Models.LeaveSetupViewModels;
 using TimeAPI.API.Models.LeaveStatusViewModels;
 using TimeAPI.API.Models.LeaveTypeViewModels;
-using TimeAPI.API.Models.SocialViewModels;
 using TimeAPI.API.Models.TimeOffSetupViewModels;
 using TimeAPI.API.Services;
 using TimeAPI.Domain;

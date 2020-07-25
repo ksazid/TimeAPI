@@ -8,7 +8,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using TimeAPI.API.Models;
-using TimeAPI.API.Models.EntityLocationViewModels;
 using TimeAPI.API.Models.OrganizationViewModels;
 using TimeAPI.API.Services;
 using TimeAPI.Domain;
@@ -163,7 +162,6 @@ namespace TimeAPI.API.Controllers
                 // remove weekend
                 if (_unitOfWork.WeekdaysRepository.FindByOrgID(modal.org_id).ToList().Count > 0)
                     _unitOfWork.WeekdaysRepository.RemoveByOrgID(modal.org_id);
-
 
                 if (organizationViewModel.OrganizationSetup.weekends != null)
                 {
@@ -627,7 +625,6 @@ namespace TimeAPI.API.Controllers
                     modal1.org_id = organizationViewModel.org_id;
                     modal1.modified_date = _dateTime.ToString();
                     modal1.is_deleted = false;
-
 
                     _unitOfWork.OrganizationSetupRepository.Update(modal1);
                 }

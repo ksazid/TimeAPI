@@ -4,7 +4,6 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using TimeAPI.API.Filters;
 using TimeAPI.API.Models;
 using TimeAPI.API.Models.CustomerViewModels;
 using TimeAPI.API.Services;

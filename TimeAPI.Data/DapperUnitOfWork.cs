@@ -66,6 +66,7 @@ namespace TimeAPI.Data
         private ISuperadminOrganizationRepository _superadminOrganizationRepository;
         private IAdminDashboardRepository _adminDashboardRepository;
         private IProductivityDashboardRepository _productivityDashboardRepository;
+        private IAdminProductivityDashboardRepository _adminProductivityDashboardRepository;
         private ILocationExceptionRepository _locationExceptionRepository;
         private IEntityInvitationRepository _entityInvitationRepository;
         private IWeekdaysRepository _weekdaysRepository;
@@ -459,6 +460,15 @@ namespace TimeAPI.Data
             {
                 return _productivityDashboardRepository
                     ?? (_productivityDashboardRepository = new ProductivityDashboardRepository(_transaction));
+            }
+        }
+
+        public IAdminProductivityDashboardRepository AdminProductivityDashboardRepository
+        {
+            get
+            {
+                return _adminProductivityDashboardRepository
+                    ?? (_adminProductivityDashboardRepository = new AdminProductivityDashboardRepository(_transaction));
             }
         }
 

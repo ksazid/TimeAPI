@@ -44,9 +44,8 @@ namespace TimeAPI.Domain.Model
         public string modified_date { get; set; }
         public string modifiedby { get; set; }
         public bool is_deleted { get; set; }
-
         public List<ViewLogDataModel> viewLogDataModels { get; set; }
-
+        public FirstCheckInLastCheckout FirstCheckInLastCheckout { get; set; }
     }
 
     public class TimesheetProjectCategoryDataModel
@@ -132,5 +131,13 @@ namespace TimeAPI.Domain.Model
         public string designation_name { get; set; }
         public string ondate { get; set; }
         public int rowno { get; set; }
+    }
+
+    public class FirstCheckInLastCheckout
+    {
+        public string emp_id { get; set; }
+        public string checkin { get; set; }
+        public string checkout { get; set; }
+        public string desk_time { get; set; }
     }
 }

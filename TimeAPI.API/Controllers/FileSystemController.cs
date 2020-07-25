@@ -110,7 +110,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         [HttpPost]
         [Route("AddUploadScreenshot")]
         public async Task<object> AddUploadScreenshot([FromForm] IFormFile FormFile, [FromForm] string emp_id, [FromForm] string org_id, [FromForm] string CreatedBy, CancellationToken cancellationToken)
@@ -155,7 +154,7 @@ namespace TimeAPI.API.Controllers
                     return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = et.Message, Desc = et.Message });
                 }
 
-                employeeProfileViewModel.org_id = emp_id;
+                employeeProfileViewModel.org_id = org_id;
                 employeeProfileViewModel.emp_id = emp_id;
                 employeeProfileViewModel.img_name = FormFile.FileName;
                 employeeProfileViewModel.createdby = CreatedBy;
@@ -166,6 +165,7 @@ namespace TimeAPI.API.Controllers
 
                 modal.id = Guid.NewGuid().ToString();
                 modal.created_date = _dateTime.ToString();
+                modal.ondate = _dateTime.ToString();
                 modal.is_deleted = false;
 
                 _unitOfWork.EmployeeScreenshotRepository.Add(modal);
@@ -181,30 +181,30 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-    } 
+    }
 
-        //public static async Task<bool> UploadFileToStorage(Stream fileStream, string fileName,
-        //                                            AzureStorageConfig _storageConfig)
-        //{
-        //    // Create a URI to the blob
-        //    Uri blobUri = new Uri("https://" +
-        //                          _storageConfig.AccountName +
-        //                          ".blob.core.windows.net/" +
-        //                          _storageConfig.ImageContainer +
-        //                          "/" + fileName);
+    //public static async Task<bool> UploadFileToStorage(Stream fileStream, string fileName,
+    //                                            AzureStorageConfig _storageConfig)
+    //{
+    //    // Create a URI to the blob
+    //    Uri blobUri = new Uri("https://" +
+    //                          _storageConfig.AccountName +
+    //                          ".blob.core.windows.net/" +
+    //                          _storageConfig.ImageContainer +
+    //                          "/" + fileName);
 
-        //    // Create StorageSharedKeyCredentials object by reading
-        //    // the values from the configuration (appsettings.json)
-        //    StorageSharedKeyCredential storageCredentials =
-        //        new StorageSharedKeyCredential(_storageConfig.AccountName, _storageConfig.AccountKey);
+    //    // Create StorageSharedKeyCredentials object by reading
+    //    // the values from the configuration (appsettings.json)
+    //    StorageSharedKeyCredential storageCredentials =
+    //        new StorageSharedKeyCredential(_storageConfig.AccountName, _storageConfig.AccountKey);
 
-        //    // Create the blob client.
-        //    BlobClient blobClient = new BlobClient(blobUri, storageCredentials);
+    //    // Create the blob client.
+    //    BlobClient blobClient = new BlobClient(blobUri, storageCredentials);
 
-        //    // Upload the file
-        //    await blobClient.UploadAsync(fileStream);
+    //    // Upload the file
+    //    await blobClient.UploadAsync(fileStream);
 
-        //    return await Task.FromResult(true);
-        //}
+    //    return await Task.FromResult(true);
+    //}
     //}
 }

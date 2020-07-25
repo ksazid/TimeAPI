@@ -312,7 +312,6 @@ namespace TimeAPI.API.Controllers
             }
         }
 
-
         #endregion Administrative
 
         #region Priority
@@ -1040,6 +1039,5 @@ namespace TimeAPI.API.Controllers
         }
 
         #endregion IndustryType
-
     }
 }

@@ -33,7 +33,7 @@ namespace TimeAPI.API.Controllroers
         private readonly DateTime _dateTime;
 
         public ProjectController(IUnitOfWork unitOfWork, ILogger<ProjectController> logger,
-            IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings)
+                                 IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings)
         {
             _emailSender = emailSender;
             _logger = logger;
@@ -1351,7 +1351,7 @@ namespace TimeAPI.API.Controllroers
 
         [HttpPatch]
         [Route("UpdateTask")]
-        public async Task<object> UpdateAddTask([FromBody] ProjectActivityTaskViewModel TaskViewModel, CancellationToken cancellationToken)
+        public async Task<object> UpdateTask([FromBody] ProjectActivityTaskViewModel TaskViewModel, CancellationToken cancellationToken)
         {
             try
             {
@@ -1458,6 +1458,70 @@ namespace TimeAPI.API.Controllroers
 
                 var results = _unitOfWork.ProjectActivityTaskRepository.GetProjectActivityTaskRatioByProjectID(Utils.ID);
                 return await Task.FromResult<object>(results).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPatch]
+        [Route("AssignEmpployeeToTask")]
+        public async Task<object> AssignEmpployeeToTask([FromBody] AssignEmployeeTaskViewModel TaskViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (TaskViewModel == null)
+                    throw new ArgumentNullException(nameof(TaskViewModel));
+
+                _unitOfWork.TaskTeamMembersRepository.RemoveByTaskID(TaskViewModel.id);
+
+                if (TaskViewModel.empid != null)
+                {
+                    var TaskTeamMembers = new TaskTeamMember()
+                    {
+                        id = Guid.NewGuid().ToString(),
+                        task_id = TaskViewModel.id,
+                        empid = TaskViewModel.empid,
+                        createdby = TaskViewModel.createdby,
+                        created_date = _dateTime.ToString(),
+                        is_deleted = false
+                    };
+                    _unitOfWork.TaskTeamMembersRepository.Add(TaskTeamMembers);
+                }
+
+                _unitOfWork.Commit();
+                return await System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Task updated successfully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("GetAllTaskForAssignByProjectID")]
+        public async Task<object> GetAllTaskForAssignByProjectID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                List<ProjectActivityTaskEntityViewModel> projectActivityTasks = new List<ProjectActivityTaskEntityViewModel>();
+
+                projectActivityTasks = _unitOfWork.ProjectActivityTaskRepository.GetAllTaskForAssignByProjectID(Utils.ID).ToList();
+
+                foreach (var item in projectActivityTasks.Select((value, index) => new { value, index }))
+                    projectActivityTasks[item.index].TaskTeamMember = _unitOfWork.TaskTeamMembersRepository.FindByTaskID(item.value.task_id).ToList();
+
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(projectActivityTasks, Formatting.Indented)).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

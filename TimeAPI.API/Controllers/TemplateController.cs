@@ -1,17 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using TimeAPI.API.Filters;
 using TimeAPI.API.Models;
 using TimeAPI.API.Models.MilestoneTemplateViewModels;
 using TimeAPI.API.Models.TaskTemplateViewModels;
-using TimeAPI.API.Models.TeamViewModels;
 using TimeAPI.API.Services;
 using TimeAPI.Domain;
 using TimeAPI.Domain.Entities;
@@ -60,7 +55,6 @@ namespace TimeAPI.API.Controllroers
                 modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
-              
                 _unitOfWork.MilestoneTemplateRepository.Add(modal);
                 _unitOfWork.Commit();
 
@@ -187,9 +181,6 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
-
-
-
         [HttpPost]
         [Route("AddTaskTemplate")]
         public async Task<object> AddTaskTemplate([FromBody] TaskTemplateViewModel TaskTemplateViewModel, CancellationToken cancellationToken)
@@ -209,7 +200,6 @@ namespace TimeAPI.API.Controllroers
                 modal.id = Guid.NewGuid().ToString();
                 modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
-
 
                 _unitOfWork.TaskTemplateRepository.Add(modal);
                 _unitOfWork.Commit();

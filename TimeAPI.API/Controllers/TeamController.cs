@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using TimeAPI.API.Filters;
 using TimeAPI.API.Models;
 using TimeAPI.API.Models.TeamViewModels;
 using TimeAPI.API.Services;
@@ -165,7 +164,6 @@ namespace TimeAPI.API.Controllroers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
 
         [HttpGet]
         [Route("GetAllTeam")]

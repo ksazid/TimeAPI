@@ -67,7 +67,6 @@ namespace TimeAPI.API.Controllers
                 {
                     foreach (var item in TaskViewModel.employees.Distinct())
                     {
-
                         var TaskTeamMembers = new TaskTeamMember()
                         {
                             id = Guid.NewGuid().ToString(),
@@ -273,6 +272,5 @@ namespace TimeAPI.API.Controllers
             var Result = _unitOfWork.TaskRepository.GetAllTaskByEmpID(UserID.ID, _dateTime.ToString());
             return Task.FromResult<object>(Result);
         }
-
     }
 }
