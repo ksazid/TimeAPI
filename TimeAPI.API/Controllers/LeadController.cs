@@ -265,7 +265,7 @@ namespace TimeAPI.API.Controllroers
 
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "LeadCompany saved successfully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Company saved successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -293,7 +293,7 @@ namespace TimeAPI.API.Controllroers
                 _unitOfWork.LeadCompanyRepository.Update(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "LeadCompany updated successfully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Company updated successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -316,7 +316,7 @@ namespace TimeAPI.API.Controllroers
                 _unitOfWork.LeadCompanyRepository.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "LeadCompany ID removed successfully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Company ID removed successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -411,7 +411,7 @@ namespace TimeAPI.API.Controllroers
 
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "LeadProject saved successfully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Project saved successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -439,7 +439,7 @@ namespace TimeAPI.API.Controllroers
                 _unitOfWork.LeadProjectRepository.Update(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "LeadProject updated successfully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Project updated successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -462,7 +462,7 @@ namespace TimeAPI.API.Controllroers
                 _unitOfWork.LeadProjectRepository.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "LeadProject ID removed successfully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Project ID removed successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -559,7 +559,7 @@ namespace TimeAPI.API.Controllroers
 
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "LeadSource saved successfully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Source saved successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -587,7 +587,7 @@ namespace TimeAPI.API.Controllroers
                 _unitOfWork.LeadSourceRepository.Update(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "LeadSource updated successfully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Source updated successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -610,7 +610,7 @@ namespace TimeAPI.API.Controllroers
                 _unitOfWork.LeadSourceRepository.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "LeadSource ID removed successfully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Source ID removed successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -705,7 +705,7 @@ namespace TimeAPI.API.Controllroers
 
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "LeadStatus saved successfully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Status saved successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -733,7 +733,7 @@ namespace TimeAPI.API.Controllroers
                 _unitOfWork.LeadStatusRepository.Update(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "LeadStatus updated successfully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Status updated successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -756,7 +756,7 @@ namespace TimeAPI.API.Controllroers
                 _unitOfWork.LeadStatusRepository.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "LeadStatus ID removed successfully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Status ID removed successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -851,7 +851,7 @@ namespace TimeAPI.API.Controllroers
 
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "LeadRating saved successfully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Rating saved successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -879,7 +879,7 @@ namespace TimeAPI.API.Controllroers
                 _unitOfWork.LeadRatingRepository.Update(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "LeadRating updated successfully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Rating updated successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -902,7 +902,7 @@ namespace TimeAPI.API.Controllroers
                 _unitOfWork.LeadRatingRepository.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "LeadRating ID removed successfully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Rating ID removed successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

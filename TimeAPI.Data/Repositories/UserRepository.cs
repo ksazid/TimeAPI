@@ -122,19 +122,7 @@ namespace TimeAPI.Data.Repositories
                    param: new { UserID }
             );
 
-            //var resultsTimesheetGrpID = Query<string>(
-            //    sql: @"SELECT distinct(groupid), FORMAT(CAST(timesheet.ondate AS DATETIME2), N'hh:mm tt')  from timesheet WITH (NOLOCK)
-            //            WHERE empid = @empid
-            //            AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') = FORMAT(CAST(@Date AS DATE), 'd', 'EN-US')
-            //            AND timesheet.is_deleted = 0
-            //            ORDER BY FORMAT(CAST(timesheet.ondate AS DATETIME2), N'hh:mm tt') DESC;",
-            //    param: new { empid = resultsEmployee.id, Date }
-            //);
-
             List<Organization> orgList = GetOrgAddress(resultsOrganization);
-
-            //var RootTimesheetDataList = GetTimesheetProperty(resultsTimesheetGrpID);
-
             UserDataGroupDataSet _UserDataGroupDataSet = new UserDataGroupDataSet();
 
             _UserDataGroupDataSet.User = resultsAspNetUsers;
@@ -149,7 +137,6 @@ namespace TimeAPI.Data.Repositories
 
         public IEnumerable<RootTimesheetData> GetAllTimesheetByEmpID(string EmpID, string Date)
         {
-
             var resultsTimesheetGrpID = Query<string>(
                 sql: @"SELECT distinct(groupid), FORMAT(CAST(timesheet.ondate AS DATETIME2), N'hh:mm tt')  from timesheet WITH (NOLOCK)
                         WHERE empid = @empid
@@ -165,7 +152,6 @@ namespace TimeAPI.Data.Repositories
 
         public IEnumerable<RootTimesheetData> GetEmployeeTasksTimesheetByEmpID(string EmpID, string fromDate, string toDate)
         {
-
             var resultsTimesheetGrpID = Query<string>(
                 sql: @"SELECT distinct(groupid), FORMAT(CAST(timesheet.ondate AS datetime2), N'dd-MMM-yyyy HH:mm:ss', 'EN-US')  from timesheet WITH (NOLOCK)
                         WHERE empid = @empid
@@ -179,13 +165,12 @@ namespace TimeAPI.Data.Repositories
             );
 
             List<RootTimesheetData> RootTimesheetDataList = GetTimesheetPropertyForEmployeeActivitesDashboard(resultsTimesheetGrpID);
-          
+
             return RootTimesheetDataList;
         }
 
         public IEnumerable<RootTimesheetData> GetAllTimesheetByOrgID(string OrgID, string fromDate, string toDate)
         {
-
             var resultsTimesheetGrpID = Query<string>(
                 sql: @"SELECT distinct(groupid), FORMAT(CAST(timesheet.ondate AS DATE), 'dd/MM/yyyy'), FORMAT(CAST(timesheet.ondate AS DATETIME2), N'hh:mm tt')  
                             from timesheet WITH (NOLOCK)
@@ -271,7 +256,7 @@ namespace TimeAPI.Data.Repositories
                 List<TimesheetDataModel> TimesheetDataModelList = new List<TimesheetDataModel>();
                 List<TimesheetTeamDataModel> TimesheetTeamDataModelList = new List<TimesheetTeamDataModel>();
                 List<TimesheetCurrentLocationViewModel> TimesheetCurrentLocationViewModelList = new List<TimesheetCurrentLocationViewModel>();
-                
+
                 TimesheetDataModelList.AddRange(GetTimesheetDataModel(item));
 
                 TimesheetDataModelList.Select(d => d.viewLogDataModels = GetTimesheetActivityByGroupAndProjectID(d.groupid, "", d.ondate).ToList()).ToList();
@@ -404,11 +389,7 @@ namespace TimeAPI.Data.Repositories
 								timesheet_activity.total_hrs,
 		                        timesheet_activity.is_billable,
 		                        FORMAT(dbo.timesheet_activity.ondate, 'dd-MM-yyyy', 'en-US') AS ondate ,
-
-								--dbo.timesheet_activity.start_time as start_time,
-								--dbo.timesheet_activity.end_time as end_time,
 								dbo.timesheet_activity.groupid as groupid
-
 								
                                     FROM
                                         [dbo].[timesheet_activity] WITH (NOLOCK)
@@ -459,7 +440,7 @@ namespace TimeAPI.Data.Repositories
         public FirstCheckInLastCheckout FirstCheckInLastCheckout(string EmpID, string StartDate, string EndDate)
         {
             return QuerySingleOrDefault<FirstCheckInLastCheckout>(
-                 sql: @"SELECT
+                 sql: @"SELECT TOP 1
                             timesheet.empid AS emp_id,
                             FORMAT(CAST(timesheetFirst.check_in AS DATETIME2), N'hh:mm tt') AS checkin,
                             ISNULL(FORMAT(CAST(timesheetLast.check_out AS DATETIME2), N'hh:mm tt'), '-') AS checkout,

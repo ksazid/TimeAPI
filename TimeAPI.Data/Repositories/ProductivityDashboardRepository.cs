@@ -62,16 +62,31 @@ namespace TimeAPI.Data.Repositories
         {
             EmployeeProductivity employeeProductivity = new EmployeeProductivity();
             List<EmployeeProductivity> employeeProductivities = new List<EmployeeProductivity>();
-            employeeProductivities.AddRange(EmployeeProductivity(EmpID, StartDate, EndDate));
-
-           
-            var avgCheckin = new DateTime(Convert.ToInt64(employeeProductivities.Select(d => DateTime.Parse(d.check_in).Ticks).Average())).ToString(@"hh:mm tt");
+            List<Weekdays> weekdays = new List<Weekdays>();
+            Employee employee = new Employee();
             string avgCheckout = string.Empty;
+            string avgCheckin = string.Empty;
+
+
+            //var avgCheckin = new DateTime((long)(employeeProductivities
+            //                                     .Select(d => DateTime.Parse(d.check_in).Ticks)
+            //                                     .Average())).ToString(@"hh:mm tt");
+            //avgCheckout = new DateTime((long)employeeProductivities.Where(d => !d.check_out.Contains("-"))
+            //                                                               .Select(d => DateTime.Parse(d.check_out).Ticks)
+            //          .Average()).ToString(@"hh:mm tt");
+
+
+
+            employeeProductivities.AddRange(EmployeeProductivity(EmpID, StartDate, EndDate));
+            avgCheckin = AverageCheckinTime(employeeProductivities).ToString(@"hh:mm tt");
+            employee = EmployeeDetailByEmpID(EmpID);
+            weekdays.AddRange(WorkingHoursFindByOrgID(employee.org_id));
+
             if (employeeProductivities.Count == 1 && employeeProductivities.Where(d => d.check_out.Contains("-")).Any() == true)
                 avgCheckout = "-";
             else
-                avgCheckout = new DateTime((int)employeeProductivities.Where(d => !d.check_out.Contains("-"))
-                                                                           .Select(d => DateTime.Parse(d.check_out).Ticks).Average()).ToString(@"hh:mm tt");
+                avgCheckout = AverageCheckoutTime(employeeProductivities, weekdays).ToString(@"hh:mm tt");
+
 
             TimeSpan _break_hours = TimeSpan.FromMinutes(Convert.ToInt64(employeeProductivities.Where(d => d.break_hours != null)
                                                                                     .Sum(x => TimeSpan.Parse(x.break_hours).TotalMinutes)));
@@ -93,10 +108,54 @@ namespace TimeAPI.Data.Repositories
             employeeProductivity.final_total_hours = string.Format("{0:00}:{1:00}", (int)_final_total_hours.TotalHours, _final_total_hours.Minutes);
             employeeProductivity.time_spend_activity = string.Format("{0:00}:{1:00}", (int)_time_spend_activity.TotalHours, _time_spend_activity.Minutes);
             employeeProductivity.activity_count = employeeProductivities.Sum(x => Convert.ToDouble(x.activity_count)).ToString();
-            employeeProductivity.productivity_ratio = employeeProductivities.Sum(x => Convert.ToDouble(x.productivity_ratio)).ToString();
+
+            int curr = 0;
+            if ((int)_final_total_hours.TotalMinutes == 0)
+            {
+                curr = (int)TimeSpan.FromMinutes((DateTime.Now.TimeOfDay - Convert.ToDateTime(avgCheckin).TimeOfDay).TotalMinutes).TotalMinutes;
+            }
+            else
+                curr = (int)_final_total_hours.TotalMinutes;
+
+            float value = (int)_time_spend_activity.TotalMinutes * 100 / (int)curr;
+            employeeProductivity.productivity_ratio = value.ToString();
+            //employeeProductivity.productivity_ratio = employeeProductivities.Sum(x => Convert.ToDouble(x.productivity_ratio)).ToString();
 
             return employeeProductivity;
 
+        }
+
+        private static DateTime AverageCheckinTime(List<EmployeeProductivity> employeeProductivities)
+        {
+            double temp = 0D;
+            for (int i = 0; i < employeeProductivities.Count; i++)
+            {
+                temp += (double)Convert.ToDateTime(employeeProductivities[i].check_in).Ticks / (double)employeeProductivities.Count;
+            }
+            var avgCheckin = new DateTime((long)temp);
+            return avgCheckin;
+        }
+
+        private static DateTime AverageCheckoutTime(List<EmployeeProductivity> employeeProductivities, List<Weekdays> weekdays)
+        {
+            double temp = 0D;
+            for (int i = 0; i < employeeProductivities.Count; i++)
+            {
+                if (!employeeProductivities[i].check_out.Contains("-"))
+                {
+                    temp += (double)Convert.ToDateTime(employeeProductivities[i].check_out).Ticks / (double)employeeProductivities.Count;
+                }
+                else
+                {
+                    var CheckOut = weekdays.Where(x => x.day_name == Convert.ToDateTime(employeeProductivities[i].ondate).DayOfWeek.ToString()).FirstOrDefault();
+                    if (CheckOut != null)
+                        temp += (double)Convert.ToDateTime(CheckOut.to_time).Ticks / (double)employeeProductivities.Count;
+                    else
+                        temp += (double)Convert.ToDateTime("7:00 PM").Ticks / (double)employeeProductivities.Count;
+                }
+            }
+            var avgCheckout = new DateTime((long)temp);
+            return avgCheckout;
         }
 
         private IEnumerable<EmployeeProductivity> EmployeeProductivity(string EmpID, string StartDate, string EndDate)
@@ -411,7 +470,6 @@ namespace TimeAPI.Data.Repositories
             List<EmployeeProductivityTime> employeeProductivityTimes = new List<EmployeeProductivityTime>();
             employeeProductivityTimes.AddRange(EmployeeProductivityTime(EmpID, StartDate, EndDate));
 
-
             var data = FirstCheckInLastCheckout(EmpID, StartDate, EndDate);
 
             if (employeeProductivityTimes.Count > 0)
@@ -538,7 +596,7 @@ namespace TimeAPI.Data.Repositories
                                     WHERE
                                     id IN 
                                     (
-                                     SELECT
+                                        SELECT
                                         Max(id) 
                                         FROM
                                         employee_app_usage 
@@ -662,6 +720,22 @@ namespace TimeAPI.Data.Repositories
                  param: new { EmpID, StartDate, EndDate }
              );
         }
+
+        public IEnumerable<Weekdays> WorkingHoursFindByOrgID(string key)
+        {
+            return Query<Weekdays>(
+                sql: "SELECT * FROM dbo.weekdays WHERE is_deleted = 0 and org_id = @key",
+                param: new { key }
+            );
+        }
+
+        public Employee EmployeeDetailByEmpID(string key)
+        {
+            return QuerySingleOrDefault<Employee>(
+                sql: "SELECT * FROM [dbo].[employee] WHERE id = @key and is_deleted = 0",
+                param: new { key }
+            );
+        }
     }
 
     public class RootEmployeeProductivityRatio
@@ -669,6 +743,7 @@ namespace TimeAPI.Data.Repositories
         public List<EmployeeProductivityTime> employeeProductivityTime { get; set; }
         public List<EmployeeIdleTime> employeeIdleTime { get; set; }
     }
+
     public class EmployeeFirstCheckInLastCheckout
     {
         public string emp_id { get; set; }
@@ -676,6 +751,7 @@ namespace TimeAPI.Data.Repositories
         public string checkout { get; set; }
         public string desk_time { get; set; }
     }
+
     public class EmployeeProductivityTime
     {
         public string id { get; set; }
@@ -703,10 +779,7 @@ namespace TimeAPI.Data.Repositories
     {
         public string app_name { get; set; }
         public string time_spend { get; set; }
-        //public string time_seconds { get; set; }
-
     }
-
 
     public class EmployeeProductivity
     {
