@@ -882,8 +882,6 @@ namespace TimeAPI.Data.Repositories
                         param: new { OrgID, item }
                       );
 
-
-
                 var utilsProjectDetails = QuerySingleOrDefault<UtilsProjectAndRatio>(
                        sql: @"SELECT [dbo].[project_type].type_name as project_type, 
                                 dbo.status.status_name as project_status,
@@ -899,13 +897,14 @@ namespace TimeAPI.Data.Repositories
                        param: new { item }
                     );
 
-
-                utilsProjectAndRatio.cst_name = (utilsProjectDetails.cst_name ?? string.Empty);
-                utilsProjectAndRatio.project_type = (utilsProjectDetails.project_type ?? string.Empty);
-                utilsProjectAndRatio.project_status = (utilsProjectDetails.project_status ?? string.Empty);
-                utilsProjectAndRatio.start_date = (utilsProjectDetails.start_date ?? string.Empty);
-                utilsProjectAndRatio.end_date = (utilsProjectDetails.end_date ?? string.Empty);
-
+                if (utilsProjectDetails != null && utilsProjectAndRatio != null)
+                {
+                    utilsProjectAndRatio.cst_name = ((utilsProjectDetails.cst_name) != null) ? utilsProjectDetails.cst_name : string.Empty;
+                    utilsProjectAndRatio.project_type = ((utilsProjectDetails.project_type) != null) ? utilsProjectDetails.project_type : string.Empty;
+                    utilsProjectAndRatio.project_status = ((utilsProjectDetails.project_status) != null) ? utilsProjectDetails.project_status : string.Empty; // (utilsProjectDetails.project_status ?? string.Empty);
+                    utilsProjectAndRatio.start_date = ((utilsProjectDetails.start_date) != null) ? utilsProjectDetails.start_date : string.Empty;  //(utilsProjectDetails.start_date ?? string.Empty);
+                    utilsProjectAndRatio.end_date = ((utilsProjectDetails.end_date) != null) ? utilsProjectDetails.end_date : string.Empty;  //(utilsProjectDetails.end_date ?? string.Empty);
+                }
                 utilsProjectAndRatios.Add(utilsProjectAndRatio);
             }
 
@@ -1314,7 +1313,7 @@ namespace TimeAPI.Data.Repositories
 						        and COUNT(timesheet.empid) > 1",
                         param: new { org_id, date = Dates }
                     );
- 
+
             return ResultSingleCheckinList;
         }
 

@@ -91,11 +91,20 @@ namespace TimeAPI.Domain
         IEmployeeLeaveLogRepository EmployeeLeaveLogRepository { get; }
         ILeadCompanyRepository LeadCompanyRepository { get; }
         ILeadRepository LeadRepository { get; }
-        ILeadProjectRepository LeadProjectRepository { get; }
+        ILeadDealRepository LeadDealRepository { get; }
         ILeadSourceRepository LeadSourceRepository { get; }
         ILeadStatusRepository LeadStatusRepository { get; }
         ILeadRatingRepository LeadRatingRepository { get; }
         ITimesheetDeskRepository TimesheetDeskRepository { get; }
+        ILeadDealTypeRepository LeadDealTypeRepository { get; }
+        ILeadStageRepository LeadStageRepository { get; }
+        ILeadContractRoleRepository LeadContractRoleRepository { get; }
+        IPrefixRepository PrefixRepository { get; }
+        IQuotationRepository QuotationRepository { get; }
+        IPaymentModeRepository PaymentModeRepository { get; }
+        IPaymentRepository PaymentRepository { get; }
+        IWarrantyRepository WarrantyRepository { get; }
+        IExclusionRepository ExclusionRepository { get; }
 
         #region systemadmin
         IPlanRepository PlanRepository { get; }

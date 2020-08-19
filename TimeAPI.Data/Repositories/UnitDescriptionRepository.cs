@@ -15,8 +15,8 @@ namespace TimeAPI.Data.Repositories
             entity.id = ExecuteScalar<string>(
                     sql: @"
                     INSERT INTO dbo.unit_desc
-                            (id, org_id, unit_name, is_checkbox, created_date, createdby)
-                    VALUES (@id, @org_id, @unit_name, @is_checkbox, @created_date, @createdby);
+                            (id, org_id, unit_name, is_checkbox, is_extra, created_date, createdby)
+                    VALUES (@id, @org_id, @unit_name, @is_checkbox, @is_extra, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -45,7 +45,6 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-
         public IEnumerable<UnitDescription> FetchAllUnitDescriptionExtraByOrgID(string key)
         {
             return Query<UnitDescription>(
@@ -73,6 +72,7 @@ namespace TimeAPI.Data.Repositories
                             org_id = @org_id, 
                             unit_name = @unit_name, 
                             is_checkbox = @is_checkbox,
+                            is_extra = @is_extra,
                             modified_date = @modified_date,
                             modifiedby = @modifiedby
                          WHERE id = @id",

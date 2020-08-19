@@ -113,22 +113,4 @@ namespace TimeAPI.API.Controllers
         }
     }
 }
-
-//[HttpPost]
-//[Route("DesktopEmployeeProductivityPerDateByEmpIDAndDate")]
-//public async Task<object> DesktopEmployeeProductivityPerDateByEmpIDAndDate([FromBody] UtilsEmpIDAndDate Utils, CancellationToken cancellationToken)
-//{
-//    try
-//    {
-//        if (cancellationToken != null)
-//            cancellationToken.ThrowIfCancellationRequested();
-
-//        var result = _unitOfWork.ProductivityDashboardRepository.DesktopEmployeeProductivityPerDateByEmpIDAndDate(Utils.EmpID, Utils.StartDate, Utils.EndDate);
-
-//        return await Task.FromResult<object>(result).ConfigureAwait(false);
-//    }
-//    catch (Exception ex)
-//    {
-//        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-//    }
-//}
+ 

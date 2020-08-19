@@ -47,26 +47,31 @@ namespace TimeAPI.API.Controllroers
                 if (CustomerViewModel == null)
                     throw new ArgumentNullException(nameof(CustomerViewModel));
 
+                string cst_id = string.Empty;
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<CustomerViewModel, Customer>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Customer>(CustomerViewModel);
 
                 modal.id = Guid.NewGuid().ToString();
+                cst_id = modal.id;
                 modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
                 var config1 = new AutoMapper.MapperConfiguration(m => m.CreateMap<EntityContact, EntityContact>());
                 var mapper1 = config.CreateMapper();
-                var modal1 = mapper.Map<EntityContact>(CustomerViewModel.EntityContact);
-                modal1.id = Guid.NewGuid().ToString();
-                modal1.entity_id = modal.id;
 
-                _unitOfWork.EntityContactRepository.Add(modal1);
+                if (CustomerViewModel.EntityContact != null)
+                {
+                    var modal1 = mapper.Map<EntityContact>(CustomerViewModel.EntityContact);
+                    modal1.id = Guid.NewGuid().ToString();
+                    modal1.entity_id = modal.id;
+
+                    _unitOfWork.EntityContactRepository.Add(modal1);
+                }
                 _unitOfWork.CustomerRepository.Add(modal);
-
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Customer saved successfully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = cst_id, Desc = "Customer Saved Successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -166,13 +171,16 @@ namespace TimeAPI.API.Controllroers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 var result = _unitOfWork.CustomerRepository.Find(Utils.ID);
-                var resultContact = _unitOfWork.EntityContactRepository.FindByEntityID(result.id);
 
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<CustomerViewModel, Customer>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Customer>(result);
 
-                modal.EntityContact = resultContact;
+                if (result != null)
+                {
+                    var resultContact = _unitOfWork.EntityContactRepository.FindByEntityID(result.id);
+                    modal.EntityContact = resultContact;
+                }
 
                 return await Task.FromResult<object>(modal).ConfigureAwait(false);
             }
@@ -193,6 +201,46 @@ namespace TimeAPI.API.Controllroers
 
                 var result = _unitOfWork.CustomerRepository.FindCustomerByOrgID(Utils.OrgID);
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("FindByCustomerByNameAndEmail")]
+        public async Task<object> FindByCustomerByNameAndEmail([FromBody] UtilsCustomerNameAndEmail Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                CustomerViewModel customerViewModel = new CustomerViewModel();
+
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.CustomerName));
+
+                var result = _unitOfWork.CustomerRepository.FindByCustomerByNameAndEmail(Utils.CustomerName, Utils.Email);
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<CustomerViewModel, Customer>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<Customer>(result);
+
+                if (result != null)
+                {
+                    var resultContact = _unitOfWork.EntityContactRepository.FindByEntityID(result.id);
+                    modal.EntityContact = resultContact;
+                }
+                if (modal != null)
+                {
+                    return await Task.FromResult<object>(modal).ConfigureAwait(false);
+                }
+                else
+                {
+                    return Ok(new Customer { id = "" });
+                }
+
             }
             catch (Exception ex)
             {

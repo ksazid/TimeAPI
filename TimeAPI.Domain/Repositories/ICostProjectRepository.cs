@@ -19,7 +19,8 @@ namespace TimeAPI.Domain.Repositories
         //string ProjectActivityCount(string key);
         //string CostProjectTaskCount(string key);
         void UpdateCostProjectDiscountAndProfitMarginByID(CostProject entity);
-        
+        void UpdateIsQuotationByCostProjectID(CostProject entity);
+        dynamic FindByCostProjectID(string CostProjectID);
 
     }
 }

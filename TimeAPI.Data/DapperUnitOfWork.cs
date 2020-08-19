@@ -102,14 +102,22 @@ namespace TimeAPI.Data
         private IEmployeeLeaveLogRepository _employeeLeaveLogRepository;
         private ILeadCompanyRepository _leadCompanyRepository;
         private ILeadRepository _leadRepository;
-        private ILeadProjectRepository _leadProjectRepository;
+        private ILeadDealRepository _LeadDealRepository;
         private ILeadSourceRepository _leadSourceRepository;
         private ILeadStatusRepository _leadStatusRepository;
         private ILeadRatingRepository _leadRatingRepository;
         private ITimesheetDeskRepository _timesheetDeskRepository;
 
+        private ILeadDealTypeRepository _leadDealTypeRepository;
+        private ILeadStageRepository _leadStageRepository;
+        private ILeadContractRoleRepository _leadContractRoleRepository;
+        private IPrefixRepository _prefixRepository;
 
-
+        private IQuotationRepository _quotationRepository;
+        private IPaymentModeRepository _paymentModeRepository;
+        private IPaymentRepository _paymentRepository;
+        private IWarrantyRepository _warrantyRepository;
+        private IExclusionRepository _exclusionRepository;
 
         #region systemadmin
         private IPlanRepository _planRepository;
@@ -219,7 +227,7 @@ namespace TimeAPI.Data
                     ?? (_organizationSetupRepository = new OrganizationSetupRepository(_transaction));
             }
         }
-        
+
         public IDepartmentRepository DepartmentRepository
         {
             get
@@ -632,7 +640,7 @@ namespace TimeAPI.Data
                     ?? (_adminDashboardRepository = new AdminDashboardRepository(_transaction));
             }
         }
-        
+
         public ILocationExceptionRepository LocationExceptionRepository
         {
             get
@@ -919,15 +927,41 @@ namespace TimeAPI.Data
             }
         }
 
-        public ILeadProjectRepository LeadProjectRepository
+        public ILeadDealRepository LeadDealRepository
         {
             get
             {
-                return _leadProjectRepository
-                    ?? (_leadProjectRepository = new LeadProjectRepository(_transaction));
+                return _LeadDealRepository
+                    ?? (_LeadDealRepository = new LeadDealRepository(_transaction));
             }
         }
 
+        public ILeadDealTypeRepository LeadDealTypeRepository
+        {
+            get
+            {
+                return _leadDealTypeRepository
+                    ?? (_leadDealTypeRepository = new LeadDealTypeRepository(_transaction));
+            }
+        }
+
+        public ILeadStageRepository LeadStageRepository
+        {
+            get
+            {
+                return _leadStageRepository
+                    ?? (_leadStageRepository = new LeadStageRepository(_transaction));
+            }
+        }
+
+        public ILeadContractRoleRepository LeadContractRoleRepository
+        {
+            get
+            {
+                return _leadContractRoleRepository
+                    ?? (_leadContractRoleRepository = new LeadContractRoleRepository(_transaction));
+            }
+        }
 
         public ILeadSourceRepository LeadSourceRepository
         {
@@ -965,6 +999,60 @@ namespace TimeAPI.Data
             }
         }
 
+        public IPrefixRepository PrefixRepository
+        {
+            get
+            {
+                return _prefixRepository
+                    ?? (_prefixRepository = new PrefixRepository(_transaction));
+            }
+        }
+
+        public IQuotationRepository QuotationRepository
+        {
+            get
+            {
+                return _quotationRepository
+                    ?? (_quotationRepository = new QuotationRepository(_transaction));
+            }
+        }
+
+        public IPaymentModeRepository PaymentModeRepository
+        {
+            get
+            {
+                return _paymentModeRepository
+                    ?? (_paymentModeRepository = new PaymentModeRepository(_transaction));
+            }
+        }
+
+        public IPaymentRepository PaymentRepository
+        {
+            get
+            {
+                return _paymentRepository
+                    ?? (_paymentRepository = new PaymentRepository(_transaction));
+            }
+        }
+
+        public IWarrantyRepository WarrantyRepository
+        {
+            get
+            {
+                return _warrantyRepository
+                    ?? (_warrantyRepository = new WarrantyRepository(_transaction));
+            }
+        }
+
+        public IExclusionRepository ExclusionRepository
+        {
+            get
+            {
+                return _exclusionRepository
+                    ?? (_exclusionRepository = new ExclusionRepository(_transaction));
+            }
+        }
+
         public bool Commit()
         {
             bool isSuccess = false;
@@ -998,6 +1086,13 @@ namespace TimeAPI.Data
         #region Private Methods
         private void resetRepositories()
         {
+            _planRepository = null;
+            _planFeatureRepository = null;
+            _planPriceRepository = null;
+            _subscriptionRepository = null;
+            _billingRepository = null;
+
+
             _roleRepository = null;
             _roleClaimRepository = null;
             _userRepository = null;
@@ -1039,6 +1134,55 @@ namespace TimeAPI.Data
             _projectStatusRepository = null;
             _entityContactRepository = null;
             _projectActivityRepository = null;
+            _projectActivityTaskRepository = null;
+            _customerRepository = null;
+            _customerProjectRepository = null;
+            _delegationsRepository = null;
+            _delegationsDelegateeRepository = null;
+            _superadminOrganizationRepository = null;
+            _adminDashboardRepository = null;
+            _productivityDashboardRepository = null;
+            _adminProductivityDashboardRepository = null;
+            _locationExceptionRepository = null;
+            _entityInvitationRepository = null;
+            _weekdaysRepository = null;
+            _orgWeekdaysRepository = null;
+            _projectTypeRepository = null;
+            _milestoneTemplateRepository = null;
+            _taskTemplateRepository = null;
+            _costProjectRepository = null;
+            _costProjectMilestoneRepository = null;
+            _costProjectTaskRepository = null;
+            _typeOfDesignRepository = null;
+            _specifiationRepository = null;
+            _unitDescriptionRepository = null;
+            _typeOfUnitRepository = null;
+            _projectTagsRepository = null;
+            _projectUnitRepository = null;
+            _projectDesignTypeRepository = null;
+            _packagesRepository = null;
+            _costPerHourRepository = null;
+            _profitMarginRepository = null;
+            _leaveSetupRepository = null;
+            _leaveTypeRepository = null;
+            _timeoffTypeRepository = null;
+            _employeeLeaveRepository = null;
+            _leaveStatusRepository = null;
+            _employeeScreenshotRepository = null;
+            _employeeAppUsageRepository = null;
+            _employeeAppTrackedRepository = null;
+            _employeeLeaveLogRepository = null;
+            _leadCompanyRepository = null;
+            _leadRepository = null;
+            _LeadDealRepository = null;
+            _leadSourceRepository = null;
+            _leadStatusRepository = null;
+            _leadRatingRepository = null;
+            _timesheetDeskRepository = null;
+            _leadDealTypeRepository = null;
+            _leadStageRepository = null;
+            _leadContractRoleRepository = null;
+            _prefixRepository = null;
         }
 
         private void dispose(bool disposing)

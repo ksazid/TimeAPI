@@ -13,6 +13,14 @@ namespace TimeAPI.API.Models.CustomerViewModels
         public string org_id { get; set; }
         public string cst_name { get; set; }
         public string cst_type { get; set; }
+        public string first_name { get; set; }
+        public string last_name { get; set; }
+        public bool is_company { get; set; }
+        public string company_name { get; set; }
+        public string annual_revenue { get; set; }
+        public string no_of_emp { get; set; }
+        public string industry_id { get; set; }
+        public string website { get; set; }
         public string email { get; set; }
         public string phone { get; set; }
         public string adr { get; set; }

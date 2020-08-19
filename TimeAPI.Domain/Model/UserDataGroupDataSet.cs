@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml.Serialization;
 using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.Domain.Model
 {
+
+    [XmlRoot(ElementName = "UserDataGroupDataSet")]
     public class UserDataGroupDataSet
     {
         public User User { get; set; }
         public Employee Employee { get; set; }
         public Subscription Subscription { get; set; }
+        [XmlIgnore]
         public IEnumerable<Organization> Organization { get; set; }
         //public IEnumerable<RootTimesheetData> Timesheet { get; set; }
 

@@ -13,8 +13,10 @@ namespace TimeAPI.Domain.Entities
         public string task_name { get; set; }
         public string total_unit { get; set; }
         public string default_unit_hours { get; set; }
+        public string unit_type { get; set; }
         public string unit { get; set; }
         public string qty { get; set; }
+        public string budgeted_hours { get; set; }
         public string notes { get; set; }
         public string discount_amount { get; set; }
         public string total_cost_amount { get; set; }
@@ -23,7 +25,6 @@ namespace TimeAPI.Domain.Entities
         public string modified_date { get; set; }
         public string modifiedby { get; set; }
         public bool is_deleted { get; set; }
-
         public IEnumerable<TaskTeamMember> employees { get; set; }
 
     }

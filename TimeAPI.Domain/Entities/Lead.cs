@@ -8,17 +8,19 @@ namespace TimeAPI.Domain.Entities
     {
         public string id { get; set; }
         public string org_id { get; set; }
-        public string lead_company_id { get; set; }
+        public string cst_id { get; set; }
+        public bool is_company { get; set; }
         public string lead_owner_emp_id { get; set; }
-        public string first_name { get; set; }
-        public string last_name { get; set; }
         public string lead_source_id { get; set; }
         public string lead_status_id { get; set; }
+        public string reason_id { get; set; }
+        public string others_remarks { get; set; }
         public string annual_revenue { get; set; }
         public string rating_id { get; set; }
         public string industry_id { get; set; }
         public string no_of_employee { get; set; }
         public string email { get; set; }
+        public string phone { get; set; }
         public string website { get; set; }
         public string adr_1 { get; set; }
         public string adr_2 { get; set; }
@@ -30,6 +32,6 @@ namespace TimeAPI.Domain.Entities
         public string modifiedby { get; set; }
         public bool is_deleted { get; set; }
         public List<EntityContact> EntityContact { get; set; }
-        public LeadProject LeadProject { get; set; }
+        public LeadDeal LeadDeal { get; set; }
     }
 }

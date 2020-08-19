@@ -14,8 +14,8 @@ namespace TimeAPI.Data.Repositories
         {
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.cost_project
-                                  (id, user_id, org_id, package_id, project_type_id, project_name, project_desc, project_prefix, start_date, end_date, completed_date, project_status_id, is_private, is_public, no_of_floors, plot_size, buildup_area, discount_amount, profit_margin_amount, created_date, createdby)
-                           VALUES (@id, @user_id, @org_id, @package_id, @project_type_id, @project_name, @project_desc, @project_prefix, @start_date, @end_date, @completed_date, @project_status_id, @is_private, @is_public, @no_of_floors, @plot_size, @buildup_area, @discount_amount, @profit_margin_amount, @created_date, @createdby);
+                                  (id, user_id, org_id, package_id, project_type_id, project_name, project_desc, project_prefix, start_date, end_date, completed_date, project_status_id, is_private, is_public, no_of_floors, plot_size, plot_size_unit, buildup_area, buildup_area_unit, discount_amount, profit_margin_amount, created_date, createdby)
+                           VALUES (@id, @user_id, @org_id, @package_id, @project_type_id, @project_name, @project_desc, @project_prefix, @start_date, @end_date, @completed_date, @project_status_id, @is_private, @is_public, @no_of_floors, @plot_size, @plot_size_unit, @buildup_area, @buildup_area_unit, @discount_amount, @profit_margin_amount, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -28,6 +28,31 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
+
+        public dynamic FindByCostProjectID(string key)
+        {
+            return QuerySingleOrDefault<dynamic>(
+                sql: @"SELECT 
+                           CASE
+			                    WHEN dbo.customer.is_company = 1 THEN dbo.customer.company_name
+			                    ELSE dbo.customer.first_name + ' ' + dbo.customer.last_name
+			                    END AS customer_name,
+			                    packages.package_name,
+			                    project_type.type_name as project_type_name,
+			                    cost_project.* 
+                    FROM 
+                    dbo.cost_project
+                        LEFT JOIN customer_x_project on cost_project.id = customer_x_project.project_id
+                        LEFT JOIN customer on customer_x_project.cst_id = customer.id
+                        LEFT JOIN packages on cost_project.package_id = packages.id
+                        LEFT JOIN project_type on cost_project.project_type_id = project_type.id
+                    WHERE cost_project.is_deleted = 0 and cost_project.id = @key",
+                param: new { key }
+            );
+        }
+
+
+        
 
         public CostProject FindAutoCostProjectPrefixByOrgID(string key, string date)
         {
@@ -86,7 +111,9 @@ namespace TimeAPI.Data.Repositories
                     is_public = @is_public,
                     no_of_floors = @no_of_floors, 
                     plot_size = @plot_size, 
+                    plot_size_unit = @plot_size_unit, 
                     buildup_area = @buildup_area,
+                    buildup_area_unit = @buildup_area_unit,
                     discount_amount = @discount_amount,
                     profit_margin_amount = @profit_margin_amount,
                     modified_date = @modified_date,
@@ -162,6 +189,23 @@ namespace TimeAPI.Data.Repositories
                param: entity
            );
         }
+
+        public void UpdateIsQuotationByCostProjectID(CostProject entity)
+        {
+            Execute(
+              sql: @"UPDATE dbo.cost_project
+                   SET
+                    discount_amount = @discount_amount,
+                    profit_margin_amount = @profit_margin_amount,
+                    modified_date = @modified_date,
+                    modifiedby = @modifiedby
+                    WHERE id = @id",
+              param: entity
+          );
+        }
+
+
+
 
     }
 }

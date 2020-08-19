@@ -6,9 +6,10 @@ namespace TimeAPI.Domain.Repositories
 {
     public interface IAdminProductivityDashboardRepository : IRepository<AdminProductivityDashboard, string>
     {
-        dynamic ScreenshotByEmpIDAndDate(string EmpID, string StartDate, string EndDate);
-        //dynamic DesktopEmployeeAdminProductivityPerDateByEmpIDAndDate(string EmpID, string StartDate, string EndDate);
-        //dynamic EmployeeAdminProductivityTimeFrequencyByEmpIDAndDate(string EmpID, string StartDate, string EndDate);
-        //dynamic EmployeeAppTrackedByEmpIDAndDate(string EmpID, string StartDate, string EndDate);
+        dynamic ScreenshotByOrgIDAndDate(string OrgID, string StartDate, string EndDate);
+        dynamic EmployeeProductivityPerDateByOrgIDAndDate(string OrgID, string StartDate, string EndDate);
+        //dynamic DesktopEmployeeProductivityPerDateByOrgIDAndDate(string OrgID, string StartDate, string EndDate);
+        dynamic EmployeeProductivityTimeFrequencyByOrgIDAndDate(string OrgID, string StartDate, string EndDate);
+        //dynamic EmployeeAppTrackedByOrgIDAndDate(string OrgID, string StartDate, string EndDate);
     }
 }

@@ -31,6 +31,10 @@ using TimeAPI.API.HangfireJobs;
 using Microsoft.AspNetCore.ResponseCompression;
 using System.IO.Compression;
 using Microsoft.AspNetCore.Http;
+using TimeAPI.API.Cache;
+using Microsoft.AspNetCore.Connections;
+using StackExchange.Redis;
+using TimeAPI.API.Serialization;
 //using Hangfire;
 //using Hangfire.MemoryStorage;
 
@@ -116,7 +120,6 @@ namespace TimeAPI.API
               .AddDefaultTokenProviders();
             //.AddDefaultTokenProviders(provider => new LifetimeValidator(TimeSpan.FromDays(2)));
 
-
             services.Configure<GzipCompressionProviderOptions>(options => options.Level = CompressionLevel.Optimal);
             services.AddResponseCompression(options =>
             {
@@ -145,6 +148,19 @@ namespace TimeAPI.API
             services.AddTransient<IEmailSender, EmailSender>();
             services.AddTransient<ISmsSender, SmsSender>();
             services.AddSingleton<IJobVerification, JobVerification>();
+
+
+            //InMemoryCache
+            //services.AddSingleton<ICacheService, InMemoryCacheService>();
+
+            //RedisCache
+            services.AddSingleton<IConnectionMultiplexer>(x =>
+                                  ConnectionMultiplexer.Connect(Configuration.GetValue<string>("RedisConnection")));
+            services.AddSingleton<ICacheService, RedisCacheService>();
+
+            //Serializer
+            services.AddSingleton<ISerializer<string>, Serializer>();
+
 
             services.AddSwaggerGen(c =>
             {
@@ -232,9 +248,9 @@ namespace TimeAPI.API
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, 
-                            IRecurringJobManager recurringJobManager, 
-                            IServiceProvider  serviceProvider )
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env,
+                            IRecurringJobManager recurringJobManager,
+                            IServiceProvider serviceProvider)
         {
             //app.UseHangfireDashboard();
 
@@ -251,7 +267,7 @@ namespace TimeAPI.API
             app.UseCors("CorsPolicy");
 
 
-
+            app.UseResponseCompression();
 
             //app.UseSignalR((options) =>
             //{

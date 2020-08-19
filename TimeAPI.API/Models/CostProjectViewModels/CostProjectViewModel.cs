@@ -27,13 +27,15 @@ namespace TimeAPI.API.Models.CostProjectViewModels
         public string no_of_floors { get; set; }
         public string total_unit { get; set; }
         public string plot_size { get; set; }
+        public string plot_size_unit { get; set; }
         public string buildup_area { get; set; }
+        public string buildup_area_unit { get; set; }
         public string discount_amount { get; set; }
         public string profit_margin_amount { get; set; }
         public string createdby { get; set; }
         public List<string> TypeOfDesign { get; set; }
         public List<ProjectUnit> ProjectUnit { get; set; }
-        public EntityContact EntityContact { get; set; }
+        public List<EntityContact> EntityContact { get; set; }
         public List<CostProjectMilestone> CostProjectMilestone { get; set; }
         //public EntityLocation EntityLocation { get; set; }
     }
@@ -48,14 +50,26 @@ namespace TimeAPI.API.Models.CostProjectViewModels
     }
 
 
+    public class UpdateCostProjectIsQuotationViewModel
+    {
+        public string id { get; set; }
+        public string is_quotation { get; set; }
+        public string createdby { get; set; }
+
+    }
+
+
     public class CostProjectResponseViewModel
     {
         public string id { get; set; }
         public string user_id { get; set; }
         public string org_id { get; set; }
         public string cst_id { get; set; }
+        public string customer_name { get; set; }
         public string package_id { get; set; }
+        public string package_name { get; set; }
         public string project_type_id { get; set; }
+        public string project_type_name { get; set; }
         public string project_name { get; set; }
 
         //public string project_desc { get; set; }
@@ -67,14 +81,16 @@ namespace TimeAPI.API.Models.CostProjectViewModels
         public string no_of_floors { get; set; }
         public string total_unit { get; set; }
         public string plot_size { get; set; }
+        public string plot_size_unit { get; set; }
         public string buildup_area { get; set; }
+        public string buildup_area_unit { get; set; }
         public string discount_amount { get; set; }
         public string profit_margin_amount { get; set; }
         public string createdby { get; set; }
         public List<string> TypeOfDesign { get; set; }
         public List<ProjectUnit> ProjectUnit { get; set; }
         public List<ProjectUnit> ProjectUnitExtra { get; set; }
-        public EntityContact EntityContact { get; set; }
+        public List<EntityContact> EntityContact { get; set; }
         public List<CostProjectMilestone> CostProjectMilestone { get; set; }
         //public EntityLocation EntityLocation { get; set; }
     }

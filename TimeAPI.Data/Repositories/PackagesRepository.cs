@@ -14,8 +14,8 @@ namespace TimeAPI.Data.Repositories
         {
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.packages
-                            (id, org_id, package_name,  created_date, createdby)
-                    VALUES (@id, @org_id, @package_name, @created_date, @createdby);
+                            (id, org_id, package_name, package_desc, created_date, createdby)
+                    VALUES (@id, @org_id, @package_name, @package_desc, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -61,6 +61,7 @@ namespace TimeAPI.Data.Repositories
                            SET 
                             org_id = @org_id, 
                             package_name = @package_name,
+                            package_desc = @package_desc,
                             modified_date = @modified_date,
                             modifiedby = @modifiedby
                          WHERE id = @id",

@@ -15,8 +15,10 @@ namespace TimeAPI.Data.Repositories
         {
             entity.id = ExecuteScalar<string>(
                         sql: @"
-                    INSERT INTO dbo.customer (id, org_id, cst_name, cst_type, email, phone, adr, street, country, city, created_date, createdby)
-                    VALUES (@id, @org_id, @cst_name, @cst_type, @email, @phone, @adr, @street, @country, @city, @created_date, @createdby);
+                    INSERT INTO dbo.customer (id, org_id, cst_name, cst_type, first_name, last_name, is_company, company_name, annual_revenue, 
+                                                  no_of_emp, industry_id, website, email, phone, adr, street, country, city, created_date, createdby)
+                    VALUES (@id, @org_id, @cst_name, @cst_type, @first_name, @last_name, @is_company, @company_name, @annual_revenue, 
+                                                  @no_of_emp, @industry_id, @website, @email, @phone, @adr, @street, @country, @city, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                         param: entity
                     );
@@ -63,6 +65,14 @@ namespace TimeAPI.Data.Repositories
                    SET
                     cst_name = @cst_name,   
                     cst_type = @cst_type, 
+                    first_name = @first_name, 
+                    last_name = @last_name, 
+                    is_company = @is_company,
+                    company_name = @company_name, 
+                    annual_revenue = @annual_revenue, 
+                    no_of_emp = @no_of_emp, 
+                    industry_id = @industry_id, 
+                    website = @website,
                     email = @email, 
                     phone = @phone, 
                     adr = @adr, 
@@ -75,8 +85,6 @@ namespace TimeAPI.Data.Repositories
                 param: entity
             );
         }
-
-
 
         public IEnumerable<dynamic> FindCustomerByOrgID(string key)
         {
@@ -95,6 +103,13 @@ namespace TimeAPI.Data.Repositories
                  param: new { key }
             );
         }
-     
+
+        public Customer FindByCustomerByNameAndEmail(string Name, string Email)
+        {
+            return QuerySingleOrDefault<Customer>(
+                sql: @"SELECT * FROM dbo.customer WHERE cst_name = @Name and email = @Email and is_deleted = 0",
+                 param: new { Name, Email }
+            );
+        }
     }
 }

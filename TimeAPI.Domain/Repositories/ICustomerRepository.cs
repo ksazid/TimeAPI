@@ -11,6 +11,7 @@ namespace TimeAPI.Domain.Repositories
     {
         IEnumerable<dynamic> FindCustomerByOrgID(string OrgID);
         Customer FindCustomerByProjectID(string ProjectID);
+        Customer FindByCustomerByNameAndEmail(string Name, string Email);
 
     }
 }

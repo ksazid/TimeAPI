@@ -2,6 +2,9 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
+using System.Threading;
+using System.Threading.Tasks;
+using TimeAPI.API.Cache;
 using TimeAPI.API.Models;
 using TimeAPI.API.Services;
 using TimeAPI.Domain;
@@ -19,77 +22,96 @@ namespace TimeAPI.API.Controllers
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
         private static DateTime _dateTime;
+        private readonly ICacheService _cacheService;
 
         public AdminProductivityDashboardController(IUnitOfWork unitOfWork, ILogger<AdminProductivityDashboardController> logger,
-            IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings)
+                                                    IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings, 
+                                                    ICacheService cacheService)
         {
             _emailSender = emailSender;
             _logger = logger;
             _appSettings = AppSettings.Value;
             _unitOfWork = unitOfWork;
             _dateTime = InternetTime.GetCurrentTimeFromTimeZone().Value.DateTime;
+            _cacheService = cacheService;
         }
 
-        /// <summary>
-        /// /
-        /// </summary>
-        /// <param name="Utils"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        //[HttpPost]
-        //[Route("EmployeeProductivityPerDateByEmpIDAndDate")]
-        //public async Task<object> EmployeeProductivityPerDateByEmpIDAndDate([FromBody] UtilsEmpIDAndDate Utils, CancellationToken cancellationToken)
-        //{
-        //    try
-        //    {
-        //        if (cancellationToken != null)
-        //            cancellationToken.ThrowIfCancellationRequested();
+        [HttpPost]
+        [Route("EmployeeProductivityPerDateByOrgIDAndDate")]
+        public async Task<object> EmployeeProductivityPerDateByOrgIDAndDate([FromBody] UtilsDateAndOrgID Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
 
-        //        var results = _unitOfWork.AdminProductivityDashboardRepository.DesktopEmployeeAdminProductivityPerDateByEmpIDAndDate(Utils.EmpID, Utils.StartDate, Utils.EndDate);
-        //        return await Task.FromResult<object>(results).ConfigureAwait(false);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-        //    }
-        //}
+                var results = _unitOfWork.AdminProductivityDashboardRepository.EmployeeProductivityPerDateByOrgIDAndDate(Utils.OrgID, Utils.StartDate, Utils.EndDate);
 
-        //[HttpPost]
-        //[Route("DesktopEmployeeProductivityPerDateByEmpIDAndDate")]
-        //public async Task<object> DesktopEmployeeProductivityPerDateByEmpIDAndDate([FromBody] UtilsEmpIDAndDate Utils, CancellationToken cancellationToken)
-        //{
-        //    try
-        //    {
-        //        if (cancellationToken != null)
-        //            cancellationToken.ThrowIfCancellationRequested();
+                return await Task.FromResult<object>(results).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
 
-        //        var result = _unitOfWork.AdminProductivityDashboardRepository.DesktopEmployeeProductivityPerDateByEmpIDAndDate(Utils.EmpID, Utils.StartDate, Utils.EndDate);
+        [HttpPost]
+        [Route("EmployeeProductivityTimeFrequencyByOrgIDAndDate")]
+        public async Task<object> EmployeeProductivityTimeFrequencyByOrgIDAndDate([FromBody] UtilsDateAndOrgID Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
 
-        //        return await Task.FromResult<object>(result).ConfigureAwait(false);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-        //    }
-        //}
+        
 
-        //[HttpPost]
-        //[Route("EmployeeProductivityTimeFrequencyByEmpIDAndDate")]
-        //public async Task<object> EmployeeProductivityTimeFrequencyByEmpIDAndDate([FromBody] UtilsEmpIDAndDate Utils, CancellationToken cancellationToken)
-        //{
-        //    try
-        //    {
-        //        if (cancellationToken != null)
-        //            cancellationToken.ThrowIfCancellationRequested();
+                var result = _unitOfWork.AdminProductivityDashboardRepository.EmployeeProductivityTimeFrequencyByOrgIDAndDate(Utils.OrgID, Utils.StartDate, Utils.EndDate);
 
-        //        var result = _unitOfWork.AdminProductivityDashboardRepository.EmployeeAdminProductivityTimeFrequencyByEmpIDAndDate(Utils.EmpID, Utils.StartDate, Utils.EndDate);
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
 
-        //        return await Task.FromResult<object>(result).ConfigureAwait(false);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-        //    }
-        //}
+        [HttpPost]
+        [Route("EmployeeScreenshotsPerDateByOrgIDAndDate")]
+        public async Task<object> EmployeeScreenshotsPerDateByOrgIDAndDate([FromBody] UtilsDateAndOrgID Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                var results = _unitOfWork.AdminProductivityDashboardRepository.ScreenshotByOrgIDAndDate(Utils.OrgID, Utils.StartDate, Utils.EndDate);
+
+                return await Task.FromResult<object>(results).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("GetEmployeeTasksTimesheetByOrgID")]
+        public async Task<object> GetEmployeeTasksTimesheetByOrgID([FromBody] UtilsDateAndOrgID Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                var result = _unitOfWork.UserRepository.GetEmployeeTasksTimesheetByOrgID(Utils.OrgID, Utils.StartDate, Utils.EndDate);
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
     }
 }

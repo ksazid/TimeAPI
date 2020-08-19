@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,6 +14,22 @@ using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.API.Models
 {
+
+    public class LowercaseContractResolver : DefaultContractResolver
+    {
+        protected override string ResolvePropertyName(string propertyName)
+        {
+            return propertyName.ToLower();
+        }
+    }
+
+    public class LowercaseNamingStrategy : NamingStrategy
+    {
+        protected override string ResolvePropertyName(string name)
+        {
+            return name.ToLowerInvariant();
+        }
+    }
     public class Utils
     {
         public string ID { get; set; }
@@ -22,7 +39,18 @@ namespace TimeAPI.API.Models
     {
         public string ID { get; set; }
         public string Date { get; set; }
+    }
 
+    public class UtilsMilestoneIDAndOrgID
+    {
+        public string ID { get; set; }
+        public string OrgID { get; set; }
+    }
+
+    public class UtilsCustomerNameAndEmail
+    {
+        public string CustomerName { get; set; }
+        public string Email { get; set; }
     }
 
     public class RootPlanDetails
@@ -138,6 +166,12 @@ namespace TimeAPI.API.Models
     public class UtilsEmpIDAndDate
     {
         public string EmpID { get; set; }
+        public string StartDate { get; set; }
+        public string EndDate { get; set; }
+    }
+    public class UtilsDateAndOrgID
+    {
+        public string OrgID { get; set; }
         public string StartDate { get; set; }
         public string EndDate { get; set; }
     }

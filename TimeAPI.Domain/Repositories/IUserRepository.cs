@@ -20,6 +20,8 @@ namespace TimeAPI.Domain.Repositories
 
         IEnumerable<RootTimesheetData> GetEmployeeTasksTimesheetByEmpID(string EmpID, string FromDate, string ToDate);
 
+        IEnumerable<RootTimesheetData> GetEmployeeTasksTimesheetByOrgID(string EmpID, string FromDate, string ToDate);
+
         //dynamic TotalEmployeeDashboardDataByOrgID(string OrgID);
         ////dynamic TotalEmployeeDashboardDataByOrgID(string OrgID, string toDate, string fromDate);
         //dynamic TotalEmployeeAbsentDashboardDataByOrgID(string OrgID, string toDate, string fromDate);

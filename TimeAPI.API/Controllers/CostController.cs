@@ -52,6 +52,9 @@ namespace TimeAPI.API.Controllroers
         {
             try
             {
+                int cost_up = 0;
+                int cost_up_study = 0;
+
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
@@ -92,23 +95,26 @@ namespace TimeAPI.API.Controllroers
                 //contact
                 if (projectViewModel.EntityContact != null)
                 {
-                    var entityContact = new EntityContact()
+                    for (int i = 0; i < projectViewModel.EntityContact.Count; i++)
                     {
-                        id = Guid.NewGuid().ToString(),
-                        entity_id = modal.id,
-                        name = projectViewModel.EntityContact.name,
-                        position = projectViewModel.EntityContact.position,
-                        phone = projectViewModel.EntityContact.phone,
-                        mobile = projectViewModel.EntityContact.mobile,
-                        email = projectViewModel.EntityContact.email,
-                        city = projectViewModel.EntityContact.city,
-                        country = projectViewModel.EntityContact.country,
-                        createdby = projectViewModel.createdby,
-                        created_date = _dateTime.ToString(),
-                        is_deleted = false,
-                        is_primary = projectViewModel.EntityContact.is_primary
-                    };
-                    _unitOfWork.EntityContactRepository.Add(entityContact);
+                        var entityContact = new EntityContact()
+                        {
+                            id = Guid.NewGuid().ToString(),
+                            entity_id = modal.id,
+                            name = projectViewModel.EntityContact[i].name,
+                            position = projectViewModel.EntityContact[i].position,
+                            phone = projectViewModel.EntityContact[i].phone,
+                            mobile = projectViewModel.EntityContact[i].mobile,
+                            email = projectViewModel.EntityContact[i].email,
+                            city = projectViewModel.EntityContact[i].city,
+                            country = projectViewModel.EntityContact[i].country,
+                            createdby = projectViewModel.createdby,
+                            created_date = _dateTime.ToString(),
+                            is_deleted = false,
+                            is_primary = projectViewModel.EntityContact[i].is_primary
+                        };
+                        _unitOfWork.EntityContactRepository.Add(entityContact);
+                    }
                 }
 
                 //customer
@@ -147,14 +153,22 @@ namespace TimeAPI.API.Controllroers
                 tableCostMilestoneTask.Columns.Add("milestone_id", typeof(string));
                 tableCostMilestoneTask.Columns.Add("project_id", typeof(string));
                 tableCostMilestoneTask.Columns.Add("task_name", typeof(string));
-                tableCostMilestoneTask.Columns.Add("qty", typeof(int));
+                tableCostMilestoneTask.Columns.Add("qty", typeof(double));
                 tableCostMilestoneTask.Columns.Add("unit_id", typeof(string));
+                tableCostMilestoneTask.Columns.Add("unit_type", typeof(string));
                 tableCostMilestoneTask.Columns.Add("total_unit", typeof(string));
                 tableCostMilestoneTask.Columns.Add("default_unit_hours", typeof(string));
 
                 #endregion RegionStatic
 
                 #region ProjectUnit
+
+                if (projectViewModel.ProjectUnit != null)
+                    if (cost_up == 0 && projectViewModel.ProjectUnit[0].unit_qty_all != null)
+                    {
+                        cost_up = Convert.ToInt32(projectViewModel.ProjectUnit[0].unit_qty_all);
+                        cost_up_study = Convert.ToInt32(projectViewModel.ProjectUnit[0].unit_qty_all);
+                    }
 
                 if (projectViewModel.ProjectUnit != null)
                     foreach (var item in projectViewModel.ProjectUnit)
@@ -201,16 +215,16 @@ namespace TimeAPI.API.Controllroers
                             {
                                 var StaticCostProjectMilestoneTasks = _unitOfWork.CostProjectTaskRepository
                                                                        .GetAllStaticMilestoneTasksByMilestoneID
-                                                                       (itemStaticCostProjectMilestone["milestone_id"].ToString());
+                                                                       (itemStaticCostProjectMilestone["milestone_id"].ToString(), modal.org_id);
 
                                 foreach (var itemStaticCostProjectMilestoneTasks in StaticCostProjectMilestoneTasks)
                                 {
-                                    double numberofunit = (Convert.ToInt32(1) * Convert.ToInt32(itemStaticCostProjectMilestoneTasks.qty));
-                                    if (Convert.ToInt32(item.unit_qty_all) > 0)
+                                    string numberofunit = "";
+                                    numberofunit = (Convert.ToDouble(1) * Convert.ToDouble(itemStaticCostProjectMilestoneTasks.qty)).ToString();
+                                    if (Convert.ToDouble(cost_up_study) > 0)
                                     {
-                                        double percent = Convert.ToDouble(item.unit_qty_all);
-                                        double PercentValue = Math.Round(percent / 100 * numberofunit, 2);
-                                        numberofunit = numberofunit + PercentValue;
+                                        var PercentValue = Math.Round(Convert.ToDouble(numberofunit) / Convert.ToDouble(cost_up_study) * 100, 2);
+                                        numberofunit = ((Convert.ToDouble(PercentValue) + Convert.ToDouble(numberofunit))).ToString();
                                     }
 
                                     if (tableCostMilestoneTask.Rows.Count > 0)
@@ -220,33 +234,36 @@ namespace TimeAPI.API.Controllroers
                                         {
                                             var qty = tableCostMilestoneTask.AsEnumerable()
                                                                             .Where(c => c.Field<string>("task_name") == itemStaticCostProjectMilestoneTasks.task_name)
-                                                                            .Sum(x => x.Field<int>("qty"));
+                                                                            .Sum(x => x.Field<double>("qty"));
 
-                                            if (numberofunit > 0)
+                                            if (numberofunit.Length > 0)
                                                 tableCostMilestoneTask.AsEnumerable()
                                                                                 .Where(c => c.Field<string>("task_name") == itemStaticCostProjectMilestoneTasks.task_name)
                                                                                 .ToList()
-                                                                                .ForEach(D => D.SetField("qty", qty + Convert.ToInt32(numberofunit)));
+                                                                                .ForEach(D => D.SetField("qty", qty + Convert.ToDouble(numberofunit)));
                                         }
                                         else
                                         {
                                             tableCostMilestoneTask.Rows.Add(itemStaticCostProjectMilestone["id"],
                                                modal.id, itemStaticCostProjectMilestoneTasks.task_name,
-                                               numberofunit, item.unit_id, projectViewModel.total_unit, itemStaticCostProjectMilestoneTasks.qty);
+                                               numberofunit, item.unit_id, itemStaticCostProjectMilestoneTasks.unit,
+                                               projectViewModel.total_unit, itemStaticCostProjectMilestoneTasks.qty);
                                         }
                                     }
                                     else
                                     {
                                         tableCostMilestoneTask.Rows.Add(itemStaticCostProjectMilestone["id"],
                                            modal.id, itemStaticCostProjectMilestoneTasks.task_name,
-                                           numberofunit, item.unit_id, projectViewModel.total_unit, itemStaticCostProjectMilestoneTasks.qty);
+                                           numberofunit, item.unit_id, itemStaticCostProjectMilestoneTasks.unit,
+                                           projectViewModel.total_unit, itemStaticCostProjectMilestoneTasks.qty);
                                     }
                                 }
+
                             }
+                            cost_up_study = 0;
 
                             #endregion Study
                         }
-
                         if (projectUnit.is_extra == true)
                         {
                             #region Design
@@ -256,19 +273,19 @@ namespace TimeAPI.API.Controllroers
                                 //get all static milestone tasks and save it with projectid in cost_milestone_tasks
                                 var StaticCostProjectMilestoneTasks = _unitOfWork.CostProjectTaskRepository
                                                                        .GetAllStaticMilestoneTasksByMilestoneID
-                                                                       (itemStaticCostProjectMilestone["milestone_id"].ToString());
+                                                                       (itemStaticCostProjectMilestone["milestone_id"].ToString(), modal.org_id);
 
                                 foreach (var itemStaticCostProjectMilestoneTasks in StaticCostProjectMilestoneTasks)
                                 {
                                     //convert the no_of_unit into interger.
                                     if (itemStaticCostProjectMilestoneTasks.task_name == item.unit_name)
                                     {
-                                        double numberofunit = (Convert.ToInt32(item.total_unit) * Convert.ToInt32(itemStaticCostProjectMilestoneTasks.qty));
-                                        if (Convert.ToInt32(item.unit_qty_all) > 0)
+                                        string numberofunit = "";
+                                        numberofunit = (Convert.ToDouble(item.total_unit) * Convert.ToDouble(itemStaticCostProjectMilestoneTasks.qty)).ToString();
+                                        if (Convert.ToDouble(cost_up) > 0)
                                         {
-                                            double percent = Convert.ToDouble(item.unit_qty_all);
-                                            double PercentValue = Math.Round(percent / 100 * numberofunit, 2);
-                                            numberofunit = numberofunit + PercentValue;
+                                            var PercentValue = Math.Round(Convert.ToDouble(itemStaticCostProjectMilestoneTasks.qty) / Convert.ToDouble(cost_up) * 100, 2);
+                                            numberofunit = ((Convert.ToDouble(PercentValue) + Convert.ToDouble(numberofunit))).ToString();
                                         }
 
                                         if (tableCostMilestoneTask.Rows.Count > 0)
@@ -278,26 +295,28 @@ namespace TimeAPI.API.Controllroers
                                             {
                                                 var qty = tableCostMilestoneTask.AsEnumerable()
                                                                                 .Where(c => c.Field<string>("task_name") == itemStaticCostProjectMilestoneTasks.task_name)
-                                                                                .Sum(x => x.Field<int>("qty"));
+                                                                                .Sum(x => x.Field<double>("qty"));
 
-                                                if (numberofunit > 0)
+                                                if (numberofunit.Length > 0)
                                                     tableCostMilestoneTask.AsEnumerable()
                                                                                     .Where(c => c.Field<string>("task_name") == itemStaticCostProjectMilestoneTasks.task_name)
                                                                                     .ToList()
-                                                                                    .ForEach(D => D.SetField("qty", qty + Convert.ToInt32(numberofunit)));
+                                                                                    .ForEach(D => D.SetField("qty", qty + Convert.ToDouble(numberofunit)));
                                             }
                                             else
                                             {
                                                 tableCostMilestoneTask.Rows.Add(itemStaticCostProjectMilestone["id"],
                                                    modal.id, itemStaticCostProjectMilestoneTasks.task_name,
-                                                   numberofunit, item.unit_id, item.total_unit, itemStaticCostProjectMilestoneTasks.qty);
+                                                   numberofunit, item.unit_id, itemStaticCostProjectMilestoneTasks.unit,
+                                                   item.total_unit, itemStaticCostProjectMilestoneTasks.qty);
                                             }
                                         }
                                         else
                                         {
                                             tableCostMilestoneTask.Rows.Add(itemStaticCostProjectMilestone["id"],
                                                modal.id, itemStaticCostProjectMilestoneTasks.task_name,
-                                               numberofunit, item.unit_id, item.total_unit, itemStaticCostProjectMilestoneTasks.qty);
+                                               numberofunit, item.unit_id, itemStaticCostProjectMilestoneTasks.unit,
+                                               item.total_unit, itemStaticCostProjectMilestoneTasks.qty);
                                         }
                                     }
                                 }
@@ -312,32 +331,31 @@ namespace TimeAPI.API.Controllroers
                                 //get all static milestone tasks and save it with projectid in cost_milestone_tasks
                                 var StaticCostProjectMilestoneTasks = _unitOfWork.CostProjectTaskRepository
                                                                        .GetAllStaticMilestoneTasksByMilestoneID
-                                                                       (itemStaticCostProjectMilestone["milestone_id"].ToString());
+                                                                       (itemStaticCostProjectMilestone["milestone_id"].ToString(), modal.org_id);
 
                                 foreach (var itemStaticCostProjectMilestoneTasks in StaticCostProjectMilestoneTasks)
                                 {
                                     //convert the no_of_unit into interger.
                                     if (itemStaticCostProjectMilestoneTasks.task_name == item.unit_name)
                                     {
-                                        double numberofunit = 0;
+                                        string numberofunit = "";
+
                                         if (itemStaticCostProjectMilestoneTasks.task_name == "BOQ")
                                         {
-                                            numberofunit = (Convert.ToInt32(item.total_unit) * Convert.ToInt32(itemStaticCostProjectMilestoneTasks.qty));
-                                            if (Convert.ToInt32(item.unit_qty_all) > 0)
+                                            numberofunit = (Convert.ToDouble(item.total_unit) * Convert.ToDouble(itemStaticCostProjectMilestoneTasks.qty)).ToString();
+                                            if (Convert.ToDouble(cost_up) > 0)
                                             {
-                                                double percent = Convert.ToDouble(item.unit_qty_all);
-                                                double PercentValue = Math.Round(percent / 100 * numberofunit, 2);
-                                                numberofunit = numberofunit + PercentValue;
+                                                var PercentValue = Math.Round(Convert.ToDouble(itemStaticCostProjectMilestoneTasks.qty) / Convert.ToDouble(cost_up) * 100, 2);
+                                                numberofunit = ((Convert.ToDouble(PercentValue) + Convert.ToDouble(numberofunit))).ToString();
                                             }
                                         }
                                         else
                                         {
-                                            numberofunit = (Convert.ToInt32(1) * Convert.ToInt32(itemStaticCostProjectMilestoneTasks.qty));
-                                            if (Convert.ToInt32(item.unit_qty_all) > 0)
+                                            numberofunit = (Convert.ToDouble(1) * Convert.ToDouble(itemStaticCostProjectMilestoneTasks.qty)).ToString();
+                                            if (Convert.ToDouble(cost_up) > 0)
                                             {
-                                                double percent = Convert.ToDouble(item.unit_qty_all);
-                                                double PercentValue = Math.Round(percent / 100 * numberofunit, 2);
-                                                numberofunit = numberofunit + PercentValue;
+                                                var PercentValue = Math.Round(Convert.ToDouble(itemStaticCostProjectMilestoneTasks.qty) / Convert.ToDouble(cost_up) * 100, 2);
+                                                numberofunit = ((Convert.ToDouble(PercentValue) + Convert.ToDouble(numberofunit))).ToString();
                                             }
                                         }
                                         if (tableCostMilestoneTask.Rows.Count > 0)
@@ -347,26 +365,28 @@ namespace TimeAPI.API.Controllroers
                                             {
                                                 var qty = tableCostMilestoneTask.AsEnumerable()
                                                                                 .Where(c => c.Field<string>("task_name") == itemStaticCostProjectMilestoneTasks.task_name)
-                                                                                .Sum(x => x.Field<int>("qty"));
+                                                                                .Sum(x => x.Field<double>("qty"));
 
-                                                if (numberofunit > 0)
+                                                if (numberofunit.Length > 0)
                                                     tableCostMilestoneTask.AsEnumerable()
                                                                                     .Where(c => c.Field<string>("task_name") == itemStaticCostProjectMilestoneTasks.task_name)
                                                                                     .ToList()
-                                                                                    .ForEach(D => D.SetField("qty", qty + Convert.ToInt32(numberofunit)));
+                                                                                    .ForEach(D => D.SetField("qty", qty + Convert.ToDouble(numberofunit)));
                                             }
                                             else
                                             {
                                                 tableCostMilestoneTask.Rows.Add(itemStaticCostProjectMilestone["id"],
                                                    modal.id, itemStaticCostProjectMilestoneTasks.task_name,
-                                                   numberofunit, item.unit_id, item.total_unit, itemStaticCostProjectMilestoneTasks.qty);
+                                                   numberofunit, item.unit_id, itemStaticCostProjectMilestoneTasks.unit,
+                                                   item.total_unit, itemStaticCostProjectMilestoneTasks.qty);
                                             }
                                         }
                                         else
                                         {
                                             tableCostMilestoneTask.Rows.Add(itemStaticCostProjectMilestone["id"],
                                                modal.id, itemStaticCostProjectMilestoneTasks.task_name,
-                                               numberofunit, item.unit_id, item.total_unit, itemStaticCostProjectMilestoneTasks.qty);
+                                               numberofunit, item.unit_id, itemStaticCostProjectMilestoneTasks.unit,
+                                               item.total_unit, itemStaticCostProjectMilestoneTasks.qty);
                                         }
                                     }
                                 }
@@ -383,19 +403,29 @@ namespace TimeAPI.API.Controllroers
                                     //get all static milestone tasks and save it with projectid in cost_milestone_tasks
                                     var StaticCostProjectMilestoneTasks = _unitOfWork.CostProjectTaskRepository
                                                                            .GetAllStaticMilestoneTasksByMilestoneID
-                                                                           (itemStaticCostProjectMilestone["milestone_id"].ToString());
+                                                                           (itemStaticCostProjectMilestone["milestone_id"].ToString(), modal.org_id);
 
                                     foreach (var itemStaticCostProjectMilestoneTasks in StaticCostProjectMilestoneTasks)
                                     {
                                         //convert the no_of_unit into interger.
-                                        double numberofunit = 0;
-                                        numberofunit = (Convert.ToInt32(item.total_unit) * Convert.ToInt32(itemStaticCostProjectMilestoneTasks.qty));
-                                        numberofunit = (Convert.ToInt32(numberofunit) * Convert.ToInt32(modal.no_of_floors));
-                                        if (Convert.ToInt32(item.unit_qty_all) > 0)
+                                        string numberofunit = "";
+                                        if (itemStaticCostProjectMilestoneTasks.task_name == "Legend" || itemStaticCostProjectMilestoneTasks.task_name == "Section")
                                         {
-                                            double percent = Convert.ToDouble(item.unit_qty_all);
-                                            double PercentValue = Math.Round(percent / 100 * numberofunit, 2);
-                                            numberofunit = numberofunit + PercentValue;
+                                            numberofunit = (Convert.ToDouble(item.total_unit) * Convert.ToDouble(itemStaticCostProjectMilestoneTasks.qty)).ToString();
+                                            if (Convert.ToDouble(cost_up) > 0)
+                                            {
+                                                var PercentValue = Math.Round(Convert.ToDouble(itemStaticCostProjectMilestoneTasks.qty) / Convert.ToDouble(cost_up) * 100, 2);
+                                                numberofunit = ((Convert.ToDouble(PercentValue) + Convert.ToDouble(numberofunit))).ToString();
+                                            }
+                                        }
+                                        else
+                                        {
+                                            numberofunit = (Convert.ToDouble(modal.no_of_floors) * Convert.ToDouble(itemStaticCostProjectMilestoneTasks.qty)).ToString();
+                                            if (Convert.ToDouble(cost_up) > 0)
+                                            {
+                                                var PercentValue = Math.Round(Convert.ToDouble(itemStaticCostProjectMilestoneTasks.qty) / Convert.ToDouble(cost_up) * 100, 2);
+                                                numberofunit = ((Convert.ToDouble(PercentValue) + Convert.ToDouble(numberofunit))).ToString();
+                                            }
                                         }
 
                                         if (tableCostMilestoneTask.Rows.Count > 0)
@@ -405,29 +435,33 @@ namespace TimeAPI.API.Controllroers
                                             {
                                                 var qty = tableCostMilestoneTask.AsEnumerable()
                                                                                 .Where(c => c.Field<string>("task_name") == itemStaticCostProjectMilestoneTasks.task_name)
-                                                                                .Sum(x => x.Field<int>("qty"));
+                                                                                .Sum(x => x.Field<double>("qty"));
 
-                                                if (numberofunit > 0)
+                                                if (numberofunit.Length > 0)
                                                     tableCostMilestoneTask.AsEnumerable()
                                                                                     .Where(c => c.Field<string>("task_name") == itemStaticCostProjectMilestoneTasks.task_name)
                                                                                     .ToList()
-                                                                                    .ForEach(D => D.SetField("qty", qty + Convert.ToInt32(numberofunit)));
+                                                                                    .ForEach(D => D.SetField("qty", qty + Convert.ToDouble(numberofunit)));
                                             }
                                             else
                                             {
                                                 tableCostMilestoneTask.Rows.Add(itemStaticCostProjectMilestone["id"],
                                                    modal.id, itemStaticCostProjectMilestoneTasks.task_name,
-                                                   numberofunit, item.unit_id, item.total_unit, itemStaticCostProjectMilestoneTasks.qty);
+                                                   numberofunit, item.unit_id, itemStaticCostProjectMilestoneTasks.unit,
+                                                   item.total_unit, itemStaticCostProjectMilestoneTasks.qty);
                                             }
                                         }
                                         else
                                         {
                                             tableCostMilestoneTask.Rows.Add(itemStaticCostProjectMilestone["id"],
                                                modal.id, itemStaticCostProjectMilestoneTasks.task_name,
-                                               numberofunit, item.unit_id, item.total_unit, itemStaticCostProjectMilestoneTasks.qty);
+                                               numberofunit, item.unit_id, itemStaticCostProjectMilestoneTasks.unit,
+                                               item.total_unit, itemStaticCostProjectMilestoneTasks.qty);
                                         }
                                     }
                                 }
+
+                                cost_up = 0;
                             }
 
                             #endregion ShopDrawing
@@ -467,6 +501,7 @@ namespace TimeAPI.API.Controllroers
                         task_name = itemtableCostMilestoneTask["task_name"].ToString(),
                         unit = itemtableCostMilestoneTask["unit_id"].ToString(),
                         qty = itemtableCostMilestoneTask["qty"].ToString(),
+                        unit_type = itemtableCostMilestoneTask["unit_type"].ToString(),
                         total_unit = itemtableCostMilestoneTask["total_unit"].ToString(),
                         default_unit_hours = itemtableCostMilestoneTask["default_unit_hours"].ToString(),
                         createdby = projectViewModel.createdby,
@@ -496,6 +531,8 @@ namespace TimeAPI.API.Controllroers
         {
             try
             {
+                int cost_up = 0;
+                int cost_up_study = 0;
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
@@ -507,25 +544,30 @@ namespace TimeAPI.API.Controllroers
                 var modal = mapper.Map<CostProject>(projectViewModel);
                 modal.modified_date = _dateTime.ToString();
 
+                _unitOfWork.EntityContactRepository.RemoveByEntityID(modal.id);
                 //contact
                 if (projectViewModel.EntityContact != null)
                 {
-                    var entityContact = new EntityContact()
+                    for (int i = 0; i < projectViewModel.EntityContact.Count; i++)
                     {
-                        entity_id = modal.id,
-                        name = projectViewModel.EntityContact.name,
-                        position = projectViewModel.EntityContact.position,
-                        phone = projectViewModel.EntityContact.phone,
-                        mobile = projectViewModel.EntityContact.mobile,
-                        email = projectViewModel.EntityContact.email,
-                        city = projectViewModel.EntityContact.city,
-                        country = projectViewModel.EntityContact.country,
-                        createdby = projectViewModel.createdby,
-                        created_date = _dateTime.ToString(),
-                        is_primary = projectViewModel.EntityContact.is_primary,
-                        is_deleted = false
-                    };
-                    _unitOfWork.EntityContactRepository.UpdateByEntityID(entityContact);
+                        var entityContact = new EntityContact()
+                        {
+                            id = Guid.NewGuid().ToString(),
+                            entity_id = modal.id,
+                            name = projectViewModel.EntityContact[i].name,
+                            position = projectViewModel.EntityContact[i].position,
+                            phone = projectViewModel.EntityContact[i].phone,
+                            mobile = projectViewModel.EntityContact[i].mobile,
+                            email = projectViewModel.EntityContact[i].email,
+                            city = projectViewModel.EntityContact[i].city,
+                            country = projectViewModel.EntityContact[i].country,
+                            createdby = projectViewModel.createdby,
+                            created_date = _dateTime.ToString(),
+                            is_deleted = false,
+                            is_primary = projectViewModel.EntityContact[i].is_primary
+                        };
+                        _unitOfWork.EntityContactRepository.Add(entityContact);
+                    }
                 }
 
                 if (projectViewModel.cst_id != null)
@@ -586,14 +628,24 @@ namespace TimeAPI.API.Controllroers
                 tableCostMilestoneTask.Columns.Add("milestone_id", typeof(string));
                 tableCostMilestoneTask.Columns.Add("project_id", typeof(string));
                 tableCostMilestoneTask.Columns.Add("task_name", typeof(string));
-                tableCostMilestoneTask.Columns.Add("qty", typeof(int));
+                tableCostMilestoneTask.Columns.Add("qty", typeof(double));
                 tableCostMilestoneTask.Columns.Add("unit_id", typeof(string));
+                tableCostMilestoneTask.Columns.Add("unit_type", typeof(string));
                 tableCostMilestoneTask.Columns.Add("total_unit", typeof(string));
                 tableCostMilestoneTask.Columns.Add("default_unit_hours", typeof(string));
 
                 #endregion RegionStatic
 
                 _unitOfWork.ProjectUnitRepository.RemoveByProjectID(modal.id);
+
+                if (projectViewModel.ProjectUnit != null)
+                    if (cost_up == 0 && projectViewModel.ProjectUnit[0].unit_qty_all != null)
+                    {
+                        cost_up = Convert.ToInt32(projectViewModel.ProjectUnit[0].unit_qty_all);
+                        cost_up_study = Convert.ToInt32(projectViewModel.ProjectUnit[0].unit_qty_all);
+                    }
+
+
                 if (projectViewModel.ProjectUnit != null)
                     foreach (var item in projectViewModel.ProjectUnit)
                     {
@@ -615,7 +667,6 @@ namespace TimeAPI.API.Controllroers
 
                         //tags
                         var _projectTags = _unitOfWork.ProjectTagsRepository.GetProjectTagsByUnitID(projectUnit.id).ToList();
-                        //.Select(x => x.design_type_id).ToList();
 
                         if ((_ProjectDesignType.Count > 0))
                             _unitOfWork.ProjectTagsRepository.RemoveByUnitID(projectUnit.id);
@@ -645,14 +696,17 @@ namespace TimeAPI.API.Controllroers
                             {
                                 var StaticCostProjectMilestoneTasks = _unitOfWork.CostProjectTaskRepository
                                                                        .GetAllStaticMilestoneTasksByMilestoneID
-                                                                       (itemStaticCostProjectMilestone["milestone_id"].ToString());
+                                                                       (itemStaticCostProjectMilestone["milestone_id"].ToString(), modal.org_id);
 
                                 foreach (var itemStaticCostProjectMilestoneTasks in StaticCostProjectMilestoneTasks)
                                 {
                                     string numberofunit = "";
-                                    numberofunit = (Convert.ToInt32(1) * Convert.ToInt32(itemStaticCostProjectMilestoneTasks.qty)).ToString();
-                                    if (Convert.ToInt32(item.unit_qty_all) > 0)
-                                        numberofunit = ((Convert.ToInt32(item.unit_qty_all) + 1) * Convert.ToInt32(numberofunit)).ToString();
+                                    numberofunit = (Convert.ToDouble(1) * Convert.ToDouble(itemStaticCostProjectMilestoneTasks.qty)).ToString();
+                                    if (Convert.ToDouble(cost_up_study) > 0)
+                                    {
+                                        var PercentValue = Math.Round(Convert.ToDouble(numberofunit) / Convert.ToDouble(cost_up_study) * 100, 2);
+                                        numberofunit = ((Convert.ToDouble(PercentValue) + Convert.ToDouble(numberofunit))).ToString();
+                                    }
 
                                     if (tableCostMilestoneTask.Rows.Count > 0)
                                     {
@@ -661,33 +715,36 @@ namespace TimeAPI.API.Controllroers
                                         {
                                             var qty = tableCostMilestoneTask.AsEnumerable()
                                                                             .Where(c => c.Field<string>("task_name") == itemStaticCostProjectMilestoneTasks.task_name)
-                                                                            .Sum(x => x.Field<int>("qty"));
+                                                                            .Sum(x => x.Field<double>("qty"));
 
                                             if (numberofunit.Length > 0)
                                                 tableCostMilestoneTask.AsEnumerable()
                                                                                 .Where(c => c.Field<string>("task_name") == itemStaticCostProjectMilestoneTasks.task_name)
                                                                                 .ToList()
-                                                                                .ForEach(D => D.SetField("qty", qty + Convert.ToInt32(numberofunit)));
+                                                                                .ForEach(D => D.SetField("qty", qty + Convert.ToDouble(numberofunit)));
                                         }
                                         else
                                         {
                                             tableCostMilestoneTask.Rows.Add(itemStaticCostProjectMilestone["id"],
                                                modal.id, itemStaticCostProjectMilestoneTasks.task_name,
-                                               numberofunit, item.unit_id, projectViewModel.total_unit, itemStaticCostProjectMilestoneTasks.qty);
+                                               numberofunit, item.unit_id, itemStaticCostProjectMilestoneTasks.unit,
+                                               projectViewModel.total_unit, itemStaticCostProjectMilestoneTasks.qty);
                                         }
                                     }
                                     else
                                     {
                                         tableCostMilestoneTask.Rows.Add(itemStaticCostProjectMilestone["id"],
                                            modal.id, itemStaticCostProjectMilestoneTasks.task_name,
-                                           numberofunit, item.unit_id, projectViewModel.total_unit, itemStaticCostProjectMilestoneTasks.qty);
+                                           numberofunit, item.unit_id, itemStaticCostProjectMilestoneTasks.unit,
+                                           projectViewModel.total_unit, itemStaticCostProjectMilestoneTasks.qty);
                                     }
                                 }
+
                             }
+                            cost_up_study = 0;
 
                             #endregion Study
                         }
-
                         if (projectUnit.is_extra == true)
                         {
                             #region Design
@@ -697,7 +754,7 @@ namespace TimeAPI.API.Controllroers
                                 //get all static milestone tasks and save it with projectid in cost_milestone_tasks
                                 var StaticCostProjectMilestoneTasks = _unitOfWork.CostProjectTaskRepository
                                                                        .GetAllStaticMilestoneTasksByMilestoneID
-                                                                       (itemStaticCostProjectMilestone["milestone_id"].ToString());
+                                                                       (itemStaticCostProjectMilestone["milestone_id"].ToString(), modal.org_id);
 
                                 foreach (var itemStaticCostProjectMilestoneTasks in StaticCostProjectMilestoneTasks)
                                 {
@@ -705,9 +762,12 @@ namespace TimeAPI.API.Controllroers
                                     if (itemStaticCostProjectMilestoneTasks.task_name == item.unit_name)
                                     {
                                         string numberofunit = "";
-                                        numberofunit = (Convert.ToInt32(item.total_unit) * Convert.ToInt32(itemStaticCostProjectMilestoneTasks.qty)).ToString();
-                                        if (Convert.ToInt32(item.unit_qty_all) > 0)
-                                            numberofunit = ((Convert.ToInt32(item.unit_qty_all) + 1) * Convert.ToInt32(numberofunit)).ToString();
+                                        numberofunit = (Convert.ToDouble(item.total_unit) * Convert.ToDouble(itemStaticCostProjectMilestoneTasks.qty)).ToString();
+                                        if (Convert.ToDouble(cost_up) > 0)
+                                        {
+                                            var PercentValue = Math.Round(Convert.ToDouble(itemStaticCostProjectMilestoneTasks.qty) / Convert.ToDouble(cost_up) * 100, 2);
+                                            numberofunit = ((Convert.ToDouble(PercentValue) + Convert.ToDouble(numberofunit))).ToString();
+                                        }
 
                                         if (tableCostMilestoneTask.Rows.Count > 0)
                                         {
@@ -716,26 +776,28 @@ namespace TimeAPI.API.Controllroers
                                             {
                                                 var qty = tableCostMilestoneTask.AsEnumerable()
                                                                                 .Where(c => c.Field<string>("task_name") == itemStaticCostProjectMilestoneTasks.task_name)
-                                                                                .Sum(x => x.Field<int>("qty"));
+                                                                                .Sum(x => x.Field<double>("qty"));
 
                                                 if (numberofunit.Length > 0)
                                                     tableCostMilestoneTask.AsEnumerable()
                                                                                     .Where(c => c.Field<string>("task_name") == itemStaticCostProjectMilestoneTasks.task_name)
                                                                                     .ToList()
-                                                                                    .ForEach(D => D.SetField("qty", qty + Convert.ToInt32(numberofunit)));
+                                                                                    .ForEach(D => D.SetField("qty", qty + Convert.ToDouble(numberofunit)));
                                             }
                                             else
                                             {
                                                 tableCostMilestoneTask.Rows.Add(itemStaticCostProjectMilestone["id"],
                                                    modal.id, itemStaticCostProjectMilestoneTasks.task_name,
-                                                   numberofunit, item.unit_id, item.total_unit, itemStaticCostProjectMilestoneTasks.qty);
+                                                   numberofunit, item.unit_id, itemStaticCostProjectMilestoneTasks.unit,
+                                                   item.total_unit, itemStaticCostProjectMilestoneTasks.qty);
                                             }
                                         }
                                         else
                                         {
                                             tableCostMilestoneTask.Rows.Add(itemStaticCostProjectMilestone["id"],
                                                modal.id, itemStaticCostProjectMilestoneTasks.task_name,
-                                               numberofunit, item.unit_id, item.total_unit, itemStaticCostProjectMilestoneTasks.qty);
+                                               numberofunit, item.unit_id, itemStaticCostProjectMilestoneTasks.unit,
+                                               item.total_unit, itemStaticCostProjectMilestoneTasks.qty);
                                         }
                                     }
                                 }
@@ -750,7 +812,7 @@ namespace TimeAPI.API.Controllroers
                                 //get all static milestone tasks and save it with projectid in cost_milestone_tasks
                                 var StaticCostProjectMilestoneTasks = _unitOfWork.CostProjectTaskRepository
                                                                        .GetAllStaticMilestoneTasksByMilestoneID
-                                                                       (itemStaticCostProjectMilestone["milestone_id"].ToString());
+                                                                       (itemStaticCostProjectMilestone["milestone_id"].ToString(), modal.org_id);
 
                                 foreach (var itemStaticCostProjectMilestoneTasks in StaticCostProjectMilestoneTasks)
                                 {
@@ -761,15 +823,23 @@ namespace TimeAPI.API.Controllroers
 
                                         if (itemStaticCostProjectMilestoneTasks.task_name == "BOQ")
                                         {
-                                            numberofunit = (Convert.ToInt32(item.total_unit) * Convert.ToInt32(itemStaticCostProjectMilestoneTasks.qty)).ToString();
-                                            if (Convert.ToInt32(item.unit_qty_all) > 0)
-                                                numberofunit = ((Convert.ToInt32(item.unit_qty_all) + 1) * Convert.ToInt32(numberofunit)).ToString();
+                                            numberofunit = (Convert.ToDouble(item.total_unit) * Convert.ToDouble(itemStaticCostProjectMilestoneTasks.qty)).ToString();
+                                            if (Convert.ToDouble(cost_up) > 0)
+                                            {
+                                                var PercentValue = Math.Round(Convert.ToDouble(itemStaticCostProjectMilestoneTasks.qty) / Convert.ToDouble(cost_up) * 100, 2);
+                                                numberofunit = ((Convert.ToDouble(PercentValue) + Convert.ToDouble(numberofunit))).ToString();
+                                            }
                                         }
                                         else
                                         {
-                                            numberofunit = (Convert.ToInt32(1) * Convert.ToInt32(itemStaticCostProjectMilestoneTasks.qty)).ToString();
-                                            if (Convert.ToInt32(item.unit_qty_all) > 0)
-                                                numberofunit = ((Convert.ToInt32(item.unit_qty_all) + 1) * Convert.ToInt32(numberofunit)).ToString();
+                                            numberofunit = (Convert.ToDouble(1) * Convert.ToDouble(itemStaticCostProjectMilestoneTasks.qty)).ToString();
+                                            //if (Convert.ToDouble(item.unit_qty_all) > 0)
+                                            //    numberofunit = ((Convert.ToDouble(item.unit_qty_all) + 1) * Convert.ToDouble(numberofunit)).ToString();
+                                            if (Convert.ToDouble(cost_up) > 0)
+                                            {
+                                                var PercentValue = Math.Round(Convert.ToDouble(itemStaticCostProjectMilestoneTasks.qty) / Convert.ToDouble(cost_up) * 100, 2);
+                                                numberofunit = ((Convert.ToDouble(PercentValue) + Convert.ToDouble(numberofunit))).ToString();
+                                            }
                                         }
                                         if (tableCostMilestoneTask.Rows.Count > 0)
                                         {
@@ -778,26 +848,28 @@ namespace TimeAPI.API.Controllroers
                                             {
                                                 var qty = tableCostMilestoneTask.AsEnumerable()
                                                                                 .Where(c => c.Field<string>("task_name") == itemStaticCostProjectMilestoneTasks.task_name)
-                                                                                .Sum(x => x.Field<int>("qty"));
+                                                                                .Sum(x => x.Field<double>("qty"));
 
                                                 if (numberofunit.Length > 0)
                                                     tableCostMilestoneTask.AsEnumerable()
                                                                                     .Where(c => c.Field<string>("task_name") == itemStaticCostProjectMilestoneTasks.task_name)
                                                                                     .ToList()
-                                                                                    .ForEach(D => D.SetField("qty", qty + Convert.ToInt32(numberofunit)));
+                                                                                    .ForEach(D => D.SetField("qty", qty + Convert.ToDouble(numberofunit)));
                                             }
                                             else
                                             {
                                                 tableCostMilestoneTask.Rows.Add(itemStaticCostProjectMilestone["id"],
                                                    modal.id, itemStaticCostProjectMilestoneTasks.task_name,
-                                                   numberofunit, item.unit_id, item.total_unit, itemStaticCostProjectMilestoneTasks.qty);
+                                                   numberofunit, item.unit_id, itemStaticCostProjectMilestoneTasks.unit,
+                                                   item.total_unit, itemStaticCostProjectMilestoneTasks.qty);
                                             }
                                         }
                                         else
                                         {
                                             tableCostMilestoneTask.Rows.Add(itemStaticCostProjectMilestone["id"],
                                                modal.id, itemStaticCostProjectMilestoneTasks.task_name,
-                                               numberofunit, item.unit_id, item.total_unit, itemStaticCostProjectMilestoneTasks.qty);
+                                               numberofunit, item.unit_id, itemStaticCostProjectMilestoneTasks.unit,
+                                               item.total_unit, itemStaticCostProjectMilestoneTasks.qty);
                                         }
                                     }
                                 }
@@ -814,16 +886,30 @@ namespace TimeAPI.API.Controllroers
                                     //get all static milestone tasks and save it with projectid in cost_milestone_tasks
                                     var StaticCostProjectMilestoneTasks = _unitOfWork.CostProjectTaskRepository
                                                                            .GetAllStaticMilestoneTasksByMilestoneID
-                                                                           (itemStaticCostProjectMilestone["milestone_id"].ToString());
+                                                                           (itemStaticCostProjectMilestone["milestone_id"].ToString(), modal.org_id);
 
                                     foreach (var itemStaticCostProjectMilestoneTasks in StaticCostProjectMilestoneTasks)
                                     {
                                         //convert the no_of_unit into interger.
                                         string numberofunit = "";
-                                        numberofunit = (Convert.ToInt32(item.total_unit) * Convert.ToInt32(itemStaticCostProjectMilestoneTasks.qty)).ToString();
-                                        numberofunit = (Convert.ToInt32(numberofunit) * Convert.ToInt32(modal.no_of_floors)).ToString();
-                                        if (Convert.ToInt32(item.unit_qty_all) > 0)
-                                            numberofunit = ((Convert.ToInt32(item.unit_qty_all) + 1) * Convert.ToInt32(numberofunit)).ToString();
+                                        if (itemStaticCostProjectMilestoneTasks.task_name == "Legend" || itemStaticCostProjectMilestoneTasks.task_name == "Section")
+                                        {
+                                            numberofunit = (Convert.ToDouble(item.total_unit) * Convert.ToDouble(itemStaticCostProjectMilestoneTasks.qty)).ToString();
+                                            if (Convert.ToDouble(cost_up) > 0)
+                                            {
+                                                var PercentValue = Math.Round(Convert.ToDouble(itemStaticCostProjectMilestoneTasks.qty) / Convert.ToDouble(cost_up) * 100, 2);
+                                                numberofunit = ((Convert.ToDouble(PercentValue) + Convert.ToDouble(numberofunit))).ToString();
+                                            }
+                                        }
+                                        else
+                                        {
+                                            numberofunit = (Convert.ToDouble(modal.no_of_floors) * Convert.ToDouble(itemStaticCostProjectMilestoneTasks.qty)).ToString();
+                                            if (Convert.ToDouble(cost_up) > 0)
+                                            {
+                                                var PercentValue = Math.Round(Convert.ToDouble(itemStaticCostProjectMilestoneTasks.qty) / Convert.ToDouble(cost_up) * 100, 2);
+                                                numberofunit = ((Convert.ToDouble(PercentValue) + Convert.ToDouble(numberofunit))).ToString();
+                                            }
+                                        }
 
                                         if (tableCostMilestoneTask.Rows.Count > 0)
                                         {
@@ -832,29 +918,33 @@ namespace TimeAPI.API.Controllroers
                                             {
                                                 var qty = tableCostMilestoneTask.AsEnumerable()
                                                                                 .Where(c => c.Field<string>("task_name") == itemStaticCostProjectMilestoneTasks.task_name)
-                                                                                .Sum(x => x.Field<int>("qty"));
+                                                                                .Sum(x => x.Field<double>("qty"));
 
                                                 if (numberofunit.Length > 0)
                                                     tableCostMilestoneTask.AsEnumerable()
                                                                                     .Where(c => c.Field<string>("task_name") == itemStaticCostProjectMilestoneTasks.task_name)
                                                                                     .ToList()
-                                                                                    .ForEach(D => D.SetField("qty", qty + Convert.ToInt32(numberofunit)));
+                                                                                    .ForEach(D => D.SetField("qty", qty + Convert.ToDouble(numberofunit)));
                                             }
                                             else
                                             {
                                                 tableCostMilestoneTask.Rows.Add(itemStaticCostProjectMilestone["id"],
                                                    modal.id, itemStaticCostProjectMilestoneTasks.task_name,
-                                                   numberofunit, item.unit_id, item.total_unit, itemStaticCostProjectMilestoneTasks.qty);
+                                                   numberofunit, item.unit_id, itemStaticCostProjectMilestoneTasks.unit,
+                                                   item.total_unit, itemStaticCostProjectMilestoneTasks.qty);
                                             }
                                         }
                                         else
                                         {
                                             tableCostMilestoneTask.Rows.Add(itemStaticCostProjectMilestone["id"],
                                                modal.id, itemStaticCostProjectMilestoneTasks.task_name,
-                                               numberofunit, item.unit_id, item.total_unit, itemStaticCostProjectMilestoneTasks.qty);
+                                               numberofunit, item.unit_id, itemStaticCostProjectMilestoneTasks.unit,
+                                               item.total_unit, itemStaticCostProjectMilestoneTasks.qty);
                                         }
                                     }
                                 }
+
+                                cost_up = 0;
                             }
 
                             #endregion ShopDrawing
@@ -896,6 +986,7 @@ namespace TimeAPI.API.Controllroers
                         task_name = itemtableCostMilestoneTask["task_name"].ToString(),
                         unit = itemtableCostMilestoneTask["unit_id"].ToString(),
                         qty = itemtableCostMilestoneTask["qty"].ToString(),
+                        unit_type = itemtableCostMilestoneTask["unit_type"].ToString(),
                         total_unit = itemtableCostMilestoneTask["total_unit"].ToString(),
                         default_unit_hours = itemtableCostMilestoneTask["default_unit_hours"].ToString(),
                         createdby = projectViewModel.createdby,
@@ -933,7 +1024,7 @@ namespace TimeAPI.API.Controllroers
                 //RETURN ALL DATA FOR PROJECT
                 CostProjectResponseViewModel modalCostProject = new CostProjectResponseViewModel();
                 List<string> typeOfDesign1 = new List<string>();
-                EntityContact entityContact1 = new EntityContact();
+                List<EntityContact> entityContact1 = new List<EntityContact>();
                 List<ProjectUnit> ProjectUnit = new List<ProjectUnit>();
                 List<ProjectUnit> ProjectUnitExtra = new List<ProjectUnit>();
                 List<CostProjectMilestone> CostProjectMilestone = new List<CostProjectMilestone>();
@@ -941,7 +1032,7 @@ namespace TimeAPI.API.Controllroers
                 //CustomerProject customer = new CustomerProject();
 
                 string _project_id = Utils.ID;
-                var CostProject = _unitOfWork.CostProjectRepository.Find(_project_id);
+                var CostProject = _unitOfWork.CostProjectRepository.FindByCostProjectID(_project_id);
 
                 var configCostProject = new AutoMapper.MapperConfiguration(m => m.CreateMap<CostProject, CostProjectResponseViewModel>());
                 var mapperCostProject = configCostProject.CreateMapper();
@@ -949,12 +1040,13 @@ namespace TimeAPI.API.Controllroers
 
                 typeOfDesign1 = _unitOfWork.ProjectDesignTypeRepository.GetProjectDesignTypeByProjectID(_project_id)
                                                                         .Select(x => x.design_type_id).ToList();
-                entityContact1 = _unitOfWork.EntityContactRepository.FindByEntityID(_project_id);
+                entityContact1 = _unitOfWork.EntityContactRepository.FindByEntityListID(_project_id).ToList();
                 ProjectUnit = _unitOfWork.ProjectUnitRepository.FindByProjectID(_project_id).ToList();
-                //ProjectUnitExtra = _unitOfWork.ProjectUnitRepository.FindByProjectID(_project_id).ToList();
                 var Customer = _unitOfWork.CustomerProjectRepository.FindByProjectID(_project_id);
 
-                modalCostProject.cst_id = Customer.cst_id;
+                if (Customer != null)
+                    modalCostProject.cst_id = Customer.cst_id;
+
 
                 for (int i = 0; i < ProjectUnit.Count; i++)
                 {
@@ -962,7 +1054,7 @@ namespace TimeAPI.API.Controllroers
                     List<ProjectTags> projectTags = new List<ProjectTags>();
 
                     projectDesignType = _unitOfWork.ProjectDesignTypeRepository.GetProjectDesignTypeByUnitID(ProjectUnit[i].id)
-                                                                                .Select(x => x.design_type_id).ToList();
+                                                                                        .Select(x => x.design_type_id).ToList();
                     projectTags = _unitOfWork.ProjectTagsRepository.GetProjectTagsByUnitID(ProjectUnit[i].id).ToList();
 
                     ProjectUnit[i].ProjectDesignType_ID = projectDesignType;
@@ -974,7 +1066,82 @@ namespace TimeAPI.API.Controllroers
                 for (int i = 0; i < CostProjectMilestone.Count; i++)
                 {
                     List<CostProjectTask> costProjectTasks = new List<CostProjectTask>();
-                    costProjectTasks = _unitOfWork.CostProjectTaskRepository.GetAllMilestoneTasksByMilestoneID(CostProjectMilestone[i].id).ToList();
+                    costProjectTasks = _unitOfWork.CostProjectTaskRepository.GetAllMilestoneTasksByMilestoneID(CostProjectMilestone[i].id, CostProjectMilestone[i].org_id).ToList();
+                    CostProjectMilestone[i].CostProjectTask = costProjectTasks;
+                }
+
+                modalCostProject.TypeOfDesign = (typeOfDesign1);
+                modalCostProject.EntityContact = entityContact1;
+                modalCostProject.ProjectUnit = (ProjectUnit.Where(x => !x.is_extra).ToList());
+                modalCostProject.ProjectUnitExtra = (ProjectUnit.Where(x => x.is_extra).ToList());
+                modalCostProject.CostProjectMilestone = (CostProjectMilestone);
+
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(modalCostProject, Formatting.Indented)).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+
+        [HttpPost]
+        [Route("RevisedQuotation")]
+        public async Task<object> RevisedQuotation([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils));
+                //RETURN ALL DATA FOR PROJECT
+                CostProjectResponseViewModel modalCostProject = new CostProjectResponseViewModel();
+                List<string> typeOfDesign1 = new List<string>();
+                List<EntityContact> entityContact1 = new List<EntityContact>();
+                List<ProjectUnit> ProjectUnit = new List<ProjectUnit>();
+                List<ProjectUnit> ProjectUnitExtra = new List<ProjectUnit>();
+                List<CostProjectMilestone> CostProjectMilestone = new List<CostProjectMilestone>();
+
+                //CustomerProject customer = new CustomerProject();
+
+                string _project_id = Utils.ID;
+                var CostProject = _unitOfWork.CostProjectRepository.FindByCostProjectID(_project_id);
+
+                var configCostProject = new AutoMapper.MapperConfiguration(m => m.CreateMap<CostProject, CostProjectResponseViewModel>());
+                var mapperCostProject = configCostProject.CreateMapper();
+                modalCostProject = mapperCostProject.Map<CostProjectResponseViewModel>(CostProject);
+
+                typeOfDesign1 = _unitOfWork.ProjectDesignTypeRepository.GetProjectDesignTypeByProjectID(_project_id)
+                                                                       .Select(x => x.design_type_id).ToList();
+                entityContact1 = _unitOfWork.EntityContactRepository.FindByEntityListID(_project_id).ToList();
+                ProjectUnit = _unitOfWork.ProjectUnitRepository.FindByProjectID(_project_id).ToList();
+                var Customer = _unitOfWork.CustomerProjectRepository.FindByProjectID(_project_id);
+
+                if (Customer != null)
+                    modalCostProject.cst_id = Customer.cst_id;
+
+
+                for (int i = 0; i < ProjectUnit.Count; i++)
+                {
+                    List<string> projectDesignType = new List<string>();
+                    List<ProjectTags> projectTags = new List<ProjectTags>();
+
+                    projectDesignType = _unitOfWork.ProjectDesignTypeRepository.GetProjectDesignTypeByUnitID(ProjectUnit[i].id)
+                                                                                        .Select(x => x.design_type_id).ToList();
+                    projectTags = _unitOfWork.ProjectTagsRepository.GetProjectTagsByUnitID(ProjectUnit[i].id).ToList();
+
+                    ProjectUnit[i].ProjectDesignType_ID = projectDesignType;
+                    ProjectUnit[i].ProjectTags = projectTags;
+                }
+
+                CostProjectMilestone = _unitOfWork.CostProjectMilestoneRepository.GetCostProjectMilestoneByProjectID(_project_id).ToList();
+
+                for (int i = 0; i < CostProjectMilestone.Count; i++)
+                {
+                    List<CostProjectTask> costProjectTasks = new List<CostProjectTask>();
+                    costProjectTasks = _unitOfWork.CostProjectTaskRepository.GetAllMilestoneTasksByMilestoneID(CostProjectMilestone[i].id, CostProjectMilestone[i].org_id).ToList();
                     CostProjectMilestone[i].CostProjectTask = costProjectTasks;
                 }
 
@@ -1010,7 +1177,7 @@ namespace TimeAPI.API.Controllroers
                 for (int i = 0; i < CostProjectMilestone.Count; i++)
                 {
                     List<CostProjectTask> costProjectTasks = new List<CostProjectTask>();
-                    costProjectTasks = _unitOfWork.CostProjectTaskRepository.GetAllMilestoneTasksByMilestoneID(CostProjectMilestone[i].id).ToList();
+                    costProjectTasks = _unitOfWork.CostProjectTaskRepository.GetAllMilestoneTasksByMilestoneID(CostProjectMilestone[i].id, CostProjectMilestone[i].org_id).ToList();
                     CostProjectMilestone[i].CostProjectTask = costProjectTasks;
                 }
 
@@ -1037,7 +1204,7 @@ namespace TimeAPI.API.Controllroers
                 _unitOfWork.CostProjectTaskRepository.UpdateIsSelectedByTaskID(Utils);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Task qty updated successfully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Updated successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -1060,7 +1227,7 @@ namespace TimeAPI.API.Controllroers
                 _unitOfWork.CostProjectTaskRepository.UpdateCostProjectTaskQtyTaskID(Utils);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Task qty updated successfully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Task Budgeted Hours Updated Successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -1083,7 +1250,7 @@ namespace TimeAPI.API.Controllroers
                 _unitOfWork.CostProjectTaskRepository.UpdateCostProjectNotesQtyTaskID(Utils);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Task notes added successfully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Task Notes Updated Successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -1106,13 +1273,37 @@ namespace TimeAPI.API.Controllroers
                 _unitOfWork.CostProjectTaskRepository.UpdateCostProjectDiscountAndTotalCostTaskID(Utils);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Task notes added successfully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Task Discount & Total Cost Updated Successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
+
+        [HttpPost]
+        [Route("UpdateCostProjectBudgetedHoursTaskID")]
+        public async Task<object> UpdateCostProjectBudgetedHoursTaskID([FromBody] CostProjectTask Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils));
+
+                _unitOfWork.CostProjectTaskRepository.UpdateCostProjectBudgetedHoursTaskID(Utils);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Task Budgeted Hours & Total Cost Updated Successfully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
 
         [HttpPost]
         [Route("FetchAllCostProjectByOrgID")]
@@ -1154,7 +1345,7 @@ namespace TimeAPI.API.Controllroers
 
                 var results = _unitOfWork.CostProjectRepository.Find(Utils.ID);
                 //var resultLocation = _unitOfWork.EntityLocationRepository.FindByEnitiyID(results.id);
-                var resultContact = _unitOfWork.EntityContactRepository.FindByEntityID(results.id);
+                var resultContact = _unitOfWork.EntityContactRepository.FindByEntityListID(results.id);
                 var resultCustomer = _unitOfWork.CustomerRepository.FindCustomerByProjectID(results.id);
 
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<CostProjectDetailViewModel, CostProject>());
@@ -1162,7 +1353,7 @@ namespace TimeAPI.API.Controllroers
                 var modal = mapper.Map<CostProject>(results);
 
                 //modal.EntityLocation = resultLocation;
-                modal.EntityContact = resultContact;
+                modal.EntityContact = resultContact.ToList();
                 modal.EntityCustomer = resultCustomer;
 
                 return await Task.FromResult<object>(modal).ConfigureAwait(false);
@@ -1287,7 +1478,7 @@ namespace TimeAPI.API.Controllroers
                                               .Select(s => s.id)
                                               .FirstOrDefault();
 
-                        var CostProjectTask = _unitOfWork.CostProjectTaskRepository.GetAllMilestoneTasksByMilestoneID(modalMilestone.id);
+                        var CostProjectTask = _unitOfWork.CostProjectTaskRepository.GetAllMilestoneTasksByMilestoneID(modalMilestone.id, item.org_id);
                         foreach (var itemTask in CostProjectTask)
                         {
                             string _status_id = _unitOfWork.StatusRepository.GetStatusByOrgID("default")
@@ -1422,6 +1613,37 @@ namespace TimeAPI.API.Controllroers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
+
+        [HttpPatch]
+        [Route("UpdateIsQuotationByCostProjectID")]
+        public async Task<object> UpdateIsQuotationByCostProjectID([FromBody] UpdateCostProjectIsQuotationViewModel projectViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (projectViewModel == null)
+                    throw new ArgumentNullException(nameof(projectViewModel));
+
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<UpdateCostProjectIsQuotationViewModel, CostProject>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<CostProject>(projectViewModel);
+                modal.modified_date = _dateTime.ToString();
+
+                _unitOfWork.CostProjectRepository.UpdateIsQuotationByCostProjectID(modal);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Profit Margin & Discount Updated Successfully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+
+
 
         #endregion CostProjects
 
@@ -1916,7 +2138,7 @@ namespace TimeAPI.API.Controllroers
 
         [HttpPost]
         [Route("GetAllStaticMilestoneTasksByMilestoneID")]
-        public async Task<object> GetAllStaticMilestoneTasksByMilestoneID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        public async Task<object> GetAllStaticMilestoneTasksByMilestoneID([FromBody] UtilsMilestoneIDAndOrgID Utils, CancellationToken cancellationToken)
         {
             try
             {
@@ -1930,7 +2152,7 @@ namespace TimeAPI.API.Controllroers
 
                 var StaticCostProjectMilestoneTasks = _unitOfWork.CostProjectTaskRepository
                                                        .GetAllStaticMilestoneTasksByMilestoneID
-                                                       (Utils.ID);
+                                                       (Utils.ID, Utils.OrgID);
 
                 return await Task.FromResult<object>(StaticCostProjectMilestoneTasks).ConfigureAwait(false);
             }

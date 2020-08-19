@@ -59,8 +59,7 @@ namespace TimeAPI.API.Controllroers
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<ProjectViewModel, Project>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Project>(projectViewModel);
-
-                modal.id = Guid.NewGuid().ToString();
+                string project_id = modal.id = Guid.NewGuid().ToString();
 
                 modal.project_status_id = _unitOfWork.ProjectStatusRepository.GetProjectStatusByOrgID("default")
                                             .Where(s => s.project_status_name.Equals("Open"))
@@ -131,7 +130,7 @@ namespace TimeAPI.API.Controllroers
                 _unitOfWork.ProjectRepository.Add(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Project saved successfully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = project_id, Desc = "Project saved successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

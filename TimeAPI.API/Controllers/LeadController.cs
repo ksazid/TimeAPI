@@ -8,8 +8,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using TimeAPI.API.Models;
 using TimeAPI.API.Models.LeadCompanyViewModels;
-using TimeAPI.API.Models.LeadProjectViewModels;
-using TimeAPI.API.Models.LeadRatingViewModels;
+using TimeAPI.API.Models.LeadDealTypeViewModels;
+using TimeAPI.API.Models.LeadDealViewModels;
 using TimeAPI.API.Models.LeadSourceViewModels;
 using TimeAPI.API.Models.LeadStatusViewModels;
 using TimeAPI.API.Models.LeadViewModels;
@@ -75,15 +75,18 @@ namespace TimeAPI.API.Controllroers
                         _unitOfWork.EntityContactRepository.Add(modal1);
                     }
 
-                var config2 = new AutoMapper.MapperConfiguration(m => m.CreateMap<LeadProject, LeadProject>());
-                var mapper2 = config2.CreateMapper();
-                var modal2 = mapper2.Map<LeadProject>(LeadViewModel.LeadProject);
-                modal2.id = Guid.NewGuid().ToString();
-                modal2.lead_id = modal.id;
+                if (LeadViewModel.LeadDeal != null)
+                {
+                    var config2 = new AutoMapper.MapperConfiguration(m => m.CreateMap<LeadDeal, LeadDeal>());
+                    var mapper2 = config2.CreateMapper();
+                    var modal2 = mapper2.Map<LeadDeal>(LeadViewModel.LeadDeal);
+                    modal2.id = Guid.NewGuid().ToString();
+                    modal2.lead_id = modal.id;
 
-                _unitOfWork.LeadProjectRepository.Add(modal2);
+                    _unitOfWork.LeadDealRepository.Add(modal2);
+                }
+
                 _unitOfWork.LeadRepository.Add(modal);
-
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead saved successfully." }).ConfigureAwait(false);
@@ -125,14 +128,14 @@ namespace TimeAPI.API.Controllroers
                     }
                 }
 
-                var config2 = new AutoMapper.MapperConfiguration(m => m.CreateMap<LeadProject, LeadProject>());
+                var config2 = new AutoMapper.MapperConfiguration(m => m.CreateMap<LeadDeal, LeadDeal>());
                 var mapper2 = config2.CreateMapper();
-                var modal2 = mapper2.Map<LeadProject>(LeadViewModel.LeadProject);
+                var modal2 = mapper2.Map<LeadDeal>(LeadViewModel.LeadDeal);
                 modal2.modified_date = _dateTime.ToString();
                 modal2.lead_id = modal.id;
 
                 _unitOfWork.LeadRepository.Update(modal);
-                _unitOfWork.LeadProjectRepository.Update(modal2);
+                _unitOfWork.LeadDealRepository.Update(modal2);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead updated successfully." }).ConfigureAwait(false);
@@ -202,14 +205,14 @@ namespace TimeAPI.API.Controllroers
 
                 var result = _unitOfWork.LeadRepository.Find(Utils.ID);
                 ListEntityContact = _unitOfWork.EntityContactRepository.FindByEntityListID(result.id).ToList();
-                var resultLeadProject = _unitOfWork.LeadProjectRepository.LeadProjectByLeadID(result.id);
+                var resultLeadDeal = _unitOfWork.LeadDealRepository.LeadDealByLeadID(result.id);
 
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<LeadViewModel, Lead>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Lead>(result);
 
                 modal.EntityContact = ListEntityContact;
-                modal.LeadProject = resultLeadProject;
+                modal.LeadDeal = resultLeadDeal;
 
                 return await Task.FromResult<object>(modal).ConfigureAwait(false);
             }
@@ -237,177 +240,83 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
+        [HttpPatch]
+        [Route("UpdateLeadStatusByLeadID")]
+        public async Task<object> UpdateLeadStatusByLeadID([FromBody] LeadStatusUpdateViewModel LeadViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (LeadViewModel == null)
+                    throw new ArgumentNullException(nameof(LeadViewModel));
+
+                if (LeadViewModel != null)
+                {
+                    Lead modal = new Lead()
+                    {
+                        id = LeadViewModel.id,
+                        lead_status_id = LeadViewModel.lead_status_id,
+                        modifiedby = LeadViewModel.modifiedby,
+                        modified_date = _dateTime.ToString()
+                    };
+
+                    if (LeadViewModel.LeadDeal != null)
+                    {
+                        LeadDeal modal2 = new LeadDeal()
+                        {
+                            lead_id = LeadViewModel.LeadDeal.lead_id,
+                            est_amount = LeadViewModel.LeadDeal.est_amount,
+                            is_manual = LeadViewModel.LeadDeal.is_manual,
+                            basic_cost = LeadViewModel.LeadDeal.basic_cost,
+                            remarks = LeadViewModel.LeadDeal.remarks,
+                            modifiedby = LeadViewModel.modifiedby,
+                            modified_date = _dateTime.ToString()
+                        };
+
+                        _unitOfWork.LeadDealRepository.UpdateEstDealValueByLeadID(modal2);
+                    };
+
+                    _unitOfWork.LeadRepository.UpdateLeadStatusByLeadID(modal);
+
+                }
+
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Status Updated Successfully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
         #endregion Lead
 
-        #region LeadCompany
+        #region LeadDeal
 
         [HttpPost]
-        [Route("AddLeadCompany")]
-        public async Task<object> AddLeadCompany([FromBody] LeadCompanyViewModel LeadCompanyViewModel, CancellationToken cancellationToken)
+        [Route("AddLeadDeal")]
+        public async Task<object> AddLeadDeal([FromBody] LeadDealViewModel LeadDealViewModel, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (LeadCompanyViewModel == null)
-                    throw new ArgumentNullException(nameof(LeadCompanyViewModel));
+                if (LeadDealViewModel == null)
+                    throw new ArgumentNullException(nameof(LeadDealViewModel));
 
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<LeadCompanyViewModel, LeadCompany>());
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<LeadDealViewModel, LeadDeal>());
                 var mapper = config.CreateMapper();
-                var modal = mapper.Map<LeadCompany>(LeadCompanyViewModel);
+                var modal = mapper.Map<LeadDeal>(LeadDealViewModel);
 
                 modal.id = Guid.NewGuid().ToString();
                 modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
-                _unitOfWork.LeadCompanyRepository.Add(modal);
-
-                _unitOfWork.Commit();
-
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Company saved successfully." }).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-            }
-        }
-
-        [HttpPatch]
-        [Route("UpdateLeadCompany")]
-        public async Task<object> UpdateLeadCompany([FromBody] LeadCompanyViewModel LeadCompanyViewModel, CancellationToken cancellationToken)
-        {
-            try
-            {
-                if (cancellationToken != null)
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                if (LeadCompanyViewModel == null)
-                    throw new ArgumentNullException(nameof(LeadCompanyViewModel));
-
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<LeadCompanyViewModel, LeadCompany>());
-                var mapper = config.CreateMapper();
-                var modal = mapper.Map<LeadCompany>(LeadCompanyViewModel);
-                modal.modified_date = _dateTime.ToString();
-
-                _unitOfWork.LeadCompanyRepository.Update(modal);
-                _unitOfWork.Commit();
-
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Company updated successfully." }).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-            }
-        }
-
-        [HttpPost]
-        [Route("RemoveLeadCompany")]
-        public async Task<object> RemoveLeadCompany([FromBody] Utils Utils, CancellationToken cancellationToken)
-        {
-            try
-            {
-                if (cancellationToken != null)
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                if (Utils == null)
-                    throw new ArgumentNullException(nameof(Utils.ID));
-
-                _unitOfWork.LeadCompanyRepository.Remove(Utils.ID);
-                _unitOfWork.Commit();
-
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Company ID removed successfully." }).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-            }
-        }
-
-        [HttpGet]
-        [Route("GetAllLeadCompany")]
-        public async Task<object> GetAllLeadCompany(CancellationToken cancellationToken)
-        {
-            try
-            {
-                if (cancellationToken != null)
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                var result = _unitOfWork.LeadCompanyRepository.All();
-                return await Task.FromResult<object>(result).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-            }
-        }
-
-        [HttpPost]
-        [Route("FindByLeadCompanyByID")]
-        public async Task<object> FindByLeadCompanyByID([FromBody] Utils Utils, CancellationToken cancellationToken)
-        {
-            try
-            {
-                LeadCompanyViewModel customerViewModel = new LeadCompanyViewModel();
-
-                if (cancellationToken != null)
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                if (Utils == null)
-                    throw new ArgumentNullException(nameof(Utils.ID));
-
-                var result = _unitOfWork.LeadCompanyRepository.Find(Utils.ID);
-                return await Task.FromResult<object>(result).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-            }
-        }
-
-        [HttpPost]
-        [Route("GetAllLeadCompanyByOrgID")]
-        public async Task<object> GetAllLeadCompanyByOrgID([FromBody] UtilsOrgID Utils, CancellationToken cancellationToken)
-        {
-            try
-            {
-                if (cancellationToken != null)
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                var result = _unitOfWork.LeadCompanyRepository.LeadCompanyByOrgID(Utils.OrgID);
-                return await Task.FromResult<object>(result).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
-            }
-        }
-
-        #endregion LeadCompany
-
-        #region LeadProject
-
-        [HttpPost]
-        [Route("AddLeadProject")]
-        public async Task<object> AddLeadProject([FromBody] LeadProjectViewModel LeadProjectViewModel, CancellationToken cancellationToken)
-        {
-            try
-            {
-                if (cancellationToken != null)
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                if (LeadProjectViewModel == null)
-                    throw new ArgumentNullException(nameof(LeadProjectViewModel));
-
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<LeadProjectViewModel, LeadProject>());
-                var mapper = config.CreateMapper();
-                var modal = mapper.Map<LeadProject>(LeadProjectViewModel);
-
-                modal.id = Guid.NewGuid().ToString();
-                modal.created_date = _dateTime.ToString();
-                modal.is_deleted = false;
-
-                _unitOfWork.LeadProjectRepository.Add(modal);
+                _unitOfWork.LeadDealRepository.Add(modal);
 
                 _unitOfWork.Commit();
 
@@ -420,23 +329,23 @@ namespace TimeAPI.API.Controllroers
         }
 
         [HttpPatch]
-        [Route("UpdateLeadProject")]
-        public async Task<object> UpdateLeadProject([FromBody] LeadProjectViewModel LeadProjectViewModel, CancellationToken cancellationToken)
+        [Route("UpdateLeadDeal")]
+        public async Task<object> UpdateLeadDeal([FromBody] LeadDealViewModel LeadDealViewModel, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (LeadProjectViewModel == null)
-                    throw new ArgumentNullException(nameof(LeadProjectViewModel));
+                if (LeadDealViewModel == null)
+                    throw new ArgumentNullException(nameof(LeadDealViewModel));
 
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<LeadProjectViewModel, LeadProject>());
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<LeadDealViewModel, LeadDeal>());
                 var mapper = config.CreateMapper();
-                var modal = mapper.Map<LeadProject>(LeadProjectViewModel);
+                var modal = mapper.Map<LeadDeal>(LeadDealViewModel);
                 modal.modified_date = _dateTime.ToString();
 
-                _unitOfWork.LeadProjectRepository.Update(modal);
+                _unitOfWork.LeadDealRepository.Update(modal);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Project updated successfully." }).ConfigureAwait(false);
@@ -448,8 +357,8 @@ namespace TimeAPI.API.Controllroers
         }
 
         [HttpPost]
-        [Route("RemoveLeadProject")]
-        public async Task<object> RemoveLeadProject([FromBody] Utils Utils, CancellationToken cancellationToken)
+        [Route("RemoveLeadDeal")]
+        public async Task<object> RemoveLeadDeal([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
             {
@@ -459,7 +368,7 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                _unitOfWork.LeadProjectRepository.Remove(Utils.ID);
+                _unitOfWork.LeadDealRepository.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Project ID removed successfully." }).ConfigureAwait(false);
@@ -471,15 +380,15 @@ namespace TimeAPI.API.Controllroers
         }
 
         [HttpGet]
-        [Route("GetAllLeadProject")]
-        public async Task<object> GetAllLeadProject(CancellationToken cancellationToken)
+        [Route("GetAllLeadDeal")]
+        public async Task<object> GetAllLeadDeal(CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.LeadProjectRepository.All();
+                var result = _unitOfWork.LeadDealRepository.All();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -490,12 +399,12 @@ namespace TimeAPI.API.Controllroers
         }
 
         [HttpPost]
-        [Route("FindByLeadProjectId")]
-        public async Task<object> FindByLeadProjectId([FromBody] Utils Utils, CancellationToken cancellationToken)
+        [Route("FindByLeadDealId")]
+        public async Task<object> FindByLeadDealId([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
             {
-                LeadProjectViewModel customerViewModel = new LeadProjectViewModel();
+                LeadDealViewModel customerViewModel = new LeadDealViewModel();
 
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
@@ -503,7 +412,7 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.LeadProjectRepository.Find(Utils.ID);
+                var result = _unitOfWork.LeadDealRepository.Find(Utils.ID);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -514,15 +423,15 @@ namespace TimeAPI.API.Controllroers
         }
 
         [HttpPost]
-        [Route("GetAllLeadProjectByOrgID")]
-        public async Task<object> GetAllLeadProjectByOrgID([FromBody] UtilsOrgID Utils, CancellationToken cancellationToken)
+        [Route("GetAllLeadDealByOrgID")]
+        public async Task<object> GetAllLeadDealByOrgID([FromBody] UtilsOrgID Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.LeadProjectRepository.LeadProjectByOrgID(Utils.OrgID);
+                var result = _unitOfWork.LeadDealRepository.LeadDealByOrgID(Utils.OrgID);
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -531,7 +440,7 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
-        #endregion LeadProject
+        #endregion LeadDeal
 
         #region LeadSource
 
@@ -825,33 +734,33 @@ namespace TimeAPI.API.Controllroers
 
         #endregion LeadStatus
 
-        #region LeadRating
+        #region LeadDealType
 
         [HttpPost]
-        [Route("AddLeadRating")]
-        public async Task<object> AddLeadRating([FromBody] LeadRatingViewModel LeadRatingViewModel, CancellationToken cancellationToken)
+        [Route("AddLeadDealType")]
+        public async Task<object> AddLeadDealType([FromBody] LeadDealTypeViewModel LeadDealTypeViewModel, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (LeadRatingViewModel == null)
-                    throw new ArgumentNullException(nameof(LeadRatingViewModel));
+                if (LeadDealTypeViewModel == null)
+                    throw new ArgumentNullException(nameof(LeadDealTypeViewModel));
 
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<LeadRatingViewModel, LeadRating>());
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<LeadDealTypeViewModel, LeadDealType>());
                 var mapper = config.CreateMapper();
-                var modal = mapper.Map<LeadRating>(LeadRatingViewModel);
+                var modal = mapper.Map<LeadDealType>(LeadDealTypeViewModel);
 
                 modal.id = Guid.NewGuid().ToString();
                 modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
-                _unitOfWork.LeadRatingRepository.Add(modal);
+                _unitOfWork.LeadDealTypeRepository.Add(modal);
 
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Rating saved successfully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Status saved successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -860,26 +769,26 @@ namespace TimeAPI.API.Controllroers
         }
 
         [HttpPatch]
-        [Route("UpdateLeadRating")]
-        public async Task<object> UpdateLeadRating([FromBody] LeadRatingViewModel LeadRatingViewModel, CancellationToken cancellationToken)
+        [Route("UpdateLeadDealType")]
+        public async Task<object> UpdateLeadDealType([FromBody] LeadDealTypeViewModel LeadDealTypeViewModel, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                if (LeadRatingViewModel == null)
-                    throw new ArgumentNullException(nameof(LeadRatingViewModel));
+                if (LeadDealTypeViewModel == null)
+                    throw new ArgumentNullException(nameof(LeadDealTypeViewModel));
 
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<LeadRatingViewModel, LeadRating>());
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<LeadDealTypeViewModel, LeadDealType>());
                 var mapper = config.CreateMapper();
-                var modal = mapper.Map<LeadRating>(LeadRatingViewModel);
+                var modal = mapper.Map<LeadDealType>(LeadDealTypeViewModel);
                 modal.modified_date = _dateTime.ToString();
 
-                _unitOfWork.LeadRatingRepository.Update(modal);
+                _unitOfWork.LeadDealTypeRepository.Update(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Rating updated successfully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Status updated successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -888,8 +797,8 @@ namespace TimeAPI.API.Controllroers
         }
 
         [HttpPost]
-        [Route("RemoveLeadRating")]
-        public async Task<object> RemoveLeadRating([FromBody] Utils Utils, CancellationToken cancellationToken)
+        [Route("RemoveLeadDealType")]
+        public async Task<object> RemoveLeadDealType([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
             {
@@ -899,10 +808,10 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                _unitOfWork.LeadRatingRepository.Remove(Utils.ID);
+                _unitOfWork.LeadDealTypeRepository.Remove(Utils.ID);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Rating ID removed successfully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Status ID removed successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -911,15 +820,15 @@ namespace TimeAPI.API.Controllroers
         }
 
         [HttpGet]
-        [Route("GetAllLeadRating")]
-        public async Task<object> GetAllLeadRating(CancellationToken cancellationToken)
+        [Route("GetAllLeadDealType")]
+        public async Task<object> GetAllLeadDealType(CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.LeadRatingRepository.All();
+                var result = _unitOfWork.LeadDealTypeRepository.All();
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -929,12 +838,12 @@ namespace TimeAPI.API.Controllroers
         }
 
         [HttpPost]
-        [Route("FindByLeadRatingByID")]
-        public async Task<object> FindByLeadRatingByID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        [Route("FindByLeadDealTypeByID")]
+        public async Task<object> FindByLeadDealTypeByID([FromBody] Utils Utils, CancellationToken cancellationToken)
         {
             try
             {
-                LeadRatingViewModel customerViewModel = new LeadRatingViewModel();
+                LeadDealTypeViewModel customerViewModel = new LeadDealTypeViewModel();
 
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
@@ -942,7 +851,7 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.LeadRatingRepository.Find(Utils.ID);
+                var result = _unitOfWork.LeadDealTypeRepository.Find(Utils.ID);
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -952,15 +861,15 @@ namespace TimeAPI.API.Controllroers
         }
 
         [HttpPost]
-        [Route("GetAllLeadRatingByOrgID")]
-        public async Task<object> GetAllLeadRatingByOrgID([FromBody] UtilsOrgID Utils, CancellationToken cancellationToken)
+        [Route("GetAllLeadDealTypeByOrgID")]
+        public async Task<object> GetAllLeadDealTypeByOrgID([FromBody] UtilsOrgID Utils, CancellationToken cancellationToken)
         {
             try
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.LeadRatingRepository.LeadRatingByOrgID(Utils.OrgID);
+                var result = _unitOfWork.LeadDealTypeRepository.GetLeadDealTypeByOrgID(Utils.OrgID);
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -969,6 +878,448 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
-        #endregion LeadRating
+        #endregion LeadDealType
+
+        #region  Rating_ContractNotInUse
+
+        //#region LeadRating
+
+        //[HttpPost]
+        //[Route("AddLeadRating")]
+        //public async Task<object> AddLeadRating([FromBody] LeadRatingViewModel LeadRatingViewModel, CancellationToken cancellationToken)
+        //{
+        //    try
+        //    {
+        //        if (cancellationToken != null)
+        //            cancellationToken.ThrowIfCancellationRequested();
+
+        //        if (LeadRatingViewModel == null)
+        //            throw new ArgumentNullException(nameof(LeadRatingViewModel));
+
+        //        var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<LeadRatingViewModel, LeadRating>());
+        //        var mapper = config.CreateMapper();
+        //        var modal = mapper.Map<LeadRating>(LeadRatingViewModel);
+
+        //        modal.id = Guid.NewGuid().ToString();
+        //        modal.created_date = _dateTime.ToString();
+        //        modal.is_deleted = false;
+
+        //        _unitOfWork.LeadRatingRepository.Add(modal);
+
+        //        _unitOfWork.Commit();
+
+        //        return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Rating saved successfully." }).ConfigureAwait(false);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+        //    }
+        //}
+
+        //[HttpPatch]
+        //[Route("UpdateLeadRating")]
+        //public async Task<object> UpdateLeadRating([FromBody] LeadRatingViewModel LeadRatingViewModel, CancellationToken cancellationToken)
+        //{
+        //    try
+        //    {
+        //        if (cancellationToken != null)
+        //            cancellationToken.ThrowIfCancellationRequested();
+
+        //        if (LeadRatingViewModel == null)
+        //            throw new ArgumentNullException(nameof(LeadRatingViewModel));
+
+        //        var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<LeadRatingViewModel, LeadRating>());
+        //        var mapper = config.CreateMapper();
+        //        var modal = mapper.Map<LeadRating>(LeadRatingViewModel);
+        //        modal.modified_date = _dateTime.ToString();
+
+        //        _unitOfWork.LeadRatingRepository.Update(modal);
+        //        _unitOfWork.Commit();
+
+        //        return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Rating updated successfully." }).ConfigureAwait(false);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+        //    }
+        //}
+
+        //[HttpPost]
+        //[Route("RemoveLeadRating")]
+        //public async Task<object> RemoveLeadRating([FromBody] Utils Utils, CancellationToken cancellationToken)
+        //{
+        //    try
+        //    {
+        //        if (cancellationToken != null)
+        //            cancellationToken.ThrowIfCancellationRequested();
+
+        //        if (Utils == null)
+        //            throw new ArgumentNullException(nameof(Utils.ID));
+
+        //        _unitOfWork.LeadRatingRepository.Remove(Utils.ID);
+        //        _unitOfWork.Commit();
+
+        //        return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Rating ID removed successfully." }).ConfigureAwait(false);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+        //    }
+        //}
+
+        //[HttpGet]
+        //[Route("GetAllLeadRating")]
+        //public async Task<object> GetAllLeadRating(CancellationToken cancellationToken)
+        //{
+        //    try
+        //    {
+        //        if (cancellationToken != null)
+        //            cancellationToken.ThrowIfCancellationRequested();
+
+        //        var result = _unitOfWork.LeadRatingRepository.All();
+        //        return await Task.FromResult<object>(result).ConfigureAwait(false);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+        //    }
+        //}
+
+        //[HttpPost]
+        //[Route("FindByLeadRatingByID")]
+        //public async Task<object> FindByLeadRatingByID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        //{
+        //    try
+        //    {
+        //        LeadRatingViewModel customerViewModel = new LeadRatingViewModel();
+
+        //        if (cancellationToken != null)
+        //            cancellationToken.ThrowIfCancellationRequested();
+
+        //        if (Utils == null)
+        //            throw new ArgumentNullException(nameof(Utils.ID));
+
+        //        var result = _unitOfWork.LeadRatingRepository.Find(Utils.ID);
+        //        return await Task.FromResult<object>(result).ConfigureAwait(false);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+        //    }
+        //}
+
+        //[HttpPost]
+        //[Route("GetAllLeadRatingByOrgID")]
+        //public async Task<object> GetAllLeadRatingByOrgID([FromBody] UtilsOrgID Utils, CancellationToken cancellationToken)
+        //{
+        //    try
+        //    {
+        //        if (cancellationToken != null)
+        //            cancellationToken.ThrowIfCancellationRequested();
+
+        //        var result = _unitOfWork.LeadRatingRepository.LeadRatingByOrgID(Utils.OrgID);
+        //        return await Task.FromResult<object>(result).ConfigureAwait(false);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+        //    }
+        //}
+
+        //#endregion LeadRating
+
+        //#region LeadContractRole
+
+        //[HttpPost]
+        //[Route("AddLeadContractRole")]
+        //public async Task<object> AddLeadContractRole([FromBody] LeadContractRoleViewModel LeadContractRoleViewModel, CancellationToken cancellationToken)
+        //{
+        //    try
+        //    {
+        //        if (cancellationToken != null)
+        //            cancellationToken.ThrowIfCancellationRequested();
+
+        //        if (LeadContractRoleViewModel == null)
+        //            throw new ArgumentNullException(nameof(LeadContractRoleViewModel));
+
+        //        var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<LeadContractRoleViewModel, LeadContractRole>());
+        //        var mapper = config.CreateMapper();
+        //        var modal = mapper.Map<LeadContractRole>(LeadContractRoleViewModel);
+
+        //        modal.id = Guid.NewGuid().ToString();
+        //        modal.created_date = _dateTime.ToString();
+        //        modal.is_deleted = false;
+
+        //        _unitOfWork.LeadContractRoleRepository.Add(modal);
+
+        //        _unitOfWork.Commit();
+
+        //        return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Status saved successfully." }).ConfigureAwait(false);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+        //    }
+        //}
+
+        //[HttpPatch]
+        //[Route("UpdateLeadContractRole")]
+        //public async Task<object> UpdateLeadContractRole([FromBody] LeadContractRoleViewModel LeadContractRoleViewModel, CancellationToken cancellationToken)
+        //{
+        //    try
+        //    {
+        //        if (cancellationToken != null)
+        //            cancellationToken.ThrowIfCancellationRequested();
+
+        //        if (LeadContractRoleViewModel == null)
+        //            throw new ArgumentNullException(nameof(LeadContractRoleViewModel));
+
+        //        var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<LeadContractRoleViewModel, LeadContractRole>());
+        //        var mapper = config.CreateMapper();
+        //        var modal = mapper.Map<LeadContractRole>(LeadContractRoleViewModel);
+        //        modal.modified_date = _dateTime.ToString();
+
+        //        _unitOfWork.LeadContractRoleRepository.Update(modal);
+        //        _unitOfWork.Commit();
+
+        //        return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Status updated successfully." }).ConfigureAwait(false);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+        //    }
+        //}
+
+        //[HttpPost]
+        //[Route("RemoveLeadContractRole")]
+        //public async Task<object> RemoveLeadContractRole([FromBody] Utils Utils, CancellationToken cancellationToken)
+        //{
+        //    try
+        //    {
+        //        if (cancellationToken != null)
+        //            cancellationToken.ThrowIfCancellationRequested();
+
+        //        if (Utils == null)
+        //            throw new ArgumentNullException(nameof(Utils.ID));
+
+        //        _unitOfWork.LeadContractRoleRepository.Remove(Utils.ID);
+        //        _unitOfWork.Commit();
+
+        //        return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Status ID removed successfully." }).ConfigureAwait(false);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+        //    }
+        //}
+
+        //[HttpGet]
+        //[Route("GetAllLeadContractRole")]
+        //public async Task<object> GetAllLeadContractRole(CancellationToken cancellationToken)
+        //{
+        //    try
+        //    {
+        //        if (cancellationToken != null)
+        //            cancellationToken.ThrowIfCancellationRequested();
+
+        //        var result = _unitOfWork.LeadContractRoleRepository.All();
+        //        return await Task.FromResult<object>(result).ConfigureAwait(false);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+        //    }
+        //}
+
+        //[HttpPost]
+        //[Route("FindByLeadContractRoleByID")]
+        //public async Task<object> FindByLeadContractRoleByID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        //{
+        //    try
+        //    {
+        //        LeadContractRoleViewModel customerViewModel = new LeadContractRoleViewModel();
+
+        //        if (cancellationToken != null)
+        //            cancellationToken.ThrowIfCancellationRequested();
+
+        //        if (Utils == null)
+        //            throw new ArgumentNullException(nameof(Utils.ID));
+
+        //        var result = _unitOfWork.LeadContractRoleRepository.Find(Utils.ID);
+        //        return await Task.FromResult<object>(result).ConfigureAwait(false);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+        //    }
+        //}
+
+        //[HttpPost]
+        //[Route("GetAllLeadContractRoleByOrgID")]
+        //public async Task<object> GetAllLeadContractRoleByOrgID([FromBody] UtilsOrgID Utils, CancellationToken cancellationToken)
+        //{
+        //    try
+        //    {
+        //        if (cancellationToken != null)
+        //            cancellationToken.ThrowIfCancellationRequested();
+
+        //        var result = _unitOfWork.LeadContractRoleRepository.GetLeadContractRoleByOrgID(Utils.OrgID);
+        //        return await Task.FromResult<object>(result).ConfigureAwait(false);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+        //    }
+        //}
+
+        //#endregion LeadContractRole
+
+        //#region LeadCompany
+
+        //[HttpPost]
+        //[Route("AddLeadCompany")]
+        //public async Task<object> AddLeadCompany([FromBody] LeadCompanyViewModel LeadCompanyViewModel, CancellationToken cancellationToken)
+        //{
+        //    try
+        //    {
+        //        if (cancellationToken != null)
+        //            cancellationToken.ThrowIfCancellationRequested();
+
+        //        if (LeadCompanyViewModel == null)
+        //            throw new ArgumentNullException(nameof(LeadCompanyViewModel));
+
+        //        var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<LeadCompanyViewModel, LeadCompany>());
+        //        var mapper = config.CreateMapper();
+        //        var modal = mapper.Map<LeadCompany>(LeadCompanyViewModel);
+
+        //        modal.id = Guid.NewGuid().ToString();
+        //        modal.created_date = _dateTime.ToString();
+        //        modal.is_deleted = false;
+
+        //        _unitOfWork.LeadCompanyRepository.Add(modal);
+
+        //        _unitOfWork.Commit();
+
+        //        return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Company saved successfully." }).ConfigureAwait(false);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+        //    }
+        //}
+
+        //[HttpPatch]
+        //[Route("UpdateLeadCompany")]
+        //public async Task<object> UpdateLeadCompany([FromBody] LeadCompanyViewModel LeadCompanyViewModel, CancellationToken cancellationToken)
+        //{
+        //    try
+        //    {
+        //        if (cancellationToken != null)
+        //            cancellationToken.ThrowIfCancellationRequested();
+
+        //        if (LeadCompanyViewModel == null)
+        //            throw new ArgumentNullException(nameof(LeadCompanyViewModel));
+
+        //        var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<LeadCompanyViewModel, LeadCompany>());
+        //        var mapper = config.CreateMapper();
+        //        var modal = mapper.Map<LeadCompany>(LeadCompanyViewModel);
+        //        modal.modified_date = _dateTime.ToString();
+
+        //        _unitOfWork.LeadCompanyRepository.Update(modal);
+        //        _unitOfWork.Commit();
+
+        //        return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Company updated successfully." }).ConfigureAwait(false);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+        //    }
+        //}
+
+        //[HttpPost]
+        //[Route("RemoveLeadCompany")]
+        //public async Task<object> RemoveLeadCompany([FromBody] Utils Utils, CancellationToken cancellationToken)
+        //{
+        //    try
+        //    {
+        //        if (cancellationToken != null)
+        //            cancellationToken.ThrowIfCancellationRequested();
+
+        //        if (Utils == null)
+        //            throw new ArgumentNullException(nameof(Utils.ID));
+
+        //        _unitOfWork.LeadCompanyRepository.Remove(Utils.ID);
+        //        _unitOfWork.Commit();
+
+        //        return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead Company ID removed successfully." }).ConfigureAwait(false);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+        //    }
+        //}
+
+        //[HttpGet]
+        //[Route("GetAllLeadCompany")]
+        //public async Task<object> GetAllLeadCompany(CancellationToken cancellationToken)
+        //{
+        //    try
+        //    {
+        //        if (cancellationToken != null)
+        //            cancellationToken.ThrowIfCancellationRequested();
+
+        //        var result = _unitOfWork.LeadCompanyRepository.All();
+        //        return await Task.FromResult<object>(result).ConfigureAwait(false);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+        //    }
+        //}
+
+        //[HttpPost]
+        //[Route("FindByLeadCompanyByID")]
+        //public async Task<object> FindByLeadCompanyByID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        //{
+        //    try
+        //    {
+        //        LeadCompanyViewModel customerViewModel = new LeadCompanyViewModel();
+
+        //        if (cancellationToken != null)
+        //            cancellationToken.ThrowIfCancellationRequested();
+
+        //        if (Utils == null)
+        //            throw new ArgumentNullException(nameof(Utils.ID));
+
+        //        var result = _unitOfWork.LeadCompanyRepository.Find(Utils.ID);
+        //        return await Task.FromResult<object>(result).ConfigureAwait(false);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+        //    }
+        //}
+
+        //[HttpPost]
+        //[Route("GetAllLeadCompanyByOrgID")]
+        //public async Task<object> GetAllLeadCompanyByOrgID([FromBody] UtilsOrgID Utils, CancellationToken cancellationToken)
+        //{
+        //    try
+        //    {
+        //        if (cancellationToken != null)
+        //            cancellationToken.ThrowIfCancellationRequested();
+
+        //        var result = _unitOfWork.LeadCompanyRepository.LeadCompanyByOrgID(Utils.OrgID);
+        //        return await Task.FromResult<object>(result).ConfigureAwait(false);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+        //    }
+        //}
+
+        //#endregion LeadCompany
+
+        #endregion Rating_ContractNotInUse
     }
 }

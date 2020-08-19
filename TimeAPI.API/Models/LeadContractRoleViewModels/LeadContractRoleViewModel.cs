@@ -5,17 +5,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 
-namespace TimeAPI.API.Models.LeadProjectViewModels
+namespace TimeAPI.API.Models.LeadContractRoleViewModels
 {
-    public class LeadProjectViewModel
+    public class LeadContractRoleViewModel
     {
         public string id { get; set; }
-        public string lead_id { get; set; }
-        public string project_prefix { get; set; }
-        public string project_name { get; set; }
-        public string design_type_id { get; set; }
-        public string project_type_id { get; set; }
-        public string packages_id { get; set; }
+        public string org_id { get; set; }
+        public string contact_role_name { get; set; }
+        public string contact_role_desc { get; set; }
         public string created_date { get; set; }
         public string createdby { get; set; }
         public string modified_date { get; set; }

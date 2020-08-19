@@ -149,7 +149,27 @@ namespace TimeAPI.Data.Repositories
             List<RootTimesheetData> RootTimesheetDataList = GetTimesheetProperty(resultsTimesheetGrpID);
             return RootTimesheetDataList;
         }
+        public IEnumerable<RootTimesheetData> GetEmployeeTasksTimesheetByOrgID(string OrgID, string fromDate, string toDate)
+        {
+            var resultsTimesheetGrpID = Query<string>(
+                sql: @"SELECT distinct(groupid), FORMAT(CAST(timesheet.ondate AS datetime2), N'dd-MMM-yyyy HH:mm:ss', 'EN-US')  
+                        FROM timesheet WITH (NOLOCK)
+                        INNER JOIN employee on timesheet.empid = employee.id
+                        WHERE employee.org_id = @OrgID
+                        AND FORMAT(CAST(timesheet.ondate AS DATE), 'MM/dd/yyyy', 'EN-US')
+                            BETWEEN FORMAT(CAST(@fromDate AS DATE), 'MM/dd/yyyy', 'EN-US')
+                            AND FORMAT(CAST(@toDate AS DATE), 'MM/dd/yyyy', 'EN-US')
+                        AND timesheet.is_deleted = 0
+						
+                        ORDER BY FORMAT(CAST(timesheet.ondate AS datetime2), N'dd-MMM-yyyy HH:mm:ss', 'EN-US') ASC",
+                param: new { OrgID, fromDate, toDate }
+            );
 
+            List<RootTimesheetData> RootTimesheetDataList = GetTimesheetPropertyForEmployeeActivitesDashboard(resultsTimesheetGrpID);
+
+            return RootTimesheetDataList;
+        }
+        
         public IEnumerable<RootTimesheetData> GetEmployeeTasksTimesheetByEmpID(string EmpID, string fromDate, string toDate)
         {
             var resultsTimesheetGrpID = Query<string>(

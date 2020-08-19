@@ -101,37 +101,9 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<CostProjectMilestone> GetAllStaticMilestoneByOrgID(string OrgID)
         {
             return Query<CostProjectMilestone>(
-                sql: "SELECT * FROM [dbo].[static_milestone] where is_deleted = 0"
+                sql: "SELECT * FROM [dbo].[static_milestone] where is_deleted = 0 and org_id = @OrgID",
+                 param: new { OrgID }
             );
         }
-        
-
-        //public void UpdateCostProjectMilestoneStatusByActivityID(CostProjectMilestone  entity)
-        //{
-        //    Execute(
-        //        sql: @"UPDATE dbo.cost_project_milestone
-        //           SET
-        //            status_id = @status_id,
-        //            modified_date = @modified_date,
-        //            modifiedby = @modifiedby
-        //            WHERE project_id = @project_id",
-        //        param: entity
-        //    );
-        //}
-
-        //public dynamic GetCostProjectMilestoneRatioByProjectID(string key)
-        //{
-        //    return Query<dynamic>(
-        //           sql: @"SELECT 
-        //                   dbo.project_status.project_status_name, 
-        //                   count(*) * 100 / sum(count(*))  over() as ratio
-        //            FROM dbo.cost_project_milestone WITH(NOLOCK)
-        //                INNER JOIN dbo.project_status on dbo.cost_project_milestone.status_id = dbo.project_status.id
-        //            WHERE dbo.cost_project_milestone.project_id = @key
-        //                AND dbo.cost_project_milestone.is_deleted = 0 
-        //                group by dbo.project_status.project_status_name",
-        //              param: new { key }
-        //       );
-        //}
     }
 }

@@ -5,10 +5,10 @@ using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.Domain.Repositories
 {
-    public interface ILeadProjectRepository : IRepository<LeadProject, string>
+    public interface ILeadDealRepository : IRepository<LeadDeal, string>
     {
-        public IEnumerable<LeadProject> LeadProjectByOrgID(string OrgID);
-        public LeadProject LeadProjectByLeadID(string LeadID);
-        
+        public IEnumerable<LeadDeal> LeadDealByOrgID(string OrgID);
+        public LeadDeal LeadDealByLeadID(string LeadID);
+        void UpdateEstDealValueByLeadID(LeadDeal entity);
     }
 }

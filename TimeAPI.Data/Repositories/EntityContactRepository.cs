@@ -14,8 +14,10 @@ namespace TimeAPI.Data.Repositories
         {
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO entity_contact
-                                  (id, entity_id, name, first_name, last_name, position, phone, mobile, email, adr_1, adr_2, city, country, is_primary, created_date, createdby)
-                           VALUES (@id, @entity_id, @name, @first_name, @last_name, @position, @phone, @mobile, @email, @adr_1, @adr_2, @city, @country, @is_primary, @created_date, @createdby);
+                                  (id, entity_id, name, first_name, last_name, relationship, position, phone, mobile, email, adr_1, adr_2, city, country, is_primary, 
+                                   department, designation, note, created_date, createdby)
+                           VALUES (@id, @entity_id, @name, @first_name, @last_name, @relationship, @position, @phone, @mobile, @email, @adr_1, @adr_2, @city, @country, @is_primary, 
+                                   @department, @designation, @note, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -28,6 +30,7 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
+
         public EntityContact FindByEntityID(string key)
         {
             return QuerySingleOrDefault<EntityContact>(
@@ -44,8 +47,6 @@ namespace TimeAPI.Data.Repositories
             );
         }
         
-
-
         public void Remove(string key)
         {
             Execute(
@@ -65,6 +66,7 @@ namespace TimeAPI.Data.Repositories
                     name = @name,
                     first_name = @first_name, 
                     last_name = @last_name,
+                    relationship =@relationship,
                     position = @position,
                     phone = @phone,
                     mobile = @mobile,
@@ -74,13 +76,15 @@ namespace TimeAPI.Data.Repositories
                     city = @city, 
                     country = @country,
                     is_primary = @is_primary,
+                    department = @department, 
+                    designation = @designation, 
+                    note = @note,
                     modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE id = @id",
                 param: entity
             );
         }
-
 
         public void UpdateByEntityID(EntityContact entity)
         {
@@ -90,6 +94,7 @@ namespace TimeAPI.Data.Repositories
                     name = @name,
                     first_name = @first_name, 
                     last_name = @last_name,
+                    relationship =@relationship,
                     position = @position,
                     phone = @phone,
                     mobile = @mobile,
@@ -98,13 +103,15 @@ namespace TimeAPI.Data.Repositories
                     adr_2 = @adr_2,
                     city = @city, 
                     country = @country,
+                    department = @department, 
+                    designation = @designation, 
+                    note = @note,
                     modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE entity_id = @entity_id",
                 param: entity
             );
         }
-
 
         public IEnumerable<EntityContact> All()
         {
