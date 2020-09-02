@@ -21,6 +21,7 @@ namespace TimeAPI.API.Models.TaskViewModels
         public string createdby { get; set; }
         public bool is_approver { get; set; }
         public string is_approver_id { get; set; }
+        public bool is_local_activity { get; set; }
         public string unit { get; set; }
         public string qty { get; set; }
         public IEnumerable<TaskTeamMember> employees { get; set; }

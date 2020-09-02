@@ -20,6 +20,7 @@ namespace TimeAPI.Domain.Entities
         public string is_approver_id { get; set; }
         public string is_approved { get; set; }
         public string unit { get; set; }
+        public string is_local_activity { get; set; }
         public string qty { get; set; }
         public string created_date { get; set; }
         public string createdby { get; set; }

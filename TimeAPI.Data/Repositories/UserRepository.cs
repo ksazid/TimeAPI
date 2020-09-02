@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Model;
 using TimeAPI.Domain.Repositories;
@@ -149,6 +150,7 @@ namespace TimeAPI.Data.Repositories
             List<RootTimesheetData> RootTimesheetDataList = GetTimesheetProperty(resultsTimesheetGrpID);
             return RootTimesheetDataList;
         }
+
         public IEnumerable<RootTimesheetData> GetEmployeeTasksTimesheetByOrgID(string OrgID, string fromDate, string toDate)
         {
             var resultsTimesheetGrpID = Query<string>(
@@ -169,7 +171,7 @@ namespace TimeAPI.Data.Repositories
 
             return RootTimesheetDataList;
         }
-        
+
         public IEnumerable<RootTimesheetData> GetEmployeeTasksTimesheetByEmpID(string EmpID, string fromDate, string toDate)
         {
             var resultsTimesheetGrpID = Query<string>(
@@ -395,7 +397,7 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<ViewLogDataModel> GetTimesheetActivityByGroupAndProjectID(string GroupID, string ProjectID, string Date)
         {
             return Query<ViewLogDataModel>(
-                sql: @"SELECT  project_type, project_name, milestone_name, task_name, remarks, total_hrs, is_billable, ondate, start_time, end_time, groupid FROM
+                sql: @"SELECT  project_type, project_name, milestone_name, task_name, remarks, total_hrs, is_billable, worked_percent, ondate, start_time, end_time, groupid FROM
 					    (
                         SELECT  
 
@@ -408,6 +410,7 @@ namespace TimeAPI.Data.Repositories
 								remarks= dbo.timesheet_activity.remarks,
 								timesheet_activity.total_hrs,
 		                        timesheet_activity.is_billable,
+		                        timesheet_activity.worked_percent,
 		                        FORMAT(dbo.timesheet_activity.ondate, 'dd-MM-yyyy', 'en-US') AS ondate ,
 								dbo.timesheet_activity.groupid as groupid
 								
@@ -436,6 +439,7 @@ namespace TimeAPI.Data.Repositories
 								remarks= dbo.timesheet_administrative_activity.remarks,
 								timesheet_administrative_activity.total_hrs,
 		                        timesheet_administrative_activity.is_billable,
+		                        timesheet_administrative_activity.worked_percent,
 		                        FORMAT(dbo.timesheet_administrative_activity.ondate, 'dd-MM-yyyy', 'en-US') AS ondate,
 								 
 								dbo.timesheet_administrative_activity.groupid as groupid

@@ -169,6 +169,61 @@ namespace TimeAPI.API.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("FindByEstimationAndQuotationID")]
+        public async Task<object> FindByEstimationAndQuotationID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                var result = _unitOfWork.QuotationRepository.FindByQuotationID(Utils.ID);
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("UpdateQuotationStageByQuotationID")]
+        public async Task<object> UpdateQuotationStageByQuotationID([FromBody] QuotationStageViewModel QuotationStageViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (QuotationStageViewModel == null)
+                    throw new ArgumentNullException(nameof(QuotationStageViewModel.id));
+
+
+                Quotation quotation = new Quotation()
+                {
+
+                    id = QuotationStageViewModel.id,
+                    stage_id = QuotationStageViewModel.stage_id,
+                    modifiedby = QuotationStageViewModel.modifiedby,
+                    modified_date = _dateTime.ToString()
+
+                };
+
+                _unitOfWork.QuotationRepository.UpdateQuotationStageByQuotationID(quotation);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Quotation stage updated successfully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
 
         [HttpPost]
         [Route("GetAllQuotationByOrgID")]
@@ -183,12 +238,34 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(UtilsOrgID.OrgID));
 
                 var results = _unitOfWork.QuotationRepository.QuotationByOrgID(UtilsOrgID.OrgID);
-
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(results, Formatting.Indented)).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 return System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("GetLastAddedQuotationPrefixByOrgID")]
+        public async Task<object> GetLastAddedQuotationPrefixByOrgID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                var result = _unitOfWork.QuotationRepository.GetLastAddedQuotationPrefixByOrgID(Utils.ID);
+                return await Task.FromResult<object>(new SuccessViewModel
+                {
+                    Status = "200",
+                    Code = (result ?? string.Empty).ToString(),
+                    Desc = ""
+                }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
 

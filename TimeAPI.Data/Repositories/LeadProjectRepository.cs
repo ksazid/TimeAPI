@@ -100,5 +100,17 @@ namespace TimeAPI.Data.Repositories
                 param: entity
             );
         }
+
+        public string GetLastAddedLeadPrefixByOrgID(string key)
+        {
+            return QuerySingleOrDefault<string>(
+                sql: @"SELECT TOP 1 deal_prefix from lead_deal 
+                        INNER JOIN lead on lead_deal.lead_id = lead.id
+                        WHERE lead.org_id = @key 
+                        AND lead.is_deleted = 0
+                        ORDER BY FORMAT(CAST( dbo.lead.created_date AS DATETIME2), N'dd/MM/yyyy hh:mm tt') DESC",
+                param: new { key }
+            );
+        }
     }
 }

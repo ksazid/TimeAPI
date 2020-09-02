@@ -7,6 +7,6 @@ namespace TimeAPI.Domain.Repositories
 {
     public interface IPrefixRepository : IRepository<Prefix, string>
     {
-        public IEnumerable<Prefix> PrefixByOrgID(string OrgID);
+        IEnumerable<Prefix> PrefixByOrgID(string OrgID);
     }
 }

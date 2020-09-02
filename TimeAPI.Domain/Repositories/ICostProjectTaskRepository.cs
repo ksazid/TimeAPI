@@ -20,9 +20,7 @@ namespace TimeAPI.Domain.Repositories
         IEnumerable<CostProjectTask> GetAllMilestoneTasksByMilestoneID(string MilestoneID, string OrgID);
 
         //IEnumerable<CostProjectTask> GetAllStaticMilestoneByOrgID(string MilestoneID);
-
         void UpdateStaticCostProjectTask(CostProjectTask entity);
-
         void RemoveByProjectID(string ProjectID);
         void UpdateIsSelectedByTaskID(CostProjectTask entity);
         void UpdateCostProjectTaskQtyTaskID(CostProjectTask entity);

@@ -30,6 +30,26 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
+        public dynamic FindByLeadID(string key)
+        {
+            return QuerySingleOrDefault<dynamic>(
+                sql: @"SELECT 
+                         dbo.customer.cst_name, dbo.employee.full_name as lead_owner,
+                        dbo.lead_source.lead_source,  dbo.lead_status.lead_status,
+                        dbo.lead_deal.deal_name,
+                        dbo.lead_deal_type.deal_type_name,
+                        dbo.lead.* FROM dbo.lead 
+                        LEFT JOIN dbo.customer on dbo.lead.cst_id =  dbo.customer.id
+                        LEFT join dbo.employee on dbo.lead.lead_owner_emp_id =  dbo.employee.id
+                        LEFT join dbo.lead_source on dbo.lead.lead_source_id =  dbo.lead_source.id
+                        LEFT join dbo.lead_status on dbo.lead.lead_status_id =  dbo.lead_status.id
+                        LEFT join dbo.lead_deal on dbo.lead.id =  dbo.lead_deal.lead_id
+                        LEFT join dbo.lead_deal_type on dbo.lead_deal.deal_type_id =  dbo.lead_deal_type.id
+                        WHERE  dbo.lead.id = @key AND  dbo.lead.is_deleted = 0",
+                param: new { key }
+            );
+        }
+
         public IEnumerable<Lead> All()
         {
             return Query<Lead>(

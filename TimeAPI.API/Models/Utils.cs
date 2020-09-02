@@ -71,6 +71,12 @@ namespace TimeAPI.API.Models
         public string OrgID { get; set; }
     }
 
+    public class UtilsOrgIDAndType
+    {
+        public string OrgID { get; set; }
+        public string Type { get; set; }
+    }
+
     public class UtilsOrgIDAndPrefix
     {
         public string OrgID { get; set; }

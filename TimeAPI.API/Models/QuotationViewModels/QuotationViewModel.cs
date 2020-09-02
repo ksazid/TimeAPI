@@ -32,4 +32,12 @@ namespace TimeAPI.API.Models.QuotationViewModels
         public string modifiedby { get; set; }
         public bool is_deleted { get; set; }
     }
+
+
+     public class QuotationStageViewModel
+    {
+        public string id { get; set; }
+        public string stage_id { get; set; }
+        public string modifiedby { get; set; }
+    }
 }

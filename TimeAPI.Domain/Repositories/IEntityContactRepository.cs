@@ -11,6 +11,7 @@ namespace TimeAPI.Domain.Repositories
         void UpdateByEntityID(EntityContact entity);
         EntityContact FindByEntityID(string EntityID);
         IEnumerable<EntityContact> FindByEntityListID(string EntityID);
+        dynamic FindByEntityContactOrgID(string OrgID);
 
     }
 }

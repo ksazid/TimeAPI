@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Model;
 using TimeAPI.Domain.Repositories;
@@ -290,7 +291,6 @@ namespace TimeAPI.Data.Repositories
             List<string> OffDays = OffDaysDates(org_id, fromDate, toDate);
             List<AttendedEmployee> AttendedEmployeeList = new List<AttendedEmployee>();
 
-
             for (int i = 0; i < Dates.Count; i++)
             {
                 var xdate = OffDays.Any(b => b.Contains(Dates[i].ToString()));
@@ -393,7 +393,7 @@ namespace TimeAPI.Data.Repositories
         public dynamic TotalEmpAbsentCountByOrgIDAndDate(string org_id, string fromDate, string toDate)
         {
             int AbsentCount = 0;
-            var OffDaysList = ExceptOffDaysDates(org_id, fromDate, toDate);
+            var OffDaysList =  ExceptOffDaysDates(org_id, fromDate, toDate);
 
             for (int i = 0; i < OffDaysList.Count(); i++)
                 AbsentCount += GetEmpAbsentCountAttendedByOrgIDAndDate(org_id, OffDaysList[i].ToString(), OffDaysList[i].ToString()).Count();
@@ -433,7 +433,7 @@ namespace TimeAPI.Data.Repositories
         {
             List<DateTime> Dates = Enumerable.Range(0, (Convert.ToDateTime(toDate) - Convert.ToDateTime(fromDate)).Days + 1)
                               .Select(d => Convert.ToDateTime(fromDate).AddDays(d)).ToList();
-            List<DateTime> ExceptOffDays = ExceptOffDaysDates(org_id, fromDate, toDate);
+            List<DateTime> ExceptOffDays =  ExceptOffDaysDates(org_id, fromDate, toDate);
             List<string> OffDays = OffDaysDates(org_id, fromDate, toDate);
             List<AttendedEmployee> AttendedEmployeeList = new List<AttendedEmployee>();
 
@@ -856,7 +856,7 @@ namespace TimeAPI.Data.Repositories
                         sql: @"SELECT 
                             dbo.project.id as project_id,
                             dbo.project.project_name as project_name,
-                             ISNULL(SUM((SELECT count(*)
+                            ISNULL(SUM((SELECT count(*)
                             FROM dbo.project_activity WITH(NOLOCK)
                             LEFT JOIN dbo.project_status on dbo.project_activity.status_id = dbo.project_status.id
                             LEFT JOIN dbo.project on dbo.project_activity.project_id = dbo.project.id
@@ -1009,10 +1009,8 @@ namespace TimeAPI.Data.Repositories
                                     WHERE is_location_validation_req = 1 
                                     OR is_autocheckout_allowed = 1 
                                     AND is_deleted = 0"
-           );
+                );
         }
-
-
 
 
 

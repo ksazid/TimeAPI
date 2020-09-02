@@ -27,8 +27,13 @@ namespace TimeAPI.Domain.Entities
         public string plot_size_unit { get; set; }
         public string buildup_area { get; set; }
         public string buildup_area_unit { get; set; }
-        public string discount_amount { get; set; }
+        public string total_hours { get; set; }
+        public string gross_total_amount { get; set; }
         public string profit_margin_amount { get; set; }
+        public string discount_amount { get; set; }
+        public string total_amount { get; set; }
+        public string vat_amount { get; set; }
+        public string net_total_amount { get; set; }
         public string createdby { get; set; }
         public string created_date { get; set; }
         public string modified_date { get; set; }

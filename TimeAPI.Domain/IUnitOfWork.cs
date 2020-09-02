@@ -105,6 +105,14 @@ namespace TimeAPI.Domain
         IPaymentRepository PaymentRepository { get; }
         IWarrantyRepository WarrantyRepository { get; }
         IExclusionRepository ExclusionRepository { get; }
+        IEntityMeetingRepository EntityMeetingRepository { get; }
+        IEntityNotesRepository EntityNotesRepository { get; }
+        IEntityMeetingParticipantsRepository EntityMeetingParticipantsRepository { get; }
+        ILocalActivityRepository LocalActivityRepository { get; }
+        IEntityCallRepository EntityCallRepository { get; }
+        IEntityHistoryLogRepository EntityHistoryLogRepository { get; }
+      
+
 
         #region systemadmin
         IPlanRepository PlanRepository { get; }

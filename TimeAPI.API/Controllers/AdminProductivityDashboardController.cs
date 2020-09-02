@@ -64,8 +64,6 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-        
-
                 var result = _unitOfWork.AdminProductivityDashboardRepository.EmployeeProductivityTimeFrequencyByOrgIDAndDate(Utils.OrgID, Utils.StartDate, Utils.EndDate);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);

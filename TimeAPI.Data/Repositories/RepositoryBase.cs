@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 
 namespace TimeAPI.Data.Repositories
 {
@@ -34,9 +35,27 @@ namespace TimeAPI.Data.Repositories
             Connection.Execute(sql, param, _transaction);
         }
 
-        protected dynamic QuerySingle(string sql, object param)
+        //async methods
+        protected async Task<T> ExecuteScalarAsync<T>(string sql, object param)
         {
-            return Connection.QuerySingle(sql, param, _transaction);
+            return await Connection.ExecuteScalarAsync<T>(sql, param, _transaction);
+        }
+
+        protected async Task<T> QuerySingleOrDefaultAsync<T>(string sql, object param)
+        {
+            return await Connection.QuerySingleOrDefaultAsync<T>(sql, param, _transaction);
+        }
+
+        protected async Task<IEnumerable<T>> QueryAsync<T>(string sql, object param = null)
+        {
+            return await Connection.QueryAsync<T>(sql, param, _transaction);
+        }
+
+        protected async 
+        Task
+ExecuteAsync(string sql, object param)
+        {
+            await Connection.ExecuteAsync(sql, param, _transaction);
         }
     }
 }

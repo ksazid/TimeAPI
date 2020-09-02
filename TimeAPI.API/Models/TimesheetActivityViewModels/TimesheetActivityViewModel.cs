@@ -17,6 +17,7 @@ namespace TimeAPI.API.Models.TimesheetActivityViewModels
         public string task_name { get; set; }
         public string status_id { get; set; }
         public string remarks { get; set; }
+        public string worked_percent { get; set; }
         public string ondate { get; set; }
         public string start_time { get; set; }
         public string end_time { get; set; }

@@ -13,7 +13,7 @@ namespace TimeAPI.Data.Repositories
 
         public void Add(Administrative entity)
         {
-            entity.id = ExecuteScalar<string>(
+          entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO [dbo].[administrative]
                            (id, dept_id, org_id, administrative_name, summary, created_date, createdby)
                     VALUES (@id, @dept_id, @org_id, @administrative_name,  @summary, @created_date, @createdby);

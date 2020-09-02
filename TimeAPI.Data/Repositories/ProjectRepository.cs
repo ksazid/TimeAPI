@@ -198,7 +198,7 @@ namespace TimeAPI.Data.Repositories
         }
 
 
-        
+
 
         //public string ProjectActivityCount(string entity)
         //{
@@ -212,5 +212,16 @@ namespace TimeAPI.Data.Repositories
         //       param: entity
         //   );
         //}
+
+        public string GetLastAddedProjectPrefixByOrgID(string key)
+        {
+            return QuerySingleOrDefault<string>(
+                sql: @"SELECT TOP 1 project_prefix from dbo.project 
+                        WHERE dbo.project.org_id = @key
+                        AND dbo.project.is_deleted = 0
+                        ORDER BY FORMAT(CAST(dbo.project .created_date AS DATETIME2), N'dd/MM/yyyy hh:mm tt') DESC",
+                param: new { key }
+            );
+        }
     }
 }

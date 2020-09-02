@@ -7,7 +7,10 @@ namespace TimeAPI.Domain.Repositories
 {
     public interface ILeadRepository : IRepository<Lead, string>
     {
-        public dynamic LeadByOrgID(string OrgID);
+        dynamic LeadByOrgID(string OrgID);
+        dynamic FindByLeadID(string LeadID);
         void UpdateLeadStatusByLeadID(Lead entity);
+
+        
     }
 }

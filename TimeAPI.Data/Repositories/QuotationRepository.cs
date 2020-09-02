@@ -31,6 +31,36 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
+        public dynamic FindByQuotationID(string key)
+        {
+            return QuerySingleOrDefault<dynamic>(
+                sql: @"SELECT
+                        CASE
+                            WHEN dbo.customer.is_company = 1 THEN dbo.customer.company_name
+                            ELSE dbo.customer.first_name + ' ' + dbo.customer.last_name
+                            END AS lead_name,
+                            dbo.customer.company_name,
+                            dbo.customer.first_name,
+                            dbo.customer.last_name,
+                            dbo.customer.is_company,
+                            dbo.cost_project.total_hours,
+                            dbo.cost_project.gross_total_amount,
+                            dbo.cost_project.profit_margin_amount,
+                            dbo.cost_project.discount_amount,
+                            dbo.cost_project.total_amount,
+                            dbo.cost_project.vat_amount,
+                            dbo.cost_project.net_total_amount,
+                            dbo.project_quotation.*
+                            FROM dbo.project_quotation
+                            INNER JOIN cost_project on project_quotation.lead_id = cost_project.id
+                            INNER JOIN customer_x_project on cost_project.id = customer_x_project.project_id
+                            INNER JOIN customer on customer_x_project.cst_id = customer.id
+                            WHERE cost_project.is_deleted = 0 and customer.is_deleted = 0  and project_quotation.is_deleted = 0 and
+                            project_quotation.id  = @key",
+                param: new { key }
+            );
+        }
+
         public IEnumerable<Quotation> All()
         {
             return Query<Quotation>(
@@ -42,21 +72,29 @@ namespace TimeAPI.Data.Repositories
         {
             return Query<dynamic>(
                 sql: @"SELECT
-                        CASE
-                            WHEN dbo.customer.is_company = 1 THEN dbo.customer.company_name
-                            ELSE dbo.customer.first_name + ' ' + dbo.customer.last_name
-                            END AS lead_name,
-                            dbo.customer.company_name,
-                            dbo.customer.first_name,
-                            dbo.customer.last_name,
-                            dbo.customer.is_company,
-                            dbo.project_quotation.*
-                            FROM dbo.project_quotation
-                            INNER JOIN cost_project on project_quotation.lead_id = cost_project.id
-                            INNER JOIN customer_x_project on cost_project.id = customer_x_project.project_id
-                            INNER JOIN customer on customer_x_project.cst_id = customer.id
-                            WHERE cost_project.is_deleted = 0 and customer.is_deleted = 0  and project_quotation.is_deleted = 0 and 
-                                  cost_project.org_id = @key",
+                        customer.cst_name as lead_name,
+                        customer_x_project.cst_id,
+                        dbo.customer.company_name,
+                        dbo.customer.first_name,
+                        dbo.customer.last_name,
+                        dbo.customer.is_company,
+                        FORMAT(CAST(dbo.project_quotation.quotation_date AS DATETIME2), N'dd/MM/yyyy') AS ondate,
+	                    dbo.cost_project.total_hours,
+	                    dbo.cost_project.gross_total_amount,
+	                    dbo.cost_project.profit_margin_amount,
+	                    dbo.cost_project.discount_amount,
+	                    dbo.cost_project.total_amount,
+	                    dbo.cost_project.vat_amount,
+	                    dbo.cost_project.net_total_amount,
+	                    dbo.lead_stage.stage_name,
+                        dbo.project_quotation.*
+                        FROM dbo.project_quotation
+                        LEFT JOIN cost_project on project_quotation.lead_id = cost_project.id
+                        LEFT JOIN customer_x_project on cost_project.id = customer_x_project.project_id
+                        LEFT JOIN customer on customer_x_project.cst_id = customer.id
+                        LEFT JOIN lead_stage on dbo.project_quotation.stage_id = lead_stage.id
+                        WHERE cost_project.is_deleted = 0 and customer.is_deleted = 0  and project_quotation.is_deleted = 0 and 
+                        cost_project.org_id = @key",
                 param: new { key }
             );
         }
@@ -101,6 +139,28 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
+        public void UpdateQuotationStageByQuotationID(Quotation entity)
+        {
+            Execute(
+                sql: @"UPDATE dbo.project_quotation
+                           SET 
+                            stage_id = @stage_id,
+                            modified_date = @modified_date,
+                            modifiedby = @modifiedby
+                         WHERE id = @id",
+                param: entity
+            );
+        }
 
+        public string GetLastAddedQuotationPrefixByOrgID(string key)
+        {
+            return QuerySingleOrDefault<string>(
+                sql: @"SELECT TOP 1 quotation_prefix from dbo.project_quotation 
+                        WHERE project_quotation.org_id = @key
+                        AND project_quotation.is_deleted = 0
+                        ORDER BY FORMAT(CAST( dbo.project_quotation.created_date AS DATETIME2), N'dd/MM/yyyy hh:mm tt') DESC",
+                param: new { key }
+            );
+        }
     }
 }

@@ -5,10 +5,12 @@ using Newtonsoft.Json;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using TimeAPI.API.Cache;
 using TimeAPI.API.Models;
 using TimeAPI.API.Models.AdministrativeViewModels;
 using TimeAPI.API.Models.EmployeeStatusViewModels;
 using TimeAPI.API.Models.EmployeeTypeViewModels;
+using TimeAPI.API.Models.LocalActivityViewModels;
 using TimeAPI.API.Models.PriorityViewModels;
 using TimeAPI.API.Models.StatusViewModels;
 using TimeAPI.API.Services;
@@ -28,15 +30,20 @@ namespace TimeAPI.API.Controllers
         private readonly ApplicationSettings _appSettings;
         private readonly IUnitOfWork _unitOfWork;
         private readonly DateTime _dateTime;
-
+        private readonly ICacheService _cacheService;
+        private readonly JsonSerializerSettings _JsonSerializerSettings;
         public SetupController(IUnitOfWork unitOfWork, ILogger<SetupController> logger,
-                        IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings)
+                        IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings, ICacheService cacheService)
         {
             _emailSender = emailSender;
             _logger = logger;
             _appSettings = AppSettings.Value;
             _unitOfWork = unitOfWork;
             _dateTime = InternetTime.GetCurrentTimeFromTimeZone().Value.DateTime;
+            _cacheService = cacheService;
+
+            _JsonSerializerSettings = new JsonSerializerSettings();
+            _JsonSerializerSettings.ContractResolver = new LowercaseContractResolver();
         }
 
         [HttpGet]
@@ -48,9 +55,20 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.SetupRepository.Country();
 
-                return await System.Threading.Tasks.Task.FromResult<object>(result).ConfigureAwait(false);
+                if (!_cacheService.IsCached("Country"))
+                {
+                    var result = _unitOfWork.SetupRepository.Country();
+                    string output = JsonConvert.SerializeObject(result, _JsonSerializerSettings);
+                    await _cacheService.SetCacheValueAsync("Country", output).ConfigureAwait(false);
+                    return Task.FromResult<object>(result);
+                }
+                else
+                {
+                    var result = _cacheService.GetCacheValueAsync("Country");
+                    object deserializedProduct = JsonConvert.DeserializeObject<object>(result.Result, _JsonSerializerSettings);
+                    return Task.FromResult<object>(deserializedProduct);
+                }
             }
             catch (Exception ex)
             {
@@ -1039,5 +1057,155 @@ namespace TimeAPI.API.Controllers
         }
 
         #endregion IndustryType
+
+
+        #region LocalActivity
+
+        [HttpPost]
+        [Route("AddLocalActivity")]
+        public async Task<object> AddLocalActivity([FromBody] LocalActivityViewModel socialViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (socialViewModel == null)
+                    throw new ArgumentNullException(nameof(socialViewModel));
+
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<LocalActivityViewModel, LocalActivity>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<LocalActivity>(socialViewModel);
+
+                modal.id = Guid.NewGuid().ToString();
+                modal.created_date = _dateTime.ToString();
+                modal.is_deleted = false;
+
+                _unitOfWork.LocalActivityRepository.Add(modal);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Notes saved successfully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPatch]
+        [Route("UpdateLocalActivity")]
+        public async Task<object> UpdateLocalActivity([FromBody] LocalActivityViewModel socialViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (socialViewModel == null)
+                    throw new ArgumentNullException(nameof(socialViewModel));
+
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<LocalActivityViewModel, LocalActivity>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<LocalActivity>(socialViewModel);
+                modal.modified_date = _dateTime.ToString();
+
+                _unitOfWork.LocalActivityRepository.Update(modal);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Notes updated successfully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("RemoveLocalActivity")]
+        public async Task<object> RemoveLocalActivity([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                _unitOfWork.LocalActivityRepository.Remove(Utils.ID);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Notes removed successfully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("GetAllLocalActivity")]
+        public async Task<object> GetAllLocalActivity(CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                var result = _unitOfWork.LocalActivityRepository.All();
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("FindByLocalActivityID")]
+        public async Task<object> FindByLocalActivityID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                var result = _unitOfWork.LocalActivityRepository.Find(Utils.ID);
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("FetchLocalActivityOrgID")]
+        public async Task<object> FetchLocalActivityOrgID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                var result = _unitOfWork.LocalActivityRepository.LocalActivityByOrgID(Utils.ID);
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        #endregion LocalActivity
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Model;
 
@@ -10,17 +11,17 @@ namespace TimeAPI.Domain.Repositories
 
         User FindByNormalizedEmail(string normalizedEmail);
 
-        UserDataGroupDataSet GetUserDataGroupByUserID(string EmpID, string Date);
+        UserDataGroupDataSet  GetUserDataGroupByUserID(string EmpID, string Date);
 
-        IEnumerable<RootTimesheetData> GetAllTimesheetByEmpID(string EmpID, string Date);
+        IEnumerable<RootTimesheetData>  GetAllTimesheetByEmpID(string EmpID, string Date);
 
-        IEnumerable<RootTimesheetData> GetAllTimesheetByOrgID(string EmpID, string FromDate, string ToDate);
+        IEnumerable<RootTimesheetData>  GetAllTimesheetByOrgID(string EmpID, string FromDate, string ToDate);
 
         dynamic LastCheckinByEmpID(string EmpID, string Date);
 
-        IEnumerable<RootTimesheetData> GetEmployeeTasksTimesheetByEmpID(string EmpID, string FromDate, string ToDate);
+         IEnumerable<RootTimesheetData>  GetEmployeeTasksTimesheetByEmpID(string EmpID, string FromDate, string ToDate);
 
-        IEnumerable<RootTimesheetData> GetEmployeeTasksTimesheetByOrgID(string EmpID, string FromDate, string ToDate);
+         IEnumerable<RootTimesheetData> GetEmployeeTasksTimesheetByOrgID(string EmpID, string FromDate, string ToDate);
 
         //dynamic TotalEmployeeDashboardDataByOrgID(string OrgID);
         ////dynamic TotalEmployeeDashboardDataByOrgID(string OrgID, string toDate, string fromDate);

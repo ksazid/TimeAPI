@@ -14,8 +14,8 @@ namespace TimeAPI.Data.Repositories
         {
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.organization_prefix
-                            (id, org_id, prefix_name, prefix_for, is_manual_allowed, created_date, createdby)
-                    VALUES (@id, @org_id, @prefix_name, @prefix_for, @is_manual_allowed, @created_date, @createdby);
+                            (id, org_id, type, prefix_ext, prefix_name, prefix_for, is_manual_allowed, is_revised,  created_date, createdby)
+                    VALUES (@id, @org_id, @type, @prefix_ext, @prefix_name, @prefix_for, @is_manual_allowed, @is_revised, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -61,9 +61,12 @@ namespace TimeAPI.Data.Repositories
                 sql: @"UPDATE dbo.organization_prefix
                            SET 
                             org_id = @org_id, 
+                            type = @type, 
+                            prefix_ext = @prefix_ext,
                             prefix_name = @prefix_name,
                             prefix_for = @prefix_for, 
                             is_manual_allowed = @is_manual_allowed,
+                            is_revised = @is_revised,
                             modified_date = @modified_date,
                             modifiedby = @modifiedby
                          WHERE id = @id",

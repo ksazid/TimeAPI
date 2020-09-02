@@ -82,6 +82,7 @@ namespace TimeAPI.API.Controllroers
                     var modal2 = mapper2.Map<LeadDeal>(LeadViewModel.LeadDeal);
                     modal2.id = Guid.NewGuid().ToString();
                     modal2.lead_id = modal.id;
+                    modal2.created_date = _dateTime.ToString();
 
                     _unitOfWork.LeadDealRepository.Add(modal2);
                 }
@@ -203,13 +204,13 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.LeadRepository.Find(Utils.ID);
-                ListEntityContact = _unitOfWork.EntityContactRepository.FindByEntityListID(result.id).ToList();
+                var result = _unitOfWork.LeadRepository.FindByLeadID(Utils.ID);
+                ListEntityContact = _unitOfWork.EntityContactRepository.FindByEntityListID(result.id);
                 var resultLeadDeal = _unitOfWork.LeadDealRepository.LeadDealByLeadID(result.id);
 
-                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<LeadViewModel, Lead>());
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<LeadViewResponseModel, LeadViewResponseModel>());
                 var mapper = config.CreateMapper();
-                var modal = mapper.Map<Lead>(result);
+                var modal = mapper.Map<LeadViewResponseModel>(result);
 
                 modal.EntityContact = ListEntityContact;
                 modal.LeadDeal = resultLeadDeal;
@@ -291,6 +292,31 @@ namespace TimeAPI.API.Controllroers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
+
+
+        [HttpPost]
+        [Route("GetLastAddedLeadPrefixByOrgID")]
+        public async Task<object> GetLastAddedLeadPrefixByOrgID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                var result = _unitOfWork.LeadDealRepository.GetLastAddedLeadPrefixByOrgID(Utils.ID);
+                return await Task.FromResult<object>(new SuccessViewModel
+                {
+                    Status = "200",
+                    Code = (result ?? string.Empty).ToString(),
+                    Desc = ""
+                }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
 
         #endregion Lead
 

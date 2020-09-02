@@ -28,6 +28,7 @@ namespace TimeAPI.Domain.Model
         public string assigned_to_name { get; set; }
         public string is_approver { get; set; }
         public string is_approver_id { get; set; }
+        public string is_local_activity { get; set; }
         public string approver_name { get; set; }
         public string due_date { get; set; }
         public string created_date { get; set; }
@@ -45,6 +46,7 @@ namespace TimeAPI.Domain.Model
         public string remarks { get; set; }
         public string total_hrs { get; set; }
         public string is_billable { get; set; }
+        public string worked_percent { get; set; }
         public string ondate { get; set; }
         public string start_time { get; set; }
         public string end_time { get; set; }

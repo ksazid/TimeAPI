@@ -10,5 +10,6 @@ namespace TimeAPI.Domain.Repositories
         public IEnumerable<LeadDeal> LeadDealByOrgID(string OrgID);
         public LeadDeal LeadDealByLeadID(string LeadID);
         void UpdateEstDealValueByLeadID(LeadDeal entity);
+        string GetLastAddedLeadPrefixByOrgID(string OrgID);
     }
 }

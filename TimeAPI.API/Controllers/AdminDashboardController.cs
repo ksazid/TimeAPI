@@ -82,7 +82,7 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.AdminDashboardRepository.TotalEmpAbsentCountByOrgIDAndDate(Utils.OrgID, Utils.fromDate, Utils.toDate);
+                var result =  _unitOfWork.AdminDashboardRepository.TotalEmpAbsentCountByOrgIDAndDate(Utils.OrgID, Utils.fromDate, Utils.toDate);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -176,7 +176,7 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.AdminDashboardRepository.GetCheckOutLocationByGroupID(Utils.ID);
+                var result =  _unitOfWork.AdminDashboardRepository.GetCheckOutLocationByGroupID(Utils.ID);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -195,7 +195,7 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.AdminDashboardRepository.GetTimesheetActivityByGroupAndDate(Utils.ID, Utils.Date);
+                var result =  _unitOfWork.AdminDashboardRepository.GetTimesheetActivityByGroupAndDate(Utils.ID, Utils.Date);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -245,7 +245,7 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("GetAllTaskByOrgAndEmpID")]
-        public Task<object> GetAllTaskByOrgAndEmpID([FromBody] UtilsOrgAndEmpID UserID, CancellationToken cancellationToken)
+        public async Task<object> GetAllTaskByOrgAndEmpID([FromBody] UtilsOrgAndEmpID UserID, CancellationToken cancellationToken)
         {
             if (cancellationToken != null)
                 cancellationToken.ThrowIfCancellationRequested();
@@ -254,12 +254,12 @@ namespace TimeAPI.API.Controllers
                 throw new ArgumentNullException(nameof(UserID.OrgID));
 
             var Result = _unitOfWork.TaskRepository.GetAllTaskByOrgAndEmpID(UserID.OrgID, UserID.EmpID);
-            return Task.FromResult<object>(Result);
+            return await Task.FromResult<object>(Result).ConfigureAwait(false);
         }
 
         [HttpPost]
         [Route("TotalEmpOverTimeCountByOrgIDAndDate")]
-        public Task<object> TotalEmpOverTimeCountByOrgIDAndDate([FromBody] UtilsOrgIDAndDate UserID, CancellationToken cancellationToken)
+        public async Task<object> TotalEmpOverTimeCountByOrgIDAndDate([FromBody] UtilsOrgIDAndDate UserID, CancellationToken cancellationToken)
         {
             if (cancellationToken != null)
                 cancellationToken.ThrowIfCancellationRequested();
@@ -268,12 +268,12 @@ namespace TimeAPI.API.Controllers
                 throw new ArgumentNullException(nameof(UserID.OrgID));
 
             var Result = _unitOfWork.AdminDashboardRepository.TotalEmpOverTimeCountByOrgIDAndDate(UserID.OrgID, UserID.toDate, UserID.fromDate);
-            return Task.FromResult<object>(Result);
+            return await Task.FromResult<object>(Result).ConfigureAwait(false);
         }
 
         [HttpPost]
         [Route("TotalEmpLessHoursByOrgIDAndDate")]
-        public Task<object> TotalEmpLessHoursByOrgIDAndDate([FromBody] UtilsOrgIDAndDate UserID, CancellationToken cancellationToken)
+        public async Task<object> TotalEmpLessHoursByOrgIDAndDate([FromBody] UtilsOrgIDAndDate UserID, CancellationToken cancellationToken)
         {
             if (cancellationToken != null)
                 cancellationToken.ThrowIfCancellationRequested();
@@ -282,12 +282,12 @@ namespace TimeAPI.API.Controllers
                 throw new ArgumentNullException(nameof(UserID.OrgID));
 
             var Result = _unitOfWork.AdminDashboardRepository.TotalEmpLessHoursByOrgIDAndDate(UserID.OrgID, UserID.toDate, UserID.fromDate);
-            return Task.FromResult<object>(Result);
+            return await Task.FromResult<object>(Result).ConfigureAwait(false);
         }
 
         [HttpPost]
         [Route("TotalLocationCheckInExceptionByOrgIDAndDate")]
-        public Task<object> TotalLocationCheckInExceptionByOrgIDAndDate([FromBody] UtilsOrgIDAndDate UserID, CancellationToken cancellationToken)
+        public async Task<object> TotalLocationCheckInExceptionByOrgIDAndDate([FromBody] UtilsOrgIDAndDate UserID, CancellationToken cancellationToken)
         {
             if (cancellationToken != null)
                 cancellationToken.ThrowIfCancellationRequested();
@@ -295,13 +295,13 @@ namespace TimeAPI.API.Controllers
             if (string.IsNullOrWhiteSpace(UserID.OrgID))
                 throw new ArgumentNullException(nameof(UserID.OrgID));
 
-            var Result = _unitOfWork.AdminDashboardRepository.TotalLocationExceptionByOrgIDAndDate(UserID.OrgID, UserID.toDate, UserID.fromDate);
-            return Task.FromResult<object>(Result);
+            var Result =  _unitOfWork.AdminDashboardRepository.TotalLocationExceptionByOrgIDAndDate(UserID.OrgID, UserID.toDate, UserID.fromDate);
+            return await Task.FromResult<object>(Result).ConfigureAwait(false);
         }
 
         [HttpPost]
         [Route("TotalLocationCheckOutExceptionByOrgIDAndDate")]
-        public Task<object> TotalLocationCheckOutExceptionByOrgIDAndDate([FromBody] UtilsOrgIDAndDate UserID, CancellationToken cancellationToken)
+        public async Task<object> TotalLocationCheckOutExceptionByOrgIDAndDate([FromBody] UtilsOrgIDAndDate UserID, CancellationToken cancellationToken)
         {
             if (cancellationToken != null)
                 cancellationToken.ThrowIfCancellationRequested();
@@ -310,7 +310,7 @@ namespace TimeAPI.API.Controllers
                 throw new ArgumentNullException(nameof(UserID.OrgID));
 
             var Result = _unitOfWork.AdminDashboardRepository.TotalLocationCheckOutExceptionByOrgIDAndDate(UserID.OrgID, UserID.toDate, UserID.fromDate);
-            return Task.FromResult<object>(Result);
+            return await Task.FromResult<object>(Result).ConfigureAwait(false);
         }
     }
 }

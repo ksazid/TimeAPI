@@ -35,6 +35,7 @@ using TimeAPI.API.Cache;
 using Microsoft.AspNetCore.Connections;
 using StackExchange.Redis;
 using TimeAPI.API.Serialization;
+using Microsoft.AspNetCore.Diagnostics;
 //using Hangfire;
 //using Hangfire.MemoryStorage;
 
@@ -116,11 +117,10 @@ namespace TimeAPI.API
             services.Configure<StorageSettings>(Configuration.GetSection("StorageSettings"));
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
-              .AddCustomStores()
-              .AddDefaultTokenProviders();
+                    .AddCustomStores()
+                    .AddDefaultTokenProviders();
             //.AddDefaultTokenProviders(provider => new LifetimeValidator(TimeSpan.FromDays(2)));
 
-            services.Configure<GzipCompressionProviderOptions>(options => options.Level = CompressionLevel.Optimal);
             services.AddResponseCompression(options =>
             {
                 options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[]
@@ -133,14 +133,17 @@ namespace TimeAPI.API
                                 "text/xml",
                                 "application/json",
                                 "text/json",
-                                // Custom
                                 "image/svg+xml"
                             });
 
                 options.Providers.Add<GzipCompressionProvider>();
 
             });
+
+            services.Configure<GzipCompressionProviderOptions>(options => options.Level = CompressionLevel.Fastest);
+
             services.AddMemoryCache();
+
             services.AddSession();
 
             // Add application services.
@@ -149,6 +152,7 @@ namespace TimeAPI.API
             services.AddTransient<ISmsSender, SmsSender>();
             services.AddSingleton<IJobVerification, JobVerification>();
 
+            services.AddResponseCaching();
 
             //InMemoryCache
             //services.AddSingleton<ICacheService, InMemoryCacheService>();
@@ -160,7 +164,6 @@ namespace TimeAPI.API
 
             //Serializer
             services.AddSingleton<ISerializer<string>, Serializer>();
-
 
             services.AddSwaggerGen(c =>
             {
@@ -263,10 +266,30 @@ namespace TimeAPI.API
                 app.UseExceptionHandler("/Home/Error");
             }
 
+
+            //app.UseExceptionHandler(config =>
+            //{
+            //    config.Run(async context =>
+            //    {
+            //        //context.Response.StatusCode = 500;
+            //        //context.Response.ContentType = "application/json";
+
+            //        var error = context.Features.Get<IExceptionHandlerFeature>();
+            //        if (error != null)
+            //        {
+            //            var ex = error.Error;
+
+            //            await context.Response.WriteAsync(new ErrorModel()
+            //            {
+            //                StatusCode = 500,
+            //                ErrorMessage = ex.Message
+            //            }.ToString()).ConfigureAwait(false);
+            //        }
+            //    });
+            //});
+
             app.UseDeveloperExceptionPage();
             app.UseCors("CorsPolicy");
-
-
             app.UseResponseCompression();
 
             //app.UseSignalR((options) =>
@@ -306,7 +329,6 @@ namespace TimeAPI.API
             //    () => serviceProvider.GetService<IJobVerification>().SendVerficationEmailConfirmationAsync(),
             //    "* * * * *"
             //    );
-
 
         }
     }

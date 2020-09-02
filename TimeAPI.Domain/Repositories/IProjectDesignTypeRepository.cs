@@ -9,17 +9,10 @@ namespace TimeAPI.Domain.Repositories
 {
     public interface IProjectDesignTypeRepository : IRepository<ProjectDesignType, string>
     {
-       IEnumerable<ProjectDesignType> GetProjectDesignTypeByUnitID(string UnitID);
-       IEnumerable<ProjectDesignType> GetProjectDesignTypeByUnitIDAndProjectTypeID(string UnitID, string ProjectTypeID);
-
-        
-
-
+        IEnumerable<ProjectDesignType> GetProjectDesignTypeByUnitID(string UnitID);
+        IEnumerable<ProjectDesignType> GetProjectDesignTypeByUnitIDAndProjectTypeID(string UnitID, string ProjectTypeID);
         void RemoveByUnitID(string UnitID);
-
-
         IEnumerable<ProjectDesignType> GetProjectDesignTypeByProjectID(string UnitID);
         void RemoveByProjectID(string UnitID);
-
     }
 }

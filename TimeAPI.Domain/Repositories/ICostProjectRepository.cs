@@ -22,5 +22,10 @@ namespace TimeAPI.Domain.Repositories
         void UpdateIsQuotationByCostProjectID(CostProject entity);
         dynamic FindByCostProjectID(string CostProjectID);
 
+        void UpdateCostProjectFinalValueByCostProjectID(CostProject entity);
+
+        string GetLastAddedCostPrefixByOrgID(string key);
+
+
     }
 }

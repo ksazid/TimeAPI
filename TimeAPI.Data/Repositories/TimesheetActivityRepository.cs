@@ -16,8 +16,8 @@ namespace TimeAPI.Data.Repositories
         {
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.timesheet_activity
-                                  (id, groupid, project_id, milestone_id, milestone_name, task_id, task_name, remarks, ondate, start_time, end_time, total_hrs, is_billable, created_date, createdby)
-                           VALUES (@id, @groupid, @project_id, @milestone_id, @milestone_name, @task_id, @task_name, @remarks, @ondate, @start_time, @end_time, @total_hrs, @is_billable, @created_date, @createdby);
+                                  (id, groupid, project_id, milestone_id, milestone_name, task_id, task_name, remarks, worked_percent, ondate, start_time, end_time, total_hrs, is_billable, created_date, createdby)
+                           VALUES (@id, @groupid, @project_id, @milestone_id, @milestone_name, @task_id, @task_name, @remarks, @worked_percent, @ondate, @start_time, @end_time, @total_hrs, @is_billable, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
                     param: entity
                 );
@@ -73,6 +73,7 @@ namespace TimeAPI.Data.Repositories
                     task_id = @task_id,
                     task_name = @task_name,
                     remarks = @remarks,
+                    worked_percent = @worked_percent,
                     ondate = @ondate,
                     start_time = @start_time,
                     end_time = @end_time,
@@ -106,7 +107,7 @@ namespace TimeAPI.Data.Repositories
                     [dbo].[timesheet_activity] WITH (NOLOCK)
                     INNER JOIN task on timesheet_activity.task_id = task.id
                     WHERE task.id = @TaskID
-                    ORDER BY timesheet_activity.ondate DESC",
+                    ORDER BY ORDER BY FORMAT(CAST(timesheet_activity.ondate AS datetime2), N'dd-MMM-yyyy HH:mm:ss', 'EN-US') DESC",
                 param: new { TaskID }
             );
         }
@@ -117,7 +118,7 @@ namespace TimeAPI.Data.Repositories
         public IEnumerable<ViewLogDataModel> GetTimesheetActivityByGroupAndProjectID(string GroupID, string ProjectID, string Date)
         {
             return Query<ViewLogDataModel>(
-                sql: @"SELECT total_time, project_type, project_name, milestone_name, task_name, remarks, total_hrs, is_billable, ondate, start_time, groupid FROM
+                sql: @"SELECT total_time, project_type, project_name, milestone_name, task_name, remarks, total_hrs, is_billable, worked_percent, ondate, start_time, groupid FROM
 					    (
                         SELECT  
 
@@ -130,6 +131,7 @@ namespace TimeAPI.Data.Repositories
 								remarks= dbo.timesheet_activity.remarks,
 								timesheet_activity.total_hrs,
 		                        timesheet_activity.is_billable,
+		                        timesheet_activity.worked_percent,
 		                        FORMAT(dbo.timesheet_activity.ondate, 'dd-MM-yyyy', 'en-US') AS ondate ,
 								dbo.timesheet_activity.start_time as start_time,
 								dbo.timesheet_activity.groupid as groupid
@@ -160,6 +162,7 @@ namespace TimeAPI.Data.Repositories
 								remarks= dbo.timesheet_administrative_activity.remarks,
 								timesheet_administrative_activity.total_hrs,
 		                        timesheet_administrative_activity.is_billable,
+		                        timesheet_administrative_activity.worked_percent,
 		                        FORMAT(dbo.timesheet_administrative_activity.ondate, 'dd-MM-yyyy', 'en-US') AS ondate,
 								dbo.timesheet_administrative_activity.start_time as start_time,
 								dbo.timesheet_administrative_activity.groupid as groupid
@@ -178,7 +181,7 @@ namespace TimeAPI.Data.Repositories
                             WHERE dbo.timesheet_administrative_activity.groupid =@GroupID
 	                        AND [dbo].timesheet_administrative_activity.is_deleted  = 0
        
-						) xDATA ORDER BY start_time ASC",
+						) xDATA ORDER BY FORMAT(CAST(start_time AS datetime2), N'dd-MMM-yyyy HH:mm:ss', 'EN-US') ASC",
                 param: new { GroupID, ProjectID, Date }
             );
         }
@@ -198,7 +201,7 @@ namespace TimeAPI.Data.Repositories
             string GroupID = String.Join("','", List);
 
             return Query<ViewLogDataModel>(
-                sql: @"SELECT total_time, project_type, project_name, milestone_name, task_name, remarks, total_hrs, is_billable, ondate, start_time, end_time, groupid FROM
+                sql: @"SELECT total_time, project_type, project_name, milestone_name, task_name, remarks, total_hrs, is_billable, worked_percent, ondate, start_time, end_time, groupid FROM
 					    (
                         SELECT  
 
@@ -211,6 +214,7 @@ namespace TimeAPI.Data.Repositories
 								remarks= dbo.timesheet_activity.remarks,
 								timesheet_activity.total_hrs,
 		                        timesheet_activity.is_billable,
+		                        timesheet_activity.worked_percent,
 		                        FORMAT(dbo.timesheet_activity.ondate, 'dd-MM-yyyy', 'en-US') AS ondate ,
 								dbo.timesheet_activity.start_time as start_time,
 								dbo.timesheet_activity.end_time as end_time,
@@ -242,6 +246,7 @@ namespace TimeAPI.Data.Repositories
 								remarks= dbo.timesheet_administrative_activity.remarks,
 								timesheet_administrative_activity.total_hrs,
 		                        timesheet_administrative_activity.is_billable,
+		                        timesheet_administrative_activity.worked_percent,
 		                        FORMAT(dbo.timesheet_administrative_activity.ondate, 'dd-MM-yyyy', 'en-US') AS ondate,
 								dbo.timesheet_administrative_activity.start_time as start_time,
 								dbo.timesheet_administrative_activity.end_time as end_time,
@@ -261,9 +266,8 @@ namespace TimeAPI.Data.Repositories
 	                        INNER JOIN  [dbo].[administrative] on   [dbo].[timesheet_administrative_activity].administrative_id = [dbo].[administrative].id 
                             WHERE dbo.timesheet_administrative_activity.groupid IN('" + GroupID + @"')
                             AND [dbo].timesheet_administrative_activity.is_deleted  = 0
-						) xDATA ORDER BY start_time ASC"
+						) xDATA ORDER BY FORMAT(CAST(start_time AS datetime2), N'dd-MMM-yyyy HH:mm:ss', 'EN-US') ASC"
             );
         }
-
     }
 }

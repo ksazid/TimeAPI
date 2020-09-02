@@ -118,6 +118,16 @@ namespace TimeAPI.Data
         private IPaymentRepository _paymentRepository;
         private IWarrantyRepository _warrantyRepository;
         private IExclusionRepository _exclusionRepository;
+        private IEntityMeetingRepository _entityMeetingRepository;
+        private IEntityNotesRepository _entityNotesRepository;
+        private IEntityMeetingParticipantsRepository _entityMeetingParticipantsRepository;
+        private ILocalActivityRepository _localActivityRepository;
+        private IEntityCallRepository _entityCallRepository;
+        private IEntityHistoryLogRepository _entityHistoryLogRepository;
+
+
+
+
 
         #region systemadmin
         private IPlanRepository _planRepository;
@@ -1052,6 +1062,62 @@ namespace TimeAPI.Data
                     ?? (_exclusionRepository = new ExclusionRepository(_transaction));
             }
         }
+
+        public IEntityMeetingRepository EntityMeetingRepository
+        {
+            get
+            {
+                return _entityMeetingRepository
+                    ?? (_entityMeetingRepository = new EntityMeetingRepository(_transaction));
+            }
+        }
+
+        public IEntityNotesRepository EntityNotesRepository
+        {
+            get
+            {
+                return _entityNotesRepository
+                    ?? (_entityNotesRepository = new EntityNotesRepository(_transaction));
+            }
+        }
+
+        public IEntityMeetingParticipantsRepository EntityMeetingParticipantsRepository
+        {
+            get
+            {
+                return _entityMeetingParticipantsRepository
+                    ?? (_entityMeetingParticipantsRepository = new EntityMeetingParticipantsRepository(_transaction));
+            }
+        }
+
+        public ILocalActivityRepository LocalActivityRepository
+        {
+            get
+            {
+                return _localActivityRepository
+                    ?? (_localActivityRepository = new LocalActivityRepository(_transaction));
+            }
+        }
+
+        public IEntityCallRepository EntityCallRepository
+        {
+            get
+            {
+                return _entityCallRepository
+                    ?? (_entityCallRepository = new EntityCallRepository(_transaction));
+            }
+        }
+
+        public IEntityHistoryLogRepository EntityHistoryLogRepository
+        {
+            get
+            {
+                return _entityHistoryLogRepository
+                    ?? (_entityHistoryLogRepository = new EntityHistoryLogRepository(_transaction));
+            }
+        }
+
+
 
         public bool Commit()
         {

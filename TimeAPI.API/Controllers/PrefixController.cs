@@ -174,11 +174,8 @@ namespace TimeAPI.API.Controllers
                 if (UtilsOrgID == null)
                     throw new ArgumentNullException(nameof(UtilsOrgID.OrgID));
 
-                oDataTable _oDataTable = new oDataTable();
                 var results = _unitOfWork.PrefixRepository.PrefixByOrgID(UtilsOrgID.OrgID);
-                var xResult = _oDataTable.ToDataTable(results);
-
-                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(results, Formatting.Indented)).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

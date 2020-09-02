@@ -109,10 +109,10 @@ namespace TimeAPI.API.Controllers
 
                 modal.modified_date = _dateTime.ToString();
                 modal.is_deleted = false;
-                _unitOfWork.TaskTeamMembersRepository.RemoveByTaskID(modal.id);
 
                 if (TaskViewModel.employees != null)
                 {
+                    _unitOfWork.TaskTeamMembersRepository.RemoveByTaskID(modal.id);
                     foreach (var item in TaskViewModel.employees.Distinct())
                     {
                         var TaskTeamMembers = new TaskTeamMember()
@@ -220,7 +220,8 @@ namespace TimeAPI.API.Controllers
                 var results = _unitOfWork.TaskRepository.FindByTaskDetailsByEmpID(Utils.ID);
                 var xResult = _oDataTable.ToDataTable(results);
 
-                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
+                return await System.Threading.Tasks.Task.FromResult<object>(xResult).ConfigureAwait(false);
+                //return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -261,7 +262,7 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("GetAllTaskByEmpID")]
-        public Task<object> GetAllTaskByEmpID([FromBody] Utils UserID, CancellationToken cancellationToken)
+        public async Task<object> GetAllTaskByEmpID([FromBody] Utils UserID, CancellationToken cancellationToken)
         {
             if (cancellationToken != null)
                 cancellationToken.ThrowIfCancellationRequested();
@@ -270,7 +271,7 @@ namespace TimeAPI.API.Controllers
                 throw new ArgumentNullException(nameof(UserID.ID));
 
             var Result = _unitOfWork.TaskRepository.GetAllTaskByEmpID(UserID.ID, _dateTime.ToString());
-            return Task.FromResult<object>(Result);
+            return await Task.FromResult<object>(Result).ConfigureAwait(false);
         }
     }
 }

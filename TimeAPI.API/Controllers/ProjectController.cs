@@ -521,6 +521,28 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
+        [HttpPost]
+        [Route("GetLastAddedProjectPrefixByOrgID")]
+        public async Task<object> GetLastAddedProjectPrefixByOrgID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                var result = _unitOfWork.ProjectRepository.GetLastAddedProjectPrefixByOrgID(Utils.ID);
+                return await Task.FromResult<object>(new SuccessViewModel
+                {
+                    Status = "200",
+                    Code = (result ?? string.Empty).ToString(),
+                    Desc = ""
+                }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
         #endregion Projects
 
         #region EntityLocation
@@ -704,6 +726,29 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
+
+        [HttpPost]
+        [Route("FindByEntityContactOrgID")]
+        public async Task<object> FindByEntityContactOrgID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                var results = _unitOfWork.EntityContactRepository.FindByEntityContactOrgID(Utils.ID);
+
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(results, Formatting.Indented)).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
         [HttpGet]
         [Route("GetAllEntityContact")]
         public async Task<object> GetAllEntityContact(CancellationToken cancellationToken)
@@ -744,6 +789,7 @@ namespace TimeAPI.API.Controllroers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
+
 
         [HttpPatch]
         [Route("UpdateEntityContact")]

@@ -113,6 +113,20 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
+        public dynamic FindByEntityContactOrgID(string key)
+        {
+            return Query<dynamic>(
+             sql: @"SELECT 
+                        DISTINCT(dbo.entity_contact.id), dbo.entity_contact.name 
+	                    FROM dbo.entity_contact
+	                    LEFT JOIN dbo.customer on dbo.entity_contact.entity_id = dbo.customer.id
+	                    WHERE dbo.customer.org_id = @key
+	                    AND dbo.entity_contact.is_deleted = 0
+	                    AND dbo.customer.is_deleted = 0",
+                param: new { key }
+            );
+        }
+
         public IEnumerable<EntityContact> All()
         {
             return Query<EntityContact>(

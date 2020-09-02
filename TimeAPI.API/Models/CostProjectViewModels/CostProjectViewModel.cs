@@ -40,6 +40,8 @@ namespace TimeAPI.API.Models.CostProjectViewModels
         //public EntityLocation EntityLocation { get; set; }
     }
 
+    
+
     public class UpdateCostProjectViewModel
     {
         public string id { get; set; }
@@ -50,11 +52,27 @@ namespace TimeAPI.API.Models.CostProjectViewModels
     }
 
 
+
+    public class UpdateCostProjectFinalValueViewModel
+    {
+        public string id { get; set; }
+        public string total_hours { get; set; }
+        public string gross_total_amount { get; set; }
+        public string profit_margin_amount { get; set; }
+        public string discount_amount { get; set; }
+        public string total_amount { get; set; }
+        public string vat_amount { get; set; }
+        public string net_total_amount { get; set; }
+        public string createdby { get; set; }
+
+    }
+
+
     public class UpdateCostProjectIsQuotationViewModel
     {
         public string id { get; set; }
-        public string is_quotation { get; set; }
-        public string createdby { get; set; }
+        public bool is_quotation { get; set; }
+        public string modifiedby { get; set; }
 
     }
 
@@ -121,6 +139,7 @@ namespace TimeAPI.API.Models.CostProjectViewModels
     {
         public string id { get; set; }
         public string project_status_id { get; set; }
+        public string project_prefix { get; set; }
         public string modifiedby { get; set; }
         public string start_date { get; set; }
         public string end_date { get; set; }
