@@ -1,30 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.Domain.Repositories
 {
-    public interface ICostProjectRepository : IRepository<CostProject, string>
+    public interface ICostProjectRepository : IRepositoryAsync<CostProject, string>
     {
         //IEnumerable<Team> FindTeamsByOrgID(string OrgID);
         //dynamic FindByTeamID(string TeamID);
-        IEnumerable<dynamic> FetchAllCostProjectByOrgID(string OrgID);
+        Task<IEnumerable<dynamic>> FetchAllCostProjectByOrgID(string OrgID);
 
-        void UpdateCostProjectStatusByID(CostProject entity);
+        Task UpdateCostProjectStatusByID(CostProject entity);
+ 
+        Task UpdateCostProjectDiscountAndProfitMarginByID(CostProject entity);
 
-        //CostProject FindAutoCostProjectPrefixByOrgID(string key, string key1);
-        //CostProject FindCustomCostProjectPrefixByOrgIDAndPrefix(string key, string key1);
-        //IEnumerable<dynamic> FindAllCostProjectActivityByCostProjectID(string ProjectID);
-        //string ProjectActivityCount(string key);
-        //string CostProjectTaskCount(string key);
-        void UpdateCostProjectDiscountAndProfitMarginByID(CostProject entity);
-        void UpdateIsQuotationByCostProjectID(CostProject entity);
-        dynamic FindByCostProjectID(string CostProjectID);
+        Task UpdateIsQuotationByCostProjectID(CostProject entity);
 
-        void UpdateCostProjectFinalValueByCostProjectID(CostProject entity);
+        Task<dynamic> FindByCostProjectID(string CostProjectID);
 
-        string GetLastAddedCostPrefixByOrgID(string key);
+        Task UpdateCostProjectFinalValueByCostProjectID(CostProject entity);
+
+        Task<string> GetLastAddedCostPrefixByOrgID(string key);
 
 
     }

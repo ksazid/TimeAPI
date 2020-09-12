@@ -1,21 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Model;
 
 namespace TimeAPI.Domain.Repositories
 {
-    public interface ITimesheetActivityRepository : IRepository<TimesheetActivity, string>
+    public interface ITimesheetActivityRepository : IRepositoryAsync<TimesheetActivity, string>
     {
         //IEnumerable<Team> FindTeamsByOrgID(string OrgID);
-        void RemoveByGroupID(string GroupID);
+        Task RemoveByGroupID(string GroupID);
 
-        dynamic GetTop10TimesheetActivityOnTaskID(string TaskID);
+        Task<dynamic> GetTop10TimesheetActivityOnTaskID(string TaskID);
 
-        IEnumerable<ViewLogDataModel> GetTimesheetActivityByGroupAndProjectID(string GroupID, string ProjectID, string Date);
+        Task<IEnumerable<ViewLogDataModel>> GetTimesheetActivityByGroupAndProjectID(string GroupID, string ProjectID, string Date);
 
-        IEnumerable<ViewLogDataModel> GetTimesheetActivityByEmpID(string EmpID, string StartDate, string EndDate);
+        Task<IEnumerable<ViewLogDataModel>> GetTimesheetActivityByEmpID(string EmpID, string StartDate, string EndDate);
 
     }
 }

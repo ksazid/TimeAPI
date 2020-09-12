@@ -174,7 +174,7 @@ namespace TimeAPI.API.Controllroers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.TeamRepository.All();
+                var result = await _unitOfWork.TeamRepository.All().ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -196,7 +196,7 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.OrgID));
 
-                var result = _unitOfWork.TeamRepository.FindTeamsByOrgID(Utils.OrgID);
+                var result = await _unitOfWork.TeamRepository.FindTeamsByOrgID(Utils.OrgID).ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -218,7 +218,7 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var results = _unitOfWork.TeamRepository.FindByTeamID(Utils.ID);
+                var results = await _unitOfWork.TeamRepository.FindByTeamID(Utils.ID).ConfigureAwait(false);
 
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(results, Formatting.Indented)).ConfigureAwait(false);
             }
@@ -241,7 +241,7 @@ namespace TimeAPI.API.Controllroers
                     throw new ArgumentNullException(nameof(Utils.OrgID));
 
                 oDataTable _oDataTable = new oDataTable();
-                var results = _unitOfWork.TeamRepository.FetchAllTeamsByOrgID(Utils.OrgID);
+                var results = await _unitOfWork.TeamRepository.FetchAllTeamsByOrgID(Utils.OrgID).ConfigureAwait(false);
                 var xResult = _oDataTable.ToDataTable(results);
 
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
@@ -265,7 +265,7 @@ namespace TimeAPI.API.Controllroers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 oDataTable _oDataTable = new oDataTable();
-                var results = _unitOfWork.TeamRepository.FetchAllTeamMembersByTeamID(Utils.ID);
+                var results = await _unitOfWork.TeamRepository.FetchAllTeamMembersByTeamID(Utils.ID).ConfigureAwait(false);
                 var xResult = _oDataTable.ToDataTable(results);
 
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
@@ -289,7 +289,7 @@ namespace TimeAPI.API.Controllroers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 oDataTable _oDataTable = new oDataTable();
-                var results = _unitOfWork.TeamRepository.GetAllTeamMembersByTeamID(Utils.ID);
+                var results = await _unitOfWork.TeamRepository.GetAllTeamMembersByTeamID(Utils.ID).ConfigureAwait(false);
                 var xResult = _oDataTable.ToDataTable(results);
 
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);

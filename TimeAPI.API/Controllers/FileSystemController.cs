@@ -64,13 +64,13 @@ namespace TimeAPI.API.Controllers
 
                         CloudBlockBlob blockBlob = container.GetBlockBlobReference(FormFile.FileName);
 
-                        if (await container.ExistsAsync())
+                        if (await container.ExistsAsync().ConfigureAwait(false))
                         {
                             CloudBlob file = container.GetBlobReference(FormFile.FileName);
 
-                            if (await file.ExistsAsync())
+                            if (await file.ExistsAsync().ConfigureAwait(false))
                             {
-                                await file.DeleteAsync();
+                                await file.DeleteAsync().ConfigureAwait(false);
                             }
                         }
 

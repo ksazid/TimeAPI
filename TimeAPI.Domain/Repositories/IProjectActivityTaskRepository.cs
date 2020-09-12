@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.Domain.Repositories
 {
-    public interface IProjectActivityTaskRepository : IRepository<ProjectActivityTask, string>
+    public interface IProjectActivityTaskRepository : IRepositoryAsync<ProjectActivityTask, string>
     {
-        void RemoveByProjectActivityID(string ProjectActivityID);
-        void RemoveByProjectID(string ProjectID);
-        IEnumerable<dynamic> GetAllTaskByActivityID(string ActivityID);
-        IEnumerable<dynamic> GetAllTaskByProjectID(string ProjectID);
-        IEnumerable<ProjectActivityTaskEntityViewModel> GetAllTaskForAssignByProjectID(string ProjectID);
-        dynamic GetProjectActivityTaskRatioByProjectID(string ProjectID);
+        Task RemoveByProjectActivityID(string ProjectActivityID);
+        Task RemoveByProjectID(string ProjectID);
+        Task< IEnumerable<dynamic>> GetAllTaskByActivityID(string ActivityID);
+        Task< IEnumerable<dynamic>> GetAllTaskByProjectID(string ProjectID);
+        Task<IEnumerable<ProjectActivityTaskEntityViewModel>> GetAllTaskForAssignByProjectID(string ProjectID);
+        Task<dynamic> GetProjectActivityTaskRatioByProjectID(string ProjectID);
+        Task<IEnumerable<ProjectSubTaskEntityViewModel>> GetAllSubTaskByTaskID(string key);
     }
 }

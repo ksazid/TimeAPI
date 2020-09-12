@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -23,17 +24,17 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public Quotation Find(string key)
+        public async Task< Quotation> Find(string key)
         {
-            return QuerySingleOrDefault<Quotation>(
+            return await QuerySingleOrDefaultAsync<Quotation>(
                 sql: "SELECT * FROM dbo.project_quotation WHERE id = @key and is_deleted = 0",
                 param: new { key }
             );
         }
 
-        public dynamic FindByQuotationID(string key)
+        public async Task<dynamic> FindByQuotationID(string key)
         {
-            return QuerySingleOrDefault<dynamic>(
+            return await QuerySingleOrDefaultAsync<dynamic>(
                 sql: @"SELECT
                         CASE
                             WHEN dbo.customer.is_company = 1 THEN dbo.customer.company_name
@@ -61,16 +62,16 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<Quotation> All()
+        public async Task<IEnumerable<Quotation>> All()
         {
-            return Query<Quotation>(
+            return await QueryAsync<Quotation>(
                 sql: "SELECT * FROM dbo.project_quotation where is_deleted = 0"
             );
         }
 
-        public dynamic QuotationByOrgID(string key)
+        public async Task<dynamic> QuotationByOrgID(string key)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                 sql: @"SELECT
                         customer.cst_name as lead_name,
                         customer_x_project.cst_id,
@@ -78,6 +79,8 @@ namespace TimeAPI.Data.Repositories
                         dbo.customer.first_name,
                         dbo.customer.last_name,
                         dbo.customer.is_company,
+						entity_contact.phone,
+						entity_contact.email,
                         FORMAT(CAST(dbo.project_quotation.quotation_date AS DATETIME2), N'dd/MM/yyyy') AS ondate,
 	                    dbo.cost_project.total_hours,
 	                    dbo.cost_project.gross_total_amount,
@@ -90,11 +93,15 @@ namespace TimeAPI.Data.Repositories
                         dbo.project_quotation.*
                         FROM dbo.project_quotation
                         LEFT JOIN cost_project on project_quotation.lead_id = cost_project.id
+						LEFT JOIN entity_contact on cost_project.id = entity_contact.entity_id
                         LEFT JOIN customer_x_project on cost_project.id = customer_x_project.project_id
                         LEFT JOIN customer on customer_x_project.cst_id = customer.id
                         LEFT JOIN lead_stage on dbo.project_quotation.stage_id = lead_stage.id
-                        WHERE cost_project.is_deleted = 0 and customer.is_deleted = 0  and project_quotation.is_deleted = 0 and 
-                        cost_project.org_id = @key",
+                        WHERE cost_project.is_deleted = 0 
+						and customer.is_deleted = 0 
+						and project_quotation.is_deleted = 0
+						and entity_contact.is_primary =1 
+						and cost_project.org_id = @key",
                 param: new { key }
             );
         }
@@ -139,9 +146,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public void UpdateQuotationStageByQuotationID(Quotation entity)
+        public async Task UpdateQuotationStageByQuotationID(Quotation entity)
         {
-            Execute(
+           await ExecuteAsync(
                 sql: @"UPDATE dbo.project_quotation
                            SET 
                             stage_id = @stage_id,
@@ -152,9 +159,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public string GetLastAddedQuotationPrefixByOrgID(string key)
+        public async Task<string> GetLastAddedQuotationPrefixByOrgID(string key)
         {
-            return QuerySingleOrDefault<string>(
+            return await QuerySingleOrDefaultAsync<string>(
                 sql: @"SELECT TOP 1 quotation_prefix from dbo.project_quotation 
                         WHERE project_quotation.org_id = @key
                         AND project_quotation.is_deleted = 0

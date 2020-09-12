@@ -40,4 +40,29 @@ namespace TimeAPI.Domain.Entities
         public bool is_deleted { get; set; }
         public List<TaskTeamMember> TaskTeamMember { get; set; }
     }
+
+
+    public class ProjectSubTaskEntityViewModel
+    {
+        public string id { get; set; }
+        public string project_id { get; set; }
+        public string activity_id { get; set; }
+        public string task_id { get; set; }
+        public string milestone_name { get; set; }
+        public string task_name { get; set; }
+        public string sub_task_name { get; set; }
+        public string due_date { get; set; }
+        public string activity_name { get; set; }
+        public string lead_id { get; set; }
+        public string lead_name { get; set; }
+        public string priority_name { get; set; }
+        public string status_name { get; set; }
+        public string status_id { get; set; }
+        public string created_date { get; set; }
+        public string createdby { get; set; }
+        public string modified_date { get; set; }
+        public string modifiedby { get; set; }
+        public bool is_deleted { get; set; }
+        public List<TaskTeamMember> TaskTeamMember { get; set; }
+    }
 }

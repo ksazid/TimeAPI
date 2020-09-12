@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -21,34 +22,34 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public ProjectDesignType Find(string key)
+        public async Task< ProjectDesignType> Find(string key)
         {
-            return QuerySingleOrDefault<ProjectDesignType>(
+            return await QuerySingleOrDefaultAsync<ProjectDesignType>(
                 sql: "SELECT * FROM dbo.project_design_type WHERE id = @key and is_deleted = 0",
                 param: new { key }
             );
         }
 
-        public IEnumerable<ProjectDesignType> GetProjectDesignTypeByUnitID(string key)
+        public async Task<IEnumerable<ProjectDesignType>> GetProjectDesignTypeByUnitID(string key)
         {
-            return Query<ProjectDesignType>(
+            return await QueryAsync<ProjectDesignType>(
                 sql: "SELECT * FROM dbo.project_design_type WHERE unit_id = @key and is_deleted = 0",
                 param: new { key }
             );
         }
 
-        public IEnumerable<ProjectDesignType> GetProjectDesignTypeByUnitIDAndProjectTypeID(string key, string ProjectTypeID)
+        public async Task<IEnumerable<ProjectDesignType>> GetProjectDesignTypeByUnitIDAndProjectTypeID(string key, string ProjectTypeID)
         {
-            return Query<ProjectDesignType>(
+            return await QueryAsync<ProjectDesignType>(
                 sql: "SELECT * FROM dbo.project_design_type WHERE unit_id = @key and is_deleted = 0 and design_type_id = @ProjectTypeID",
                 param: new { key, ProjectTypeID }
             );
         }
 
 
-        public IEnumerable<ProjectDesignType> GetProjectDesignTypeByProjectID(string key)
+        public async Task<IEnumerable<ProjectDesignType>> GetProjectDesignTypeByProjectID(string key)
         {
-            return Query<ProjectDesignType>(
+            return await QueryAsync<ProjectDesignType>(
                 sql: "SELECT * FROM dbo.project_design_type WHERE project_id = @key and is_deleted = 0",
                 param: new { key }
             );
@@ -57,9 +58,9 @@ namespace TimeAPI.Data.Repositories
 
 
 
-        public IEnumerable<ProjectDesignType> All()
+        public async Task<IEnumerable<ProjectDesignType>> All()
         {
-            return Query<ProjectDesignType>(
+            return await QueryAsync<ProjectDesignType>(
                 sql: "SELECT * FROM dbo.project_design_type where is_deleted = 0"
             );
         }
@@ -75,9 +76,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public void RemoveByUnitID(string key)
+        public async Task RemoveByUnitID(string key)
         {
-            Execute(
+           await ExecuteAsync(
                 sql: @"UPDATE dbo.project_design_type
                    SET
                        modified_date = GETDATE(), is_deleted = 1
@@ -85,9 +86,9 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
-        public void RemoveByProjectID(string key)
+        public async Task RemoveByProjectID(string key)
         {
-            Execute(
+           await ExecuteAsync(
                 sql: @"UPDATE dbo.project_design_type
                    SET
                        modified_date = GETDATE(), is_deleted = 1

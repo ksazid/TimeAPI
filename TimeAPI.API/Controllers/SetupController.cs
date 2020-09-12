@@ -61,13 +61,13 @@ namespace TimeAPI.API.Controllers
                     var result = _unitOfWork.SetupRepository.Country();
                     string output = JsonConvert.SerializeObject(result, _JsonSerializerSettings);
                     await _cacheService.SetCacheValueAsync("Country", output).ConfigureAwait(false);
-                    return Task.FromResult<object>(result);
+                    return await Task.FromResult<object>(result).ConfigureAwait(false);
                 }
                 else
                 {
                     var result = _cacheService.GetCacheValueAsync("Country");
                     object deserializedProduct = JsonConvert.DeserializeObject<object>(result.Result, _JsonSerializerSettings);
-                    return Task.FromResult<object>(deserializedProduct);
+                    return await Task.FromResult<object>(deserializedProduct).ConfigureAwait(false);
                 }
             }
             catch (Exception ex)
@@ -104,9 +104,21 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.SetupRepository.PhoneCodes();
 
-                return await System.Threading.Tasks.Task.FromResult<object>(result).ConfigureAwait(false);
+                if (!_cacheService.IsCached("PhoneCodes"))
+                {
+
+                    var result = _unitOfWork.SetupRepository.PhoneCodes();
+                    string output = JsonConvert.SerializeObject(result, _JsonSerializerSettings);
+                    await _cacheService.SetCacheValueAsync("PhoneCodes", output).ConfigureAwait(false);
+                    return await Task.FromResult<object>(result).ConfigureAwait(false);
+                }
+                else
+                {
+                    var result = _cacheService.GetCacheValueAsync("PhoneCodes");
+                    object deserializedProduct = JsonConvert.DeserializeObject<object>(result.Result, _JsonSerializerSettings);
+                    return await Task.FromResult<object>(deserializedProduct).ConfigureAwait(false);
+                }
             }
             catch (Exception ex)
             {
@@ -426,7 +438,7 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.PriorityRepository.All();
+                var result = await _unitOfWork.PriorityRepository.All().ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -448,7 +460,7 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.PriorityRepository.Find(Utils.ID);
+                var result = await _unitOfWork.PriorityRepository.Find(Utils.ID).ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -470,7 +482,7 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.PriorityRepository.GetPriorityByOrgID(Utils.ID);
+                var result = await _unitOfWork.PriorityRepository.GetPriorityByOrgID(Utils.ID).ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -577,7 +589,7 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.StatusRepository.All();
+                var result = await _unitOfWork.StatusRepository.All().ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -599,7 +611,7 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.StatusRepository.Find(Utils.ID);
+                var result = await _unitOfWork.StatusRepository.Find(Utils.ID).ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -621,7 +633,7 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.StatusRepository.GetStatusByOrgID(Utils.ID);
+                var result = await _unitOfWork.StatusRepository.GetStatusByOrgID(Utils.ID).ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -1057,7 +1069,6 @@ namespace TimeAPI.API.Controllers
         }
 
         #endregion IndustryType
-
 
         #region LocalActivity
 

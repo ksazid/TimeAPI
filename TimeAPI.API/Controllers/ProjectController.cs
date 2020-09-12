@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using TimeAPI.API.Models;
 using TimeAPI.API.Models.EntityLocationViewModels;
 using TimeAPI.API.Models.ProjectActivityViewModels;
+using TimeAPI.API.Models.ProjectTagsViewModels;
 using TimeAPI.API.Models.ProjectTypeViewModels;
 using TimeAPI.API.Models.ProjectViewModels;
 using TimeAPI.API.Models.StatusViewModels;
@@ -72,21 +73,24 @@ namespace TimeAPI.API.Controllroers
 
                 if (projectViewModel.EntityContact != null)
                 {
-                    var entityContact = new EntityContact()
+                    for (int i = 0; i < projectViewModel.EntityContact.Count; i++)
                     {
-                        id = Guid.NewGuid().ToString(),
-                        entity_id = modal.id,
-                        name = projectViewModel.EntityContact.name,
-                        position = projectViewModel.EntityContact.position,
-                        phone = projectViewModel.EntityContact.phone,
-                        mobile = projectViewModel.EntityContact.mobile,
-                        email = projectViewModel.EntityContact.email,
-                        createdby = projectViewModel.createdby,
-                        created_date = _dateTime.ToString(),
-                        is_primary = projectViewModel.EntityContact.is_primary,
-                        is_deleted = false
-                    };
-                    _unitOfWork.EntityContactRepository.Add(entityContact);
+                        var entityContact = new EntityContact()
+                        {
+                            id = Guid.NewGuid().ToString(),
+                            entity_id = modal.id,
+                            name = projectViewModel.EntityContact[i].name,
+                            position = projectViewModel.EntityContact[i].position,
+                            phone = projectViewModel.EntityContact[i].phone,
+                            mobile = projectViewModel.EntityContact[i].mobile,
+                            email = projectViewModel.EntityContact[i].email,
+                            createdby = projectViewModel.createdby,
+                            created_date = _dateTime.ToString(),
+                            is_primary = projectViewModel.EntityContact[i].is_primary,
+                            is_deleted = false
+                        };
+                        _unitOfWork.EntityContactRepository.Add(entityContact);
+                    }
                 }
 
                 if (projectViewModel.EntityLocation != null)
@@ -151,7 +155,7 @@ namespace TimeAPI.API.Controllroers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 oDataTable _oDataTable = new oDataTable();
-                var results = _unitOfWork.ProjectRepository.FetchAllProjectByOrgID(Utils.ID);
+                var results = await _unitOfWork.ProjectRepository.FetchAllProjectByOrgID(Utils.ID).ConfigureAwait(false);
                 var xResult = _oDataTable.ToDataTable(results);
 
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
@@ -176,17 +180,17 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var results = _unitOfWork.ProjectRepository.Find(Utils.ID);
+                var results = await _unitOfWork.ProjectRepository.Find(Utils.ID).ConfigureAwait(false);
                 var resultLocation = _unitOfWork.EntityLocationRepository.FindByEnitiyID(results.id);
-                var resultContact = _unitOfWork.EntityContactRepository.FindByEntityID(results.id);
-                var resultCustomer = _unitOfWork.CustomerRepository.FindCustomerByProjectID(results.id);
+                var resultContact = await _unitOfWork.EntityContactRepository.FindByEntityListID(results.id).ConfigureAwait(false);
+                var resultCustomer = await _unitOfWork.CustomerRepository.FindCustomerByProjectID(results.id).ConfigureAwait(false);
 
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<ProjectDetailViewModel, Project>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Project>(results);
 
                 modal.EntityLocation = resultLocation;
-                modal.EntityContact = resultContact;
+                modal.EntityContact = resultContact.ToList();
                 modal.EntityCustomer = resultCustomer;
 
                 return await Task.FromResult<object>(modal).ConfigureAwait(false);
@@ -206,7 +210,7 @@ namespace TimeAPI.API.Controllroers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.ProjectRepository.All();
+                var result = await _unitOfWork.ProjectRepository.All().ConfigureAwait(false);
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -228,9 +232,9 @@ namespace TimeAPI.API.Controllroers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 _unitOfWork.ProjectRepository.Remove(Utils.ID);
-                _unitOfWork.EntityContactRepository.RemoveByEntityID(Utils.ID);
+                await _unitOfWork.EntityContactRepository.RemoveByEntityID(Utils.ID).ConfigureAwait(false);
                 _unitOfWork.EntityLocationRepository.RemoveByEntityID(Utils.ID);
-                _unitOfWork.ProjectActivityTaskRepository.RemoveByProjectID(Utils.ID);
+                await _unitOfWork.ProjectActivityTaskRepository.RemoveByProjectID(Utils.ID).ConfigureAwait(false);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Project removed successfully." }).ConfigureAwait(false);
@@ -258,21 +262,43 @@ namespace TimeAPI.API.Controllroers
                 var modal = mapper.Map<Project>(projectViewModel);
                 modal.modified_date = _dateTime.ToString();
 
+                //if (projectViewModel.EntityContact != null)
+                //{
+                //    var entityContact = new EntityContact()
+                //    {
+                //        entity_id = modal.id,
+                //        name = projectViewModel.EntityContact.name,
+                //        position = projectViewModel.EntityContact.position,
+                //        phone = projectViewModel.EntityContact.phone,
+                //        mobile = projectViewModel.EntityContact.mobile,
+                //        email = projectViewModel.EntityContact.email,
+                //        modifiedby = projectViewModel.createdby,
+                //        modified_date = _dateTime.ToString(),
+                //        is_primary = projectViewModel.EntityContact.is_primary
+                //    };
+                //    _unitOfWork.EntityContactRepository.Update(entityContact);
+                //}
+                await _unitOfWork.EntityContactRepository.RemoveByEntityID(modal.id).ConfigureAwait(false);
                 if (projectViewModel.EntityContact != null)
                 {
-                    var entityContact = new EntityContact()
+                    for (int i = 0; i < projectViewModel.EntityContact.Count; i++)
                     {
-                        entity_id = modal.id,
-                        name = projectViewModel.EntityContact.name,
-                        position = projectViewModel.EntityContact.position,
-                        phone = projectViewModel.EntityContact.phone,
-                        mobile = projectViewModel.EntityContact.mobile,
-                        email = projectViewModel.EntityContact.email,
-                        modifiedby = projectViewModel.createdby,
-                        modified_date = _dateTime.ToString(),
-                        is_primary = projectViewModel.EntityContact.is_primary
-                    };
-                    _unitOfWork.EntityContactRepository.Update(entityContact);
+                        var entityContact = new EntityContact()
+                        {
+                            id = Guid.NewGuid().ToString(),
+                            entity_id = modal.id,
+                            name = projectViewModel.EntityContact[i].name,
+                            position = projectViewModel.EntityContact[i].position,
+                            phone = projectViewModel.EntityContact[i].phone,
+                            mobile = projectViewModel.EntityContact[i].mobile,
+                            email = projectViewModel.EntityContact[i].email,
+                            createdby = projectViewModel.createdby,
+                            created_date = _dateTime.ToString(),
+                            is_primary = projectViewModel.EntityContact[i].is_primary,
+                            is_deleted = false
+                        };
+                        _unitOfWork.EntityContactRepository.Add(entityContact);
+                    }
                 }
 
                 if (projectViewModel.EntityLocation != null)
@@ -341,7 +367,7 @@ namespace TimeAPI.API.Controllroers
                 modal.modified_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
-                _unitOfWork.ProjectRepository.UpdateProjectStatusByID(modal);
+                await _unitOfWork.ProjectRepository.UpdateProjectStatusByID(modal).ConfigureAwait(false);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Project Status Updated Successfully." }).ConfigureAwait(false);
@@ -366,7 +392,7 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.OrgID));
 
-                var results = _unitOfWork.ProjectRepository.FindAutoProjectPrefixByOrgID(Utils.OrgID, _dateTime.ToString());
+                var results = await _unitOfWork.ProjectRepository.FindAutoProjectPrefixByOrgID(Utils.OrgID, _dateTime.ToString()).ConfigureAwait(false);
 
                 return await Task.FromResult<object>(results).ConfigureAwait(false);
             }
@@ -390,7 +416,7 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.OrgID));
 
-                var results = _unitOfWork.ProjectRepository.FindAutoCostProjectPrefixByOrgID(Utils.OrgID, _dateTime.ToString());
+                var results = await _unitOfWork.ProjectRepository.FindAutoCostProjectPrefixByOrgID(Utils.OrgID, _dateTime.ToString()).ConfigureAwait(false);
 
                 return await Task.FromResult<object>(results).ConfigureAwait(false);
             }
@@ -436,7 +462,7 @@ namespace TimeAPI.API.Controllroers
                 if (statusingViewModel == null)
                     throw new ArgumentNullException(nameof(statusingViewModel));
 
-                var CustomerProject = _unitOfWork.CustomerProjectRepository.Find(statusingViewModel.project_id);
+                var CustomerProject = await _unitOfWork.CustomerProjectRepository.Find(statusingViewModel.project_id).ConfigureAwait(false);
 
                 if (CustomerProject == null)
                 {
@@ -487,8 +513,7 @@ namespace TimeAPI.API.Controllroers
                 if (_Utils == null)
                     throw new ArgumentNullException(nameof(_Utils));
 
-                var results = _unitOfWork.ProjectRepository.ProjectTaskCount(_Utils.ID);
-
+                var results = await _unitOfWork.ProjectRepository.ProjectTaskCount(_Utils.ID).ConfigureAwait(false);
                 return await Task.FromResult<object>(results).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -510,7 +535,7 @@ namespace TimeAPI.API.Controllroers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 oDataTable _oDataTable = new oDataTable();
-                var results = _unitOfWork.ProjectRepository.FindAllProjectActivityByProjectID(Utils.ID);
+                var results = await _unitOfWork.ProjectRepository.FindAllProjectActivityByProjectID(Utils.ID).ConfigureAwait(false);
                 var xResult = _oDataTable.ToDataTable(results);
 
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
@@ -530,7 +555,7 @@ namespace TimeAPI.API.Controllroers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.ProjectRepository.GetLastAddedProjectPrefixByOrgID(Utils.ID);
+                var result = await _unitOfWork.ProjectRepository.GetLastAddedProjectPrefixByOrgID(Utils.ID).ConfigureAwait(false);
                 return await Task.FromResult<object>(new SuccessViewModel
                 {
                     Status = "200",
@@ -543,6 +568,31 @@ namespace TimeAPI.API.Controllroers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
+
+        [HttpPost]
+        [Route("GetAllSubTaskByTaskID")]
+        public async Task<object> GetAllSubTaskByTaskID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+              
+                List<ProjectSubTaskEntityViewModel> projectActivityTasks = new List<ProjectSubTaskEntityViewModel>();
+
+                projectActivityTasks = (await _unitOfWork.ProjectActivityTaskRepository.GetAllSubTaskByTaskID(Utils.ID).ConfigureAwait(false)).ToList();
+
+                foreach (var item in projectActivityTasks.Select((value, index) => new { value, index }))
+                    projectActivityTasks[item.index].TaskTeamMember = (await _unitOfWork.TaskTeamMembersRepository.FindByTaskID(item.value.id).ConfigureAwait(false)).ToList();
+
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(projectActivityTasks, Formatting.Indented)).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
         #endregion Projects
 
         #region EntityLocation
@@ -739,7 +789,7 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var results = _unitOfWork.EntityContactRepository.FindByEntityContactOrgID(Utils.ID);
+                var results = await _unitOfWork.EntityContactRepository.FindByEntityContactOrgID(Utils.ID).ConfigureAwait(false);
 
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(results, Formatting.Indented)).ConfigureAwait(false);
             }
@@ -1022,7 +1072,7 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.ProjectActivityRepository.FindByProjectActivityID(Utils.ID);
+                var result = await _unitOfWork.ProjectActivityRepository.FindByProjectActivityID(Utils.ID).ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -1041,7 +1091,7 @@ namespace TimeAPI.API.Controllroers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.ProjectActivityRepository.All();
+                var result = await _unitOfWork.ProjectActivityRepository.All().ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -1063,7 +1113,7 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.ProjectActivityRepository.GetProjectActivityByProjectID(Utils.ID);
+                var result = await _unitOfWork.ProjectActivityRepository.GetProjectActivityByProjectID(Utils.ID).ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -1086,7 +1136,7 @@ namespace TimeAPI.API.Controllroers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 _unitOfWork.ProjectActivityRepository.Remove(Utils.ID);
-                _unitOfWork.ProjectActivityTaskRepository.RemoveByProjectActivityID(Utils.ID);
+                await _unitOfWork.ProjectActivityTaskRepository.RemoveByProjectActivityID(Utils.ID).ConfigureAwait(false);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Project Activity Removed successfully." }).ConfigureAwait(false);
@@ -1116,11 +1166,11 @@ namespace TimeAPI.API.Controllroers
 
                 modal.modified_date = _dateTime.ToString();
 
-                var status = _unitOfWork.StatusRepository.Find(statusingViewModel.status_id);
+                var status = await _unitOfWork.StatusRepository.Find(statusingViewModel.status_id).ConfigureAwait(false);
                 if (status != null)
                     if (status.status_name == "Completed")
                     {
-                        var Result = _unitOfWork.ProjectActivityTaskRepository.GetAllTaskByActivityID(modal.id);
+                        var Result = await _unitOfWork.ProjectActivityTaskRepository.GetAllTaskByActivityID(modal.id).ConfigureAwait(false);
                         if (Result != null)
                         {
                             return await Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = "Error", Desc = "There are still task for this milestone is pending." }).ConfigureAwait(false);
@@ -1157,7 +1207,7 @@ namespace TimeAPI.API.Controllroers
 
                 modal.modified_date = _dateTime.ToString();
 
-                _unitOfWork.ProjectActivityRepository.UpdateProjectActivityStatusByActivityID(modal);
+                await _unitOfWork.ProjectActivityRepository.UpdateProjectActivityStatusByActivityID(modal).ConfigureAwait(false);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Project Activity updated successfully." }).ConfigureAwait(false);
@@ -1180,7 +1230,7 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.ProjectActivityRepository.GetProjectActivityRatioByProjectID(Utils.ID);
+                var result = await _unitOfWork.ProjectActivityRepository.GetProjectActivityRatioByProjectID(Utils.ID).ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -1211,7 +1261,7 @@ namespace TimeAPI.API.Controllroers
                 var modal = mapper.Map<Domain.Entities.Tasks>(TaskViewModel);
 
                 modal.id = Guid.NewGuid().ToString();
-                modal.status_id = _unitOfWork.StatusRepository.GetStatusByOrgID("default")
+                modal.status_id = (await _unitOfWork.StatusRepository.GetStatusByOrgID("default").ConfigureAwait(false))
                                     .Where(s => s.status_name.Equals("Open"))
                                     .Select(s => s.id)
                                     .FirstOrDefault();
@@ -1278,7 +1328,7 @@ namespace TimeAPI.API.Controllroers
                     var modal = mapper.Map<Domain.Entities.Tasks>(TaskViewModel[i]);
 
                     modal.id = Guid.NewGuid().ToString();
-                    modal.status_id = _unitOfWork.StatusRepository.GetStatusByOrgID("default")
+                    modal.status_id = (await _unitOfWork.StatusRepository.GetStatusByOrgID("default").ConfigureAwait(false))
                                         .Where(s => s.status_name.Equals("Open"))
                                         .Select(s => s.id)
                                         .FirstOrDefault();
@@ -1340,8 +1390,8 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var results = _unitOfWork.TaskRepository.Find(Utils.ID);
-                results.employees = _unitOfWork.TaskTeamMembersRepository.FindByTaskID(Utils.ID).ToList();
+                var results = await _unitOfWork.TaskRepository.Find(Utils.ID).ConfigureAwait(false);
+                results.employees = (await _unitOfWork.TaskTeamMembersRepository.FindByTaskID(Utils.ID).ConfigureAwait(false)).ToList();
 
                 return await System.Threading.Tasks.Task.FromResult<object>(results).ConfigureAwait(false);
             }
@@ -1411,7 +1461,7 @@ namespace TimeAPI.API.Controllroers
                 var modal = mapper.Map<Domain.Entities.Tasks>(TaskViewModel);
                 modal.modified_date = _dateTime.ToString();
 
-                _unitOfWork.TaskTeamMembersRepository.RemoveByTaskID(modal.id);
+                await _unitOfWork.TaskTeamMembersRepository.RemoveByTaskID(modal.id).ConfigureAwait(false);
 
                 if (TaskViewModel.employees != null)
                 {
@@ -1454,7 +1504,7 @@ namespace TimeAPI.API.Controllroers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 oDataTable _oDataTable = new oDataTable();
-                var results = _unitOfWork.ProjectActivityTaskRepository.GetAllTaskByActivityID(Utils.ID);
+                var results = await _unitOfWork.ProjectActivityTaskRepository.GetAllTaskByActivityID(Utils.ID).ConfigureAwait(false);
                 var xResult = _oDataTable.ToDataTable(results);
 
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
@@ -1478,7 +1528,7 @@ namespace TimeAPI.API.Controllroers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 oDataTable _oDataTable = new oDataTable();
-                var results = _unitOfWork.ProjectActivityTaskRepository.GetAllTaskByProjectID(Utils.ID);
+                var results = await _unitOfWork.ProjectActivityTaskRepository.GetAllTaskByProjectID(Utils.ID).ConfigureAwait(false);
                 var xResult = _oDataTable.ToDataTable(results);
 
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
@@ -1501,7 +1551,7 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var results = _unitOfWork.ProjectActivityTaskRepository.GetProjectActivityTaskRatioByProjectID(Utils.ID);
+                var results = await _unitOfWork.ProjectActivityTaskRepository.GetProjectActivityTaskRatioByProjectID(Utils.ID).ConfigureAwait(false);
                 return await Task.FromResult<object>(results).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -1522,7 +1572,7 @@ namespace TimeAPI.API.Controllroers
                 if (TaskViewModel == null)
                     throw new ArgumentNullException(nameof(TaskViewModel));
 
-                _unitOfWork.TaskTeamMembersRepository.RemoveByTaskID(TaskViewModel.id);
+                await _unitOfWork.TaskTeamMembersRepository.RemoveByTaskID(TaskViewModel.id).ConfigureAwait(false);
 
                 if (TaskViewModel.empid != null)
                 {
@@ -1561,10 +1611,10 @@ namespace TimeAPI.API.Controllroers
 
                 List<ProjectActivityTaskEntityViewModel> projectActivityTasks = new List<ProjectActivityTaskEntityViewModel>();
 
-                projectActivityTasks = _unitOfWork.ProjectActivityTaskRepository.GetAllTaskForAssignByProjectID(Utils.ID).ToList();
+                projectActivityTasks = (await _unitOfWork.ProjectActivityTaskRepository.GetAllTaskForAssignByProjectID(Utils.ID).ConfigureAwait(false)).ToList();
 
                 foreach (var item in projectActivityTasks.Select((value, index) => new { value, index }))
-                    projectActivityTasks[item.index].TaskTeamMember = _unitOfWork.TaskTeamMembersRepository.FindByTaskID(item.value.task_id).ToList();
+                    projectActivityTasks[item.index].TaskTeamMember = (await _unitOfWork.TaskTeamMembersRepository.FindByTaskID(item.value.task_id).ConfigureAwait(false)).ToList();
 
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(projectActivityTasks, Formatting.Indented)).ConfigureAwait(false);
             }
@@ -1726,5 +1776,156 @@ namespace TimeAPI.API.Controllroers
         }
 
         #endregion ProjectType
+
+        #region ProjectTags
+
+        [HttpPost]
+        [Route("AddProjectTags")]
+        public async Task<object> AddProjectTags([FromBody] ProjectTagsViewModel statusingViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (statusingViewModel == null)
+                    throw new ArgumentNullException(nameof(statusingViewModel));
+
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<ProjectTagsViewModel, ProjectTags>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<ProjectTags>(statusingViewModel);
+
+                modal.id = Guid.NewGuid().ToString();
+                modal.created_date = _dateTime.ToString();
+                modal.is_deleted = false;
+
+                _unitOfWork.ProjectTagsRepository.Add(modal);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "ProjectTags registered successfully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("FindByProjectTagsID")]
+        public async Task<object> FindByProjectTagsID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                var result = await _unitOfWork.ProjectTagsRepository.Find(Utils.ID).ConfigureAwait(false);
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("GetAllProjectTags")]
+        public async Task<object> GetAllProjectTags(CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                var result = await _unitOfWork.ProjectTagsRepository.All().ConfigureAwait(false);
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("GetProjectTagsByUnitID")]
+        public async Task<object> GetProjectTagsByUnitID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                var result = await _unitOfWork.ProjectTagsRepository.GetProjectTagsByUnitID(Utils.ID).ConfigureAwait(false);
+
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("RemoveProjectTags")]
+        public async Task<object> RemoveProjectTags([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                _unitOfWork.ProjectTagsRepository.Remove(Utils.ID);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "ProjectTags removed successfully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        [HttpPatch]
+        [Route("UpdateProjectTags")]
+        public async Task<object> UpdateProjectTags([FromBody] ProjectTagsViewModel statusingViewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (statusingViewModel == null)
+                    throw new ArgumentNullException(nameof(statusingViewModel));
+
+                statusingViewModel.modified_date = _dateTime.ToString();
+                var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<ProjectTagsViewModel, ProjectTags>());
+                var mapper = config.CreateMapper();
+                var modal = mapper.Map<ProjectTags>(statusingViewModel);
+
+                modal.modified_date = _dateTime.ToString();
+
+                _unitOfWork.ProjectTagsRepository.Update(modal);
+                _unitOfWork.Commit();
+
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "ProjectTags updated successfully." }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+        #endregion ProjectTags
     }
 }

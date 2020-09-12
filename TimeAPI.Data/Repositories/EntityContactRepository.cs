@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -23,25 +24,25 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public EntityContact Find(string key)
+        public async Task< EntityContact> Find(string key)
         {
-            return QuerySingleOrDefault<EntityContact>(
+            return await QuerySingleOrDefaultAsync<EntityContact>(
                 sql: "SELECT * FROM entity_contact WHERE is_deleted = 0 and id = @key",
                 param: new { key }
             );
         }
 
-        public EntityContact FindByEntityID(string key)
+        public async Task<EntityContact> FindByEntityID(string key)
         {
-            return QuerySingleOrDefault<EntityContact>(
+            return await QuerySingleOrDefaultAsync<EntityContact>(
                 sql: "SELECT * FROM entity_contact WHERE is_deleted = 0 and entity_id = @key",
                 param: new { key }
             );
         }
 
-        public IEnumerable<EntityContact> FindByEntityListID(string key)
+        public async Task<IEnumerable<EntityContact>> FindByEntityListID(string key)
         {
-            return Query<EntityContact>(
+            return await QueryAsync<EntityContact>(
                 sql: "SELECT * FROM [dbo].[entity_contact] where is_deleted = 0 AND entity_id = @key",
                 param: new { key }
             );
@@ -86,9 +87,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public void UpdateByEntityID(EntityContact entity)
+        public async Task UpdateByEntityID(EntityContact entity)
         {
-            Execute(
+           await ExecuteAsync(
                 sql: @"UPDATE entity_contact
                    SET
                     name = @name,
@@ -113,9 +114,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public dynamic FindByEntityContactOrgID(string key)
+        public async Task<dynamic> FindByEntityContactOrgID(string key)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
              sql: @"SELECT 
                         DISTINCT(dbo.entity_contact.id), dbo.entity_contact.name 
 	                    FROM dbo.entity_contact
@@ -127,16 +128,16 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<EntityContact> All()
+        public async Task<IEnumerable<EntityContact>> All()
         {
-            return Query<EntityContact>(
+            return await QueryAsync<EntityContact>(
                 sql: "SELECT * FROM [dbo].[entity_contact] where is_deleted = 0"
             );
         }
 
-        public void RemoveByEntityID(string key)
+        public async Task RemoveByEntityID(string key)
         {
-            Execute(
+            await ExecuteAsync(
                 sql: @"UPDATE entity_contact
                    SET
                        modified_date = GETDATE(), is_deleted = 1

@@ -8,14 +8,14 @@ using TimeAPI.Domain.Model;
 
 namespace TimeAPI.Domain.Repositories
 {
-    public interface ITaskRepository : IRepository<Tasks, string>
+    public interface ITaskRepository : IRepositoryAsync<Tasks, string>
     {
-        dynamic FindByTaskDetailsByEmpID(string empid);
+        Task<dynamic> FindByTaskDetailsByEmpID(string empid);
 
-        void UpdateTaskStatus(Tasks entity);
+        Task UpdateTaskStatus(Tasks entity);
 
-        RootEmployeeTask GetAllTaskByEmpID(string empid, string date);
+        Task<RootEmployeeTask> GetAllTaskByEmpID(string empid, string date);
 
-        RootEmployeeTask GetAllTaskByOrgAndEmpID(string key, string EmpID);
+        Task<RootEmployeeTask> GetAllTaskByOrgAndEmpID(string key, string EmpID);
     }
 }

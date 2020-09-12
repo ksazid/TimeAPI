@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Text;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Model;
 
 namespace TimeAPI.Domain.Repositories
 {
-    public interface IProjectUnitRepository : IRepository<ProjectUnit, string>
+    public interface IProjectUnitRepository : IRepositoryAsync<ProjectUnit, string>
     {
-        IEnumerable<ProjectUnit> FindByProjectID(string ProjectID);
-        void RemoveByProjectID(string ProjectID);
+        Task<IEnumerable<ProjectUnit>> FindByProjectID(string ProjectID);
+        Task RemoveByProjectID(string ProjectID);
     }
 }

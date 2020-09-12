@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -21,9 +22,9 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public TimesheetTeam Find(string key)
+        public async Task<TimesheetTeam> Find(string key)
         {
-            return QuerySingleOrDefault<TimesheetTeam>(
+            return await QuerySingleOrDefaultAsync<TimesheetTeam>(
                 sql: "SELECT * FROM dbo.timesheet_x_team WHERE is_deleted = 0 and id = @key",
                 param: new { key }
             );
@@ -40,15 +41,15 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public void RemoveByGroupID(string GroupID)
+        public async Task RemoveByGroupID(string GroupID)
         {
-            Execute(
-                sql: @"UPDATE dbo.timesheet_x_team
+            await ExecuteAsync(
+                   sql: @"UPDATE dbo.timesheet_x_team
                    SET
                        modified_date = GETDATE(), is_deleted = 1
                     WHERE groupid = @GroupID",
-                param: new { GroupID }
-            );
+                   param: new { GroupID }
+               );
         }
 
         public void Update(TimesheetTeam entity)
@@ -65,9 +66,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<TimesheetTeam> All()
+        public async Task<IEnumerable<TimesheetTeam>> All()
         {
-            return Query<TimesheetTeam>(
+            return await QueryAsync<TimesheetTeam>(
                 sql: "SELECT * FROM [dbo].[timesheet_x_team] where is_deleted = 0"
             );
         }

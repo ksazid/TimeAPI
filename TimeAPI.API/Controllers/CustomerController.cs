@@ -102,7 +102,7 @@ namespace TimeAPI.API.Controllroers
                 modal1.modified_date = _dateTime.ToString();
                 modal1.entity_id = modal.id;
 
-                _unitOfWork.EntityContactRepository.UpdateByEntityID(modal1);
+                await _unitOfWork.EntityContactRepository.UpdateByEntityID(modal1).ConfigureAwait(false);
                 _unitOfWork.CustomerRepository.Update(modal);
                 _unitOfWork.Commit();
 
@@ -146,7 +146,7 @@ namespace TimeAPI.API.Controllroers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.CustomerRepository.All();
+                var result = await _unitOfWork.CustomerRepository.All().ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -170,7 +170,7 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.CustomerRepository.Find(Utils.ID);
+                var result = await _unitOfWork.CustomerRepository.Find(Utils.ID).ConfigureAwait(false);
 
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<CustomerViewModel, Customer>());
                 var mapper = config.CreateMapper();
@@ -178,7 +178,7 @@ namespace TimeAPI.API.Controllroers
 
                 if (result != null)
                 {
-                    var resultContact = _unitOfWork.EntityContactRepository.FindByEntityID(result.id);
+                    var resultContact = await _unitOfWork.EntityContactRepository.FindByEntityID(result.id).ConfigureAwait(false);
                     modal.EntityContact = resultContact;
                 }
 
@@ -199,7 +199,7 @@ namespace TimeAPI.API.Controllroers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.CustomerRepository.FindCustomerByOrgID(Utils.OrgID);
+                var result = await _unitOfWork.CustomerRepository.FindCustomerByOrgID(Utils.OrgID).ConfigureAwait(false);
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -222,14 +222,14 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.CustomerName));
 
-                var result = _unitOfWork.CustomerRepository.FindByCustomerByNameAndEmail(Utils.CustomerName, Utils.Email);
+                var result = await _unitOfWork.CustomerRepository.FindByCustomerByNameAndEmail(Utils.CustomerName, Utils.Email).ConfigureAwait(false);
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<CustomerViewModel, Customer>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<Customer>(result);
 
                 if (result != null)
                 {
-                    var resultContact = _unitOfWork.EntityContactRepository.FindByEntityID(result.id);
+                    var resultContact = await _unitOfWork.EntityContactRepository.FindByEntityID(result.id).ConfigureAwait(false);
                     modal.EntityContact = resultContact;
                 }
                 if (modal != null)

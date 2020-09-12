@@ -55,7 +55,7 @@ namespace TimeAPI.API.Controllers
                 var modal = mapper.Map<Domain.Entities.Tasks>(TaskViewModel);
 
                 modal.id = Guid.NewGuid().ToString();
-                modal.status_id = _unitOfWork.StatusRepository.GetStatusByOrgID("default")
+                modal.status_id = (await _unitOfWork.StatusRepository.GetStatusByOrgID("default").ConfigureAwait(false))
                                                .Where(s => s.status_name.Equals("Open"))
                                                .Select(s => s.id)
                                                .FirstOrDefault();
@@ -112,7 +112,7 @@ namespace TimeAPI.API.Controllers
 
                 if (TaskViewModel.employees != null)
                 {
-                    _unitOfWork.TaskTeamMembersRepository.RemoveByTaskID(modal.id);
+                    await _unitOfWork.TaskTeamMembersRepository.RemoveByTaskID(modal.id).ConfigureAwait(false);
                     foreach (var item in TaskViewModel.employees.Distinct())
                     {
                         var TaskTeamMembers = new TaskTeamMember()
@@ -171,7 +171,7 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.TaskRepository.All();
+                var result = await _unitOfWork.TaskRepository.All().ConfigureAwait(false);
 
                 return await System.Threading.Tasks.Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -193,8 +193,8 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var results = _unitOfWork.TaskRepository.Find(Utils.ID);
-                results.employees = _unitOfWork.TaskTeamMembersRepository.FindByTaskID(Utils.ID).ToList();
+                var results = await _unitOfWork.TaskRepository.Find(Utils.ID).ConfigureAwait(false);
+                results.employees = (await _unitOfWork.TaskTeamMembersRepository.FindByTaskID(Utils.ID).ConfigureAwait(false)).ToList();
 
                 return await System.Threading.Tasks.Task.FromResult<object>(results).ConfigureAwait(false);
             }
@@ -217,7 +217,7 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 oDataTable _oDataTable = new oDataTable();
-                var results = _unitOfWork.TaskRepository.FindByTaskDetailsByEmpID(Utils.ID);
+                var results = await _unitOfWork.TaskRepository.FindByTaskDetailsByEmpID(Utils.ID).ConfigureAwait(false);
                 var xResult = _oDataTable.ToDataTable(results);
 
                 return await System.Threading.Tasks.Task.FromResult<object>(xResult).ConfigureAwait(false);
@@ -249,7 +249,7 @@ namespace TimeAPI.API.Controllers
                     modified_date = _dateTime.ToString()
                 };
 
-                _unitOfWork.TaskRepository.UpdateTaskStatus(modal);
+                await _unitOfWork.TaskRepository.UpdateTaskStatus(modal).ConfigureAwait(false);
                 _unitOfWork.Commit();
 
                 return await System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Task updated successfully." }).ConfigureAwait(false);
@@ -270,7 +270,7 @@ namespace TimeAPI.API.Controllers
             if (string.IsNullOrWhiteSpace(UserID.ID))
                 throw new ArgumentNullException(nameof(UserID.ID));
 
-            var Result = _unitOfWork.TaskRepository.GetAllTaskByEmpID(UserID.ID, _dateTime.ToString());
+            var Result = await _unitOfWork.TaskRepository.GetAllTaskByEmpID(UserID.ID, _dateTime.ToString()).ConfigureAwait(false);
             return await Task.FromResult<object>(Result).ConfigureAwait(false);
         }
     }

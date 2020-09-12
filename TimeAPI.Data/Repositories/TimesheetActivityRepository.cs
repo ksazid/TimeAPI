@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Model;
 using TimeAPI.Domain.Repositories;
@@ -23,9 +24,9 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public TimesheetActivity Find(string key)
+        public async Task<TimesheetActivity> Find(string key)
         {
-            return QuerySingleOrDefault<TimesheetActivity>(
+            return await QuerySingleOrDefaultAsync<TimesheetActivity>(
                 sql: "SELECT * FROM dbo.timesheet_activity WHERE is_deleted = 0 and id = @key",
                 param: new { key }
             );
@@ -50,9 +51,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public void RemoveByGroupID(string GroupID)
+        public async Task RemoveByGroupID(string GroupID)
         {
-            Execute(
+           await ExecuteAsync(
                 sql: @"UPDATE dbo.timesheet_activity
                    SET
                        modified_date = GETDATE(), is_deleted = 1
@@ -85,16 +86,16 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<TimesheetActivity> All()
+        public async Task<IEnumerable<TimesheetActivity>> All()
         {
-            return Query<TimesheetActivity>(
+            return await QueryAsync<TimesheetActivity>(
                 sql: "SELECT * FROM [dbo].[timesheet_activity] where is_deleted = 0"
             );
         }
 
-        public dynamic GetTop10TimesheetActivityOnTaskID(string TaskID)
+        public async Task<dynamic> GetTop10TimesheetActivityOnTaskID(string TaskID)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                 sql: @"SELECT TOP 10
                         timesheet_activity.id,
                         timesheet_activity.task_name AS task_name,
@@ -112,12 +113,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-
-
-
-        public IEnumerable<ViewLogDataModel> GetTimesheetActivityByGroupAndProjectID(string GroupID, string ProjectID, string Date)
+        public async Task<IEnumerable<ViewLogDataModel>> GetTimesheetActivityByGroupAndProjectID(string GroupID, string ProjectID, string Date)
         {
-            return Query<ViewLogDataModel>(
+            return await QueryAsync<ViewLogDataModel>(
                 sql: @"SELECT total_time, project_type, project_name, milestone_name, task_name, remarks, total_hrs, is_billable, worked_percent, ondate, start_time, groupid FROM
 					    (
                         SELECT  
@@ -186,10 +184,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-
-        public IEnumerable<ViewLogDataModel> GetTimesheetActivityByEmpID(string EmpID, string StartDate, string EndDate)
+        public async Task<IEnumerable<ViewLogDataModel>> GetTimesheetActivityByEmpID(string EmpID, string StartDate, string EndDate)
         {
-            var List = Query<string>(
+            var List = await QueryAsync<string>(
               sql: @"select distinct(groupid) from timesheet
                         WHERE empid = @EmpID
                         AND FORMAT(CAST(timesheet.ondate AS DATE), 'MM/dd/yyyy', 'EN-US')
@@ -200,7 +197,7 @@ namespace TimeAPI.Data.Repositories
 
             string GroupID = String.Join("','", List);
 
-            return Query<ViewLogDataModel>(
+            return await QueryAsync<ViewLogDataModel>(
                 sql: @"SELECT total_time, project_type, project_name, milestone_name, task_name, remarks, total_hrs, is_billable, worked_percent, ondate, start_time, end_time, groupid FROM
 					    (
                         SELECT  

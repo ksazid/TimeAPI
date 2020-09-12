@@ -44,7 +44,7 @@ namespace TimeAPI.API.Controllers
 
         [HttpPost]
         [Route("GetUserDataGroupByUserID")]
-        public Task<object> GetUserDataGroupByUserID([FromBody] Utils UserID, CancellationToken cancellationToken)
+        public async Task<object> GetUserDataGroupByUserID([FromBody] Utils UserID, CancellationToken cancellationToken)
         {
             if (cancellationToken != null)
                 cancellationToken.ThrowIfCancellationRequested();
@@ -54,22 +54,22 @@ namespace TimeAPI.API.Controllers
 
             if (!_cacheService.IsCached(UserID.ID))
             {
-                var Result = _unitOfWork.UserRepository.GetUserDataGroupByUserID(UserID.ID, _dateTime.ToString());
+                var Result = await _unitOfWork.UserRepository.GetUserDataGroupByUserID(UserID.ID, _dateTime.ToString()).ConfigureAwait(false);
                 string output = JsonConvert.SerializeObject(Result, _JsonSerializerSettings);
-                _cacheService.SetCacheValueAsync(UserID.ID, output);
-                return Task.FromResult<object>(Result);
+                await _cacheService.SetCacheValueAsync(UserID.ID, output).ConfigureAwait(false);
+                return await Task.FromResult<object>(Result).ConfigureAwait(false);
             }
             else
             {
-                var Result = _cacheService.GetCacheValueAsync(UserID.ID);
-                object deserializedProduct = JsonConvert.DeserializeObject<object>(Result.Result, _JsonSerializerSettings);
-                return Task.FromResult<object>(deserializedProduct);
+                var Result = await _cacheService.GetCacheValueAsync(UserID.ID).ConfigureAwait(false);
+                object deserializedProduct = JsonConvert.DeserializeObject<object>(Result, _JsonSerializerSettings);
+                return await Task.FromResult(deserializedProduct).ConfigureAwait(false);
             }
         }
 
         [HttpPost]
         [Route("GetAllTimesheetByEmpID")]
-        public Task<object> GetAllTimesheetByEmpID([FromBody] Utils UserID, CancellationToken cancellationToken)
+        public async Task<object> GetAllTimesheetByEmpID([FromBody] Utils UserID, CancellationToken cancellationToken)
         {
             if (cancellationToken != null)
                 cancellationToken.ThrowIfCancellationRequested();
@@ -77,13 +77,27 @@ namespace TimeAPI.API.Controllers
             if (string.IsNullOrWhiteSpace(UserID.ID))
                 throw new ArgumentNullException(nameof(UserID.ID));
 
-            var Result = _unitOfWork.UserRepository.GetAllTimesheetByEmpID(UserID.ID, _dateTime.ToString());
-            return Task.FromResult<object>(Result);
+            var Result = await _unitOfWork.UserRepository.GetAllTimesheetByEmpID(UserID.ID, _dateTime.ToString()).ConfigureAwait(false);
+            return await Task.FromResult<object>(Result).ConfigureAwait(false);
         }
+
+        //[HttpPost]
+        //[Route("GetAllProjectTaskByEmpID")]
+        //public async Task<object> GetAllProjectTaskByEmpID([FromBody] Utils UserID, CancellationToken cancellationToken)
+        //{
+        //    if (cancellationToken != null)
+        //        cancellationToken.ThrowIfCancellationRequested();
+
+        //    if (string.IsNullOrWhiteSpace(UserID.ID))
+        //        throw new ArgumentNullException(nameof(UserID.ID));
+
+        //    var Result = await _unitOfWork.UserRepository.GetAllProjectTaskByEmpID(UserID.ID, _dateTime.ToString()).ConfigureAwait(false);
+        //    return await Task.FromResult<object>(Result).ConfigureAwait(false);
+        //}
 
         [HttpPost]
         [Route("LastCheckinByEmpID")]
-        public Task<object> LastCheckinByEmpID([FromBody] Utils UserID, CancellationToken cancellationToken)
+        public async Task<object> LastCheckinByEmpID([FromBody] Utils UserID, CancellationToken cancellationToken)
         {
             if (cancellationToken != null)
                 cancellationToken.ThrowIfCancellationRequested();
@@ -91,8 +105,8 @@ namespace TimeAPI.API.Controllers
             if (string.IsNullOrWhiteSpace(UserID.ID))
                 throw new ArgumentNullException(nameof(UserID.ID));
 
-            var Result = _unitOfWork.UserRepository.LastCheckinByEmpID(UserID.ID, _dateTime.ToString());
-            return Task.FromResult<object>(Result);
+            var Result = await _unitOfWork.UserRepository.LastCheckinByEmpID(UserID.ID, _dateTime.ToString()).ConfigureAwait(false);
+            return await Task.FromResult<object>(Result).ConfigureAwait(false);
         }
     }
 }

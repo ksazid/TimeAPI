@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -22,38 +24,37 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public LeadDeal Find(string key)
+        public async Task<LeadDeal> Find(string key)
         {
-            return QuerySingleOrDefault<LeadDeal>(
+            return await QuerySingleOrDefaultAsync<LeadDeal>(
                 sql: "SELECT * FROM dbo.lead_deal WHERE id = @key and is_deleted = 0",
                 param: new { key }
             );
         }
 
-        public IEnumerable<LeadDeal> All()
+        public async Task<IEnumerable<LeadDeal>> All()
         {
-            return Query<LeadDeal>(
+            return await QueryAsync<LeadDeal>(
                 sql: "SELECT * FROM dbo.lead_deal where is_deleted = 0"
             );
         }
 
-        public IEnumerable<LeadDeal> LeadDealByOrgID(string key)
+        public async Task<IEnumerable<LeadDeal>> LeadDealByOrgID(string key)
         {
-            return Query<LeadDeal>(
+            return await QueryAsync<LeadDeal>(
                 sql: "SELECT * FROM dbo.lead_deal where is_deleted = 0 and org_id = @key",
                 param: new { key }
             );
         }
 
-        public LeadDeal LeadDealByLeadID(string key)
+        public async Task<LeadDeal> LeadDealByLeadID(string key)
         {
-            return QuerySingleOrDefault<LeadDeal>(
+            return await QuerySingleOrDefaultAsync<LeadDeal>(
                 sql: "SELECT * FROM dbo.lead_deal where is_deleted = 0 and lead_id = @key",
                 param: new { key }
             );
         }
 
-        
         public void Remove(string key)
         {
             Execute(
@@ -64,6 +65,19 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
+
+        public async Task RemoveByLeadID(string key)
+        {
+            await ExecuteAsync(
+                 sql: @"UPDATE dbo.lead_deal
+                   SET
+                       modified_date = GETDATE(), is_deleted = 1
+                    WHERE lead_id = @key",
+                 param: new { key }
+             );
+        }
+
+
 
         public void Update(LeadDeal entity)
         {
@@ -85,9 +99,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public void UpdateEstDealValueByLeadID(LeadDeal entity)
+        public async Task UpdateEstDealValueByLeadID(LeadDeal entity)
         {
-            Execute(
+            await ExecuteAsync(
                 sql: @"UPDATE dbo.lead_deal
                            SET 
                             est_amount = @est_amount,
@@ -101,9 +115,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public string GetLastAddedLeadPrefixByOrgID(string key)
+        public async Task<string> GetLastAddedLeadPrefixByOrgID(string key)
         {
-            return QuerySingleOrDefault<string>(
+            return await QuerySingleOrDefaultAsync<string>(
                 sql: @"SELECT TOP 1 deal_prefix from lead_deal 
                         INNER JOIN lead on lead_deal.lead_id = lead.id
                         WHERE lead.org_id = @key 

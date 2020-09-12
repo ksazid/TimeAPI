@@ -117,7 +117,7 @@ namespace TimeAPI.API.Controllroers
 
                 if (LeadViewModel.EntityContact != null)
                 {
-                    _unitOfWork.EntityContactRepository.RemoveByEntityID(modal.id);
+                    await _unitOfWork.EntityContactRepository.RemoveByEntityID(modal.id).ConfigureAwait(false);
                     foreach (var item in LeadViewModel.EntityContact)
                     {
                         var config1 = new AutoMapper.MapperConfiguration(m => m.CreateMap<EntityContact, EntityContact>());
@@ -160,9 +160,10 @@ namespace TimeAPI.API.Controllroers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 _unitOfWork.LeadRepository.Remove(Utils.ID);
+                await _unitOfWork.LeadDealRepository.RemoveByLeadID(Utils.ID).ConfigureAwait(false);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead ID removed successfully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Lead removed successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -179,7 +180,7 @@ namespace TimeAPI.API.Controllroers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.LeadRepository.All();
+                var result = await _unitOfWork.LeadRepository.All().ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -204,9 +205,9 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.LeadRepository.FindByLeadID(Utils.ID);
-                ListEntityContact = _unitOfWork.EntityContactRepository.FindByEntityListID(result.id);
-                var resultLeadDeal = _unitOfWork.LeadDealRepository.LeadDealByLeadID(result.id);
+                var result = await _unitOfWork.LeadRepository.FindByLeadID(Utils.ID).ConfigureAwait(false);
+                ListEntityContact = await _unitOfWork.EntityContactRepository.FindByEntityListID(result.id).ConfigureAwait(false);
+                var resultLeadDeal = await _unitOfWork.LeadDealRepository.LeadDealByLeadID(result.id).ConfigureAwait(false);
 
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<LeadViewResponseModel, LeadViewResponseModel>());
                 var mapper = config.CreateMapper();
@@ -232,7 +233,7 @@ namespace TimeAPI.API.Controllroers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.LeadRepository.LeadByOrgID(Utils.OrgID);
+                var result = await _unitOfWork.LeadRepository.LeadByOrgID(Utils.OrgID).ConfigureAwait(false);
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -276,10 +277,10 @@ namespace TimeAPI.API.Controllroers
                             modified_date = _dateTime.ToString()
                         };
 
-                        _unitOfWork.LeadDealRepository.UpdateEstDealValueByLeadID(modal2);
+                        await _unitOfWork.LeadDealRepository.UpdateEstDealValueByLeadID(modal2).ConfigureAwait(false);
                     };
 
-                    _unitOfWork.LeadRepository.UpdateLeadStatusByLeadID(modal);
+                    await _unitOfWork.LeadRepository.UpdateLeadStatusByLeadID(modal).ConfigureAwait(false);
 
                 }
 
@@ -303,7 +304,7 @@ namespace TimeAPI.API.Controllroers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.LeadDealRepository.GetLastAddedLeadPrefixByOrgID(Utils.ID);
+                var result = await _unitOfWork.LeadDealRepository.GetLastAddedLeadPrefixByOrgID(Utils.ID).ConfigureAwait(false);
                 return await Task.FromResult<object>(new SuccessViewModel
                 {
                     Status = "200",
@@ -414,7 +415,7 @@ namespace TimeAPI.API.Controllroers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.LeadDealRepository.All();
+                var result = await _unitOfWork.LeadDealRepository.All().ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -438,7 +439,7 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.LeadDealRepository.Find(Utils.ID);
+                var result = await _unitOfWork.LeadDealRepository.Find(Utils.ID).ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -457,7 +458,7 @@ namespace TimeAPI.API.Controllroers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.LeadDealRepository.LeadDealByOrgID(Utils.OrgID);
+                var result = await _unitOfWork.LeadDealRepository.LeadDealByOrgID(Utils.OrgID).ConfigureAwait(false);
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)

@@ -14,6 +14,6 @@ namespace TimeAPI.Domain.Repositories
         void Update(TEntity entity);
 
         void Remove(TKey key);
- 
+
     }
 }

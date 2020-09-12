@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -21,17 +22,17 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public Project Find(string key)
+        public async Task<Project> Find(string key)
         {
-            return QuerySingleOrDefault<Project>(
+            return await QuerySingleOrDefaultAsync<Project>(
                 sql: "SELECT * FROM dbo.project WHERE is_deleted = 0 and id = @key",
                 param: new { key }
             );
         }
 
-        public Project FindAutoProjectPrefixByOrgID(string key, string date)
+        public async Task<Project> FindAutoProjectPrefixByOrgID(string key, string date)
         {
-            return QuerySingleOrDefault<Project>(
+            return await QuerySingleOrDefaultAsync<Project>(
                 sql: @"SELECT TOP 1 project_prefix 
                             FROM dbo.project 
                         WHERE   
@@ -44,9 +45,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public Project FindAutoCostProjectPrefixByOrgID(string key, string date)
+        public async Task<Project> FindAutoCostProjectPrefixByOrgID(string key, string date)
         {
-            return QuerySingleOrDefault<Project>(
+            return await QuerySingleOrDefaultAsync<Project>(
                 sql: @"SELECT TOP 1 project_prefix 
                             FROM dbo.cost_project 
                         WHERE   
@@ -59,9 +60,11 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public Project FindCustomProjectPrefixByOrgIDAndPrefix(string key, string project_prefix)
+      
+
+        public async Task<Project> FindCustomProjectPrefixByOrgIDAndPrefix(string key, string project_prefix)
         {
-            return QuerySingleOrDefault<Project>(
+            return await QuerySingleOrDefaultAsync<Project>(
                 sql: @"SELECT TOP 1 project_prefix    
                             FROM dbo.project  WHERE 
                             project_prefix = @project_prefix
@@ -107,56 +110,71 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<Project> All()
+        public async Task<IEnumerable<Project>> All()
         {
-            return Query<Project>(
+            return await QueryAsync<Project>(
                 sql: "SELECT * FROM [dbo].[project] where is_deleted = 0"
             );
         }
 
-        public IEnumerable<dynamic> FetchAllProjectByOrgID(string key)
+        public async Task<IEnumerable<dynamic>> FetchAllProjectByOrgID(string key)
         {
-            return Query<dynamic>(
+            //AND entity_contact.is_primary = 1
+            return await QueryAsync<dynamic>(
                    sql: @"SELECT
-                            ROW_NUMBER() OVER (ORDER BY project.project_name) AS rowno,
                             project_type.id as project_type_id,
                             project_type.type_name as project_type_name,
                             project.id as project_id,
+		                    dbo.customer.id,
                             project.project_name,
                             project.project_prefix,
+		                    dbo.customer.cst_name,
+		                    entity_contact.name,
+		                    entity_contact.phone,
+		                    entity_contact.email,
+		                    entity_contact.is_primary,
                             e_tl.full_name as project_owner,
                             e_tl.workemail,
                             project_status.project_status_name ,
 		                    project.start_date,
                             project.end_date,
-                            project.completed_date
-                        FROM dbo.project WITH(NOLOCK)
-                        LEFT JOIN dbo.employee e_tl ON dbo.project.user_id = e_tl.id
-                        LEFT JOIN dbo.project_status  ON dbo.project.project_status_id = dbo.project_status.id
-                        LEFT JOIN dbo.project_type  ON dbo.project.project_type_id = dbo.project_type.id
-                        WHERE dbo.project.org_id =@key
-                        AND dbo.project.is_deleted = 0
-                        ORDER BY dbo.project.project_name ASC",
+                            project.completed_date,
+                            CASE
+                            WHEN FORMAT(CAST( project.modified_date AS DATETIME2), N'dd/MM/yyyy') IS NULL
+	                        THEN FORMAT(CAST( project.created_date AS DATETIME2), N'dd/MM/yyyy')
+                            ELSE FORMAT(CAST( project.created_date AS DATETIME2), N'dd/MM/yyyy') 
+                        END AS ondate
+                        FROM project  WITH(NOLOCK)
+                        LEFT JOIN dbo.customer_x_project  ON project.id = dbo.customer_x_project.project_id
+	                    LEFT JOIN dbo.customer ON dbo.customer_x_project.cst_id = dbo.customer.id
+	                    LEFT JOIN dbo.entity_contact on dbo.customer.id = dbo.entity_contact.entity_id
+	                    LEFT JOIN dbo.employee e_tl ON project.user_id = e_tl.id
+                        LEFT JOIN project_status  ON project.project_status_id = project_status.id
+                        LEFT JOIN project_type  ON project.project_type_id = project_type.id
+                        WHERE
+	                    project.org_id= @key
+	                    AND project.is_deleted = 0
+	                    ORDER BY project.project_name ASC",
                       param: new { key }
                );
         }
 
-        public void UpdateProjectStatusByID(Project entity)
+        public async Task UpdateProjectStatusByID(Project entity)
         {
-            Execute(
-               sql: @"UPDATE dbo.project
+            await ExecuteAsync(
+                sql: @"UPDATE dbo.project
                    SET
                     project_status_id = @project_status_id,
                     modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE id = @id",
-               param: entity
-           );
+                param: entity
+            );
         }
 
-        public string ProjectTaskCount(string entity)
+        public async Task<string> ProjectTaskCount(string entity)
         {
-            return QuerySingleOrDefault<string>(
+            return await QuerySingleOrDefaultAsync<string>(
                      sql: @"SELECT 
                             TaskCount = COUNT (task.id) FROM dbo.project
                             INNER JOIN project_activity_x_task on project.id = project_activity_x_task.project_id
@@ -170,9 +188,9 @@ namespace TimeAPI.Data.Repositories
            );
         }
 
-        public IEnumerable<dynamic> FindAllProjectActivityByProjectID(string key)
+        public async Task<IEnumerable<dynamic>> FindAllProjectActivityByProjectID(string key)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                    sql: @"SELECT 
                             project_activity.project_id, 
                             project_activity.id as project_activity_id,
@@ -196,26 +214,10 @@ namespace TimeAPI.Data.Repositories
                       param: new { key }
                );
         }
-
-
-
-
-        //public string ProjectActivityCount(string entity)
-        //{
-        //    return QuerySingleOrDefault<string>(
-        //             sql: @"SELECT 
-        //                    COUNT(project.id) FROM dbo.project
-        //                    INNER JOIN project_activity_x_task on project.id = project_activity_x_task.project_id
-        //                    INNER JOIN project_activity on project_activity_x_task.activity_id = project_activity.id
-        //                    INNER JOIN task on task.id = project_activity_x_task.task_id
-        //                WHERE project.id = @entity",
-        //       param: entity
-        //   );
-        //}
-
-        public string GetLastAddedProjectPrefixByOrgID(string key)
+         
+        public async Task<string> GetLastAddedProjectPrefixByOrgID(string key)
         {
-            return QuerySingleOrDefault<string>(
+            return await QuerySingleOrDefaultAsync<string>(
                 sql: @"SELECT TOP 1 project_prefix from dbo.project 
                         WHERE dbo.project.org_id = @key
                         AND dbo.project.is_deleted = 0

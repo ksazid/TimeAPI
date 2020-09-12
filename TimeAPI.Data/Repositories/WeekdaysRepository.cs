@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -20,17 +21,17 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public Weekdays Find(string key)
+        public async Task< Weekdays> Find(string key)
         {
-            return QuerySingleOrDefault<Weekdays>(
+            return await QuerySingleOrDefaultAsync<Weekdays>(
                 sql: "SELECT * FROM dbo.weekdays WHERE is_deleted = 0 and id = @key",
                 param: new { key }
             );
         }
 
-        public IEnumerable<Weekdays> FindByOrgID(string key)
+        public async Task<IEnumerable<Weekdays>> FindByOrgID(string key)
         {
-            return Query<Weekdays>(
+            return await QueryAsync<Weekdays>(
                 sql: "SELECT * FROM dbo.weekdays WHERE is_deleted = 0 and org_id = @key",
                 param: new { key }
             );
@@ -47,9 +48,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public void RemoveByOrgID(string key)
+        public async Task RemoveByOrgID(string key)
         {
-            Execute(
+          await  ExecuteAsync(
                 sql: @"UPDATE dbo.weekdays
                    SET
                        modified_date = GETDATE(), is_deleted = 1
@@ -74,9 +75,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<Weekdays> All()
+        public async Task<IEnumerable<Weekdays>> All()
         {
-            return Query<Weekdays>(
+            return await QueryAsync<Weekdays>(
                 sql: "SELECT * FROM dbo.weekdays where is_deleted = 0"
             );
         }

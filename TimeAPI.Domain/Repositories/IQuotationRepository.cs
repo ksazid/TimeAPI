@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.Domain.Repositories
 {
-    public interface IQuotationRepository : IRepository<Quotation, string>
+    public interface IQuotationRepository : IRepositoryAsync<Quotation, string>
     {
-        dynamic QuotationByOrgID(string OrgID);
-        dynamic FindByQuotationID(string QuotationID);
-        void UpdateQuotationStageByQuotationID(Quotation entity);
-
-        string GetLastAddedQuotationPrefixByOrgID(string key);
-
+        Task<dynamic> QuotationByOrgID(string OrgID);
+        Task<dynamic> FindByQuotationID(string QuotationID);
+        Task UpdateQuotationStageByQuotationID(Quotation entity);
+        Task<string> GetLastAddedQuotationPrefixByOrgID(string key);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -22,17 +23,17 @@ namespace TimeAPI.Data.Repositories
                     );
         }
 
-        public CustomerProject Find(string key)
+        public async Task< CustomerProject> Find(string key)
         {
-            return QuerySingleOrDefault<CustomerProject>(
+            return await QuerySingleOrDefaultAsync<CustomerProject>(
                 sql: "SELECT * FROM dbo.customer_x_project WHERE project_id = @key and is_deleted = 0",
                 param: new { key }
             );
         }
 
-        public CustomerProject FindByProjectID(string key)
+        public async Task<CustomerProject> FindByProjectID(string key)
         {
-            return QuerySingleOrDefault<CustomerProject>(
+            return await QuerySingleOrDefaultAsync<CustomerProject>(
                 sql: "SELECT * FROM dbo.customer_x_project WHERE project_id = @key and is_deleted = 0",
                 param: new { key }
             );
@@ -40,9 +41,9 @@ namespace TimeAPI.Data.Repositories
 
         
 
-        public IEnumerable<CustomerProject> All()
+        public async Task<IEnumerable<CustomerProject>> All()
         {
-            return Query<CustomerProject>(
+            return await QueryAsync<CustomerProject>(
                 sql: "SELECT * FROM dbo.customer_x_project where is_deleted = 0"
             );
         }
@@ -71,9 +72,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<Customer> FindCustomerByOrgID(string key)
+        public async Task<IEnumerable<Customer>> FindCustomerByOrgID(string key)
         {
-            return Query<Customer>(
+            return await QueryAsync<Customer>(
                 sql: "SELECT * FROM dbo.customer_x_project where is_deleted = 0 AND org_id = @key",
                  param: new { key }
             );

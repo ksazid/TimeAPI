@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Text;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Model;
 
 namespace TimeAPI.Domain.Repositories
 {
-    public interface IUnitDescriptionRepository : IRepository<UnitDescription, string>
+    public interface IUnitDescriptionRepository : IRepositoryAsync<UnitDescription, string>
     {
         //dynamic FindByTaskDetailsByEmpID(string empid);
 
@@ -16,9 +17,9 @@ namespace TimeAPI.Domain.Repositories
         //RootEmployeeTask GetAllTaskByEmpID(string empid, string date);
 
         //RootEmployeeTask GetAllTaskByOrgAndEmpID(string key, string EmpID);
-        IEnumerable<UnitDescription> FetchAllUnitDescriptionByOrgID(string OrgID);
-        IEnumerable<UnitDescription> FetchAllUnitDescriptionExtraByOrgID(string OrgID);
+        Task<IEnumerable<UnitDescription>> FetchAllUnitDescriptionByOrgID(string OrgID);
+        Task<IEnumerable<UnitDescription>> FetchAllUnitDescriptionExtraByOrgID(string OrgID);
 
-        
+
     }
 }

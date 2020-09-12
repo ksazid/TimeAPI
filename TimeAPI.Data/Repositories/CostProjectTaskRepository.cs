@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Model;
 using TimeAPI.Domain.Repositories;
@@ -23,9 +24,9 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public CostProjectTask Find(string key)
+        public async Task<CostProjectTask> Find(string key)
         {
-            return QuerySingleOrDefault<CostProjectTask>(
+            return await QuerySingleOrDefaultAsync<CostProjectTask>(
                 sql: @"SELECT dbo.project_activity_x_task.project_id as project_id, dbo.project_activity_x_task.activity_id as activtity_id, dbo.cost_task.* 
 						FROM dbo.cost_task
 						LEFT JOIN dbo.project_activity_x_task on dbo.cost_task.id = dbo.project_activity_x_task.task_id
@@ -45,9 +46,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public void RemoveByProjectID(string key)
+        public async Task RemoveByProjectID(string key)
         {
-            Execute(
+            await ExecuteAsync(
                 sql: @"UPDATE dbo.cost_task
                    SET
                        modified_date = GETDATE(), is_deleted = 1
@@ -77,9 +78,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public void UpdateStaticCostProjectTask(CostProjectTask entity)
+        public async Task UpdateStaticCostProjectTask(CostProjectTask entity)
         {
-            Execute(
+            await ExecuteAsync(
                 sql: @"UPDATE dbo.static_tasks
                    SET
 					unit = @unit, 
@@ -91,9 +92,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public void UpdateCostProjectTaskQtyTaskID(CostProjectTask entity)
+        public async Task UpdateCostProjectTaskQtyTaskID(CostProjectTask entity)
         {
-            Execute(
+            await ExecuteAsync(
                 sql: @"UPDATE dbo.cost_task
                    SET
 					qty = @qty,
@@ -104,9 +105,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public void UpdateCostProjectNotesQtyTaskID(CostProjectTask entity)
+        public async Task UpdateCostProjectNotesQtyTaskID(CostProjectTask entity)
         {
-            Execute(
+            await ExecuteAsync(
                 sql: @"UPDATE dbo.cost_task
                    SET
 					notes = @notes,
@@ -117,9 +118,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public void UpdateCostProjectDiscountAndTotalCostTaskID(CostProjectTask entity)
+        public async Task UpdateCostProjectDiscountAndTotalCostTaskID(CostProjectTask entity)
         {
-            Execute(
+            await ExecuteAsync(
                 sql: @"UPDATE dbo.cost_task
                    SET
 					discount_amount = @discount_amount,
@@ -131,9 +132,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public void UpdateCostProjectBudgetedHoursTaskID(CostProjectTask entity)
+        public async Task UpdateCostProjectBudgetedHoursTaskID(CostProjectTask entity)
         {
-            Execute(
+            await ExecuteAsync(
                 sql: @"UPDATE dbo.cost_task
                    SET
 					qty = @qty,
@@ -145,39 +146,37 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-
-
-        public void UpdateIsSelectedByTaskID(CostProjectTask entity)
+        public async Task UpdateIsSelectedByTaskID(CostProjectTask entity)
         {
-            Execute(
-                sql: @"UPDATE dbo.cost_task
+            await ExecuteAsync(
+                 sql: @"UPDATE dbo.cost_task
                    SET
 					is_selected  = @is_selected, 
                     modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE id =  @id",
-                param: entity
-            );
+                 param: entity
+             );
         }
 
-        public IEnumerable<CostProjectTask> All()
+        public async Task<IEnumerable<CostProjectTask>> All()
         {
-            return Query<CostProjectTask>(
+            return await QueryAsync<CostProjectTask>(
                 sql: "SELECT * FROM [dbo].[cost_task] where is_deleted = 0"
             );
         }
 
-        public IEnumerable<CostProjectTask> GetAllStaticMilestoneTasksByMilestoneID(string MilestoneID, string OrgID)
+        public async Task<IEnumerable<CostProjectTask>> GetAllStaticMilestoneTasksByMilestoneID(string MilestoneID, string OrgID)
         {
-            return Query<CostProjectTask>(
+            return await QueryAsync<CostProjectTask>(
                 sql: "SELECT * FROM [dbo].[static_tasks] where is_deleted = 0 and  milestone_id = @MilestoneID and org_id = @OrgID",
                  param: new { MilestoneID, OrgID }
             );
         }
 
-        public IEnumerable<CostProjectTask> GetAllMilestoneTasksByMilestoneID(string MilestoneID, string OrgID)
+        public async Task<IEnumerable<CostProjectTask>> GetAllMilestoneTasksByMilestoneID(string MilestoneID, string OrgID)
         {
-            return Query<CostProjectTask>(
+            return await QueryAsync<CostProjectTask>(
                 sql: "SELECT * FROM [dbo].[cost_task] where is_deleted = 0 and  milestone_id = @MilestoneID and is_selected = 1",
                  param: new { MilestoneID }
             );

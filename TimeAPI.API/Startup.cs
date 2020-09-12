@@ -53,12 +53,12 @@ namespace TimeAPI.API
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
-            });
+            //services.Configure<CookiePolicyOptions>(options =>
+            //{
+            //    // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+            //    options.CheckConsentNeeded = context => true;
+            //    options.MinimumSameSitePolicy = SameSiteMode.None;
+            //});
 
 
             services.AddHealthChecks();
@@ -143,7 +143,6 @@ namespace TimeAPI.API
             services.Configure<GzipCompressionProviderOptions>(options => options.Level = CompressionLevel.Fastest);
 
             services.AddMemoryCache();
-
             services.AddSession();
 
             // Add application services.

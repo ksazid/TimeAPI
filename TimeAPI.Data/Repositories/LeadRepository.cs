@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -22,17 +23,17 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public Lead Find(string key)
+        public async Task<Lead> Find(string key)
         {
-            return QuerySingleOrDefault<Lead>(
+            return await QuerySingleOrDefaultAsync<Lead>(
                 sql: "SELECT * FROM dbo.lead WHERE id = @key and is_deleted = 0",
                 param: new { key }
             );
         }
 
-        public dynamic FindByLeadID(string key)
+        public async Task<dynamic> FindByLeadID(string key)
         {
-            return QuerySingleOrDefault<dynamic>(
+            return await QuerySingleOrDefaultAsync<dynamic>(
                 sql: @"SELECT 
                          dbo.customer.cst_name, dbo.employee.full_name as lead_owner,
                         dbo.lead_source.lead_source,  dbo.lead_status.lead_status,
@@ -50,16 +51,16 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<Lead> All()
+        public async Task<IEnumerable<Lead>> All()
         {
-            return Query<Lead>(
+            return await QueryAsync<Lead>(
                 sql: "SELECT * FROM dbo.lead where is_deleted = 0"
             );
         }
 
-        public dynamic LeadByOrgID(string key)
+        public async Task<dynamic> LeadByOrgID(string key)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                 sql: @"SELECT 
 			                CASE
 			                WHEN dbo.lead.is_company = 1 THEN dbo.customer.company_name
@@ -80,6 +81,7 @@ namespace TimeAPI.Data.Repositories
                             dbo.lead_deal.deal_name, 
 			                dbo.lead_deal_type.deal_type_name,
 							dbo.lead_contact_role.contact_role_name,
+                            FORMAT(CAST(dbo.lead.created_date AS DATETIME2), N'dd/MM/yyyy') as ondate,
                             dbo.lead.id
                         FROM  dbo.lead
                         LEFT JOIN dbo.customer on dbo.lead.cst_id = dbo.customer.id
@@ -141,17 +143,17 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public void UpdateLeadStatusByLeadID(Lead entity)
+        public async Task UpdateLeadStatusByLeadID(Lead entity)
         {
-            Execute(
-                 sql: @"UPDATE dbo.lead
+            await ExecuteAsync(
+                   sql: @"UPDATE dbo.lead
                            SET 
                             lead_status_id = @lead_status_id, 
                             modified_date = @modified_date,
                             modifiedby = @modifiedby
                          WHERE id = @id",
-                param: entity
-            );
+                  param: entity
+              );
         }
     }
 }

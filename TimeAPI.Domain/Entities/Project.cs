@@ -26,7 +26,7 @@ namespace TimeAPI.Domain.Entities
         public string modified_date { get; set; }
         public string modifiedby { get; set; }
         public bool is_deleted { get; set; }
-        public EntityContact EntityContact { get; set; }
+        public List<EntityContact> EntityContact { get; set; }
         public EntityLocation EntityLocation { get; set; }
         public Customer EntityCustomer { get; set; }
     }

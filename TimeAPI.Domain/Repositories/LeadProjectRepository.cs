@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.Domain.Repositories
 {
-    public interface ILeadDealRepository : IRepository<LeadDeal, string>
+    public interface ILeadDealRepository : IRepositoryAsync<LeadDeal, string>
     {
-        public IEnumerable<LeadDeal> LeadDealByOrgID(string OrgID);
-        public LeadDeal LeadDealByLeadID(string LeadID);
-        void UpdateEstDealValueByLeadID(LeadDeal entity);
-        string GetLastAddedLeadPrefixByOrgID(string OrgID);
+        Task<IEnumerable<LeadDeal>> LeadDealByOrgID(string OrgID);
+        Task<LeadDeal> LeadDealByLeadID(string LeadID);
+        Task UpdateEstDealValueByLeadID(LeadDeal entity);
+        Task<string> GetLastAddedLeadPrefixByOrgID(string OrgID);
+        Task RemoveByLeadID(string LeadID);
+
+
     }
 }

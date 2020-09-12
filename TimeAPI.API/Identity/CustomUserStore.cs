@@ -35,11 +35,11 @@ namespace TimeAPI.API.Identity
         }
 
         #region IQueryableUserStore<ApplicationUser> Members
-        public IQueryable<ApplicationUser> Users
+        public IQueryable<ApplicationUser>  Users
         {
             get
             {
-                return _unitOfWork.UserRepository.All()
+                return _unitOfWork.UserRepository.GetAll()
                     .Select(x => getApplicationUser(x))
                     .AsQueryable();
             }
@@ -90,7 +90,7 @@ namespace TimeAPI.API.Identity
             }
         }
 
-        public Task<ApplicationUser> FindByIdAsync(string userId, CancellationToken cancellationToken)
+        public async Task<ApplicationUser> FindByIdAsync(string userId, CancellationToken cancellationToken)
         {
             if (cancellationToken != null)
                 cancellationToken.ThrowIfCancellationRequested();
@@ -101,9 +101,9 @@ namespace TimeAPI.API.Identity
             if (!Guid.TryParse(userId, out Guid id))
                 throw new ArgumentOutOfRangeException(nameof(userId), $"{nameof(userId)} is not a valid GUID");
 
-            var userEntity = _unitOfWork.UserRepository.Find(id.ToString());
+            var userEntity = await _unitOfWork.UserRepository.Find(id.ToString()).ConfigureAwait(false);
 
-            return Task.FromResult(getApplicationUser(userEntity));
+            return await Task.FromResult(getApplicationUser(userEntity)).ConfigureAwait(false);
         }
 
         public Task<ApplicationUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
@@ -394,7 +394,7 @@ namespace TimeAPI.API.Identity
             return Task.FromResult(result);
         }
 
-        public Task<ApplicationUser> FindByLoginAsync(string loginProvider, string providerKey, CancellationToken cancellationToken)
+        public async Task<ApplicationUser> FindByLoginAsync(string loginProvider, string providerKey, CancellationToken cancellationToken)
         {
             if (cancellationToken != null)
                 cancellationToken.ThrowIfCancellationRequested();
@@ -407,11 +407,11 @@ namespace TimeAPI.API.Identity
 
             var loginEntity = _unitOfWork.UserLoginRepository.Find(new UserLoginKey { LoginProvider = loginProvider, ProviderKey = providerKey });
             if (loginEntity == null)
-                return Task.FromResult(default(ApplicationUser));
+                return await Task.FromResult(default(ApplicationUser)).ConfigureAwait(false);
 
-            var userEntity = _unitOfWork.UserRepository.Find(loginEntity.UserId);
+            var userEntity = await _unitOfWork.UserRepository.Find(loginEntity.UserId).ConfigureAwait(false);
 
-            return Task.FromResult(getApplicationUser(userEntity));
+            return await Task.FromResult(getApplicationUser(userEntity)).ConfigureAwait(false);
         }
         #endregion
 
@@ -897,7 +897,7 @@ namespace TimeAPI.API.Identity
             entity.SecurityStamp = ApplicationUser.SecurityStamp;
             entity.TwoFactorEnabled = ApplicationUser.TwoFactorEnabled;
             entity.UserName = ApplicationUser.UserName;
- 
+
         }
 
         private ApplicationUser getApplicationUser(User entity)

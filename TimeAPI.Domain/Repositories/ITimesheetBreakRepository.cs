@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.Domain.Repositories
 {
-    public interface ITimesheetBreakRepository : IRepository<TimesheetBreak, string>
+    public interface ITimesheetBreakRepository : IRepositoryAsync<TimesheetBreak, string>
     {
-        void BreakOutByEmpIDAndGrpID(TimesheetBreak entity);
-        TimesheetBreak FindTimeSheetBreakByEmpID(string empid, string groupid);
-        void RemoveByGroupID(string GroupID);
-        dynamic GetAllTimesheetBreakByOrgID(string OrgID);
-        IEnumerable<string> GetAllEmpByGroupID(string GroupID);
-        IEnumerable<TimesheetBreak> FindLastTimeSheetBreakByEmpIDAndGrpID(string empid, string groupid);
+        Task BreakOutByEmpIDAndGrpID(TimesheetBreak entity);
+        Task<TimesheetBreak> FindTimeSheetBreakByEmpID(string empid, string groupid);
+        Task RemoveByGroupID(string GroupID);
+        Task<dynamic> GetAllTimesheetBreakByOrgID(string OrgID);
+        Task<IEnumerable<string>> GetAllEmpByGroupID(string GroupID);
+        Task<IEnumerable<TimesheetBreak>> FindLastTimeSheetBreakByEmpIDAndGrpID(string empid, string groupid);
     }
 }

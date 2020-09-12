@@ -1,21 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.Domain.Repositories
 {
-    public interface IProjectActivityRepository : IRepository<ProjectActivity, string>
+    public interface IProjectActivityRepository : IRepositoryAsync<ProjectActivity, string>
     {
-        //IEnumerable<Team> FindTeamsByOrgID(string OrgID);
-        //dynamic FindByTeamID(string TeamID);
-        //IEnumerable<dynamic> FetchAllTeamsByOrgID(string OrgID);
-        //IEnumerable<dynamic> FetchAllTeamMembersByTeamID(string key);
-        IEnumerable<ProjectActivity> GetProjectActivityByProjectID(string ProjectID);
-        void UpdateProjectActivityStatusByActivityID(ProjectActivity entity);
-        dynamic GetProjectActivityRatioByProjectID(string ProjectID);
-        dynamic FindByProjectActivityID(string ProjectID);
-        //IEnumerable<ProjectActivity> GetProjectActivityByProjectID(string ProjectID);
-
+        Task< IEnumerable<ProjectActivity>> GetProjectActivityByProjectID(string ProjectID);
+        Task UpdateProjectActivityStatusByActivityID(ProjectActivity entity);
+        Task<dynamic> GetProjectActivityRatioByProjectID(string ProjectID);
+        Task<dynamic> FindByProjectActivityID(string ProjectID);
     }
 }

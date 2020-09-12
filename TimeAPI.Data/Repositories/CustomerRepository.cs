@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -24,25 +25,25 @@ namespace TimeAPI.Data.Repositories
                     );
         }
 
-        public Customer Find(string key)
+        public async Task<Customer> Find(string key)
         {
-            return QuerySingleOrDefault<Customer>(
+            return await QuerySingleOrDefaultAsync<Customer>(
                 sql: "SELECT * FROM dbo.customer WHERE id = @key and is_deleted = 0",
                 param: new { key }
             );
         }
 
-        public Customer FindByEmpUserID(string key)
+        public async Task<Customer> FindByEmpUserID(string key)
         {
-            return QuerySingleOrDefault<Customer>(
+            return await QuerySingleOrDefaultAsync<Customer>(
                 sql: "SELECT * FROM dbo.customer WHERE user_id = @key and is_deleted = 0",
                 param: new { key }
             );
         }
 
-        public IEnumerable<Customer> All()
+        public async Task<IEnumerable<Customer>> All()
         {
-            return Query<Customer>(
+            return await QueryAsync<Customer>(
                 sql: "SELECT * FROM dbo.customer where is_deleted = 0"
             );
         }
@@ -86,17 +87,17 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<dynamic> FindCustomerByOrgID(string key)
+        public async Task<IEnumerable<dynamic>> FindCustomerByOrgID(string key)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                 sql: "SELECT  ROW_NUMBER() OVER (ORDER BY dbo.customer.cst_name) AS rowno, * FROM dbo.customer where is_deleted = 0 AND org_id = @key",
                  param: new { key }
             );
         }
 
-        public Customer FindCustomerByProjectID(string key)
+        public async Task<Customer> FindCustomerByProjectID(string key)
         {
-            return QuerySingleOrDefault<Customer>(
+            return await QuerySingleOrDefaultAsync<Customer>(
                 sql: @"SELECT dbo.customer.* FROM dbo.customer
                         INNER JOIN customer_x_project ON customer_x_project.cst_id = customer.id
                         WHERE customer_x_project.project_id = @key",
@@ -104,9 +105,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public Customer FindByCustomerByNameAndEmail(string Name, string Email)
+        public async Task<Customer> FindByCustomerByNameAndEmail(string Name, string Email)
         {
-            return QuerySingleOrDefault<Customer>(
+            return await QuerySingleOrDefaultAsync<Customer>(
                 sql: @"SELECT * FROM dbo.customer WHERE cst_name = @Name and email = @Email and is_deleted = 0",
                  param: new { Name, Email }
             );

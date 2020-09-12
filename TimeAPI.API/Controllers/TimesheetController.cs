@@ -138,7 +138,7 @@ namespace TimeAPI.API.Controllers
                 #region Teams
 
                 //Remove TeamMembers with this CurrentGroupID
-                _unitOfWork.TimesheetTeamRepository.RemoveByGroupID(modal.groupid);
+                await _unitOfWork.TimesheetTeamRepository.RemoveByGroupID(modal.groupid).ConfigureAwait(false);
 
                 foreach (var item in timesheetViewModel.teamid.Distinct())
                 {
@@ -159,7 +159,7 @@ namespace TimeAPI.API.Controllers
                 #region TimesheetProjectCategory
 
                 //Remove ProjectCategory with this CurrentGroupID
-                _unitOfWork.TimesheetProjectCategoryRepository.RemoveByGroupID(modal.groupid);
+                await _unitOfWork.TimesheetProjectCategoryRepository.RemoveByGroupID(modal.groupid).ConfigureAwait(false);
                 if (timesheetViewModel.TimesheetCategoryViewModel != null)
                 {
                     var project_category_type = new TimesheetProjectCategory
@@ -182,7 +182,7 @@ namespace TimeAPI.API.Controllers
 
                 #region TimesheetLocation
 
-                _unitOfWork.TimesheetLocationRepository.RemoveByGroupID(modal.groupid);
+                await _unitOfWork.TimesheetLocationRepository.RemoveByGroupID(modal.groupid).ConfigureAwait(false);
 
                 if (timesheetViewModel.TimesheetSearchLocationViewModel != null)
                 {
@@ -259,14 +259,14 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(paramName: nameof(Utils.ID));
 
-                var Timesheet = _unitOfWork.TimesheetRepository.Find(Utils.ID);
+                var Timesheet = await _unitOfWork.TimesheetRepository.Find(Utils.ID).ConfigureAwait(false);
                 _unitOfWork.TimesheetRepository.Remove(Utils.ID);
                 _unitOfWork.TimesheetRepository.RemoveByGroupID(Timesheet.groupid);
-                _unitOfWork.TimesheetTeamRepository.RemoveByGroupID(Timesheet.groupid);
-                _unitOfWork.TimesheetProjectCategoryRepository.RemoveByGroupID(Timesheet.groupid);
-                _unitOfWork.TimesheetActivityRepository.RemoveByGroupID(Timesheet.groupid);
+                await _unitOfWork.TimesheetTeamRepository.RemoveByGroupID(Timesheet.groupid).ConfigureAwait(false);
+                await _unitOfWork.TimesheetProjectCategoryRepository.RemoveByGroupID(Timesheet.groupid).ConfigureAwait(false);
+                await _unitOfWork.TimesheetActivityRepository.RemoveByGroupID(Timesheet.groupid).ConfigureAwait(false);
                 _unitOfWork.TimesheetAdministrativeRepository.RemoveByGroupID(Timesheet.groupid);
-                _unitOfWork.TimesheetBreakRepository.RemoveByGroupID(Timesheet.groupid);
+                await _unitOfWork.TimesheetBreakRepository.RemoveByGroupID(Timesheet.groupid).ConfigureAwait(false);
 
                 if (_unitOfWork.LocationExceptionRepository.FindByGroupID(Timesheet.groupid) != null)
                     _unitOfWork.LocationExceptionRepository.RemoveByGroupID(Timesheet.groupid);
@@ -290,7 +290,7 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.TimesheetRepository.All();
+                var result = await _unitOfWork.TimesheetRepository.All().ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -319,7 +319,7 @@ namespace TimeAPI.API.Controllers
                     modal.empid = item;
                     modal.groupid = timesheetViewModel.groupid;
 
-                    var Timesheet = _unitOfWork.TimesheetRepository.FindTimeSheetByEmpID(modal.empid, modal.groupid);
+                    var Timesheet = await _unitOfWork.TimesheetRepository.FindTimeSheetByEmpID(modal.empid, modal.groupid).ConfigureAwait(false);
                     if (Timesheet == null)
                     {
                         return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = "Not a valid employee", Desc = modal.empid });
@@ -341,7 +341,7 @@ namespace TimeAPI.API.Controllers
                     modal.check_out = _dateTime.ToString();
                     modal.modifiedby = _dateTime.ToString();
 
-                    _unitOfWork.TimesheetRepository.CheckOutByEmpID(modal);
+                   await _unitOfWork.TimesheetRepository.CheckOutByEmpID(modal).ConfigureAwait(false);
                 }
 
                 #region Location
@@ -472,7 +472,7 @@ namespace TimeAPI.API.Controllers
                 #region TimesheetBreakWithTeamMembers
 
                 //Remove TeamMembers with this CurrentGroupID
-                _unitOfWork.TimesheetBreakRepository.RemoveByGroupID(modal.groupid);
+                await _unitOfWork.TimesheetBreakRepository.RemoveByGroupID(modal.groupid).ConfigureAwait(false);
 
                 foreach (var item in TimesheetBreakViewModel.team_member_empid.Distinct())
                 {
@@ -538,9 +538,9 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(paramName: nameof(Utils.ID));
 
-                var TimesheetBreak = _unitOfWork.TimesheetBreakRepository.Find(Utils.ID);
+                var TimesheetBreak = await _unitOfWork.TimesheetBreakRepository.Find(Utils.ID).ConfigureAwait(false);
                 _unitOfWork.TimesheetBreakRepository.Remove(Utils.ID);
-                _unitOfWork.TimesheetBreakRepository.RemoveByGroupID(TimesheetBreak.groupid);
+                await _unitOfWork.TimesheetBreakRepository.RemoveByGroupID(TimesheetBreak.groupid).ConfigureAwait(false);
 
                 if (_unitOfWork.LocationExceptionRepository.FindByGroupID(TimesheetBreak.groupid) != null)
                     _unitOfWork.LocationExceptionRepository.RemoveByGroupID(TimesheetBreak.groupid);
@@ -564,7 +564,7 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.TimesheetBreakRepository.All();
+                var result = await _unitOfWork.TimesheetBreakRepository.All().ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -593,7 +593,7 @@ namespace TimeAPI.API.Controllers
                     modal.empid = item;
                     modal.groupid = TimesheetBreakOutViewModel.groupid;
 
-                    var TimesheetBreak = _unitOfWork.TimesheetBreakRepository.FindTimeSheetBreakByEmpID(modal.empid, modal.groupid);
+                    var TimesheetBreak = await _unitOfWork.TimesheetBreakRepository.FindTimeSheetBreakByEmpID(modal.empid, modal.groupid).ConfigureAwait(false);
                     if (TimesheetBreak == null)
                     {
                         return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = "Not a valid employee", Desc = modal.empid });
@@ -615,7 +615,7 @@ namespace TimeAPI.API.Controllers
                     modal.break_out = _dateTime.ToString();
                     modal.modifiedby = _dateTime.ToString();
 
-                    _unitOfWork.TimesheetBreakRepository.BreakOutByEmpIDAndGrpID(modal);
+                    await _unitOfWork.TimesheetBreakRepository.BreakOutByEmpIDAndGrpID(modal).ConfigureAwait(false);
                 }
 
                 #region Location
@@ -668,7 +668,7 @@ namespace TimeAPI.API.Controllers
                 if (utils == null)
                     throw new ArgumentNullException(nameof(utils));
 
-                var result = _unitOfWork.TimesheetBreakRepository.FindLastTimeSheetBreakByEmpIDAndGrpID(utils.EmpID, utils.GrpID);
+                var result = await _unitOfWork.TimesheetBreakRepository.FindLastTimeSheetBreakByEmpIDAndGrpID(utils.EmpID, utils.GrpID).ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -727,7 +727,7 @@ namespace TimeAPI.API.Controllers
                         modifiedby = timesheetActivityViewModel.modifiedby,
                         modified_date = _dateTime.ToString()
                     };
-                    _unitOfWork.TaskRepository.UpdateTaskStatus(modalTasks);
+                    await _unitOfWork.TaskRepository.UpdateTaskStatus(modalTasks).ConfigureAwait(false);
                 }
 
                 _unitOfWork.TimesheetActivityRepository.Add(modal);
@@ -822,7 +822,7 @@ namespace TimeAPI.API.Controllers
                     cancellationToken.ThrowIfCancellationRequested();
 
                 oDataTable _oDataTable = new oDataTable();
-                var result = _unitOfWork.TimesheetActivityRepository.GetTop10TimesheetActivityOnTaskID(Utils.ID);
+                var result = await _unitOfWork.TimesheetActivityRepository.GetTop10TimesheetActivityOnTaskID(Utils.ID).ConfigureAwait(false);
                 var xResult = _oDataTable.ToDataTable(result);
 
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
@@ -842,7 +842,7 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.TimesheetActivityRepository.GetTimesheetActivityByGroupAndProjectID(Utils.GroupID, Utils.ProjectID, Utils.Date.ToString());
+                var result = await _unitOfWork.TimesheetActivityRepository.GetTimesheetActivityByGroupAndProjectID(Utils.GroupID, Utils.ProjectID, Utils.Date.ToString()).ConfigureAwait(false);
                 var GroupID = result.Select(x => x.groupid).ToList();
 
                 for (int i = 0; i < GroupID.Count(); i++)
@@ -872,7 +872,7 @@ namespace TimeAPI.API.Controllers
                     cancellationToken.ThrowIfCancellationRequested();
 
                 oDataTable _oDataTable = new oDataTable();
-                var result = _unitOfWork.TimesheetActivityRepository.GetTimesheetActivityByEmpID(Utils.EmpID, Utils.StartDate, Utils.EndDate);
+                var result = await _unitOfWork.TimesheetActivityRepository.GetTimesheetActivityByEmpID(Utils.EmpID, Utils.StartDate, Utils.EndDate).ConfigureAwait(false);
 
                 var GroupID = result.Select(x => x.groupid).ToList();
                 for (int i = 0; i < GroupID.Count; i++)

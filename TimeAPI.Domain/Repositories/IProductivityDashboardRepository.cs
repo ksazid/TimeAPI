@@ -1,15 +1,16 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Model;
 
 namespace TimeAPI.Domain.Repositories
 {
-    public interface IProductivityDashboardRepository : IRepository<ProductivityDashboard, string>
+    public interface IProductivityDashboardRepository : IRepositoryAsync<ProductivityDashboard, string>
     {
-        dynamic EmployeeProductivityPerDateByEmpIDAndDate(string EmpID, string StartDate, string EndDate);
-        dynamic DesktopEmployeeProductivityPerDateByEmpIDAndDate(string EmpID, string StartDate, string EndDate);
-        dynamic EmployeeProductivityTimeFrequencyByEmpIDAndDate(string EmpID, string StartDate, string EndDate);
-        dynamic EmployeeAppTrackedByEmpIDAndDate(string EmpID, string StartDate, string EndDate);
+        Task<dynamic> EmployeeProductivityPerDateByEmpIDAndDate(string EmpID, string StartDate, string EndDate);
+        Task<dynamic> DesktopEmployeeProductivityPerDateByEmpIDAndDate(string EmpID, string StartDate, string EndDate);
+        Task<dynamic> EmployeeProductivityTimeFrequencyByEmpIDAndDate(string EmpID, string StartDate, string EndDate);
+        Task<dynamic> EmployeeAppTrackedByEmpIDAndDate(string EmpID, string StartDate, string EndDate);
 
         //dynamic EmployeeProductivityTimeGraphFrequencyByUsageID(string UsageID);
         //dynamic TotalEmpAttentedCountByOrgIDAndDate(string OrgID, string toDate, string fromDate);

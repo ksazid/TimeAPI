@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.Domain.Repositories
 {
-    public interface ICustomerProjectRepository : IRepository<CustomerProject, string>
+    public interface ICustomerProjectRepository : IRepositoryAsync<CustomerProject, string>
     {
-        IEnumerable<Customer> FindCustomerByOrgID(string key);
-        public CustomerProject FindByProjectID(string key);
+        Task<IEnumerable<Customer>> FindCustomerByOrgID(string key);
+        Task<CustomerProject> FindByProjectID(string key);
 
     }
 }

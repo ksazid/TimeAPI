@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -10,7 +11,7 @@ namespace TimeAPI.Data.Repositories
         public CostProjectMilestoneRepository(IDbTransaction transaction) : base(transaction)
         { }
 
-        public void Add(CostProjectMilestone  entity)
+        public void Add(CostProjectMilestone entity)
         {
             entity.id = ExecuteScalar<string>(
                     sql: @"INSERT INTO dbo.cost_project_milestone
@@ -21,17 +22,17 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public CostProjectMilestone  Find(string key)
+        public async Task<CostProjectMilestone> Find(string key)
         {
-            return QuerySingleOrDefault<CostProjectMilestone >(
+            return await QuerySingleOrDefaultAsync<CostProjectMilestone>(
                 sql: "SELECT * FROM dbo.cost_project_milestone WHERE is_deleted = 0 and id = @key",
                 param: new { key }
             );
         }
 
-        public dynamic FindByCostProjectMilestoneID(string key)
+        public async Task<dynamic> FindByCostProjectMilestoneID(string key)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                    sql: @"SELECT 
                                 dbo.cost_project_milestone.id as cost_project_milestone_id,
                                 dbo.cost_project_milestone.project_id,
@@ -53,9 +54,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public void RemoveByProjectID(string key)
+        public async Task RemoveByProjectID(string key)
         {
-            Execute(
+            await ExecuteAsync(
                 sql: @"UPDATE dbo.cost_project_milestone
                    SET
                        modified_date = GETDATE(), is_deleted = 1
@@ -63,8 +64,8 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
-        
-        public void Update(CostProjectMilestone  entity)
+
+        public void Update(CostProjectMilestone entity)
         {
             Execute(
                 sql: @"UPDATE dbo.cost_project_milestone
@@ -80,16 +81,16 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<CostProjectMilestone > All()
+        public async Task<IEnumerable<CostProjectMilestone>> All()
         {
-            return Query<CostProjectMilestone >(
+            return await QueryAsync<CostProjectMilestone>(
                 sql: "SELECT * FROM [dbo].[cost_project_milestone] where is_deleted = 0"
             );
         }
 
-        public IEnumerable<CostProjectMilestone> GetCostProjectMilestoneByProjectID(string key)
+        public async Task<IEnumerable<CostProjectMilestone>> GetCostProjectMilestoneByProjectID(string key)
         {
-            return Query<CostProjectMilestone>(
+            return await QueryAsync<CostProjectMilestone>(
                 sql: @"SELECT dbo.cost_project_milestone.*
                         FROM dbo.cost_project_milestone 
                     WHERE dbo.cost_project_milestone.is_deleted = 0 
@@ -98,9 +99,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<CostProjectMilestone> GetAllStaticMilestoneByOrgID(string OrgID)
+        public async Task<IEnumerable<CostProjectMilestone>> GetAllStaticMilestoneByOrgID(string OrgID)
         {
-            return Query<CostProjectMilestone>(
+            return await QueryAsync<CostProjectMilestone>(
                 sql: "SELECT * FROM [dbo].[static_milestone] where is_deleted = 0 and org_id = @OrgID",
                  param: new { OrgID }
             );

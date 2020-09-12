@@ -160,8 +160,8 @@ namespace TimeAPI.API.Controllers
                 AddOrUpdateSetupAndLocation(organizationViewModel, config, mapper, modal, result, result1);
 
                 // remove weekend
-                if (_unitOfWork.WeekdaysRepository.FindByOrgID(modal.org_id).ToList().Count > 0)
-                    _unitOfWork.WeekdaysRepository.RemoveByOrgID(modal.org_id);
+                if ((await _unitOfWork.WeekdaysRepository.FindByOrgID(modal.org_id).ConfigureAwait(false)).ToList().Count > 0)
+                    await _unitOfWork.WeekdaysRepository.RemoveByOrgID(modal.org_id).ConfigureAwait(false);
 
                 if (organizationViewModel.OrganizationSetup.weekends != null)
                 {
@@ -213,8 +213,8 @@ namespace TimeAPI.API.Controllers
                 _unitOfWork.SuperadminOrganizationRepository.RemoveByOrgID(Utils.ID);
                 _unitOfWork.OrganizationSetupRepository.RemoveByOrgID(Utils.ID);
 
-                if (_unitOfWork.WeekdaysRepository.FindByOrgID(Utils.ID).ToList().Count > 0)
-                    _unitOfWork.WeekdaysRepository.RemoveByOrgID(Utils.ID);
+                if ((await _unitOfWork.WeekdaysRepository.FindByOrgID(Utils.ID).ConfigureAwait(false)).ToList().Count > 0)
+                    await _unitOfWork.WeekdaysRepository.RemoveByOrgID(Utils.ID).ConfigureAwait(false);
 
                 var ListBranch = _unitOfWork.OrganizationBranchRepository.FindByParentOrgID(Utils.ID).ToList();
                 for (int i = 0; i < ListBranch.Count; i++)
@@ -254,7 +254,7 @@ namespace TimeAPI.API.Controllers
                 var resultLocation = _unitOfWork.EntityLocationRepository.FindByEnitiyID(result.org_id);
                 var resultSetup = _unitOfWork.OrganizationSetupRepository.FindByEnitiyID(result.org_id);
                 var resultBranch = _unitOfWork.OrganizationRepository.FindByAllBranchByParengOrgID(result.org_id).ToList();
-                var resultWeekdays = _unitOfWork.WeekdaysRepository.FindByOrgID(result.org_id).ToList();
+                var resultWeekdays = (await _unitOfWork.WeekdaysRepository.FindByOrgID(result.org_id).ConfigureAwait(false)).ToList();
 
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<OrganizationViewModel, Organization>());
                 var mapper = config.CreateMapper();

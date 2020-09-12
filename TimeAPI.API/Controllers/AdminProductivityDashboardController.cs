@@ -25,7 +25,7 @@ namespace TimeAPI.API.Controllers
         private readonly ICacheService _cacheService;
 
         public AdminProductivityDashboardController(IUnitOfWork unitOfWork, ILogger<AdminProductivityDashboardController> logger,
-                                                    IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings, 
+                                                    IEmailSender emailSender, IOptions<ApplicationSettings> AppSettings,
                                                     ICacheService cacheService)
         {
             _emailSender = emailSender;
@@ -45,7 +45,8 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var results = _unitOfWork.AdminProductivityDashboardRepository.EmployeeProductivityPerDateByOrgIDAndDate(Utils.OrgID, Utils.StartDate, Utils.EndDate);
+                var results = await _unitOfWork.AdminProductivityDashboardRepository.EmployeeProductivityPerDateByOrgIDAndDate
+                                                    (Utils.OrgID, Utils.StartDate, Utils.EndDate).ConfigureAwait(false);
 
                 return await Task.FromResult<object>(results).ConfigureAwait(false);
             }
@@ -64,7 +65,8 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.AdminProductivityDashboardRepository.EmployeeProductivityTimeFrequencyByOrgIDAndDate(Utils.OrgID, Utils.StartDate, Utils.EndDate);
+                var result = await _unitOfWork.AdminProductivityDashboardRepository
+                                    .EmployeeProductivityTimeFrequencyByOrgIDAndDate(Utils.OrgID, Utils.StartDate, Utils.EndDate).ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -83,7 +85,8 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var results = _unitOfWork.AdminProductivityDashboardRepository.ScreenshotByOrgIDAndDate(Utils.OrgID, Utils.StartDate, Utils.EndDate);
+                var results = await _unitOfWork.AdminProductivityDashboardRepository
+                                    .ScreenshotByOrgIDAndDate(Utils.OrgID, Utils.StartDate, Utils.EndDate).ConfigureAwait(false);
 
                 return await Task.FromResult<object>(results).ConfigureAwait(false);
             }
@@ -102,7 +105,7 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.UserRepository.GetEmployeeTasksTimesheetByOrgID(Utils.OrgID, Utils.StartDate, Utils.EndDate);
+                var result = await _unitOfWork.UserRepository.GetEmployeeTasksTimesheetByOrgID(Utils.OrgID, Utils.StartDate, Utils.EndDate).ConfigureAwait(false);
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -110,6 +113,5 @@ namespace TimeAPI.API.Controllers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
-
     }
 }

@@ -47,7 +47,7 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var results = _unitOfWork.ProductivityDashboardRepository.EmployeeProductivityPerDateByEmpIDAndDate(Utils.EmpID, Utils.StartDate, Utils.EndDate);
+                var results = await _unitOfWork.ProductivityDashboardRepository.EmployeeProductivityPerDateByEmpIDAndDate(Utils.EmpID, Utils.StartDate, Utils.EndDate).ConfigureAwait(false);
 
                 return await Task.FromResult<object>(results).ConfigureAwait(false);
             }
@@ -66,7 +66,7 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.ProductivityDashboardRepository.EmployeeProductivityTimeFrequencyByEmpIDAndDate(Utils.EmpID, Utils.StartDate, Utils.EndDate);
+                var result = await _unitOfWork.ProductivityDashboardRepository.EmployeeProductivityTimeFrequencyByEmpIDAndDate(Utils.EmpID, Utils.StartDate, Utils.EndDate).ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -85,7 +85,7 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.ProductivityDashboardRepository.EmployeeAppTrackedByEmpIDAndDate(Utils.EmpID, Utils.StartDate, Utils.EndDate);
+                var result = await _unitOfWork.ProductivityDashboardRepository.EmployeeAppTrackedByEmpIDAndDate(Utils.EmpID, Utils.StartDate, Utils.EndDate).ConfigureAwait(false);
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -103,7 +103,7 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.UserRepository.GetEmployeeTasksTimesheetByEmpID(Utils.EmpID, Utils.StartDate, Utils.EndDate);
+                var result = await _unitOfWork.UserRepository.GetEmployeeTasksTimesheetByEmpID(Utils.EmpID, Utils.StartDate, Utils.EndDate).ConfigureAwait(false);
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)

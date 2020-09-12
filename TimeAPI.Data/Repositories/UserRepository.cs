@@ -33,16 +33,23 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<User> All()
+        public async Task<IEnumerable<User>> All()
+        {
+            return await QueryAsync<User>(
+                sql: "SELECT * FROM AspNetUsers"
+            );
+        }
+
+        public IEnumerable<User> GetAll()
         {
             return Query<User>(
                 sql: "SELECT * FROM AspNetUsers"
             );
         }
 
-        public User Find(string key)
+        public async Task<User> Find(string key)
         {
-            return QuerySingleOrDefault<User>(
+            return await QuerySingleOrDefaultAsync<User>(
                 sql: "SELECT * FROM AspNetUsers WHERE Id = @key",
                 param: new { key }
             );
@@ -101,29 +108,29 @@ namespace TimeAPI.Data.Repositories
         //        );
         //}
 
-        public UserDataGroupDataSet GetUserDataGroupByUserID(string UserID, string Date)
+        public async Task<UserDataGroupDataSet> GetUserDataGroupByUserID(string UserID, string Date)
         {
-            var resultsAspNetUsers = QuerySingleOrDefault<User>(
+            var resultsAspNetUsers = await QuerySingleOrDefaultAsync<User>(
                 sql: @"SELECT * from AspNetUsers WITH (NOLOCK) WHERE id = @UserID;",
                 param: new { UserID }
             );
 
-            var resultsOrganization = Query<Organization>(
+            var resultsOrganization = await QueryAsync<Organization>(
                 sql: @"SELECT * from organization WITH (NOLOCK) WHERE user_id = @UserID and is_deleted = 0;",
                 param: new { UserID }
             );
 
-            var resultsEmployee = QuerySingleOrDefault<Employee>(
+            var resultsEmployee = await QuerySingleOrDefaultAsync<Employee>(
                 sql: @"SELECT * from employee WITH (NOLOCK) WHERE user_id = @UserID and is_deleted = 0;",
                 param: new { UserID }
             );
 
-            var resultsSubscription = QuerySingleOrDefault<Subscription>(
+            var resultsSubscription = await QuerySingleOrDefaultAsync<Subscription>(
                    sql: @"SELECT * from subscription WITH (NOLOCK) WHERE user_id = @UserID and is_deleted = 0;",
                    param: new { UserID }
             );
 
-            List<Organization> orgList = GetOrgAddress(resultsOrganization);
+            List<Organization> orgList = await GetOrgAddress(resultsOrganization);
             UserDataGroupDataSet _UserDataGroupDataSet = new UserDataGroupDataSet();
 
             _UserDataGroupDataSet.User = resultsAspNetUsers;
@@ -136,9 +143,9 @@ namespace TimeAPI.Data.Repositories
             return _UserDataGroupDataSet;
         }
 
-        public IEnumerable<RootTimesheetData> GetAllTimesheetByEmpID(string EmpID, string Date)
+        public async Task<IEnumerable<RootTimesheetData>> GetAllTimesheetByEmpID(string EmpID, string Date)
         {
-            var resultsTimesheetGrpID = Query<string>(
+            var resultsTimesheetGrpID = await QueryAsync<string>(
                 sql: @"SELECT distinct(groupid), FORMAT(CAST(timesheet.ondate AS DATETIME2), N'hh:mm tt')  from timesheet WITH (NOLOCK)
                         WHERE empid = @empid
                         AND FORMAT(CAST(timesheet.ondate AS DATE), 'd', 'EN-US') = FORMAT(CAST(@Date AS DATE), 'd', 'EN-US')
@@ -147,13 +154,13 @@ namespace TimeAPI.Data.Repositories
                 param: new { empid = EmpID, Date }
             );
 
-            List<RootTimesheetData> RootTimesheetDataList = GetTimesheetProperty(resultsTimesheetGrpID);
+            List<RootTimesheetData> RootTimesheetDataList = await GetTimesheetProperty(resultsTimesheetGrpID);
             return RootTimesheetDataList;
         }
 
-        public IEnumerable<RootTimesheetData> GetEmployeeTasksTimesheetByOrgID(string OrgID, string fromDate, string toDate)
+        public async Task<IEnumerable<RootTimesheetData>> GetEmployeeTasksTimesheetByOrgID(string OrgID, string fromDate, string toDate)
         {
-            var resultsTimesheetGrpID = Query<string>(
+            var resultsTimesheetGrpID = await QueryAsync<string>(
                 sql: @"SELECT distinct(groupid), FORMAT(CAST(timesheet.ondate AS datetime2), N'dd-MMM-yyyy HH:mm:ss', 'EN-US')  
                         FROM timesheet WITH (NOLOCK)
                         INNER JOIN employee on timesheet.empid = employee.id
@@ -167,14 +174,14 @@ namespace TimeAPI.Data.Repositories
                 param: new { OrgID, fromDate, toDate }
             );
 
-            List<RootTimesheetData> RootTimesheetDataList = GetTimesheetPropertyForEmployeeActivitesDashboard(resultsTimesheetGrpID);
+            List<RootTimesheetData> RootTimesheetDataList = await GetTimesheetPropertyForEmployeeActivitesDashboard(resultsTimesheetGrpID);
 
             return RootTimesheetDataList;
         }
 
-        public IEnumerable<RootTimesheetData> GetEmployeeTasksTimesheetByEmpID(string EmpID, string fromDate, string toDate)
+        public async Task<IEnumerable<RootTimesheetData>> GetEmployeeTasksTimesheetByEmpID(string EmpID, string fromDate, string toDate)
         {
-            var resultsTimesheetGrpID = Query<string>(
+            var resultsTimesheetGrpID = await QueryAsync<string>(
                 sql: @"SELECT distinct(groupid), FORMAT(CAST(timesheet.ondate AS datetime2), N'dd-MMM-yyyy HH:mm:ss', 'EN-US')  from timesheet WITH (NOLOCK)
                         WHERE empid = @empid
                         AND FORMAT(CAST(timesheet.ondate AS DATE), 'MM/dd/yyyy', 'EN-US')
@@ -186,14 +193,14 @@ namespace TimeAPI.Data.Repositories
                 param: new { empid = EmpID, fromDate, toDate }
             );
 
-            List<RootTimesheetData> RootTimesheetDataList = GetTimesheetPropertyForEmployeeActivitesDashboard(resultsTimesheetGrpID);
+            List<RootTimesheetData> RootTimesheetDataList = await GetTimesheetPropertyForEmployeeActivitesDashboard(resultsTimesheetGrpID);
 
             return RootTimesheetDataList;
         }
 
-        public IEnumerable<RootTimesheetData> GetAllTimesheetByOrgID(string OrgID, string fromDate, string toDate)
+        public async Task<IEnumerable<RootTimesheetData>> GetAllTimesheetByOrgID(string OrgID, string fromDate, string toDate)
         {
-            var resultsTimesheetGrpID = Query<string>(
+            var resultsTimesheetGrpID = await QueryAsync<string>(
                 sql: @"SELECT distinct(groupid), FORMAT(CAST(timesheet.ondate AS DATE), 'dd/MM/yyyy'), FORMAT(CAST(timesheet.ondate AS DATETIME2), N'hh:mm tt')  
                             from timesheet WITH (NOLOCK)
                             INNER JOIN employee on timesheet.empid = employee.id
@@ -206,16 +213,16 @@ namespace TimeAPI.Data.Repositories
                 param: new { OrgID, fromDate, toDate }
             );
 
-            List<RootTimesheetData> RootTimesheetDataList = GetTimesheetProperty(resultsTimesheetGrpID);
+            List<RootTimesheetData> RootTimesheetDataList = await GetTimesheetProperty(resultsTimesheetGrpID);
             return RootTimesheetDataList;
         }
 
-        private List<Organization> GetOrgAddress(IEnumerable<Organization> resultsOrganization)
+        private async Task<List<Organization>> GetOrgAddress(IEnumerable<Organization> resultsOrganization)
         {
             List<Organization> orgList = (resultsOrganization as List<Organization>);
             for (int i = 0; i < orgList.Count; i++)
             {
-                var entityLocation = QuerySingleOrDefault<EntityLocation>(
+                var entityLocation = await QuerySingleOrDefaultAsync<EntityLocation>(
                    sql: @"SELECT * from entity_location WITH (NOLOCK) WHERE entity_id = @item and is_deleted = 0;",
                    param: new { item = orgList[i].org_id }
                   );
@@ -226,7 +233,7 @@ namespace TimeAPI.Data.Repositories
             return orgList;
         }
 
-        private List<RootTimesheetData> GetTimesheetProperty(IEnumerable<string> resultsTimesheetGrpID)
+        private async Task<List<RootTimesheetData>> GetTimesheetProperty(IEnumerable<string> resultsTimesheetGrpID)
         {
             List<RootTimesheetData> RootTimesheetDataList = new List<RootTimesheetData>();
 
@@ -241,21 +248,21 @@ namespace TimeAPI.Data.Repositories
                 List<TimesheetCurrentLocationViewModel> TimesheetCurrentLocationViewModelList = new List<TimesheetCurrentLocationViewModel>();
                 List<FirstCheckInLastCheckout> FirstCheckInLastCheckoutList = new List<FirstCheckInLastCheckout>();
 
-                TimesheetDataModelList.AddRange(GetTimesheetDataModel(item));
+                TimesheetDataModelList.AddRange(await GetTimesheetDataModel(item));
 
-                TimesheetDataModelList.Select(d => d.viewLogDataModels = GetTimesheetActivityByGroupAndProjectID(d.groupid, "", d.ondate).ToList())
+                TimesheetDataModelList.Select(async d => d.viewLogDataModels = (await GetTimesheetActivityByGroupAndProjectID(d.groupid, "", d.ondate)).ToList())
                                             .ToList();
 
                 MembersList.AddRange(TimesheetDataModelList.Select(x => x.emp_name));
-                TimesheetTeamDataModelList.AddRange(GetTimesheetTeamDataModel(item));
-                TimesheetCurrentLocationViewModelList.AddRange(GetTimesheetCurrentLocationViewModel(item));
+                TimesheetTeamDataModelList.AddRange(await GetTimesheetTeamDataModel(item));
+                TimesheetCurrentLocationViewModelList.AddRange(await GetTimesheetCurrentLocationViewModel(item));
 
                 #region
                 rootTimesheetData.TimesheetDataModels = TimesheetDataModelList;
-                rootTimesheetData.TimesheetProjectCategoryDataModel = GetTimesheetProjectCategoryDataModel(item);
+                rootTimesheetData.TimesheetProjectCategoryDataModel = await GetTimesheetProjectCategoryDataModel(item);
                 rootTimesheetData.TimesheetTeamDataModels = TimesheetTeamDataModelList;
                 rootTimesheetData.Members = MembersList;
-                rootTimesheetData.TimesheetSearchLocationViewModel = GetTimesheetSearchLocationViewModel(item);
+                rootTimesheetData.TimesheetSearchLocationViewModel = await GetTimesheetSearchLocationViewModel(item);
                 rootTimesheetData.TimesheetCurrentLocationViewModels = TimesheetCurrentLocationViewModelList;
                 #endregion PrivateMethods
 
@@ -265,7 +272,7 @@ namespace TimeAPI.Data.Repositories
             return RootTimesheetDataList;
         }
 
-        private List<RootTimesheetData> GetTimesheetPropertyForEmployeeActivitesDashboard(IEnumerable<string> resultsTimesheetGrpID)
+        private async Task<List<RootTimesheetData>> GetTimesheetPropertyForEmployeeActivitesDashboard(IEnumerable<string> resultsTimesheetGrpID)
         {
             List<RootTimesheetData> RootTimesheetDataList = new List<RootTimesheetData>();
 
@@ -279,21 +286,21 @@ namespace TimeAPI.Data.Repositories
                 List<TimesheetTeamDataModel> TimesheetTeamDataModelList = new List<TimesheetTeamDataModel>();
                 List<TimesheetCurrentLocationViewModel> TimesheetCurrentLocationViewModelList = new List<TimesheetCurrentLocationViewModel>();
 
-                TimesheetDataModelList.AddRange(GetTimesheetDataModel(item));
+                TimesheetDataModelList.AddRange(await GetTimesheetDataModel(item));
 
-                TimesheetDataModelList.Select(d => d.viewLogDataModels = GetTimesheetActivityByGroupAndProjectID(d.groupid, "", d.ondate).ToList()).ToList();
-                TimesheetDataModelList.Select(d => d.FirstCheckInLastCheckout = FirstCheckInLastCheckout(d.emp_id, d.ondate, d.ondate)).ToList();
+                TimesheetDataModelList.Select(async d => d.viewLogDataModels = (await GetTimesheetActivityByGroupAndProjectID(d.groupid, "", d.ondate)).ToList()).ToList();
+                TimesheetDataModelList.Select(async d => d.FirstCheckInLastCheckout = (await FirstCheckInLastCheckout(d.emp_id, d.ondate, d.ondate))).ToList();
 
                 MembersList.AddRange(TimesheetDataModelList.Select(x => x.emp_name));
-                TimesheetTeamDataModelList.AddRange(GetTimesheetTeamDataModel(item));
-                TimesheetCurrentLocationViewModelList.AddRange(GetTimesheetCurrentLocationViewModel(item));
+                TimesheetTeamDataModelList.AddRange(await GetTimesheetTeamDataModel(item));
+                TimesheetCurrentLocationViewModelList.AddRange((await GetTimesheetCurrentLocationViewModel(item)));
 
                 #region PrivateMethods
                 rootTimesheetData.TimesheetDataModels = TimesheetDataModelList;
-                rootTimesheetData.TimesheetProjectCategoryDataModel = GetTimesheetProjectCategoryDataModel(item);
+                rootTimesheetData.TimesheetProjectCategoryDataModel = await GetTimesheetProjectCategoryDataModel(item);
                 rootTimesheetData.TimesheetTeamDataModels = TimesheetTeamDataModelList;
                 rootTimesheetData.Members = MembersList;
-                rootTimesheetData.TimesheetSearchLocationViewModel = GetTimesheetSearchLocationViewModel(item);
+                rootTimesheetData.TimesheetSearchLocationViewModel = await GetTimesheetSearchLocationViewModel(item);
                 rootTimesheetData.TimesheetCurrentLocationViewModels = TimesheetCurrentLocationViewModelList;
                 #endregion PrivateMethods
 
@@ -303,9 +310,9 @@ namespace TimeAPI.Data.Repositories
             return RootTimesheetDataList;
         }
 
-        private IEnumerable<TimesheetDataModel> GetTimesheetDataModel(string GroupID)
+        private async Task<IEnumerable<TimesheetDataModel>> GetTimesheetDataModel(string GroupID)
         {
-            var TimesheetDataModel = Query<TimesheetDataModel>(
+            var TimesheetDataModel = await QueryAsync<TimesheetDataModel>(
                 sql: @"SELECT
                             timesheet.id, employee.id as emp_id, employee.full_name as emp_name, timesheet.groupid,
 			                timesheet.ondate, timesheet.check_in, timesheet.check_out,
@@ -321,9 +328,9 @@ namespace TimeAPI.Data.Repositories
             return TimesheetDataModel;
         }
 
-        private IEnumerable<TimesheetTeamDataModel> GetTimesheetTeamDataModel(string GroupID)
+        private async Task<IEnumerable<TimesheetTeamDataModel>> GetTimesheetTeamDataModel(string GroupID)
         {
-            var TimesheetTeamDataModel = Query<TimesheetTeamDataModel>(
+            var TimesheetTeamDataModel = await QueryAsync<TimesheetTeamDataModel>(
                 sql: @"SELECT
                         timesheet_x_team.id, timesheet_x_team.teamid, team.team_name
                     FROM timesheet_x_team   WITH (NOLOCK)
@@ -335,9 +342,9 @@ namespace TimeAPI.Data.Repositories
             return TimesheetTeamDataModel;
         }
 
-        private IEnumerable<TimesheetCurrentLocationViewModel> GetTimesheetCurrentLocationViewModel(string GroupID)
+        private async Task<IEnumerable<TimesheetCurrentLocationViewModel>> GetTimesheetCurrentLocationViewModel(string GroupID)
         {
-            var TimesheetCurrentLocationViewModel = Query<TimesheetCurrentLocationViewModel>(
+            var TimesheetCurrentLocationViewModel = await QueryAsync<TimesheetCurrentLocationViewModel>(
                sql: @"SELECT id, groupid, formatted_address, lat, lang, street_number, route, locality,
                        administrative_area_level_2, administrative_area_level_1, postal_code, country, is_checkout
                 FROM location  WITH (NOLOCK) where groupid  = @GroupID;",
@@ -347,9 +354,9 @@ namespace TimeAPI.Data.Repositories
             return TimesheetCurrentLocationViewModel;
         }
 
-        private TimesheetProjectCategoryDataModel GetTimesheetProjectCategoryDataModel(string GroupID)
+        private async Task<TimesheetProjectCategoryDataModel> GetTimesheetProjectCategoryDataModel(string GroupID)
         {
-            var TimesheetAdministrativeDataModel = QuerySingleOrDefault<TimesheetProjectCategoryDataModel>(
+            var TimesheetAdministrativeDataModel = await QuerySingleOrDefaultAsync<TimesheetProjectCategoryDataModel>(
                 sql: @"SELECT
                         timesheet_x_project_category.id as category_id,
                         timesheet_x_project_category.groupid as groupid,
@@ -365,9 +372,9 @@ namespace TimeAPI.Data.Repositories
             return TimesheetAdministrativeDataModel;
         }
 
-        private TimesheetSearchLocationViewModel GetTimesheetSearchLocationViewModel(string GroupID)
+        private async Task<TimesheetSearchLocationViewModel> GetTimesheetSearchLocationViewModel(string GroupID)
         {
-            var TimesheetSearchLocationViewModel = QuerySingleOrDefault<TimesheetSearchLocationViewModel>(
+            var TimesheetSearchLocationViewModel = await QuerySingleOrDefaultAsync<TimesheetSearchLocationViewModel>(
                 sql: @"SELECT id, groupid, manual_address, geo_address, formatted_address, lat, lang, street_number, route, locality,
                        administrative_area_level_2, administrative_area_level_1, postal_code, country, is_office, is_manual
                     FROM timesheet_location  WITH (NOLOCK) where groupid  = @GroupID;",
@@ -377,9 +384,9 @@ namespace TimeAPI.Data.Repositories
             return TimesheetSearchLocationViewModel;
         }
 
-        public dynamic LastCheckinByEmpID(string EmpID, string Date)
+        public async Task<dynamic> LastCheckinByEmpID(string EmpID, string Date)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                 sql: @"SELECT groupid, empid, check_in, check_out, is_checkout, ondate
                             FROM timesheet
                             WHERE groupid in (SELECT TOP 1 groupid 
@@ -394,9 +401,9 @@ namespace TimeAPI.Data.Repositories
                   );
         }
 
-        public IEnumerable<ViewLogDataModel> GetTimesheetActivityByGroupAndProjectID(string GroupID, string ProjectID, string Date)
+        public async Task<IEnumerable<ViewLogDataModel>> GetTimesheetActivityByGroupAndProjectID(string GroupID, string ProjectID, string Date)
         {
-            return Query<ViewLogDataModel>(
+            return await QueryAsync<ViewLogDataModel>(
                 sql: @"SELECT  project_type, project_name, milestone_name, task_name, remarks, total_hrs, is_billable, worked_percent, ondate, start_time, end_time, groupid FROM
 					    (
                         SELECT  
@@ -461,9 +468,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public FirstCheckInLastCheckout FirstCheckInLastCheckout(string EmpID, string StartDate, string EndDate)
+        public async Task<FirstCheckInLastCheckout> FirstCheckInLastCheckout(string EmpID, string StartDate, string EndDate)
         {
-            return QuerySingleOrDefault<FirstCheckInLastCheckout>(
+            return await QuerySingleOrDefaultAsync<FirstCheckInLastCheckout>(
                  sql: @"SELECT TOP 1
                             timesheet.empid AS emp_id,
                             FORMAT(CAST(timesheetFirst.check_in AS DATETIME2), N'hh:mm tt') AS checkin,

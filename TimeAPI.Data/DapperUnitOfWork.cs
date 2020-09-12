@@ -33,6 +33,7 @@ namespace TimeAPI.Data
         private ITimesheetRepository _timesheetRepository;
         private ITimesheetBreakRepository _timesheetBreakRepository;
         private ITaskRepository _taskRepository;
+        private ISubTaskRepository _subTaskRepository;
         private ITaskTeamMembersRepository _taskTeamMembersRepository;
         private ISetupRepository _setupRepository;
         private IAdministrativeRepository _administrativeRepository;
@@ -316,6 +317,15 @@ namespace TimeAPI.Data
             {
                 return _taskRepository
                     ?? (_taskRepository = new TaskRepository(_transaction));
+            }
+        }
+
+        public ISubTaskRepository SubTaskRepository
+        {
+            get
+            {
+                return _subTaskRepository
+                    ?? (_subTaskRepository = new SubTaskRepository(_transaction));
             }
         }
 
@@ -821,6 +831,7 @@ namespace TimeAPI.Data
                     ?? (_packagesRepository = new PackagesRepository(_transaction));
             }
         }
+
         public ICostPerHourRepository CostPerHourRepository
         {
             get
@@ -829,6 +840,7 @@ namespace TimeAPI.Data
                     ?? (_costPerHourRepository = new CostPerHourRepository(_transaction));
             }
         }
+
         public IProfitMarginRepository ProfitMarginRepository
         {
             get
@@ -1116,8 +1128,6 @@ namespace TimeAPI.Data
                     ?? (_entityHistoryLogRepository = new EntityHistoryLogRepository(_transaction));
             }
         }
-
-
 
         public bool Commit()
         {

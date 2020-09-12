@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.Domain.Repositories
 {
-    public interface ITimesheetRepository : IRepository<Timesheet, string>
+    public interface ITimesheetRepository : IRepositoryAsync<Timesheet, string>
     {
-        void CheckOutByEmpID(Timesheet entity);
-        Timesheet FindTimeSheetByEmpID(string empid, string groupid);
+        Task CheckOutByEmpID(Timesheet entity);
+        Task<Timesheet> FindTimeSheetByEmpID(string empid, string groupid);
         void RemoveByGroupID(string GroupID);
-        dynamic GetAllTimesheetByOrgID(string OrgID);
-        IEnumerable<string> GetAllEmpByGroupID(string GroupID);
+        Task<dynamic> GetAllTimesheetByOrgID(string OrgID);
+        Task<IEnumerable<string>> GetAllEmpByGroupID(string GroupID);
 
     }
 }

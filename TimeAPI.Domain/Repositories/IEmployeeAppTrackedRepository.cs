@@ -7,6 +7,6 @@ namespace TimeAPI.Domain.Repositories
 {
     public interface IEmployeeAppTrackedRepository : IRepository<EmployeeAppTracked, string>
     {
-        public EmployeeAppTracked FindEmployeeAppTrackedEmpID(string key);
+         EmployeeAppTracked FindEmployeeAppTrackedEmpID(string key);
     }
 }

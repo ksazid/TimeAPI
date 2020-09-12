@@ -34,14 +34,14 @@ namespace TimeAPI.API.HangfireJobs
 
                 try
                 {
-                    var xResultOrg = unitOfWork.AdminDashboardRepository.GetAllOrgSetupForHangFireJobs();
+                    var xResultOrg = await unitOfWork.AdminDashboardRepository.GetAllOrgSetupForHangFireJobs().ConfigureAwait(false);
 
                     foreach (var item in xResultOrg)
                     {
                         var xResult = await unitOfWork.AdminDashboardRepository
                                                 .GetAllSingleCheckInEmployeesForHangFireJobs
                                                 ("44919b38-176e-45ce-9b12-db5faef620d6",
-                                                dateTime.ToString(), dateTime.ToString());
+                                                dateTime.ToString(), dateTime.ToString()).ConfigureAwait(false);
 
                         AttendedEmployeeList.AddRange(xResult);
                         var REST = AttendedEmployeeList.Cast<AttendedEmployee>().ToList();

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -23,17 +24,17 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public Priority Find(string key)
+        public async Task<Priority> Find(string key)
         {
-            return QuerySingleOrDefault<Priority>(
+            return await QuerySingleOrDefaultAsync<Priority>(
                 sql: "SELECT * FROM [dbo].[priority] WHERE id = @key and is_deleted = 0",
                 param: new { key }
             );
         }
 
-        public IEnumerable<Priority> GetPriorityByOrgID(string key)
+        public async Task<IEnumerable<Priority>> GetPriorityByOrgID(string key)
         {
-            return Query<Priority>(
+            return await QueryAsync<Priority>(
                 sql: @"SELECT * FROM [dbo].[priority]
                         WHERE org_id='default' AND is_deleted = 0
                         UNION 
@@ -44,9 +45,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<Priority> All()
+        public async Task<IEnumerable<Priority>> All()
         {
-            return Query<Priority>(
+            return await QueryAsync<Priority>(
                 sql: "SELECT * FROM [dbo].[priority] where is_deleted = 0"
             );
         }

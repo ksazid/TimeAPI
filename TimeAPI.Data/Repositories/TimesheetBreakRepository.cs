@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -21,17 +22,17 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public TimesheetBreak Find(string key)
+        public async Task<TimesheetBreak> Find(string key)
         {
-            return QuerySingleOrDefault<TimesheetBreak>(
+            return await QuerySingleOrDefaultAsync<TimesheetBreak>(
                 sql: "SELECT * FROM dbo.timesheet_break WHERE is_deleted = 0 and id = @key",
                 param: new { key }
             );
         }
 
-        public TimesheetBreak FindTimeSheetBreakByEmpID(string empid, string groupid)
+        public async Task<TimesheetBreak> FindTimeSheetBreakByEmpID(string empid, string groupid)
         {
-            return QuerySingleOrDefault<TimesheetBreak>(
+            return await QuerySingleOrDefaultAsync<TimesheetBreak>(
                 sql: "SELECT top 1 * FROM dbo.timesheet_break WHERE is_deleted = 0 and empid = @empid and groupid = @groupid AND is_breakout = 0",
                 param: new { empid, groupid }
             );
@@ -48,9 +49,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public void RemoveByGroupID(string GroupID)
+        public async Task RemoveByGroupID(string GroupID)
         {
-            Execute(
+           await ExecuteAsync(
                 sql: @"UPDATE dbo.timesheet_break
                    SET
                        modified_date = GETDATE(), is_deleted = 1
@@ -78,16 +79,16 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<TimesheetBreak> All()
+        public async Task<IEnumerable<TimesheetBreak>> All()
         {
-            return Query<TimesheetBreak>(
+            return await QueryAsync<TimesheetBreak>(
                 sql: "SELECT * FROM dbo.timesheet_break where is_deleted = 0"
             );
         }
 
-        public IEnumerable<string> GetAllEmpByGroupID(string GroupID)
+        public async Task<IEnumerable<string>> GetAllEmpByGroupID(string GroupID)
         {
-            return Query<string>(
+            return await QueryAsync<string>(
            sql: @"SELECT full_name FROM employee 
                 INNER JOIN timesheet_break on employee.id = timesheet_break.empid
                 WHERE timesheet_break.groupid = @GroupID",
@@ -95,17 +96,17 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public dynamic GetAllTimesheetBreakByOrgID(string OrgID)
+        public async Task<dynamic> GetAllTimesheetBreakByOrgID(string OrgID)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
            sql: "SELECT * FROM dbo.timesheet_break where is_deleted = 0 AND orgid= @OrgID",
                 param: new { OrgID }
             );
         }
 
-        public void BreakOutByEmpIDAndGrpID(TimesheetBreak entity)
+        public async Task BreakOutByEmpIDAndGrpID(TimesheetBreak entity)
         {
-            Execute(
+          await  ExecuteAsync(
                  sql: @"UPDATE dbo.timesheet_break
                    SET
                     break_out = @break_out, 
@@ -118,9 +119,9 @@ namespace TimeAPI.Data.Repositories
              );
         }
 
-        public IEnumerable<TimesheetBreak> FindLastTimeSheetBreakByEmpIDAndGrpID(string empid, string groupid)
+        public async Task< IEnumerable<TimesheetBreak>> FindLastTimeSheetBreakByEmpIDAndGrpID(string empid, string groupid)
         {
-            return Query<TimesheetBreak>(
+            return await QueryAsync<TimesheetBreak>(
                 sql: "SELECT * FROM dbo.timesheet_break WHERE is_deleted = 0 and empid = @empid and groupid = @groupid AND is_breakout=0",
                 param: new { empid, groupid }
             );

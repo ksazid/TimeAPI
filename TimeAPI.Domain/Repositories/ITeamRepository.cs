@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.Domain.Repositories
 {
-    public interface ITeamRepository : IRepository<Team, string>
+    public interface ITeamRepository : IRepositoryAsync<Team, string>
     {
-        IEnumerable<dynamic> FindTeamsByOrgID(string OrgID);
-        dynamic FindByTeamID(string TeamID);
-        IEnumerable<dynamic> FetchAllTeamsByOrgID(string OrgID);
-        IEnumerable<dynamic> FetchAllTeamMembersByTeamID(string key);
-        dynamic GetAllTeamMembersByTeamID(string key);
+       Task<IEnumerable<dynamic>> FindTeamsByOrgID(string OrgID);
+        Task<dynamic> FindByTeamID(string TeamID);
+        Task<IEnumerable<dynamic>> FetchAllTeamsByOrgID(string OrgID);
+        Task<IEnumerable<dynamic>> FetchAllTeamMembersByTeamID(string key);
+        Task<dynamic> GetAllTeamMembersByTeamID(string key);
     }
 }

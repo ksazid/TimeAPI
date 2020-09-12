@@ -5,30 +5,26 @@ using TimeAPI.Domain.Model;
 
 namespace TimeAPI.Domain.Repositories
 {
-    public interface IUserRepository : IRepository<User, string>
+    public interface IUserRepository : IRepositoryAsync<User, string>
     {
         User FindByNormalizedUserName(string normalizedUserName);
 
         User FindByNormalizedEmail(string normalizedEmail);
 
-        UserDataGroupDataSet  GetUserDataGroupByUserID(string EmpID, string Date);
+        Task<UserDataGroupDataSet> GetUserDataGroupByUserID(string EmpID, string Date);
 
-        IEnumerable<RootTimesheetData>  GetAllTimesheetByEmpID(string EmpID, string Date);
+        Task<IEnumerable<RootTimesheetData>> GetAllTimesheetByEmpID(string EmpID, string Date);
 
-        IEnumerable<RootTimesheetData>  GetAllTimesheetByOrgID(string EmpID, string FromDate, string ToDate);
+        //Task<IEnumerable<RootTimesheetData>> GetAllProjectTaskByEmpID(string EmpID, string Date);
 
-        dynamic LastCheckinByEmpID(string EmpID, string Date);
+        Task<IEnumerable<RootTimesheetData>> GetAllTimesheetByOrgID(string EmpID, string FromDate, string ToDate);
 
-         IEnumerable<RootTimesheetData>  GetEmployeeTasksTimesheetByEmpID(string EmpID, string FromDate, string ToDate);
+        Task<dynamic> LastCheckinByEmpID(string EmpID, string Date);
 
-         IEnumerable<RootTimesheetData> GetEmployeeTasksTimesheetByOrgID(string EmpID, string FromDate, string ToDate);
+        Task<IEnumerable<RootTimesheetData>> GetEmployeeTasksTimesheetByEmpID(string EmpID, string FromDate, string ToDate);
 
-        //dynamic TotalEmployeeDashboardDataByOrgID(string OrgID);
-        ////dynamic TotalEmployeeDashboardDataByOrgID(string OrgID, string toDate, string fromDate);
-        //dynamic TotalEmployeeAbsentDashboardDataByOrgID(string OrgID, string toDate, string fromDate);
-        //dynamic GetTimesheetDashboardDataByOrgIDAndDate(string OrgID, string toDate, string fromDate);
-        //dynamic GetTimesheetDashboardGridDataByOrgIDAndDate(string OrgID, string toDate, string fromDate);
-        //dynamic GetCheckOutLocationByGroupID(string GroupID);
-        //dynamic GetTimesheetDashboardGridAbsentDataByOrgIDAndDate(string OrgID, string toDate, string fromDate);
+        Task<IEnumerable<RootTimesheetData>> GetEmployeeTasksTimesheetByOrgID(string EmpID, string FromDate, string ToDate);
+
+        IEnumerable<User> GetAll();
     }
 }

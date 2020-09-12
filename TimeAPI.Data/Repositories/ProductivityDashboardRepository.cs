@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -33,16 +34,16 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<ProductivityDashboard> All()
+        public async Task<IEnumerable<ProductivityDashboard>> All()
         {
-            return Query<ProductivityDashboard>(
+            return await QueryAsync<ProductivityDashboard>(
                 sql: ""
             );
         }
 
-        public ProductivityDashboard Find(string key)
+        public async Task<ProductivityDashboard> Find(string key)
         {
-            return QuerySingleOrDefault<ProductivityDashboard>(
+            return await QuerySingleOrDefaultAsync<ProductivityDashboard>(
                 sql: "",
                 param: new { key }
             );
@@ -58,7 +59,7 @@ namespace TimeAPI.Data.Repositories
 
         #endregion
 
-        public dynamic EmployeeProductivityPerDateByEmpIDAndDate(string EmpID, string StartDate, string EndDate)
+        public async Task<dynamic> EmployeeProductivityPerDateByEmpIDAndDate(string EmpID, string StartDate, string EndDate)
         {
             EmployeeProductivity employeeProductivity = new EmployeeProductivity();
             List<EmployeeProductivity> employeeProductivities = new List<EmployeeProductivity>();
@@ -77,13 +78,13 @@ namespace TimeAPI.Data.Repositories
 
 
 
-            employeeProductivities.AddRange(EmployeeProductivity(EmpID, StartDate, EndDate));
+            employeeProductivities.AddRange(await EmployeeProductivity(EmpID, StartDate, EndDate).ConfigureAwait(false));
 
             if (employeeProductivities.Count > 0)
             {
                 avgCheckin = AverageCheckinTime(employeeProductivities).ToString(@"hh:mm tt");
-                employee = EmployeeDetailByEmpID(EmpID);
-                weekdays.AddRange(WorkingHoursFindByOrgID(employee.org_id));
+                employee = await EmployeeDetailByEmpID(EmpID).ConfigureAwait(false);
+                weekdays.AddRange(await WorkingHoursFindByOrgID(employee.org_id).ConfigureAwait(false));
 
                 if (employeeProductivities.Count == 1 && employeeProductivities.Where(d => d.check_out.Contains("-")).Any() == true)
                     avgCheckout = "-";
@@ -161,132 +162,132 @@ namespace TimeAPI.Data.Repositories
             return avgCheckout;
         }
 
-        private IEnumerable<EmployeeProductivity> EmployeeProductivity(string EmpID, string StartDate, string EndDate)
+        private async Task<IEnumerable<EmployeeProductivity>> EmployeeProductivity(string EmpID, string StartDate, string EndDate)
         {
-            return Query<EmployeeProductivity>(
-                             sql: @"SELECT
-                            emp_id,
-                            FORMAT(CAST(check_in AS DATETIME2), N'hh:mm tt') AS check_in,
-                            ISNULL(FORMAT(CAST(check_out AS DATETIME2), N'hh:mm tt'), '-') AS check_out,
-                            ISNULL(break_hours, '00:00') AS break_hours,
-                            CONVERT(VARCHAR(5), DATEADD (MINUTE, (DATEDIFF(MINUTE, check_in, check_out)), 0), 114) AS total_hrs,
-                            ISNULL(CONVERT(VARCHAR(5), DATEADD(MINUTE,(DATEDIFF(MINUTE, ISNULL(break_hours , '00:00'), 
-	                        CONVERT(VARCHAR(5), DATEADD(MINUTE, (DATEDIFF(MINUTE, check_in, check_out)), 0), 114))), 0 ), 114), '00:00') AS final_total_hours,
-                            FORMAT(CAST(ondate AS DATE), 'MM/dd/yyyy', 'EN-US') AS ondate,
-	                        ISNULL(activityCount, 0) +  ISNULL(adminactivityCount, 0) as activity_count,
- 	                        ISNULL(CONVERT(VARCHAR(5),  ISNULL(DATEADD(s, ((DATEPART(hh, activity_hours) * 3600 ) + (DATEPART(mi, activity_hours) * 60 ) + DATEPART(ss, activity_hours)), 0), 0) +
-								                        ISNULL(DATEADD(s, (( DATEPART(hh, adminactivity_hours) * 3600 ) + (DATEPART(mi, adminactivity_hours) * 60 ) + DATEPART(ss, adminactivity_hours)),0), 0)
-	                        , 114), '00:00')  AS time_spend_activity,
-                          (DATEDIFF(minute, 0,  ISNULL(DATEADD(s, ((DATEPART(hh, activity_hours) * 3600 ) + (DATEPART(mi, activity_hours) * 60 ) + DATEPART(ss, activity_hours)), 0), 0) +
-                           ISNULL(DATEADD(s, ((DATEPART(hh, adminactivity_hours) * 3600 ) + (DATEPART(mi, adminactivity_hours) * 60 ) + DATEPART(ss, adminactivity_hours)),0), 0))) 
-                           * 100 /  (DATEDIFF(minute, 0,  ISNULL(DATEADD(s, ((DATEPART(hh, ISNULL(check_out , GETDATE())) * 3600 ) + (DATEPART(mi, ISNULL(check_out , GETDATE())) * 60 ) + DATEPART(ss, ISNULL(check_out , GETDATE()))), 0), 0) -
-                           ISNULL(DATEADD(s, ((DATEPART(hh, check_in) * 3600 ) + (DATEPART(mi, check_in) * 60 ) + DATEPART(ss, check_in)),0), 0)))  as productivity_ratio
+            return await QueryAsync<EmployeeProductivity>(
+                            sql: @"SELECT
+                        emp_id,
+                        FORMAT(CAST(check_in AS DATETIME2), N'hh:mm tt') AS check_in,
+                        ISNULL(FORMAT(CAST(check_out AS DATETIME2), N'hh:mm tt'), '-') AS check_out,
+                        ISNULL(break_hours, '00:00') AS break_hours,
+                        CONVERT(VARCHAR(5), DATEADD (MINUTE, (DATEDIFF(MINUTE, check_in, check_out)), 0), 114) AS total_hrs,
+                        ISNULL(CONVERT(VARCHAR(5), DATEADD(MINUTE,(DATEDIFF(MINUTE, ISNULL(break_hours , '00:00'), 
+	                    CONVERT(VARCHAR(5), DATEADD(MINUTE, (DATEDIFF(MINUTE, check_in, check_out)), 0), 114))), 0 ), 114), '00:00') AS final_total_hours,
+                        FORMAT(CAST(ondate AS DATE), 'MM/dd/yyyy', 'EN-US') AS ondate,
+	                    ISNULL(activityCount, 0) +  ISNULL(adminactivityCount, 0) as activity_count,
+ 	                    ISNULL(CONVERT(VARCHAR(5),  ISNULL(DATEADD(s, ((DATEPART(hh, activity_hours) * 3600 ) + (DATEPART(mi, activity_hours) * 60 ) + DATEPART(ss, activity_hours)), 0), 0) +
+								                    ISNULL(DATEADD(s, (( DATEPART(hh, adminactivity_hours) * 3600 ) + (DATEPART(mi, adminactivity_hours) * 60 ) + DATEPART(ss, adminactivity_hours)),0), 0)
+	                    , 114), '00:00')  AS time_spend_activity,
+                        (DATEDIFF(minute, 0,  ISNULL(DATEADD(s, ((DATEPART(hh, activity_hours) * 3600 ) + (DATEPART(mi, activity_hours) * 60 ) + DATEPART(ss, activity_hours)), 0), 0) +
+                        ISNULL(DATEADD(s, ((DATEPART(hh, adminactivity_hours) * 3600 ) + (DATEPART(mi, adminactivity_hours) * 60 ) + DATEPART(ss, adminactivity_hours)),0), 0))) 
+                        * 100 /  (DATEDIFF(minute, 0,  ISNULL(DATEADD(s, ((DATEPART(hh, ISNULL(check_out , GETDATE())) * 3600 ) + (DATEPART(mi, ISNULL(check_out , GETDATE())) * 60 ) + DATEPART(ss, ISNULL(check_out , GETDATE()))), 0), 0) -
+                        ISNULL(DATEADD(s, ((DATEPART(hh, check_in) * 3600 ) + (DATEPART(mi, check_in) * 60 ) + DATEPART(ss, check_in)),0), 0)))  as productivity_ratio
  
-                        FROM (
+                    FROM (
 
-                            SELECT
-                                timesheet.empid AS emp_id,
-                                timesheet.groupid AS groupid,
-                                timesheetFirst.check_in AS check_in,
-                                timesheetLast.check_out AS check_out,
-                                timesheetbreak.break_hrs AS break_hours,
-                                timesheet.ondate,
-                                timesheetactivity.activityCount,
-                                timesheetactivity.activity_hours,
-                                timesheetadministrative.adminactivityCount,
-                                timesheetadministrative.adminactivity_hours
-                            FROM timesheet
-                            INNER JOIN (SELECT
-                                timesheet.id,
-                                timesheet.groupid,
-                                ISNULL(FORMAT(CAST(check_in AS datetime2), N'hh:mm tt'), '00:00') AS check_in,
-                                FORMAT(CAST(ondate AS date), 'MM/dd/yyyy', 'EN-US') AS ondate,
-                                empid
-                            FROM timesheet
-                            WHERE FORMAT(CAST(ondate AS datetime2), N'dd-MMM-yyyy HH:mm:ss', 'EN-US') IN (SELECT
-                                MIN(FORMAT(CAST(ondate AS datetime2), N'dd-MMM-yyyy HH:mm:ss', 'EN-US'))
-                            FROM timesheet
-                            WHERE FORMAT(CAST(ondate AS date), 'MM/dd/yyyy', 'EN-US')
-                            BETWEEN FORMAT(CAST(@StartDate AS date), 'MM/dd/yyyy', 'EN-US')
-                            AND FORMAT(CAST(@EndDate AS date), 'MM/dd/yyyy', 'EN-US')
-                            AND empid = @EmpID
-                            AND timesheet.is_deleted = 0
-                            GROUP BY FORMAT(CAST(ondate AS date), 'MM/dd/yyyy', 'EN-US'))) AS timesheetFirst
-                                ON dbo.timesheet.groupid = timesheetFirst.groupid
-                            LEFT JOIN (SELECT
-                                timesheet.id,
-                                timesheet.groupid,
-                                ISNULL(FORMAT(CAST(check_out AS datetime2), N'hh:mm tt'), NULL) AS check_out,
-                                FORMAT(CAST(ondate AS date), 'MM/dd/yyyy', 'EN-US') AS ondate,
-                                empid
-                            FROM timesheet
-                            WHERE ondate IN (SELECT
-                                MAX(ondate)
-                            FROM timesheet
-                            WHERE FORMAT(CAST(ondate AS date), 'MM/dd/yyyy', 'EN-US')
-                            BETWEEN FORMAT(CAST(@StartDate AS date), 'MM/dd/yyyy', 'EN-US')
-                            AND FORMAT(CAST(@EndDate AS date), 'MM/dd/yyyy', 'EN-US')
-                            AND empid = @EmpID
-                            AND timesheet.is_deleted = 0
-                            GROUP BY FORMAT(CAST(ondate AS date), 'MM/dd/yyyy', 'EN-US'))) AS timesheetLast
-                                ON timesheetFirst.ondate = timesheetLast.ondate
-                            LEFT JOIN (SELECT
-                                timesheet.empid,
-                                FORMAT(CAST(timesheet.ondate AS date), 'MM/dd/yyyy', 'EN-US') AS ondate,
-                                CONVERT(varchar(5), DATEADD(MINUTE, SUM(DATEDIFF(MINUTE, timesheet_break.break_in, timesheet_break.break_out)), 0), 114) AS break_hrs
-                            FROM timesheet_break
-                            LEFT JOIN timesheet
-                                ON timesheet_break.groupid = timesheet.groupid
-                            WHERE FORMAT(CAST(timesheet.ondate AS date), 'MM/dd/yyyy', 'EN-US')
-                            BETWEEN FORMAT(CAST(@StartDate AS date), 'MM/dd/yyyy', 'EN-US')
-                            AND FORMAT(CAST(@EndDate AS date), 'MM/dd/yyyy', 'EN-US')
-                            AND timesheet.empid = @EmpID
-                            AND timesheet_break.is_deleted = 0
-                            GROUP BY FORMAT(CAST(timesheet.ondate AS date), 'MM/dd/yyyy', 'EN-US'),
-                                        timesheet.empid) AS timesheetbreak
-                                ON timesheetFirst.ondate = timesheetbreak.ondate
-                            LEFT JOIN (SELECT
-                                COUNT(*) AS activityCount,
-                                FORMAT(CAST(timesheet_activity.ondate AS date), 'MM/dd/yyyy', 'EN-US') AS ondate,
-                                CONVERT(varchar(5), DATEADD(MINUTE, SUM(DATEDIFF(MINUTE, timesheet_activity.start_time, timesheet_activity.end_time)), 0), 114) AS activity_hours
-                            FROM timesheet_activity
-                            LEFT JOIN timesheet
-                                ON timesheet_activity.groupid = timesheet.groupid
-                            WHERE FORMAT(CAST(timesheet.ondate AS date), 'MM/dd/yyyy', 'EN-US')
-                            BETWEEN FORMAT(CAST(@StartDate AS date), 'MM/dd/yyyy', 'EN-US')
-                            AND FORMAT(CAST(@EndDate AS date), 'MM/dd/yyyy', 'EN-US')
-                            AND timesheet.empid = @EmpID
-                            AND timesheet_activity.is_deleted = 0
-                            GROUP BY FORMAT(CAST(timesheet_activity.ondate AS date), 'MM/dd/yyyy', 'EN-US')) AS timesheetactivity
-                                ON timesheetFirst.ondate = timesheetactivity.ondate
-                            LEFT JOIN (SELECT
-                                COUNT(*) AS adminactivityCount,
-                                FORMAT(CAST(timesheet_administrative_activity.ondate AS date), 'MM/dd/yyyy', 'EN-US') AS ondate,
-                                CONVERT(varchar(5), DATEADD(MINUTE, SUM(DATEDIFF(MINUTE, timesheet_administrative_activity.start_time, timesheet_administrative_activity.end_time)), 0), 114) AS adminactivity_hours
-                            FROM timesheet_administrative_activity
-                            LEFT JOIN timesheet
-                                ON timesheet_administrative_activity.groupid = timesheet.groupid
-                            WHERE FORMAT(CAST(timesheet_administrative_activity.ondate AS date), 'MM/dd/yyyy', 'EN-US')
-                            BETWEEN FORMAT(CAST(@StartDate AS date), 'MM/dd/yyyy', 'EN-US')
-                            AND FORMAT(CAST(@EndDate AS date), 'MM/dd/yyyy', 'EN-US')
-                            AND timesheet.empid = @EmpID
-                            AND timesheet_administrative_activity.is_deleted = 0
-                            GROUP BY FORMAT(CAST(timesheet_administrative_activity.ondate AS date), 'MM/dd/yyyy', 'EN-US')) AS timesheetadministrative
-                                ON timesheetFirst.ondate = timesheetadministrative.ondate
-                            WHERE timesheet.empid = @EmpID
-                            AND FORMAT(CAST(timesheet.ondate AS date), 'MM/dd/yyyy', 'EN-US')
-                            BETWEEN FORMAT(CAST(@StartDate AS date), 'MM/dd/yyyy', 'EN-US')
-                            AND FORMAT(CAST(@EndDate AS date), 'MM/dd/yyyy', 'EN-US')
-                            AND timesheet.is_deleted = 0) X
+                        SELECT
+                            timesheet.empid AS emp_id,
+                            timesheet.groupid AS groupid,
+                            timesheetFirst.check_in AS check_in,
+                            timesheetLast.check_out AS check_out,
+                            timesheetbreak.break_hrs AS break_hours,
+                            timesheet.ondate,
+                            timesheetactivity.activityCount,
+                            timesheetactivity.activity_hours,
+                            timesheetadministrative.adminactivityCount,
+                            timesheetadministrative.adminactivity_hours
+                        FROM timesheet
+                        INNER JOIN (SELECT
+                            timesheet.id,
+                            timesheet.groupid,
+                            ISNULL(FORMAT(CAST(check_in AS datetime2), N'hh:mm tt'), '00:00') AS check_in,
+                            FORMAT(CAST(ondate AS date), 'MM/dd/yyyy', 'EN-US') AS ondate,
+                            empid
+                        FROM timesheet
+                        WHERE FORMAT(CAST(ondate AS datetime2), N'dd-MMM-yyyy HH:mm:ss', 'EN-US') IN (SELECT
+                            MIN(FORMAT(CAST(ondate AS datetime2), N'dd-MMM-yyyy HH:mm:ss', 'EN-US'))
+                        FROM timesheet
+                        WHERE FORMAT(CAST(ondate AS date), 'MM/dd/yyyy', 'EN-US')
+                        BETWEEN FORMAT(CAST(@StartDate AS date), 'MM/dd/yyyy', 'EN-US')
+                        AND FORMAT(CAST(@EndDate AS date), 'MM/dd/yyyy', 'EN-US')
+                        AND empid = @EmpID
+                        AND timesheet.is_deleted = 0
+                        GROUP BY FORMAT(CAST(ondate AS date), 'MM/dd/yyyy', 'EN-US'))) AS timesheetFirst
+                            ON dbo.timesheet.groupid = timesheetFirst.groupid
+                        LEFT JOIN (SELECT
+                            timesheet.id,
+                            timesheet.groupid,
+                            ISNULL(FORMAT(CAST(check_out AS datetime2), N'hh:mm tt'), NULL) AS check_out,
+                            FORMAT(CAST(ondate AS date), 'MM/dd/yyyy', 'EN-US') AS ondate,
+                            empid
+                        FROM timesheet
+                        WHERE ondate IN (SELECT
+                            MAX(ondate)
+                        FROM timesheet
+                        WHERE FORMAT(CAST(ondate AS date), 'MM/dd/yyyy', 'EN-US')
+                        BETWEEN FORMAT(CAST(@StartDate AS date), 'MM/dd/yyyy', 'EN-US')
+                        AND FORMAT(CAST(@EndDate AS date), 'MM/dd/yyyy', 'EN-US')
+                        AND empid = @EmpID
+                        AND timesheet.is_deleted = 0
+                        GROUP BY FORMAT(CAST(ondate AS date), 'MM/dd/yyyy', 'EN-US'))) AS timesheetLast
+                            ON timesheetFirst.ondate = timesheetLast.ondate
+                        LEFT JOIN (SELECT
+                            timesheet.empid,
+                            FORMAT(CAST(timesheet.ondate AS date), 'MM/dd/yyyy', 'EN-US') AS ondate,
+                            CONVERT(varchar(5), DATEADD(MINUTE, SUM(DATEDIFF(MINUTE, timesheet_break.break_in, timesheet_break.break_out)), 0), 114) AS break_hrs
+                        FROM timesheet_break
+                        LEFT JOIN timesheet
+                            ON timesheet_break.groupid = timesheet.groupid
+                        WHERE FORMAT(CAST(timesheet.ondate AS date), 'MM/dd/yyyy', 'EN-US')
+                        BETWEEN FORMAT(CAST(@StartDate AS date), 'MM/dd/yyyy', 'EN-US')
+                        AND FORMAT(CAST(@EndDate AS date), 'MM/dd/yyyy', 'EN-US')
+                        AND timesheet.empid = @EmpID
+                        AND timesheet_break.is_deleted = 0
+                        GROUP BY FORMAT(CAST(timesheet.ondate AS date), 'MM/dd/yyyy', 'EN-US'),
+                                    timesheet.empid) AS timesheetbreak
+                            ON timesheetFirst.ondate = timesheetbreak.ondate
+                        LEFT JOIN (SELECT
+                            COUNT(*) AS activityCount,
+                            FORMAT(CAST(timesheet_activity.ondate AS date), 'MM/dd/yyyy', 'EN-US') AS ondate,
+                            CONVERT(varchar(5), DATEADD(MINUTE, SUM(DATEDIFF(MINUTE, timesheet_activity.start_time, timesheet_activity.end_time)), 0), 114) AS activity_hours
+                        FROM timesheet_activity
+                        LEFT JOIN timesheet
+                            ON timesheet_activity.groupid = timesheet.groupid
+                        WHERE FORMAT(CAST(timesheet.ondate AS date), 'MM/dd/yyyy', 'EN-US')
+                        BETWEEN FORMAT(CAST(@StartDate AS date), 'MM/dd/yyyy', 'EN-US')
+                        AND FORMAT(CAST(@EndDate AS date), 'MM/dd/yyyy', 'EN-US')
+                        AND timesheet.empid = @EmpID
+                        AND timesheet_activity.is_deleted = 0
+                        GROUP BY FORMAT(CAST(timesheet_activity.ondate AS date), 'MM/dd/yyyy', 'EN-US')) AS timesheetactivity
+                            ON timesheetFirst.ondate = timesheetactivity.ondate
+                        LEFT JOIN (SELECT
+                            COUNT(*) AS adminactivityCount,
+                            FORMAT(CAST(timesheet_administrative_activity.ondate AS date), 'MM/dd/yyyy', 'EN-US') AS ondate,
+                            CONVERT(varchar(5), DATEADD(MINUTE, SUM(DATEDIFF(MINUTE, timesheet_administrative_activity.start_time, timesheet_administrative_activity.end_time)), 0), 114) AS adminactivity_hours
+                        FROM timesheet_administrative_activity
+                        LEFT JOIN timesheet
+                            ON timesheet_administrative_activity.groupid = timesheet.groupid
+                        WHERE FORMAT(CAST(timesheet_administrative_activity.ondate AS date), 'MM/dd/yyyy', 'EN-US')
+                        BETWEEN FORMAT(CAST(@StartDate AS date), 'MM/dd/yyyy', 'EN-US')
+                        AND FORMAT(CAST(@EndDate AS date), 'MM/dd/yyyy', 'EN-US')
+                        AND timesheet.empid = @EmpID
+                        AND timesheet_administrative_activity.is_deleted = 0
+                        GROUP BY FORMAT(CAST(timesheet_administrative_activity.ondate AS date), 'MM/dd/yyyy', 'EN-US')) AS timesheetadministrative
+                            ON timesheetFirst.ondate = timesheetadministrative.ondate
+                        WHERE timesheet.empid = @EmpID
+                        AND FORMAT(CAST(timesheet.ondate AS date), 'MM/dd/yyyy', 'EN-US')
+                        BETWEEN FORMAT(CAST(@StartDate AS date), 'MM/dd/yyyy', 'EN-US')
+                        AND FORMAT(CAST(@EndDate AS date), 'MM/dd/yyyy', 'EN-US')
+                        AND timesheet.is_deleted = 0) X
  
-                            ORDER BY  FORMAT(CAST(ondate AS datetime2), N'dd-MMM-yyyy HH:mm:ss', 'EN-US') ASC",
-                             param: new { EmpID, StartDate, EndDate }
-                         );
+                        ORDER BY  FORMAT(CAST(ondate AS datetime2), N'dd-MMM-yyyy HH:mm:ss', 'EN-US') ASC",
+                            param: new { EmpID, StartDate, EndDate }
+                        );
         }
 
-        public dynamic DesktopEmployeeProductivityPerDateByEmpIDAndDate(string EmpID, string StartDate, string EndDate)
+        public async Task<dynamic> DesktopEmployeeProductivityPerDateByEmpIDAndDate(string EmpID, string StartDate, string EndDate)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                  sql: @"SELECT
                               emp_id,
                               FORMAT(CAST(check_in AS DATETIME2), N'hh:mm tt') AS check_in,
@@ -466,7 +467,7 @@ namespace TimeAPI.Data.Repositories
              );
         }
 
-        public dynamic EmployeeProductivityTimeFrequencyByEmpIDAndDate(string EmpID, string StartDate, string EndDate)
+        public async Task<dynamic> EmployeeProductivityTimeFrequencyByEmpIDAndDate(string EmpID, string StartDate, string EndDate)
         {
             double? temp = 0D, temp1 = 0D, tempx = 0D;
             DateTime avgCheckin = DateTime.Now, avgCheckout = DateTime.Now;
@@ -476,11 +477,11 @@ namespace TimeAPI.Data.Repositories
             RootEmployeeProductivityRatio rootEmployeeProductivityRatio = new RootEmployeeProductivityRatio();
             List<Weekdays> weekdays = new List<Weekdays>();
             List<EmployeeProductivityTime> employeeProductivityTimes = new List<EmployeeProductivityTime>();
-            employeeProductivityTimes.AddRange(EmployeeProductivityTime(EmpID, StartDate, EndDate));
+            employeeProductivityTimes.AddRange(await EmployeeProductivityTime(EmpID, StartDate, EndDate));
 
-            var data = FirstCheckInLastCheckout(EmpID, StartDate, EndDate).ToList();
-            var employee = EmployeeDetailByEmpID(EmpID);
-            weekdays.AddRange(WorkingHoursFindByOrgID(employee.org_id));
+            var data = (await FirstCheckInLastCheckout(EmpID, StartDate, EndDate).ConfigureAwait(false)).ToList();
+            var employee = await EmployeeDetailByEmpID(EmpID).ConfigureAwait(false);
+            weekdays.AddRange(await WorkingHoursFindByOrgID(employee.org_id).ConfigureAwait(false));
 
             if (data != null)
             {
@@ -557,18 +558,18 @@ namespace TimeAPI.Data.Repositories
 
 
             List<EmployeeIdleTime> employeeIdleTime = new List<EmployeeIdleTime>();
-            employeeIdleTime.AddRange(EmployeeProductivityIdleTime(EmpID, StartDate, EndDate));
+            employeeIdleTime.AddRange(await EmployeeProductivityIdleTime(EmpID, StartDate, EndDate).ConfigureAwait(false));
 
             for (int i = 0; i < employeeProductivityTimes.Count; i++)
             {
                 List<EmployeeProductivityTrackedTime> EmployeeProductivityTrackedTime = new List<EmployeeProductivityTrackedTime>();
                 List<EmployeeProductivityTrackedTime> EmployeeProductivityIdleTrackedTime = new List<EmployeeProductivityTrackedTime>();
 
-                EmployeeProductivityTrackedTime.AddRange(EmployeeProductivityTimeGraphFrequencyByUsageID(employeeProductivityTimes[i].id));
+                EmployeeProductivityTrackedTime.AddRange(await EmployeeProductivityTimeGraphFrequencyByUsageID(employeeProductivityTimes[i].id).ConfigureAwait(false));
                 employeeProductivityTimes[i].employeeProductivityTrackedTimes = EmployeeProductivityTrackedTime;
 
 
-                EmployeeProductivityIdleTrackedTime.AddRange(EmployeeProductivityIdleGraphFrequencyByUsageID(employeeProductivityTimes[i].id));
+                EmployeeProductivityIdleTrackedTime.AddRange(await EmployeeProductivityIdleGraphFrequencyByUsageID(employeeProductivityTimes[i].id).ConfigureAwait(false));
                 employeeIdleTime[i].employeeProductivityTrackedTimes = EmployeeProductivityIdleTrackedTime;
 
                 TimeSpan timeSpan = TimeSpan.ParseExact(employeeProductivityTimes[i].start_time, "c", null);
@@ -613,9 +614,9 @@ namespace TimeAPI.Data.Repositories
             return rootEmployeeProductivityRatio;
         }
 
-        public IEnumerable<EmployeeProductivityTrackedTime> EmployeeProductivityTimeGraphFrequencyByUsageID(string UsageID)
+        public async Task<IEnumerable<EmployeeProductivityTrackedTime>> EmployeeProductivityTimeGraphFrequencyByUsageID(string UsageID)
         {
-            return Query<EmployeeProductivityTrackedTime>(
+            return await QueryAsync<EmployeeProductivityTrackedTime>(
                            sql: @"SELECT
                                     app_category_name as app_name,
                                     CONVERT(varchar(5), DATEADD(MINUTE, SUM(DATEDIFF(MINUTE, 0, time_spend)), 0), 114) AS time_spend,
@@ -636,9 +637,9 @@ namespace TimeAPI.Data.Repositories
                         );
         }
 
-        public IEnumerable<EmployeeProductivityTrackedTime> EmployeeProductivityIdleGraphFrequencyByUsageID(string UsageID)
+        public async Task<IEnumerable<EmployeeProductivityTrackedTime>> EmployeeProductivityIdleGraphFrequencyByUsageID(string UsageID)
         {
-            return Query<EmployeeProductivityTrackedTime>(
+            return await QueryAsync<EmployeeProductivityTrackedTime>(
                            sql: @"SELECT
                                     app_name,
                                     CONVERT(varchar(5), DATEADD(MINUTE, SUM(DATEDIFF(MINUTE, 0, time_spend)), 0), 114) AS time_spend,
@@ -658,9 +659,9 @@ namespace TimeAPI.Data.Repositories
                         );
         }
 
-        private IEnumerable<EmployeeProductivityTime> EmployeeProductivityTime(string EmpID, string StartDate, string EndDate)
+        private async Task<IEnumerable<EmployeeProductivityTime>> EmployeeProductivityTime(string EmpID, string StartDate, string EndDate)
         {
-            return Query<EmployeeProductivityTime>(
+            return await QueryAsync<EmployeeProductivityTime>(
                     sql: @"SELECT
                                     employee_app_usage.id,
                                     employee_app_usage.start_time,
@@ -690,9 +691,9 @@ namespace TimeAPI.Data.Repositories
                         );
         }
 
-        private IEnumerable<EmployeeIdleTime> EmployeeProductivityIdleTime(string EmpID, string StartDate, string EndDate)
+        private async Task<IEnumerable<EmployeeIdleTime>> EmployeeProductivityIdleTime(string EmpID, string StartDate, string EndDate)
         {
-            return Query<EmployeeIdleTime>(
+            return await QueryAsync<EmployeeIdleTime>(
                     sql: @"SELECT
                                     employee_app_usage.id,
                                     employee_app_usage.start_time,
@@ -722,9 +723,9 @@ namespace TimeAPI.Data.Repositories
                          );
         }
 
-        public dynamic EmployeeAppTrackedByEmpIDAndDate(string EmpID, string StartDate, string EndDate)
+        public async Task<dynamic> EmployeeAppTrackedByEmpIDAndDate(string EmpID, string StartDate, string EndDate)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                  sql: @" SELECT
 			            employee_app_tracked.app_category_name 
 			            ,CONVERT(varchar(5), DATEADD(MINUTE, SUM(DATEDIFF(MINUTE, 0, employee_app_tracked.time_spend)), 0), 114) as time_spend,
@@ -744,9 +745,9 @@ namespace TimeAPI.Data.Repositories
              );
         }
 
-        private IEnumerable<EmployeeFirstCheckInLastCheckout> FirstCheckInLastCheckout(string EmpID, string StartDate, string EndDate)
+        private async Task<IEnumerable<EmployeeFirstCheckInLastCheckout>> FirstCheckInLastCheckout(string EmpID, string StartDate, string EndDate)
         {
-            return Query<EmployeeFirstCheckInLastCheckout>(
+            return await QueryAsync<EmployeeFirstCheckInLastCheckout>(
                  sql: @"SELECT
                             timesheet.empid AS emp_id,
                             FORMAT(CAST(timesheetFirst.check_in AS DATETIME2), N'hh:mm tt') AS checkin,
@@ -798,17 +799,17 @@ namespace TimeAPI.Data.Repositories
              );
         }
 
-        private IEnumerable<Weekdays> WorkingHoursFindByOrgID(string key)
+        private async Task<IEnumerable<Weekdays>> WorkingHoursFindByOrgID(string key)
         {
-            return Query<Weekdays>(
+            return await QueryAsync<Weekdays>(
                 sql: "SELECT * FROM dbo.weekdays WHERE is_deleted = 0 and org_id = @key",
                 param: new { key }
             );
         }
 
-        public Employee EmployeeDetailByEmpID(string key)
+        public async Task<Employee> EmployeeDetailByEmpID(string key)
         {
-            return QuerySingleOrDefault<Employee>(
+            return await QuerySingleOrDefaultAsync<Employee>(
                 sql: "SELECT * FROM [dbo].[employee] WHERE id = @key and is_deleted = 0",
                 param: new { key }
             );

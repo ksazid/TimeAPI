@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Model;
@@ -36,16 +37,16 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<AdminDashboard> All()
+        public async Task<IEnumerable<AdminDashboard>> All()
         {
-            return Query<AdminDashboard>(
+            return await QueryAsync<AdminDashboard>(
                 sql: ""
             );
         }
 
-        public AdminDashboard Find(string key)
+        public async Task<AdminDashboard> Find(string key)
         {
-            return QuerySingleOrDefault<AdminDashboard>(
+            return await QuerySingleOrDefaultAsync<AdminDashboard>(
                 sql: "",
                 param: new { key }
             );
@@ -77,24 +78,9 @@ namespace TimeAPI.Data.Repositories
 
         #endregion
 
-        public dynamic TotalDefaultEmpCountByOrgID(string org_id)
+        public async Task<dynamic> TotalDefaultEmpCountByOrgID(string org_id)
         {
-            //SELECT
-            //                ISNULL(UPPER(employee_type.employee_type_name), 'PERMANENT') AS employee_type_name,
-            //                COUNT (DISTINCT[dbo].[employee].id) AS employee_count
-            //                FROM[dbo].[employee] WITH(NOLOCK)
-
-            //                INNER JOIN superadmin_x_org ON superadmin_x_org.superadmin_empid = employee.id
-
-            //                LEFT JOIN employee_type on employee.emp_type_id = employee_type.id
-            //                WHERE[dbo].[employee].is_deleted = 0 AND[dbo].[employee].is_inactive = 0
-            //                AND superadmin_x_org.org_id = @org_id
-            //                GROUP BY
-            //                employee_type.employee_type_name
-
-            //        UNION ALL
-
-            var resultsAspNetUsers = Query<dynamic>(
+            var resultsAspNetUsers = await QueryAsync<dynamic>(
                 sql: @"SELECT employee_type_name, SUM(employee_count) as attandance  FROM
                         (
                      
@@ -113,12 +99,12 @@ namespace TimeAPI.Data.Repositories
             return resultsAspNetUsers;
         }
 
-        public dynamic TotalEmpAttentedCountByOrgIDAndDate(string org_id, string fromDate, string toDate)
+        public async Task<dynamic> TotalEmpAttentedCountByOrgIDAndDate(string org_id, string fromDate, string toDate)
         {
             List<dynamic> TimesheetDashboardData = new List<dynamic>();
 
             //OffDaysDates(org_id, fromDate, toDate)
-            var DGridData = GettingTimesheetDashboardDataPerDate(org_id, fromDate, toDate);
+            var DGridData = await GettingTimesheetDashboardDataPerDate(org_id, fromDate, toDate);
 
             if (DGridData.Count > 0)
             {
@@ -127,9 +113,9 @@ namespace TimeAPI.Data.Repositories
             return TimesheetDashboardData;
         }
 
-        public dynamic GetTimesheetDashboardGridDataByOrgIDAndDate(string org_id, string fromDate, string toDate)
+        public async Task<dynamic> GetTimesheetDashboardGridDataByOrgIDAndDate(string org_id, string fromDate, string toDate)
         {
-            var resultsAspNetUsers = Query<dynamic>(
+            var resultsAspNetUsers = await QueryAsync<dynamic>(
                 sql: @"SELECT
                         ROW_NUMBER() OVER (ORDER BY full_name) AS rowno,
                         project_category_type, project_or_comp_id, project_or_comp_name,
@@ -175,7 +161,7 @@ namespace TimeAPI.Data.Repositories
             return resultsAspNetUsers;
         }
 
-        public dynamic GetTimesheetDashboardFirstCheckInGridDataByOrgIDAndDate(string org_id, string fromDate, string toDate)
+        public async Task<dynamic> GetTimesheetDashboardFirstCheckInGridDataByOrgIDAndDate(string org_id, string fromDate, string toDate)
         {
             List<DateTime> Dates = Enumerable.Range(0, (Convert.ToDateTime(toDate) - Convert.ToDateTime(fromDate)).Days + 1)
                               .Select(d => Convert.ToDateTime(fromDate).AddDays(d)).ToList();
@@ -189,8 +175,8 @@ namespace TimeAPI.Data.Repositories
                 var xdate = OffDays.Any(b => b.Contains(Dates[i].ToString()));
                 List<ResultSingleCheckin> ResultSingleCheckinList = new List<ResultSingleCheckin>();
 
-                var ResultSingleList = SingleFirstCheckINResult(org_id, Dates[i], xdate);
-                var ResultMultipleList = MultipleFirstCheckINResult(org_id, Dates[i], xdate);
+                var ResultSingleList = await SingleFirstCheckINResult(org_id, Dates[i], xdate).ConfigureAwait(false);
+                var ResultMultipleList = await MultipleFirstCheckINResult(org_id, Dates[i], xdate).ConfigureAwait(false);
 
                 ResultSingleCheckinList.AddRange(ResultSingleList);
                 ResultSingleCheckinList.AddRange(ResultMultipleList);
@@ -200,7 +186,7 @@ namespace TimeAPI.Data.Repositories
                 for (int x = 0; x < REST.Count(); x++)
                 {
 
-                    var resultsAspNetUsers = Query<AttendedEmployee>(
+                    var resultsAspNetUsers = await QueryAsync<AttendedEmployee>(
                         sql: @"SELECT
                         ROW_NUMBER() OVER (ORDER BY full_name) AS rowno,
                         project_category_type, project_or_comp_name,
@@ -283,7 +269,7 @@ namespace TimeAPI.Data.Repositories
             return AttendedEmployeeList;
         }
 
-        public dynamic GetTimesheetDashboardLastCheckoutGridDataByOrgIDAndDate(string org_id, string fromDate, string toDate)
+        public async Task<dynamic> GetTimesheetDashboardLastCheckoutGridDataByOrgIDAndDate(string org_id, string fromDate, string toDate)
         {
             List<DateTime> Dates = Enumerable.Range(0, (Convert.ToDateTime(toDate) - Convert.ToDateTime(fromDate)).Days + 1)
                               .Select(d => Convert.ToDateTime(fromDate).AddDays(d)).ToList();
@@ -296,8 +282,8 @@ namespace TimeAPI.Data.Repositories
                 var xdate = OffDays.Any(b => b.Contains(Dates[i].ToString()));
                 List<ResultSingleCheckin> ResultSingleCheckinList = new List<ResultSingleCheckin>();
 
-                var ResultSingleList = SingleFirstCheckINResult(org_id, Dates[i], xdate);
-                var ResultMultipleList = MultipleFirstCheckINResult(org_id, Dates[i], xdate);
+                var ResultSingleList = await SingleFirstCheckINResult(org_id, Dates[i], xdate).ConfigureAwait(false);
+                var ResultMultipleList = await MultipleFirstCheckINResult(org_id, Dates[i], xdate).ConfigureAwait(false);
 
                 ResultSingleCheckinList.AddRange(ResultSingleList);
                 ResultSingleCheckinList.AddRange(ResultMultipleList);
@@ -307,7 +293,7 @@ namespace TimeAPI.Data.Repositories
                 for (int x = 0; x < REST.Count(); x++)
                 {
 
-                    var resultsAspNetUsers = Query<AttendedEmployee>(
+                    var resultsAspNetUsers = await QueryAsync<AttendedEmployee>(
                         sql: @"SELECT
                         ROW_NUMBER() OVER (ORDER BY full_name) AS rowno,
                         project_category_type, project_or_comp_name,
@@ -390,35 +376,37 @@ namespace TimeAPI.Data.Repositories
             return AttendedEmployeeList;
         }
 
-        public dynamic TotalEmpAbsentCountByOrgIDAndDate(string org_id, string fromDate, string toDate)
+        public async Task<dynamic> TotalEmpAbsentCountByOrgIDAndDate(string org_id, string fromDate, string toDate)
         {
             int AbsentCount = 0;
-            var OffDaysList =  ExceptOffDaysDates(org_id, fromDate, toDate);
+            var OffDaysList = ExceptOffDaysDates(org_id, fromDate, toDate);
 
             for (int i = 0; i < OffDaysList.Count(); i++)
-                AbsentCount += GetEmpAbsentCountAttendedByOrgIDAndDate(org_id, OffDaysList[i].ToString(), OffDaysList[i].ToString()).Count();
-
+            {
+                var count = await GetEmpAbsentCountAttendedByOrgIDAndDate(org_id, OffDaysList[i].ToString(), OffDaysList[i].ToString());
+                AbsentCount += count.Count();
+            }
             return AbsentCount;
         }
 
-        public dynamic GetTimesheetDashboardGridAbsentDataByOrgIDAndDate(string org_id, string fromDate, string toDate)
+        public async Task<dynamic> GetTimesheetDashboardGridAbsentDataByOrgIDAndDate(string org_id, string fromDate, string toDate)
         {
             List<TimesheetAbsent> AbsentData = new List<TimesheetAbsent>();
 
             var OffDaysList = ExceptOffDaysDates(org_id, fromDate, toDate);
             for (int i = 0; i < OffDaysList.Count(); i++)
             {
-                List<string> EmpList = GetEmpAbsentCountAttendedByOrgIDAndDate(org_id, OffDaysList[i].ToString(), OffDaysList[i].ToString()).ToList();
-                var Result = GettingAllAbsentEmployeeList(OffDaysList[i].ToString(), EmpList);
+                var EmpList = await GetEmpAbsentCountAttendedByOrgIDAndDate(org_id, OffDaysList[i].ToString(), OffDaysList[i].ToString()).ConfigureAwait(false);
+                var Result = await GettingAllAbsentEmployeeList(OffDaysList[i].ToString(), EmpList.ToList()).ConfigureAwait(false);
                 AbsentData.AddRange(Result);
             }
 
             return AbsentData;
         }
 
-        public dynamic GetCheckOutLocationByGroupID(string GroupID)
+        public async Task<dynamic> GetCheckOutLocationByGroupID(string GroupID)
         {
-            var resultsAspNetUsers = Query<dynamic>(
+            var resultsAspNetUsers = await QueryAsync<dynamic>(
                 sql: @"SELECT lat, lang
                     FROM dbo.location
                     WHERE groupid =@GroupID
@@ -429,11 +417,11 @@ namespace TimeAPI.Data.Repositories
             return resultsAspNetUsers;
         }
 
-        public dynamic TotalEmpOverTimeCountByOrgIDAndDate(string org_id, string fromDate, string toDate)
+        public async Task<dynamic> TotalEmpOverTimeCountByOrgIDAndDate(string org_id, string fromDate, string toDate)
         {
             List<DateTime> Dates = Enumerable.Range(0, (Convert.ToDateTime(toDate) - Convert.ToDateTime(fromDate)).Days + 1)
                               .Select(d => Convert.ToDateTime(fromDate).AddDays(d)).ToList();
-            List<DateTime> ExceptOffDays =  ExceptOffDaysDates(org_id, fromDate, toDate);
+            List<DateTime> ExceptOffDays = ExceptOffDaysDates(org_id, fromDate, toDate);
             List<string> OffDays = OffDaysDates(org_id, fromDate, toDate);
             List<AttendedEmployee> AttendedEmployeeList = new List<AttendedEmployee>();
 
@@ -443,8 +431,8 @@ namespace TimeAPI.Data.Repositories
                 var xdate = OffDays.Any(b => b.Contains(Dates[i].ToString()));
                 List<ResultSingleCheckin> ResultSingleCheckinList = new List<ResultSingleCheckin>();
 
-                var ResultSingleList = SingleCheckINResult(org_id, Dates[i], xdate);
-                var ResultMultipleList = MultipleCheckINResult(org_id, Dates[i], xdate);
+                var ResultSingleList = await SingleCheckINResult(org_id, Dates[i], xdate).ConfigureAwait(false);
+                var ResultMultipleList = await MultipleCheckINResult(org_id, Dates[i], xdate).ConfigureAwait(false);
 
                 ResultSingleCheckinList.AddRange(ResultSingleList);
                 ResultSingleCheckinList.AddRange(ResultMultipleList);
@@ -454,7 +442,7 @@ namespace TimeAPI.Data.Repositories
                 for (int x = 0; x < REST.Count(); x++)
                 {
 
-                    var resultsAspNetUsers = Query<AttendedEmployee>(
+                    var resultsAspNetUsers = await QueryAsync<AttendedEmployee>(
                         sql: @"SELECT
                         ROW_NUMBER() OVER (ORDER BY full_name) AS rowno,
                         project_category_type, project_or_comp_name,
@@ -537,7 +525,7 @@ namespace TimeAPI.Data.Repositories
             return AttendedEmployeeList;
         }
 
-        public dynamic TotalEmpLessHoursByOrgIDAndDate(string org_id, string fromDate, string toDate)
+        public async Task<dynamic> TotalEmpLessHoursByOrgIDAndDate(string org_id, string fromDate, string toDate)
         {
             List<DateTime> Dates = Enumerable.Range(0, (Convert.ToDateTime(toDate) - Convert.ToDateTime(fromDate)).Days + 1)
                               .Select(d => Convert.ToDateTime(fromDate).AddDays(d)).ToList();
@@ -552,8 +540,8 @@ namespace TimeAPI.Data.Repositories
                     var xdate = OffDays.Any(b => b.Contains(Dates[i].ToString()));
                     List<ResultSingleCheckin> ResultSingleCheckinList = new List<ResultSingleCheckin>();
 
-                    var ResultSingleList = SingleCheckINExceptionResult(org_id, Dates[i], xdate);
-                    var ResultMultipleList = MultipleCheckINExceptionResult(org_id, Dates[i], xdate);
+                    var ResultSingleList = await SingleCheckINExceptionResult(org_id, Dates[i], xdate).ConfigureAwait(false);
+                    var ResultMultipleList = await MultipleCheckINExceptionResult(org_id, Dates[i], xdate).ConfigureAwait(false);
 
                     ResultSingleCheckinList.AddRange(ResultSingleList);
                     ResultSingleCheckinList.AddRange(ResultMultipleList);
@@ -563,8 +551,8 @@ namespace TimeAPI.Data.Repositories
                     for (int x = 0; x < REST.Count(); x++)
                     {
 
-                        var resultsAspNetUsers = Query<AttendedEmployee>(
-                            sql: @"SELECT
+                        var resultsAspNetUsers = await QueryAsync<AttendedEmployee>(
+                                  sql: @"SELECT
                         ROW_NUMBER() OVER (ORDER BY full_name) AS rowno,
                         project_category_type, project_or_comp_name,
                         timesheet_id, groupid, is_checkout,
@@ -652,7 +640,7 @@ namespace TimeAPI.Data.Repositories
             return AttendedEmployeeList;
         }
 
-        public dynamic TotalLocationExceptionByOrgIDAndDate(string org_id, string fromDate, string toDate)
+        public async Task<dynamic> TotalLocationExceptionByOrgIDAndDate(string org_id, string fromDate, string toDate)
         {
             List<DateTime> Dates = Enumerable.Range(0, (Convert.ToDateTime(toDate) - Convert.ToDateTime(fromDate)).Days + 1)
                               .Select(d => Convert.ToDateTime(fromDate).AddDays(d)).ToList();
@@ -663,7 +651,7 @@ namespace TimeAPI.Data.Repositories
 
             for (int i = 0; i < Dates.Count; i++)
             {
-                var resultsAspNetUsers = Query<AttendedEmployee>(
+                var resultsAspNetUsers = await QueryAsync<AttendedEmployee>(
                     sql: @"SELECT
                         ROW_NUMBER() OVER (ORDER BY full_name) AS rowno,
                         project_category_type, project_or_comp_id, project_or_comp_name,
@@ -716,7 +704,7 @@ namespace TimeAPI.Data.Repositories
             return AttendedEmployeeList;
         }
 
-        public dynamic TotalLocationCheckOutExceptionByOrgIDAndDate(string org_id, string fromDate, string toDate)
+        public async Task<dynamic> TotalLocationCheckOutExceptionByOrgIDAndDate(string org_id, string fromDate, string toDate)
         {
             List<DateTime> Dates = Enumerable.Range(0, (Convert.ToDateTime(toDate) - Convert.ToDateTime(fromDate)).Days + 1)
                               .Select(d => Convert.ToDateTime(fromDate).AddDays(d)).ToList();
@@ -727,7 +715,7 @@ namespace TimeAPI.Data.Repositories
 
             for (int i = 0; i < Dates.Count; i++)
             {
-                var resultsAspNetUsers = Query<AttendedEmployee>(
+                var resultsAspNetUsers = await QueryAsync<AttendedEmployee>(
                     sql: @"SELECT
                         ROW_NUMBER() OVER (ORDER BY full_name) AS rowno,
                         project_category_type, project_or_comp_id, project_or_comp_name,
@@ -780,9 +768,9 @@ namespace TimeAPI.Data.Repositories
             return AttendedEmployeeList;
         }
 
-        public dynamic GetTimesheetActivityByGroupAndDate(string GroupID, string Date)
+        public async Task<dynamic> GetTimesheetActivityByGroupAndDate(string GroupID, string Date)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                 sql: @"SELECT
 		                UPPER(dbo.timesheet_x_project_category.project_category_type) + ': '
 			                        + [dbo].[administrative].administrative_name + ' ('
@@ -841,18 +829,18 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public dynamic AllProjectRatioByOrgID(string OrgID)
+        public async Task<dynamic> AllProjectRatioByOrgID(string OrgID)
         {
             List<UtilsProjectAndRatio> utilsProjectAndRatios = new List<UtilsProjectAndRatio>();
 
-            var projectList = Query<string>(
+            var projectList = await QueryAsync<string>(
                sql: @"SELECT id from project where org_id = @OrgID and is_deleted = 0",
                param: new { OrgID }
            );
 
             foreach (var item in projectList)
             {
-                UtilsProjectAndRatio utilsProjectAndRatio = QuerySingleOrDefault<UtilsProjectAndRatio>(
+                UtilsProjectAndRatio utilsProjectAndRatio = await QuerySingleOrDefaultAsync<UtilsProjectAndRatio>(
                         sql: @"SELECT 
                             dbo.project.id as project_id,
                             dbo.project.project_name as project_name,
@@ -882,7 +870,7 @@ namespace TimeAPI.Data.Repositories
                         param: new { OrgID, item }
                       );
 
-                var utilsProjectDetails = QuerySingleOrDefault<UtilsProjectAndRatio>(
+                var utilsProjectDetails = await QuerySingleOrDefaultAsync<UtilsProjectAndRatio>(
                        sql: @"SELECT [dbo].[project_type].type_name as project_type, 
                                 dbo.status.status_name as project_status,
                             FORMAT(dbo.project.start_date, 'dd-MM-yyyy', 'en-US') as start_date,
@@ -911,9 +899,9 @@ namespace TimeAPI.Data.Repositories
             return utilsProjectAndRatios;
         }
 
-        public dynamic GetAllTimesheetRecentActivityList(string org_id, string fromDate, string toDate)
+        public async Task<dynamic> GetAllTimesheetRecentActivityList(string org_id, string fromDate, string toDate)
         {
-            var resultsAspNetUsers = Query<dynamic>(
+            var resultsAspNetUsers = await QueryAsync<dynamic>(
                 sql: @"SELECT DISTINCT( dbo.timesheet.groupid), 
                             FORMAT(CAST( dbo.timesheet.ondate AS DATETIME2), N'hh:mm tt')  
                         FROM dbo.timesheet WITH (NOLOCK)
@@ -929,7 +917,7 @@ namespace TimeAPI.Data.Repositories
             return resultsAspNetUsers;
         }
 
-        public dynamic GetAllSingleCheckInEmployeesForHangFireJobs(string org_id, string fromDate, string toDate)
+        public async Task<dynamic> GetAllSingleCheckInEmployeesForHangFireJobs(string org_id, string fromDate, string toDate)
         {
             List<DateTime> Dates = Enumerable.Range(0, (Convert.ToDateTime(toDate) - Convert.ToDateTime(fromDate)).Days + 1)
                               .Select(d => Convert.ToDateTime(fromDate).AddDays(d)).ToList();
@@ -942,7 +930,7 @@ namespace TimeAPI.Data.Repositories
                 var xdate = OffDays.Any(b => b.Contains(Dates[i].ToString()));
                 List<ResultSingleCheckin> ResultSingleCheckinList = new List<ResultSingleCheckin>();
 
-                var ResultSingleList = SingleFirstCheckINResult(org_id, Dates[i], xdate);
+                var ResultSingleList = await SingleFirstCheckINResult(org_id, Dates[i], xdate).ConfigureAwait(false);
                 ResultSingleCheckinList.AddRange(ResultSingleList);
 
                 var REST = ResultSingleCheckinList.Cast<ResultSingleCheckin>().ToList();
@@ -950,7 +938,7 @@ namespace TimeAPI.Data.Repositories
                 for (int x = 0; x < REST.Count(); x++)
                 {
 
-                    var resultsAspNetUsers = Query<AttendedEmployee>(
+                    var resultsAspNetUsers = await QueryAsync<AttendedEmployee>(
                         sql: @"SELECT
                         ROW_NUMBER() OVER (ORDER BY full_name) AS rowno,
                         project_category_type, project_or_comp_name,
@@ -1002,9 +990,9 @@ namespace TimeAPI.Data.Repositories
             return AttendedEmployeeList;
         }
 
-        public IEnumerable<string> GetAllOrgSetupForHangFireJobs()
+        public async Task<IEnumerable<string>> GetAllOrgSetupForHangFireJobs()
         {
-            return Query<string>(
+            return await QueryAsync<string>(
                sql: @"SELECT org_id FROM organization_setup 
                                     WHERE is_location_validation_req = 1 
                                     OR is_autocheckout_allowed = 1 
@@ -1043,9 +1031,9 @@ namespace TimeAPI.Data.Repositories
             return TimesheetCurrentLocationViewModel;
         }
 
-        private IEnumerable<string> GetEmpAbsentCountAttendedByOrgIDAndDate(string OrgID, string fromDate, string toDate)
+        private async Task<IEnumerable<string>> GetEmpAbsentCountAttendedByOrgIDAndDate(string OrgID, string fromDate, string toDate)
         {
-            return Query<string>(
+            return await QueryAsync<string>(
                   sql: @"WITH TotalEmployeeAttended AS
                             (SELECT
 	                                   employee.id as employee
@@ -1103,9 +1091,9 @@ namespace TimeAPI.Data.Repositories
                );
         }
 
-        private dynamic GettingTimesheetDashboardDataPerDate(string org_id, string fromDate, string toDate)
+        private async Task<dynamic> GettingTimesheetDashboardDataPerDate(string org_id, string fromDate, string toDate)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                 sql: @"SELECT employee_type_name, SUM(attandance) as attandance, ondate
                         FROM (
                             SELECT COUNT(DISTINCT(timesheet.empid)) as attandance,
@@ -1126,11 +1114,11 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        private IEnumerable<TimesheetAbsent> GettingAllAbsentEmployeeList(string Date, List<string> List)
+        private async Task<IEnumerable<TimesheetAbsent>> GettingAllAbsentEmployeeList(string Date, List<string> List)
         {
             string EmpList = String.Join("','", List);
 
-            return Query<TimesheetAbsent>(
+            return await QueryAsync<TimesheetAbsent>(
                 sql: @"SELECT
 	                        employee.id,
 	                        employee.full_name,
@@ -1200,9 +1188,9 @@ namespace TimeAPI.Data.Repositories
             return OffDaysList;
         }
 
-        private IEnumerable<ResultSingleCheckin> SingleCheckINResult(string org_id, DateTime Dates, bool xdate)
+        private async Task<IEnumerable<ResultSingleCheckin>> SingleCheckINResult(string org_id, DateTime Dates, bool xdate)
         {
-            IEnumerable<ResultSingleCheckin> ResultSingleCheckinList = Query<ResultSingleCheckin>(
+            IEnumerable<ResultSingleCheckin> ResultSingleCheckinList = await QueryAsync<ResultSingleCheckin>(
                         sql: @"select  distinct(employee.id) as empid, COUNT(employee.id),
 						         RIGHT('0' + CAST(SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 3600 AS VARCHAR),2) + ':' +
 							        RIGHT('0' + CAST((SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 60) % 60 AS VARCHAR),2)  as time
@@ -1218,7 +1206,7 @@ namespace TimeAPI.Data.Repositories
                         param: new { org_id, date = Dates }
                     );
             if (xdate)
-                ResultSingleCheckinList = Query<ResultSingleCheckin>(
+                ResultSingleCheckinList = await QueryAsync<ResultSingleCheckin>(
                        sql: @"select  distinct(employee.id) as empid, COUNT(employee.id),
 						         RIGHT('0' + CAST(SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 3600 AS VARCHAR),2) + ':' +
 							        RIGHT('0' + CAST((SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 60) % 60 AS VARCHAR),2)  as time
@@ -1236,9 +1224,9 @@ namespace TimeAPI.Data.Repositories
             return ResultSingleCheckinList;
         }
 
-        private IEnumerable<ResultSingleCheckin> MultipleCheckINResult(string org_id, DateTime Dates, bool xdate)
+        private async Task<IEnumerable<ResultSingleCheckin>> MultipleCheckINResult(string org_id, DateTime Dates, bool xdate)
         {
-            IEnumerable<ResultSingleCheckin> ResultSingleCheckinList = Query<ResultSingleCheckin>(
+            IEnumerable<ResultSingleCheckin> ResultSingleCheckinList = await QueryAsync<ResultSingleCheckin>(
                         sql: @"select  distinct(employee.id) as empid, COUNT(employee.id),
 						         RIGHT('0' + CAST(SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 3600 AS VARCHAR),2) + ':' +
 							        RIGHT('0' + CAST((SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 60) % 60 AS VARCHAR),2)  as time
@@ -1255,7 +1243,7 @@ namespace TimeAPI.Data.Repositories
                     );
 
             if (xdate)
-                ResultSingleCheckinList = Query<ResultSingleCheckin>(
+                ResultSingleCheckinList = await QueryAsync<ResultSingleCheckin>(
                        sql: @"select  distinct(employee.id) as empid, COUNT(employee.id),
 						         RIGHT('0' + CAST(SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 3600 AS VARCHAR),2) + ':' +
 							        RIGHT('0' + CAST((SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 60) % 60 AS VARCHAR),2)  as time
@@ -1273,9 +1261,9 @@ namespace TimeAPI.Data.Repositories
             return ResultSingleCheckinList;
         }
 
-        private IEnumerable<ResultSingleCheckin> SingleCheckINExceptionResult(string org_id, DateTime Dates, bool xdate)
+        private async Task<IEnumerable<ResultSingleCheckin>> SingleCheckINExceptionResult(string org_id, DateTime Dates, bool xdate)
         {
-            IEnumerable<ResultSingleCheckin> ResultSingleCheckinList = Query<ResultSingleCheckin>(
+            IEnumerable<ResultSingleCheckin> ResultSingleCheckinList = await QueryAsync<ResultSingleCheckin>(
                         sql: @"select  distinct(employee.id) as empid, COUNT(employee.id),
 						         RIGHT('0' + CAST(SUM((DATEPART(HOUR,isnull(total_hrs, '00:00'))*3600)+(DATEPART(MINUTE,isnull(total_hrs, '00:00'))*60)+(DATEPART(Second,isnull(total_hrs, '00:00')))) / 3600 AS VARCHAR),2) + ':' +
 							        RIGHT('0' + CAST((SUM((DATEPART(HOUR,isnull(total_hrs, '00:00'))*3600)+(DATEPART(MINUTE,isnull(total_hrs, '00:00'))*60)+(DATEPART(Second,isnull(total_hrs, '00:00')))) / 60) % 60 AS VARCHAR),2)  as time
@@ -1294,9 +1282,9 @@ namespace TimeAPI.Data.Repositories
             return ResultSingleCheckinList;
         }
 
-        private IEnumerable<ResultSingleCheckin> MultipleCheckINExceptionResult(string org_id, DateTime Dates, bool xdate)
+        private async Task<IEnumerable<ResultSingleCheckin>> MultipleCheckINExceptionResult(string org_id, DateTime Dates, bool xdate)
         {
-            IEnumerable<ResultSingleCheckin> ResultSingleCheckinList = Query<ResultSingleCheckin>(
+            IEnumerable<ResultSingleCheckin> ResultSingleCheckinList = await QueryAsync<ResultSingleCheckin>(
                         sql: @"select   distinct(employee.id) as empid, COUNT(employee.id),
 						         RIGHT('0' + CAST(SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 3600 AS VARCHAR),2) + ':' +
 							        RIGHT('0' + CAST((SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 60) % 60 AS VARCHAR),2)  as time
@@ -1315,9 +1303,9 @@ namespace TimeAPI.Data.Repositories
             return ResultSingleCheckinList;
         }
 
-        private IEnumerable<ResultSingleCheckin> SingleFirstCheckINResult(string org_id, DateTime Dates, bool xdate)
+        private async Task<IEnumerable<ResultSingleCheckin>> SingleFirstCheckINResult(string org_id, DateTime Dates, bool xdate)
         {
-            IEnumerable<ResultSingleCheckin> ResultSingleCheckinList = Query<ResultSingleCheckin>(
+            IEnumerable<ResultSingleCheckin> ResultSingleCheckinList = await QueryAsync<ResultSingleCheckin>(
                         sql: @"select   distinct(employee.id) as empid, COUNT(employee.id),
 						         RIGHT('0' + CAST(SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 3600 AS VARCHAR),2) + ':' +
 							        RIGHT('0' + CAST((SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 60) % 60 AS VARCHAR),2)  as time
@@ -1335,9 +1323,9 @@ namespace TimeAPI.Data.Repositories
             return ResultSingleCheckinList;
         }
 
-        private IEnumerable<ResultSingleCheckin> MultipleFirstCheckINResult(string org_id, DateTime Dates, bool xdate)
+        private async Task<IEnumerable<ResultSingleCheckin>> MultipleFirstCheckINResult(string org_id, DateTime Dates, bool xdate)
         {
-            IEnumerable<ResultSingleCheckin> ResultSingleCheckinList = Query<ResultSingleCheckin>(
+            IEnumerable<ResultSingleCheckin> ResultSingleCheckinList = await QueryAsync<ResultSingleCheckin>(
                         sql: @"select  distinct(employee.id) as empid, COUNT(employee.id),
 						         RIGHT('0' + CAST(SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 3600 AS VARCHAR),2) + ':' +
 							        RIGHT('0' + CAST((SUM((DATEPART(HOUR,total_hrs)*3600)+(DATEPART(MINUTE,total_hrs)*60)+(DATEPART(Second,total_hrs))) / 60) % 60 AS VARCHAR),2)  as time

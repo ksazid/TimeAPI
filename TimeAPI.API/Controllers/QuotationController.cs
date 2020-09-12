@@ -64,6 +64,7 @@ namespace TimeAPI.API.Controllers
                 modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
+
                 _unitOfWork.QuotationRepository.Add(modal);
                 _unitOfWork.Commit();
 
@@ -136,7 +137,7 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.QuotationRepository.All();
+                var result = await _unitOfWork.QuotationRepository.All().ConfigureAwait(false);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
@@ -159,7 +160,7 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.QuotationRepository.Find(Utils.ID);
+                var result = await _unitOfWork.QuotationRepository.Find(Utils.ID).ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -181,7 +182,7 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.QuotationRepository.FindByQuotationID(Utils.ID);
+                var result = await _unitOfWork.QuotationRepository.FindByQuotationID(Utils.ID).ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -214,7 +215,7 @@ namespace TimeAPI.API.Controllers
 
                 };
 
-                _unitOfWork.QuotationRepository.UpdateQuotationStageByQuotationID(quotation);
+                await _unitOfWork.QuotationRepository.UpdateQuotationStageByQuotationID(quotation).ConfigureAwait(false);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Quotation stage updated successfully." }).ConfigureAwait(false);
@@ -237,7 +238,7 @@ namespace TimeAPI.API.Controllers
                 if (UtilsOrgID == null)
                     throw new ArgumentNullException(nameof(UtilsOrgID.OrgID));
 
-                var results = _unitOfWork.QuotationRepository.QuotationByOrgID(UtilsOrgID.OrgID);
+                var results = await _unitOfWork.QuotationRepository.QuotationByOrgID(UtilsOrgID.OrgID).ConfigureAwait(false);
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(results, Formatting.Indented)).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -255,7 +256,7 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.QuotationRepository.GetLastAddedQuotationPrefixByOrgID(Utils.ID);
+                var result = await _unitOfWork.QuotationRepository.GetLastAddedQuotationPrefixByOrgID(Utils.ID).ConfigureAwait(false);
                 return await Task.FromResult<object>(new SuccessViewModel
                 {
                     Status = "200",

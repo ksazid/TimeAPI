@@ -25,6 +25,7 @@ namespace TimeAPI.Domain
         ITimesheetRepository TimesheetRepository { get; }
         ITimesheetBreakRepository TimesheetBreakRepository { get; }
         ITaskRepository TaskRepository { get; }
+        ISubTaskRepository SubTaskRepository { get; }
         ITaskTeamMembersRepository TaskTeamMembersRepository { get; }
         ISetupRepository SetupRepository { get; }
         IPriorityRepository PriorityRepository { get; }

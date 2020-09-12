@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -22,32 +23,32 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public UnitDescription Find(string key)
+        public async Task<UnitDescription> Find(string key)
         {
-            return QuerySingleOrDefault<UnitDescription>(
+            return await  QuerySingleOrDefaultAsync<UnitDescription>(
                 sql: "SELECT * FROM dbo.unit_desc WHERE id = @key and is_deleted = 0",
                 param: new { key }
             );
         }
 
-        public IEnumerable<UnitDescription> All()
+        public async Task<IEnumerable<UnitDescription>> All()
         {
-            return Query<UnitDescription>(
+            return await QueryAsync<UnitDescription>(
                 sql: "SELECT * FROM dbo.unit_desc where is_deleted = 0"
             );
         }
 
-        public IEnumerable<UnitDescription> FetchAllUnitDescriptionByOrgID(string key)
+        public async Task<IEnumerable<UnitDescription>> FetchAllUnitDescriptionByOrgID(string key)
         {
-            return Query<UnitDescription>(
+            return await QueryAsync<UnitDescription>(
                 sql: "SELECT * FROM dbo.unit_desc WHERE is_deleted = 0 AND org_id = @key AND is_extra = 0 ORDER BY unit_name ASC",
                    param: new { key }
             );
         }
 
-        public IEnumerable<UnitDescription> FetchAllUnitDescriptionExtraByOrgID(string key)
+        public async Task<IEnumerable<UnitDescription>> FetchAllUnitDescriptionExtraByOrgID(string key)
         {
-            return Query<UnitDescription>(
+            return await QueryAsync<UnitDescription>(
                 sql: "SELECT * FROM dbo.unit_desc WHERE is_deleted = 0 AND org_id = @key AND is_extra = 1 ORDER BY unit_name ASC",
                    param: new { key }
             );

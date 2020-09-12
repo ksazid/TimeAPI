@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -21,26 +22,34 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public ProjectTags Find(string key)
+        public async Task<ProjectTags> Find(string key)
         {
-            return QuerySingleOrDefault<ProjectTags>(
+            return await QuerySingleOrDefaultAsync<ProjectTags>(
                 sql: "SELECT * FROM dbo.project_tags WHERE id = @key and is_deleted = 0",
                 param: new { key }
             );
         }
 
-        
-
-        public IEnumerable<ProjectTags> GetProjectTagsByUnitID(string key)
+        public async Task<IEnumerable<ProjectTags>> GetProjectTagsByUnitID(string key)
         {
-            return Query<ProjectTags>(
+            return await QueryAsync<ProjectTags>(
                 sql: "SELECT * FROM dbo.project_tags where is_deleted = 0 and unit_id = @key",
                 param: new { key }
             );
         }
-        public IEnumerable<ProjectTags> All()
+
+        public async Task<IEnumerable<ProjectTags>> GetProjectTagsByProjectID(string key)
         {
-            return Query<ProjectTags>(
+            return await QueryAsync<ProjectTags>(
+                sql: "SELECT * FROM dbo.project_tags where is_deleted = 0 and project_id = @key",
+                param: new { key }
+            );
+        }
+
+        
+        public async Task<IEnumerable<ProjectTags>> All()
+        {
+            return await QueryAsync<ProjectTags>(
                 sql: "SELECT * FROM dbo.project_tags where is_deleted = 0"
             );
         }
@@ -56,9 +65,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public void RemoveByUnitID(string key)
+        public async Task RemoveByUnitID(string key)
         {
-            Execute(
+           await ExecuteAsync(
                 sql: @"UPDATE dbo.project_tags
                    SET
                        modified_date = GETDATE(), is_deleted = 1
@@ -67,7 +76,7 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        
+
         public void Update(ProjectTags entity)
         {
             Execute(

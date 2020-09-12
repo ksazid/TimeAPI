@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -13,36 +14,36 @@ namespace TimeAPI.Data.Repositories
 
         public void Add(Administrative entity)
         {
-          entity.id = ExecuteScalar<string>(
-                    sql: @"INSERT INTO [dbo].[administrative]
+            entity.id = ExecuteScalar<string>(
+                      sql: @"INSERT INTO [dbo].[administrative]
                            (id, dept_id, org_id, administrative_name, summary, created_date, createdby)
                     VALUES (@id, @dept_id, @org_id, @administrative_name,  @summary, @created_date, @createdby);
                     SELECT SCOPE_IDENTITY()",
-                    param: entity
-                );
+                      param: entity
+                  );
         }
 
-        public IEnumerable<Administrative> All()
+        public async Task<IEnumerable<Administrative>> All()
         {
-            return Query<Administrative>(
+            return await QueryAsync<Administrative>(
                 sql: "SELECT * FROM [dbo].[administrative] WHERE  is_deleted = 0"
             );
         }
 
-        public Administrative Find(string key)
+        public async Task<Administrative> Find(string key)
         {
-            return QuerySingleOrDefault<Administrative>(
+            return await QuerySingleOrDefaultAsync<Administrative>(
                 sql: "SELECT * FROM [dbo].[administrative] WHERE id = @key and  is_deleted = 0",
                 param: new { key }
             );
         }
 
-        public RootObject GetByOrgID(string key)
+        public async Task<RootObject> GetByOrgID(string key)
         {
             RootObject rootObject = new RootObject();
             List<RootDepartmentObject> rootDepartmentObjectsList = new List<RootDepartmentObject>();
 
-            var dep = Query<Department>(
+            var dep = await QueryAsync<Department>(
                    sql: @"SELECT DISTINCT(department.id),
                         department.dep_name
                             FROM [dbo].[department] WHERE is_deleted = 0
@@ -56,7 +57,7 @@ namespace TimeAPI.Data.Repositories
                 List<AdministrativeDropDown> administrativesList = new List<AdministrativeDropDown>();
                 rootDepartmentObject.id = item.id;
                 rootDepartmentObject.dept_name = item.dep_name;
-                var result = GetDepartmentObject(item.id) as List<AdministrativeDropDown>;
+                var result = await GetDepartmentObject(item.id) as List<AdministrativeDropDown>;
 
                 if (result.Count > 0)
                     administrativesList.AddRange(result);
@@ -96,9 +97,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        private IEnumerable<AdministrativeDropDown> GetDepartmentObject(string key)
+        private async Task<IEnumerable<AdministrativeDropDown>> GetDepartmentObject(string key)
         {
-            return Query<AdministrativeDropDown>(
+            return await QueryAsync<AdministrativeDropDown>(
               sql: @"SELECT
                     ROW_NUMBER() OVER (ORDER BY id) AS rowno,
                     id,
@@ -111,9 +112,9 @@ namespace TimeAPI.Data.Repositories
           );
         }
 
-        public dynamic GetAdministrativeTaskByOrgID(string key)
+        public async Task<dynamic> GetAdministrativeTaskByOrgID(string key)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                 sql: @"SELECT dbo.department.id as department_id, 
                         dbo.department.dep_name, 
                         dbo.administrative.id,

@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -33,16 +34,16 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<AdminProductivityDashboard> All()
+        public async Task<IEnumerable<AdminProductivityDashboard>> All()
         {
-            return Query<AdminProductivityDashboard>(
+            return await QueryAsync<AdminProductivityDashboard>(
                 sql: ""
             );
         }
 
-        public AdminProductivityDashboard Find(string key)
+        public async Task<AdminProductivityDashboard> Find(string key)
         {
-            return QuerySingleOrDefault<AdminProductivityDashboard>(
+            return await QuerySingleOrDefaultAsync<AdminProductivityDashboard>(
                 sql: "",
                 param: new { key }
             );
@@ -59,7 +60,7 @@ namespace TimeAPI.Data.Repositories
         #endregion
 
 
-        public dynamic EmployeeProductivityPerDateByOrgIDAndDate(string OrgID, string StartDate, string EndDate)
+        public async Task<dynamic> EmployeeProductivityPerDateByOrgIDAndDate(string OrgID, string StartDate, string EndDate)
         {
             EmployeeProductivity employeeProductivity = new EmployeeProductivity();
             List<EmployeeProductivity> employeeProductivities = new List<EmployeeProductivity>();
@@ -68,11 +69,11 @@ namespace TimeAPI.Data.Repositories
             string avgCheckout = string.Empty;
             string avgCheckin = string.Empty;
 
-            List<Employee> employees = EmployeeDetailByOrgID(OrgID).ToList();
-            weekdays.AddRange(WorkingHoursFindByOrgID(OrgID));
+            List<Employee> employees = (await EmployeeDetailByOrgID(OrgID)).ToList();
+            weekdays.AddRange((await WorkingHoursFindByOrgID(OrgID)));
             for (int i = 0; i < employees.Count; i++)
             {
-                employeeProductivities.AddRange(EmployeeProductivity(employees[i].id, StartDate, EndDate));
+                employeeProductivities.AddRange((await EmployeeProductivity(employees[i].id, StartDate, EndDate)));
             }
 
             avgCheckin = AverageCheckinTime(employeeProductivities).ToString(@"hh:mm tt");
@@ -141,9 +142,9 @@ namespace TimeAPI.Data.Repositories
             return _temp_total_hrs;
         }
 
-        public dynamic ScreenshotByOrgIDAndDate(string OrgID, string StartDate, string EndDate)
+        public async Task<dynamic> ScreenshotByOrgIDAndDate(string OrgID, string StartDate, string EndDate)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                  sql: @"SELECT * FROM employee_screenshot
                         WHERE FORMAT(CAST(employee_screenshot.created_date AS date), 'MM/dd/yyyy', 'EN-US')
                     BETWEEN FORMAT(CAST(@StartDate AS DATE), 'MM/dd/yyyy', 'EN-US')
@@ -156,7 +157,7 @@ namespace TimeAPI.Data.Repositories
              );
         }
 
-        public dynamic EmployeeProductivityTimeFrequencyByOrgIDAndDate(string OrgID, string StartDate, string EndDate)
+        public async Task<dynamic> EmployeeProductivityTimeFrequencyByOrgIDAndDate(string OrgID, string StartDate, string EndDate)
         {
             double? temp = 0D, temp1 = 0D, tempx = 0D;
             DateTime avgCheckin = DateTime.Now, avgCheckout = DateTime.Now;
@@ -167,17 +168,17 @@ namespace TimeAPI.Data.Repositories
             List<Weekdays> weekdays = new List<Weekdays>();
 
             List<EmployeeProductivityTime> employeeProductivityTimes = new List<EmployeeProductivityTime>();
-            employeeProductivityTimes.AddRange(EmployeeProductivityTime(OrgID, StartDate, EndDate));
+            employeeProductivityTimes.AddRange((await EmployeeProductivityTime(OrgID, StartDate, EndDate)));
 
             List<EmployeeIdleTime> employeeIdleTime = new List<EmployeeIdleTime>();
-            employeeIdleTime.AddRange(EmployeeProductivityIdleTime(OrgID, StartDate, EndDate));
+            employeeIdleTime.AddRange((await EmployeeProductivityIdleTime(OrgID, StartDate, EndDate)));
 
             var EmpIDList = employeeProductivityTimes.Select(x => x.emp_id).Distinct().ToList();
-            weekdays.AddRange(WorkingHoursFindByOrgID(OrgID));
+            weekdays.AddRange((await WorkingHoursFindByOrgID(OrgID)));
 
             for (int i = 0; i < EmpIDList.Count; i++)
             {
-                var data = FirstCheckInLastCheckout(EmpIDList[i], StartDate, EndDate).ToList();
+                var data = (await FirstCheckInLastCheckout(EmpIDList[i], StartDate, EndDate)).ToList();
 
                 if (data != null)
                 {
@@ -251,11 +252,11 @@ namespace TimeAPI.Data.Repositories
                 List<EmployeeProductivityTrackedTime> EmployeeProductivityTrackedTime = new List<EmployeeProductivityTrackedTime>();
                 List<EmployeeProductivityTrackedTime> EmployeeProductivityIdleTrackedTime = new List<EmployeeProductivityTrackedTime>();
 
-                EmployeeProductivityTrackedTime.AddRange(EmployeeProductivityTimeGraphFrequencyByUsageID(employeeProductivityTimes[i].id));
+                EmployeeProductivityTrackedTime.AddRange(await EmployeeProductivityTimeGraphFrequencyByUsageID(employeeProductivityTimes[i].id));
                 employeeProductivityTimes[i].employeeProductivityTrackedTimes = EmployeeProductivityTrackedTime;
 
 
-                EmployeeProductivityIdleTrackedTime.AddRange(EmployeeProductivityIdleGraphFrequencyByUsageID(employeeProductivityTimes[i].id));
+                EmployeeProductivityIdleTrackedTime.AddRange(await EmployeeProductivityIdleGraphFrequencyByUsageID(employeeProductivityTimes[i].id));
                 employeeIdleTime[i].employeeProductivityTrackedTimes = EmployeeProductivityIdleTrackedTime;
 
                 TimeSpan timeSpan = TimeSpan.ParseExact(employeeProductivityTimes[i].start_time, "c", null);
@@ -302,9 +303,9 @@ namespace TimeAPI.Data.Repositories
 
         #region PrivateMethods
 
-        private IEnumerable<EmployeeProductivityTime> EmployeeProductivityTime(string OrgID, string StartDate, string EndDate)
+        private async Task<IEnumerable<EmployeeProductivityTime>> EmployeeProductivityTime(string OrgID, string StartDate, string EndDate)
         {
-            return Query<EmployeeProductivityTime>(
+            return await QueryAsync<EmployeeProductivityTime>(
                     sql: @"SELECT
                                     employee_app_usage.id,
                                     employee_app_usage.start_time,
@@ -334,9 +335,9 @@ namespace TimeAPI.Data.Repositories
                         );
         }
 
-        private IEnumerable<EmployeeIdleTime> EmployeeProductivityIdleTime(string OrgID, string StartDate, string EndDate)
+        private async Task<IEnumerable<EmployeeIdleTime>> EmployeeProductivityIdleTime(string OrgID, string StartDate, string EndDate)
         {
-            return Query<EmployeeIdleTime>(
+            return await QueryAsync<EmployeeIdleTime>(
                     sql: @"SELECT
                                     employee_app_usage.id,
                                     employee_app_usage.start_time,
@@ -366,9 +367,9 @@ namespace TimeAPI.Data.Repositories
                          );
         }
 
-        private IEnumerable<EmployeeProductivityTrackedTime> EmployeeProductivityTimeGraphFrequencyByUsageID(string UsageID)
+        private async Task<IEnumerable<EmployeeProductivityTrackedTime>> EmployeeProductivityTimeGraphFrequencyByUsageID(string UsageID)
         {
-            return Query<EmployeeProductivityTrackedTime>(
+            return await QueryAsync<EmployeeProductivityTrackedTime>(
                            sql: @"SELECT
                                     app_category_name as app_name,
                                     CONVERT(varchar(5), DATEADD(MINUTE, SUM(DATEDIFF(MINUTE, 0, time_spend)), 0), 114) AS time_spend,
@@ -389,9 +390,9 @@ namespace TimeAPI.Data.Repositories
                         );
         }
 
-        private IEnumerable<EmployeeProductivityTrackedTime> EmployeeProductivityIdleGraphFrequencyByUsageID(string UsageID)
+        private async Task<IEnumerable<EmployeeProductivityTrackedTime>> EmployeeProductivityIdleGraphFrequencyByUsageID(string UsageID)
         {
-            return Query<EmployeeProductivityTrackedTime>(
+            return await QueryAsync<EmployeeProductivityTrackedTime>(
                            sql: @"SELECT
                                     app_name,
                                     CONVERT(varchar(5), DATEADD(MINUTE, SUM(DATEDIFF(MINUTE, 0, time_spend)), 0), 114) AS time_spend,
@@ -411,9 +412,9 @@ namespace TimeAPI.Data.Repositories
                         );
         }
 
-        private IEnumerable<EmployeeFirstCheckInLastCheckout> FirstCheckInLastCheckout(string EmpID, string StartDate, string EndDate)
+        private async Task<IEnumerable<EmployeeFirstCheckInLastCheckout>> FirstCheckInLastCheckout(string EmpID, string StartDate, string EndDate)
         {
-            return Query<EmployeeFirstCheckInLastCheckout>(
+            return await QueryAsync<EmployeeFirstCheckInLastCheckout>(
                  sql: @"SELECT
                             timesheet.empid AS emp_id,
                             FORMAT(CAST(timesheetFirst.check_in AS DATETIME2), N'hh:mm tt') AS checkin,
@@ -467,9 +468,9 @@ namespace TimeAPI.Data.Repositories
 
 
         //EmployeeProductivityPerDateByEmpIDAndDate
-        private IEnumerable<EmployeeProductivity> EmployeeProductivity(string EmpID, string StartDate, string EndDate)
+        private async Task<IEnumerable<EmployeeProductivity>> EmployeeProductivity(string EmpID, string StartDate, string EndDate)
         {
-            return Query<EmployeeProductivity>(
+            return await QueryAsync<EmployeeProductivity>(
                              sql: @"SELECT
                             emp_id,
                             FORMAT(CAST(check_in AS DATETIME2), N'hh:mm tt') AS check_in,
@@ -623,17 +624,17 @@ namespace TimeAPI.Data.Repositories
             return avgCheckout;
         }
 
-        public IEnumerable<Employee> EmployeeDetailByOrgID(string key)
+        public async Task<IEnumerable<Employee>> EmployeeDetailByOrgID(string key)
         {
-            return Query<Employee>(
+            return await QueryAsync<Employee>(
                 sql: "SELECT * FROM [dbo].[employee] WHERE org_id = @key and is_deleted = 0",
                 param: new { key }
             );
         }
 
-        private IEnumerable<Weekdays> WorkingHoursFindByOrgID(string key)
+        private async Task<IEnumerable<Weekdays>> WorkingHoursFindByOrgID(string key)
         {
-            return Query<Weekdays>(
+            return await QueryAsync<Weekdays>(
                 sql: "SELECT * FROM dbo.weekdays WHERE is_deleted = 0 and org_id = @key",
                 param: new { key }
             );

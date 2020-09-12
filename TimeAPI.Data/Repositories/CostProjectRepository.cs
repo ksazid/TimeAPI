@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -21,27 +22,27 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public CostProject Find(string key)
+        public async Task<CostProject> Find(string key)
         {
-            return QuerySingleOrDefault<CostProject>(
+            return await QuerySingleOrDefaultAsync<CostProject>(
                 sql: "SELECT * FROM dbo.cost_project WHERE is_deleted = 0 and id = @key",
                 param: new { key }
             );
         }
 
-        public dynamic FindByCostProjectID(string key)
+        public async Task<dynamic> FindByCostProjectID(string key)
         {
-            return QuerySingleOrDefault<dynamic>(
+            return await QuerySingleOrDefaultAsync<dynamic>(
                 sql: @"SELECT 
                            CASE
 			                    WHEN dbo.customer.is_company = 1 THEN dbo.customer.company_name
 			                    ELSE dbo.customer.first_name + ' ' + dbo.customer.last_name
-			                    END AS customer_name,
+			                    END AS customer_name, 
+                                dbo.customer.id as cst_id,
 			                    packages.package_name,
 			                    project_type.type_name as project_type_name,
 			                    cost_project.* 
-                    FROM 
-                    dbo.cost_project
+                    FROM dbo.cost_project
                         LEFT JOIN customer_x_project on cost_project.id = customer_x_project.project_id
                         LEFT JOIN customer on customer_x_project.cst_id = customer.id
                         LEFT JOIN packages on cost_project.package_id = packages.id
@@ -50,10 +51,10 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
-        
-        public CostProject FindAutoCostProjectPrefixByOrgID(string key, string date)
+
+        public async Task<CostProject> FindAutoCostProjectPrefixByOrgID(string key, string date)
         {
-            return QuerySingleOrDefault<CostProject>(
+            return await QuerySingleOrDefaultAsync<CostProject>(
                 sql: @"SELECT TOP 1 project_prefix 
                             FROM dbo.cost_project 
                         WHERE   
@@ -65,9 +66,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public CostProject FindCustomCostProjectPrefixByOrgIDAndPrefix(string key, string project_prefix)
+        public async Task<CostProject> FindCustomCostProjectPrefixByOrgIDAndPrefix(string key, string project_prefix)
         {
-            return QuerySingleOrDefault<CostProject>(
+            return await QuerySingleOrDefaultAsync<CostProject>(
                 sql: @"SELECT TOP 1 project_prefix    
                             FROM dbo.cost_project  WHERE 
                             project_prefix = @project_prefix
@@ -120,26 +121,30 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<CostProject> All()
+        public async Task<IEnumerable<CostProject>> All()
         {
-            return Query<CostProject>(
+            return await QueryAsync<CostProject>(
                 sql: "SELECT * FROM [dbo].[cost_project] where is_deleted = 0"
             );
         }
 
-        public IEnumerable<dynamic> FetchAllCostProjectByOrgID(string key)
+        public async Task<IEnumerable<dynamic>> FetchAllCostProjectByOrgID(string key)
         {
-            return Query<dynamic>(
+            //AND entity_contact.is_primary = 1
+            return await QueryAsync<dynamic>(
                    sql: @"SELECT
 	                        project_type.id as project_type_id,
                             project_type.type_name as project_type_name,
+                            entity_contact.name,
+							entity_contact.phone,
+							entity_contact.email,
                             cost_project.id as project_id,
                             cost_project.project_name,
 	                        CASE
                             WHEN FORMAT(CAST( dbo.cost_project.modified_date AS DATETIME2), N'dd/MM/yyyy') IS NULL
 	                        THEN FORMAT(CAST( dbo.cost_project.created_date AS DATETIME2), N'dd/MM/yyyy')
-                            ELSE FORMAT(CAST( dbo.cost_project.modified_date AS DATETIME2), N'dd/MM/yyyy') 
-                        END AS ondate,
+                            ELSE FORMAT(CAST( dbo.cost_project.created_date AS DATETIME2), N'dd/MM/yyyy') 
+                            END AS ondate,
 	                        dbo.customer.cst_name,
                             cost_project.project_prefix,
                             cost_project.no_of_floors, 
@@ -159,17 +164,20 @@ namespace TimeAPI.Data.Repositories
                         LEFT JOIN dbo.project_status ON dbo.cost_project.project_status_id = dbo.project_status.id
                         LEFT JOIN dbo.project_type ON dbo.cost_project.project_type_id = dbo.project_type.id
                         LEFT JOIN dbo.customer_x_project ON dbo.cost_project.id = dbo.customer_x_project.project_id
-                        LEFT JOIN dbo.customer ON dbo.customer_x_project.cst_id = dbo.customer.id
-                        WHERE dbo.cost_project.org_id = @key
+						LEFT JOIN dbo.customer ON dbo.customer_x_project.cst_id = dbo.customer.id
+                        LEFT JOIN dbo.entity_contact on dbo.customer.id = dbo.entity_contact.entity_id
+                        WHERE
+						dbo.cost_project.org_id = @key
+	                     
                         AND dbo.cost_project.is_deleted = 0 and cost_project.is_quotation != 1
                         ORDER BY dbo.cost_project.project_name ASC",
                       param: new { key }
                );
         }
 
-        public void UpdateCostProjectStatusByID(CostProject entity)
+        public async Task UpdateCostProjectStatusByID(CostProject entity)
         {
-            Execute(
+           await ExecuteAsync(
                sql: @"UPDATE dbo.cost_project
                    SET
                     project_status_id = @project_status_id,
@@ -180,23 +188,23 @@ namespace TimeAPI.Data.Repositories
            );
         }
 
-        public void UpdateCostProjectDiscountAndProfitMarginByID(CostProject entity)
+        public async Task UpdateCostProjectDiscountAndProfitMarginByID(CostProject entity)
         {
-            Execute(
-               sql: @"UPDATE dbo.cost_project
+            await ExecuteAsync(
+                sql: @"UPDATE dbo.cost_project
                    SET
                     discount_amount = @discount_amount,
                     profit_margin_amount = @profit_margin_amount,
                     modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE id = @id",
-               param: entity
-           );
+                param: entity
+            );
         }
 
-        public void UpdateIsQuotationByCostProjectID(CostProject entity)
+        public async Task UpdateIsQuotationByCostProjectID(CostProject entity)
         {
-            Execute(
+            await ExecuteAsync(
               sql: @"UPDATE dbo.cost_project
                    SET
                     is_quotation = @is_quotation,
@@ -207,9 +215,9 @@ namespace TimeAPI.Data.Repositories
           );
         }
 
-        public void UpdateCostProjectFinalValueByCostProjectID(CostProject entity)
+        public async Task UpdateCostProjectFinalValueByCostProjectID(CostProject entity)
         {
-            Execute(
+            await ExecuteAsync(
               sql: @"UPDATE dbo.cost_project
                    SET
                     total_hours = @total_hours,
@@ -225,9 +233,9 @@ namespace TimeAPI.Data.Repositories
           );
         }
 
-        public string GetLastAddedCostPrefixByOrgID(string key)
+        public async Task<string> GetLastAddedCostPrefixByOrgID(string key)
         {
-            return QuerySingleOrDefault<string>(
+            return await QuerySingleOrDefaultAsync<string>(
                 sql: @"SELECT TOP 1 project_prefix from cost_project 
                         WHERE cost_project.org_id = @key 
                         AND cost_project.is_deleted = 0
@@ -235,5 +243,6 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
+       
     }
 }

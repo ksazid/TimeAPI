@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -21,25 +22,25 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public ProjectUnit Find(string key)
+        public async Task< ProjectUnit> Find(string key)
         {
-            return QuerySingleOrDefault<ProjectUnit>(
+            return await QuerySingleOrDefaultAsync<ProjectUnit>(
                 sql: "SELECT * FROM dbo.project_unit WHERE id = @key and is_deleted = 0",
                 param: new { key }
             );
         }
-        public IEnumerable<ProjectUnit> FindByProjectID(string key)
+
+        public async Task<IEnumerable<ProjectUnit>> FindByProjectID(string key)
         {
-            return Query<ProjectUnit>(
+            return await QueryAsync<ProjectUnit>(
                 sql: "SELECT * FROM dbo.project_unit where is_deleted = 0 and project_id = @key",
                 param: new { key }
             );
         }
 
-        
-        public void RemoveByProjectID(string key)
+        public async Task RemoveByProjectID(string key)
         {
-            Execute(
+          await  ExecuteAsync(
                 sql: @"UPDATE dbo.project_unit
                    SET
                        modified_date = GETDATE(), is_deleted = 1
@@ -48,12 +49,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-
-
-
-        public IEnumerable<ProjectUnit> All()
+        public async Task<IEnumerable<ProjectUnit>> All()
         {
-            return Query<ProjectUnit>(
+            return await QueryAsync<ProjectUnit>(
                 sql: "SELECT * FROM dbo.project_unit where is_deleted = 0"
             );
         }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -21,9 +22,9 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public ProjectActivityTask Find(string key)
+        public async Task<ProjectActivityTask> Find(string key)
         {
-            return QuerySingleOrDefault<ProjectActivityTask>(
+            return await QuerySingleOrDefaultAsync<ProjectActivityTask>(
                 sql: "SELECT * FROM dbo.project_activity_x_task WHERE is_deleted = 0 and id = @key",
                 param: new { key }
             );
@@ -55,17 +56,17 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<ProjectActivityTask> All()
+        public async Task<IEnumerable<ProjectActivityTask>> All()
         {
-            return Query<ProjectActivityTask>(
+            return await QueryAsync<ProjectActivityTask>(
                 sql: "SELECT * FROM [dbo].[project_activity_x_task] where is_deleted = 0"
             );
         }
 
-        public void RemoveByProjectActivityID(string key)
+        public async Task RemoveByProjectActivityID(string key)
         {
-            Execute(
-                sql: @"UPDATE dbo.project_activity_x_task
+            await ExecuteAsync(
+                      sql: @"UPDATE dbo.project_activity_x_task
                    SET
                        modified_date = GETDATE(), is_deleted = 1
                     WHERE activity_id = @key",
@@ -73,20 +74,20 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public void RemoveByProjectID(string key)
+        public async Task RemoveByProjectID(string key)
         {
-            Execute(
-                sql: @"UPDATE dbo.project_activity_x_task
+            await ExecuteAsync(
+                  sql: @"UPDATE dbo.project_activity_x_task
                    SET
                        modified_date = GETDATE(), is_deleted = 1
                     WHERE project_id = @key",
-                param: new { key }
-            );
+                  param: new { key }
+              );
         }
 
-        public IEnumerable<dynamic> GetAllTaskByActivityID(string key)
+        public async Task<IEnumerable<dynamic>> GetAllTaskByActivityID(string key)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                    sql: @"SELECT
                             dbo.task.id,
                             dbo.task.task_name,
@@ -102,9 +103,9 @@ namespace TimeAPI.Data.Repositories
                );
         }
 
-        public IEnumerable<dynamic> GetAllTaskByProjectID(string key)
+        public async Task<IEnumerable<dynamic>> GetAllTaskByProjectID(string key)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                    sql: @"SELECT 
                             dbo.task.id as task_id,
                             dbo.task.task_name,
@@ -132,9 +133,9 @@ namespace TimeAPI.Data.Repositories
                );
         }
 
-        public IEnumerable<ProjectActivityTaskEntityViewModel> GetAllTaskForAssignByProjectID(string key)
+        public async Task<IEnumerable<ProjectActivityTaskEntityViewModel>> GetAllTaskForAssignByProjectID(string key)
         {
-            return Query<ProjectActivityTaskEntityViewModel>(
+            return await QueryAsync<ProjectActivityTaskEntityViewModel>(
                    sql: @"SELECT 
                             dbo.project_activity_x_task.id as id,
                             project.id as project_id,
@@ -164,11 +165,43 @@ namespace TimeAPI.Data.Repositories
                );
         }
 
-        
-
-        public dynamic GetProjectActivityTaskRatioByProjectID(string key)
+        public async Task<IEnumerable<ProjectSubTaskEntityViewModel>> GetAllSubTaskByTaskID(string key)
         {
-            return Query<dynamic>(
+            return await QueryAsync<ProjectSubTaskEntityViewModel>(
+                sql: @"SELECT 
+                            dbo.sub_task.id as id,
+                            project.id as project_id,
+                            dbo.project_activity.id as activity_id,
+                            dbo.task.id as task_id,
+							dbo.project_activity.activity_name as milestone_name,
+                            dbo.task.task_name as task_name,
+                            dbo.sub_task.sub_task_name,
+                            FORMAT(CAST(dbo.sub_task.due_date AS DATE), 'd', 'EN-US') as due_date,
+                            sub_task.lead_id as lead_id,
+                            x.first_name as lead_name,
+                            dbo.priority.priority_name,
+                            dbo.status.status_name,
+                            dbo.status.id as status_id
+                        FROM dbo.sub_task WITH (NOLOCK)
+							LEFT JOIN dbo.task on sub_task.task_id = dbo.task.id
+                            LEFT JOIN dbo.project_activity_x_task on task.id = dbo.project_activity_x_task.task_id
+                            LEFT JOIN dbo.project_activity on [project_activity_x_task].activity_id = dbo.project_activity.id
+                            LEFT JOIN dbo.project on [project_activity_x_task].project_id = dbo.project.id
+                            LEFT JOIN dbo.employee x on sub_task.lead_id = x.id
+                            LEFT JOIN dbo.priority on sub_task.priority_id = dbo.priority.id
+                            LEFT JOIN dbo.status on sub_task.status_id = dbo.status.id
+                        WHERE dbo.task.id = @key
+                            AND dbo.project.is_deleted = 0
+                            AND dbo.project_activity.is_deleted = 0
+                            AND dbo.task.is_deleted = 0
+                        ORDER BY dbo.task.task_name ASC",
+                param: new { key }
+            );
+        }
+
+        public async Task<dynamic> GetProjectActivityTaskRatioByProjectID(string key)
+        {
+            return await QueryAsync<dynamic>(
                    sql: @"SELECT dbo.status.status_name, count(*) * 100 / sum(count(*))  over() as ratio
                         FROM dbo.task WITH(NOLOCK)
                             INNER JOIN dbo.project_activity_x_task on dbo.task.id = dbo.project_activity_x_task.task_id

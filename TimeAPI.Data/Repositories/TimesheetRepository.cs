@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -21,17 +22,17 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public Timesheet Find(string key)
+        public async Task<Timesheet> Find(string key)
         {
-            return QuerySingleOrDefault<Timesheet>(
+            return await QuerySingleOrDefaultAsync<Timesheet>(
                 sql: "SELECT * FROM dbo.timesheet WHERE is_deleted = 0 and id = @key",
                 param: new { key }
             );
         }
 
-        public Timesheet FindTimeSheetByEmpID(string empid, string groupid)
+        public async Task<Timesheet> FindTimeSheetByEmpID(string empid, string groupid)
         {
-            return QuerySingleOrDefault<Timesheet>(
+            return await QuerySingleOrDefaultAsync<Timesheet>(
                 sql: "SELECT * FROM dbo.timesheet WHERE is_deleted = 0 and empid = @empid and groupid = @groupid",
                 param: new { empid, groupid }
             );
@@ -77,17 +78,17 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<Timesheet> All()
+        public async Task<IEnumerable<Timesheet>> All()
         {
-            return Query<Timesheet>(
+            return await QueryAsync<Timesheet>(
                 sql: "SELECT * FROM [dbo].[timesheet] where is_deleted = 0"
             );
         }
 
-        public void CheckOutByEmpID(Timesheet entity)
+        public async Task CheckOutByEmpID(Timesheet entity)
         {
-            Execute(
-                 sql: @"UPDATE dbo.timesheet
+            await ExecuteAsync(
+                  sql: @"UPDATE dbo.timesheet
                    SET
                     check_out = @check_out,
                     is_checkout = @is_checkout,
@@ -95,26 +96,28 @@ namespace TimeAPI.Data.Repositories
                     modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE empid = @empid and groupid = @groupid",
-                 param: entity
-             );
+                  param: entity
+              );
         }
 
-        public dynamic GetAllTimesheetByOrgID(string OrgID)
+        public async Task<dynamic> GetAllTimesheetByOrgID(string OrgID)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
            sql: "SELECT * FROM [dbo].[timesheet] where is_deleted = 0 AND timesheet.groupid = @OrgID",
                 param: new { OrgID }
             );
         }
 
-        public IEnumerable<string> GetAllEmpByGroupID(string OrgID)
+        public async Task<IEnumerable<string>> GetAllEmpByGroupID(string OrgID)
         {
-            return Query<string>(
+            return await QueryAsync<string>(
            sql: @"SELECT full_name FROM employee 
                 INNER JOIN timesheet on employee.id = timesheet.empid
                 WHERE timesheet.groupid = @OrgID",
                 param: new { OrgID }
             );
         }
+
+
     }
 }

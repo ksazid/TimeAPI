@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -21,21 +23,21 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public TaskTeamMember Find(string key)
+        public async Task<TaskTeamMember> Find(string key)
         {
-            return QuerySingleOrDefault<TaskTeamMember>(
+            return await QuerySingleOrDefaultAsync<TaskTeamMember>(
                 sql: "SELECT * FROM dbo.task_team_members WHERE is_deleted = 0 and id = @key",
                 param: new { key }
             );
         }
-        public IEnumerable<TaskTeamMember> FindByTaskID(string key)
+
+        public async Task<IEnumerable<TaskTeamMember>> FindByTaskID(string key)
         {
-            return Query<TaskTeamMember>(
+            return await QueryAsync<TaskTeamMember>(
                 sql: "SELECT * FROM dbo.task_team_members WHERE is_deleted = 0 and task_id = @key",
                 param: new { key }
             );
         }
-        
 
         public void Remove(string key)
         {
@@ -62,22 +64,22 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<TaskTeamMember> All()
+        public async Task<IEnumerable<TaskTeamMember>> All()
         {
-            return Query<TaskTeamMember>(
+            return await QueryAsync<TaskTeamMember>(
                 sql: "SELECT * FROM [dbo].[task_team_members] where is_deleted = 0"
             );
         }
 
-        public void RemoveByTaskID(string key)
+        public async Task RemoveByTaskID(string key)
         {
-            Execute(
-                sql: @"UPDATE dbo.task_team_members
+            await ExecuteAsync(
+                 sql: @"UPDATE dbo.task_team_members
                    SET
                        modified_date = GETDATE(), is_deleted = 1
                     WHERE task_id = @key",
-                param: new { key }
-            );
+                 param: new { key }
+             );
         }
     }
 }

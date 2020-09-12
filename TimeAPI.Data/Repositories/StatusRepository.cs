@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -21,9 +22,9 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public Status Find(string key)
+        public async Task< Status> Find(string key)
         {
-            return QuerySingleOrDefault<Status>(
+            return await  QuerySingleOrDefaultAsync<Status>(
                 sql: "SELECT * FROM dbo.status WHERE is_deleted = 0 and id = @key",
                 param: new { key }
             );
@@ -55,16 +56,16 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<Status> All()
+        public async Task<IEnumerable<Status>> All()
         {
-            return Query<Status>(
+            return await QueryAsync<Status>(
                 sql: "SELECT * FROM [dbo].[status] WHERE is_deleted = 0 "
             );
         }
 
-        public IEnumerable<Status> GetStatusByOrgID(string key)
+        public async Task<IEnumerable<Status>> GetStatusByOrgID(string key)
         {
-            return Query<Status>(
+            return await QueryAsync<Status>(
                 sql: @"SELECT * FROM [dbo].[status]
                         WHERE org_id='default' AND is_deleted = 0
                         UNION 

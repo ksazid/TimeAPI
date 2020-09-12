@@ -138,6 +138,7 @@ namespace TimeAPI.API.Models.CostProjectViewModels
     public class CostProjectStatusModel
     {
         public string id { get; set; }
+        public string emp_id { get; set; }
         public string project_status_id { get; set; }
         public string project_prefix { get; set; }
         public string modifiedby { get; set; }

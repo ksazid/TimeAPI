@@ -310,7 +310,7 @@ namespace TimeAPI.API.Controllers
 
                 _unitOfWork.Commit();
 
-                return await System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Successful", Desc = "Department Added Successfully" });
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Successful", Desc = "Department Added Successfully" }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

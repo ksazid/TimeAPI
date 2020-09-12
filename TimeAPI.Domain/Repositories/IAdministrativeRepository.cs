@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.Domain.Repositories
 {
-    public interface IAdministrativeRepository : IRepository<Administrative, string>
+    public interface IAdministrativeRepository : IRepositoryAsync<Administrative, string>
     {
-        RootObject GetByOrgID(string OrgID);
+        Task<RootObject> GetByOrgID(string OrgID);
 
-        dynamic GetAdministrativeTaskByOrgID(string OrgID);
+        Task<dynamic> GetAdministrativeTaskByOrgID(string OrgID);
     }
 }

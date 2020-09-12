@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -23,33 +24,33 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public TypeOfDesign Find(string key)
+        public async Task<TypeOfDesign> Find(string key)
         {
-            return QuerySingleOrDefault<TypeOfDesign>(
+            return await QuerySingleOrDefaultAsync<TypeOfDesign>(
                 sql: "SELECT * FROM dbo.design_type WHERE id = @key and is_deleted = 0",
                 param: new { key }
             );
         }
 
-        public IEnumerable<TypeOfDesign> FetchAllTypeOfDesignByProjectID(string key)
+        public async Task<IEnumerable<TypeOfDesign>> FetchAllTypeOfDesignByProjectID(string key)
         {
-            return Query<TypeOfDesign>(
+            return await QueryAsync<TypeOfDesign>(
                 sql: "SELECT * FROM dbo.design_type WHERE is_deleted = 0 and project_id= @key",
                 param: new { key }
             );
         }
-        public IEnumerable<TypeOfDesign> FetchAllTypeOfDesignByOrgID(string key)
+
+        public async Task<IEnumerable<TypeOfDesign>> FetchAllTypeOfDesignByOrgID(string key)
         {
-            return Query<TypeOfDesign>(
+            return await QueryAsync<TypeOfDesign>(
                 sql: "SELECT * FROM dbo.design_type WHERE is_deleted = 0 and org_id= @key",
                 param: new { key }
             );
         }
-        
 
-        public IEnumerable<TypeOfDesign> All()
+        public async Task<IEnumerable<TypeOfDesign>> All()
         {
-            return Query<TypeOfDesign>(
+            return await QueryAsync <TypeOfDesign>(
                 sql: "SELECT * FROM dbo.design_type where is_deleted = 0"
             );
         }

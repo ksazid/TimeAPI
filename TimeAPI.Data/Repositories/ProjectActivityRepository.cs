@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -21,17 +22,17 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public ProjectActivity Find(string key)
+        public async Task<ProjectActivity> Find(string key)
         {
-            return QuerySingleOrDefault<ProjectActivity>(
+            return await QuerySingleOrDefaultAsync<ProjectActivity>(
                 sql: "SELECT * FROM dbo.project_activity WHERE is_deleted = 0 and id = @key",
                 param: new { key }
             );
         }
 
-        public dynamic FindByProjectActivityID(string key)
+        public async Task<dynamic> FindByProjectActivityID(string key)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                    sql: @"SELECT 
                                 dbo.project_activity.id as project_activity_id,
                                 dbo.project_activity.project_id,
@@ -86,16 +87,16 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<ProjectActivity> All()
+        public async Task<IEnumerable<ProjectActivity>> All()
         {
-            return Query<ProjectActivity>(
+            return await QueryAsync<ProjectActivity>(
                 sql: "SELECT * FROM [dbo].[project_activity] where is_deleted = 0"
             );
         }
 
-        public IEnumerable<ProjectActivity> GetProjectActivityByProjectID(string key)
+        public async Task<IEnumerable<ProjectActivity>> GetProjectActivityByProjectID(string key)
         {
-            return Query<ProjectActivity>(
+            return await QueryAsync<ProjectActivity>(
                 sql: @"SELECT dbo.project_activity.*, status.status_name  FROM dbo.project_activity 
                         LEFT JOIN status on dbo.project_activity.status_id = status.id 
                     WHERE dbo.project_activity.is_deleted = 0 and dbo.project_activity.project_id = @key",
@@ -103,22 +104,22 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public void UpdateProjectActivityStatusByActivityID(ProjectActivity entity)
+        public async Task UpdateProjectActivityStatusByActivityID(ProjectActivity entity)
         {
-            Execute(
-                sql: @"UPDATE dbo.project_activity
+            await ExecuteAsync(
+                  sql: @"UPDATE dbo.project_activity
                    SET
                     status_id = @status_id,
                     modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE project_id = @project_id",
-                param: entity
-            );
+                  param: entity
+              );
         }
 
-        public dynamic GetProjectActivityRatioByProjectID(string key)
+        public async Task<dynamic> GetProjectActivityRatioByProjectID(string key)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                    sql: @"SELECT 
                            dbo.project_status.project_status_name, 
                            count(*) * 100 / sum(count(*))  over() as ratio

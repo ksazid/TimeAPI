@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -21,9 +22,9 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public Team Find(string key)
+        public async Task<Team> Find(string key)
         {
-            return QuerySingleOrDefault<Team>(
+            return await QuerySingleOrDefaultAsync<Team>(
                 sql: "SELECT * FROM dbo.team WHERE is_deleted = 0 and id = @key",
                 param: new { key }
             );
@@ -58,24 +59,24 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<Team> All()
+        public async Task<IEnumerable<Team>> All()
         {
-            return Query<Team>(
+            return await QueryAsync<Team>(
                 sql: "SELECT * FROM [dbo].[team] where is_deleted = 0"
             );
         }
 
-        public IEnumerable<dynamic> FindTeamsByOrgID(string key)
+        public async Task<IEnumerable<dynamic>> FindTeamsByOrgID(string key)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                 sql: "SELECT ROW_NUMBER() OVER (ORDER BY team.team_name) AS rowno,* FROM dbo.team WHERE is_deleted = 0 and org_id = @key",
                 param: new { key }
             );
         }
 
-        public dynamic FindByTeamID(string key)
+        public async Task<dynamic> FindByTeamID(string key)
         {
-            return QuerySingleOrDefault<dynamic>(
+            return await QuerySingleOrDefaultAsync<dynamic>(
                    sql: @"SELECT
 		                        team.id as team_id,
 		                        team.team_name,
@@ -98,7 +99,7 @@ namespace TimeAPI.Data.Repositories
 
         //public IEnumerable<dynamic> FetchByAllTeamMembersTeamID(string key)
         //{
-        //    return Query<dynamic>(
+        //    return await QueryAsync<dynamic>(
         //           sql: @"SELECT
         //                  team.id as team_id,
         //                  team.team_name,
@@ -120,9 +121,9 @@ namespace TimeAPI.Data.Repositories
         //              param: new { key }
         //       );
         //}
-        public IEnumerable<dynamic> FetchAllTeamsByOrgID(string key)
+        public async Task<IEnumerable<dynamic>> FetchAllTeamsByOrgID(string key)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                    sql: @"SELECT
                             team.id as team_id,
                             team.team_name,
@@ -139,9 +140,9 @@ namespace TimeAPI.Data.Repositories
                );
         }
 
-        public IEnumerable<dynamic> FetchAllTeamMembersByTeamID(string key)
+        public async Task<IEnumerable<dynamic>> FetchAllTeamMembersByTeamID(string key)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                    sql: @"SELECT
 		                    team_members.team_id as team_id,
 		                    team_members.id as team_members_id,
@@ -163,9 +164,9 @@ namespace TimeAPI.Data.Repositories
                );
         }
 
-        public dynamic GetAllTeamMembersByTeamID(string key)
+        public async Task<dynamic> GetAllTeamMembersByTeamID(string key)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                    sql: @"SELECT
 		                        team_members.id as team_members_id,
 		                        team_members.emp_id,
