@@ -67,11 +67,12 @@ namespace TimeAPI.Data.Repositories
 			                ELSE dbo.customer.first_name + ' ' + dbo.customer.last_name
 			                END AS lead_name,
 			                dbo.customer.company_name,
+			                dbo.customer.cst_name,
 			                dbo.customer.first_name,
 			                dbo.customer.last_name,
 			                dbo.customer.is_company,
-			                dbo.lead.email,
-			                dbo.lead.phone,
+			                dbo.entity_contact.email,
+			                dbo.entity_contact.phone,
                             dbo.employee.full_name,
                             dbo.lead_source.lead_source,
 			                dbo.lead_status.lead_status,
@@ -93,10 +94,14 @@ namespace TimeAPI.Data.Repositories
                         LEFT JOIN dbo.lead_deal  on dbo.lead.id =  dbo.lead_deal.lead_id
                         LEFT JOIN dbo.lead_deal_type  on dbo.lead_deal.deal_type_id =  dbo.lead_deal_type.id
                         LEFT JOIN dbo.lead_contact_role  on dbo.lead_deal.contact_role_id =  dbo.lead_contact_role.id
+                        LEFT JOIN dbo.entity_contact  on dbo.lead.id =  dbo.entity_contact.entity_id
                     WHERE dbo.lead.is_deleted = 0 
-						 and dbo.lead_status.lead_status != 'Cost Estimation'
-					     and dbo.lead_status.lead_status != 'Project'
-                AND dbo.lead.org_id = @key",
+						 AND dbo.lead_status.lead_status != 'Cost Estimation'
+					     AND dbo.lead_status.lead_status != 'Project'
+					     AND dbo.entity_contact.is_primary = 1
+					     AND dbo.entity_contact.is_deleted = 0
+                         AND dbo.lead.org_id = @key
+				ORDER BY FORMAT(CAST( dbo.lead.created_date AS DATETIME2), N'MM/dd/yyyy hh:mm tt') DESC",
                 param: new { key }
             );
         }

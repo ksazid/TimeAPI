@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -23,17 +24,17 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public EmployeeLeave Find(string key)
+        public async Task<EmployeeLeave> Find(string key)
         {
-            return QuerySingleOrDefault<EmployeeLeave>(
+            return await  QuerySingleOrDefaultAsync<EmployeeLeave>(
                 sql: "SELECT * FROM dbo.employee_leave WHERE id = @key and is_deleted = 0",
                 param: new { key }
             );
         }
 
-        public dynamic FetchEmployeeLeaveOrgID(string key)
+        public async Task<dynamic> FetchEmployeeLeaveOrgID(string key)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                 sql: @"	SELECT 
 	                        dbo.employee_leave.id as employee_leave_id, 
 		                    dbo.employee_leave.org_id, dbo.employee_leave.emp_id, 
@@ -58,9 +59,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public dynamic FetchEmployeeLeaveID(string key)
+        public async Task<dynamic> FetchEmployeeLeaveID(string key)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                 sql: @"SELECT 
 	                        dbo.employee_leave.id as employee_leave_id, 
 		                    dbo.employee_leave.org_id, dbo.employee_leave.emp_id, 
@@ -84,9 +85,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public dynamic FetchEmployeeLeaveEmpID(string key)
+        public async Task<dynamic> FetchEmployeeLeaveEmpID(string key)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                 sql: @"SELECT 
 	                        dbo.employee_leave.id as employee_leave_id, 
 		                    dbo.employee_leave.org_id, dbo.employee_leave.emp_id, 
@@ -111,9 +112,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public dynamic FetchEmployeeLeaveHistoryEmpID(string key)
+        public async Task<dynamic> FetchEmployeeLeaveHistoryEmpID(string key)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                 sql: @"SELECT 
                             (leave_start_date) AS leave_start_date,
                             (leave_end_date) AS leave_end_date,
@@ -135,9 +136,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public dynamic GetDaysOfMonth(string startdate, string enddate)
+        public async Task<dynamic> GetDaysOfMonth(string startdate, string enddate)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                 sql: @";WITH n(n) AS
                             (
                               SELECT TOP (DATEDIFF(MONTH, CAST(@startdate AS SMALLDATETIME), CAST(@enddate AS SMALLDATETIME))+1) ROW_NUMBER() OVER 
@@ -156,9 +157,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public dynamic FetchEmployeeLeaveHistoryOrgID(string key)
+        public async Task<dynamic> FetchEmployeeLeaveHistoryOrgID(string key)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                 sql: @"SELECT 
 		                    SUM(CAST(leave_days AS int)) as leave_days,
 		                    MONTH(ondate_applied) AS month,
@@ -186,9 +187,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public dynamic FetchEmployeeLeaveHistoryApproverID(string key)
+        public async Task<dynamic> FetchEmployeeLeaveHistoryApproverID(string key)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                 sql: @"SELECT 
 		                    SUM(CAST(leave_days AS int)) as leave_days,
 		                    MONTH(ondate_applied) AS month,
@@ -215,11 +216,10 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
-        
 
-        public IEnumerable<EmployeeLeave> All()
+        public async Task<IEnumerable<EmployeeLeave>> All()
         {
-            return Query<EmployeeLeave>(
+            return await QueryAsync<EmployeeLeave>(
                 sql: "SELECT * FROM dbo.employee_leave where is_deleted = 0"
             );
         }
@@ -262,10 +262,10 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public void UpdateApprovedByID(EmployeeLeave entity)
+        public async Task UpdateApprovedByID(EmployeeLeave entity)
         {
-            Execute(
-                sql: @"UPDATE dbo.employee_leave
+            await ExecuteAsync(
+                 sql: @"UPDATE dbo.employee_leave
                            SET 
                             is_approved = @is_approved, 
                             approve_start_date = @approve_start_date, 
@@ -277,8 +277,8 @@ namespace TimeAPI.Data.Repositories
                             modified_date = @modified_date,
                             modifiedby = @modifiedby
                          WHERE id = @id",
-                param: entity
-            );
+                 param: entity
+             );
         }
 
     }

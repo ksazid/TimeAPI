@@ -129,7 +129,7 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.DepartmentRepository.All();
+                var result = await _unitOfWork.DepartmentRepository.All().ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -151,7 +151,7 @@ namespace TimeAPI.API.Controllers
                 if (UtilsName == null)
                     throw new ArgumentNullException(nameof(UtilsName.FullName));
 
-                var result = _unitOfWork.DepartmentRepository.FindByDepartmentName(UtilsName.FullName);
+                var result = await _unitOfWork.DepartmentRepository.FindByDepartmentName(UtilsName.FullName).ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -173,7 +173,7 @@ namespace TimeAPI.API.Controllers
                 if (UtilsAlias == null)
                     throw new ArgumentNullException(nameof(UtilsAlias.Alias));
 
-                var result = _unitOfWork.DepartmentRepository.FindByDepartmentAlias(UtilsAlias.Alias);
+                var result = await _unitOfWork.DepartmentRepository.FindByDepartmentAlias(UtilsAlias.Alias).ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -195,7 +195,7 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.DepartmentRepository.FindDepartmentByOrgID(Utils.ID);
+                var result = await _unitOfWork.DepartmentRepository.FindDepartmentByOrgID(Utils.ID).ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -217,7 +217,7 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.DepartmentRepository.Find(Utils.ID);
+                var result = await _unitOfWork.DepartmentRepository.Find(Utils.ID).ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -239,7 +239,7 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.DepartmentRepository.FindDepLeadByDepID(Utils.ID);
+                var result = await _unitOfWork.DepartmentRepository.FindDepLeadByDepID(Utils.ID).ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -262,7 +262,7 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(UtilsOrgID.OrgID));
 
                 oDataTable _oDataTable = new oDataTable();
-                var results = _unitOfWork.DepartmentRepository.FetchGridDataByDepOrgID(UtilsOrgID.OrgID);
+                var results = await _unitOfWork.DepartmentRepository.FetchGridDataByDepOrgID(UtilsOrgID.OrgID).ConfigureAwait(false);
                 var xResult = _oDataTable.ToDataTable(results);
 
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);

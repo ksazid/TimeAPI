@@ -61,7 +61,7 @@ namespace TimeAPI.API.Controllers
                 modal.subscription_key = organizationViewModel.subscription_key;
 
                 //SuperAdminXOrg
-                var result = _unitOfWork.EmployeeRepository.FindByEmpUserID(modal.user_id);
+                var result = await _unitOfWork.EmployeeRepository.FindByEmpUserID(modal.user_id).ConfigureAwait(false);
 
                 if (result.is_superadmin)
                 {

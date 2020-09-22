@@ -14,7 +14,7 @@ using TimeAPI.API.Models.EntityNotesViewModels;
 using TimeAPI.API.Services;
 using TimeAPI.Domain;
 using TimeAPI.Domain.Entities;
-
+using TimeAPI.Domain.Model;
 
 namespace TimeAPI.API.Controllroers
 {
@@ -76,15 +76,100 @@ namespace TimeAPI.API.Controllroers
                     _unitOfWork.EntityMeetingParticipantsRepository.Add(entityMeetingParticipants);
                 }
 
+                var _status_id = (await _unitOfWork.StatusRepository.GetStatusByOrgID("default").ConfigureAwait(false))
+                                     .Where(s => s.status_name.Equals("Completed"))
+                                     .Select(s => s.id)
+                                     .FirstOrDefault();
+
+                var _TotalMinutes = (Convert.ToDateTime(modal.end_time) - Convert.ToDateTime(modal.start_time)).Ticks;
+                TimeSpan elapsedSpan = new TimeSpan(_TotalMinutes);
+
+                string TotalHours;
+                string TotalMinutes;
+                ConvertHoursAndMinutes(elapsedSpan, out TotalHours, out TotalMinutes);
+
+                var modalTasks = new Domain.Entities.Tasks()
+                {
+                    id = Guid.NewGuid().ToString(),
+                    empid = socialViewModel.emp_id,
+                    project_id = modal.entity_id,
+                    task_name = modal.meeting_name,
+                    status_id = _status_id,
+                    assigned_empid = socialViewModel.emp_id,
+                    is_local_activity = false,
+                    modifiedby = modal.createdby,
+                    created_date = _dateTime.ToString(),
+                    is_deleted = false
+                };
+
+                foreach (var item in socialViewModel.participant_id.Distinct())
+                {
+                    var TaskTeamMembers = new TaskTeamMember()
+                    {
+                        id = Guid.NewGuid().ToString(),
+                        task_id = modalTasks.id,
+                        empid = item,
+                        createdby = modal.createdby,
+                        created_date = _dateTime.ToString(),
+                        is_deleted = false
+                    };
+                    _unitOfWork.TaskTeamMembersRepository.Add(TaskTeamMembers);
+                }
+                string _groupid = string.Empty;
+                var RecentTimesheet = await _unitOfWork.EntityMeetingRepository.GetRecentTimesheetByEmpID(socialViewModel.emp_id, _dateTime.ToString())
+                                                                               .ConfigureAwait(false);
+
+                if (RecentTimesheet == null)
+                {
+                    return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Please do checkin first for add logs." }).ConfigureAwait(false);
+                }
+                _groupid = RecentTimesheet;
+
+                TimesheetActivity timesheetActivity = new TimesheetActivity()
+                {
+                    id = Guid.NewGuid().ToString(),
+                    groupid = _groupid,
+                    project_id = modal.entity_id,
+                    task_id = modalTasks.id,
+                    task_name = modal.meeting_name,
+                    remarks = modal.desc,
+                    ondate = _dateTime.ToString(),
+                    start_time = modal.start_time,
+                    end_time = modal.end_time,
+                    total_hrs = string.Format(@"{0}:{1}", TotalHours, TotalMinutes),
+                    is_billable = false,
+                };
+
                 _unitOfWork.EntityMeetingRepository.Add(modal);
+                _unitOfWork.TaskRepository.Add(modalTasks);
+                _unitOfWork.TimesheetActivityRepository.Add(timesheetActivity);
+
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Meeting saved successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+                return Task.FromResult<object>(new SuccessViewModel
+                {
+                    Status = "201",
+                    Code = ex.Message,
+                    Desc = ex.Message
+                });
             }
+        }
+
+        private static void ConvertHoursAndMinutes(TimeSpan elapsedSpan, out string TotalHours, out string TotalMinutes)
+        {
+            if (elapsedSpan.TotalHours.ToString().Split('.')[0].Length == 1)
+                TotalHours = "0" + elapsedSpan.TotalHours.ToString().Split('.')[0].ToString();
+            else
+                TotalHours = elapsedSpan.TotalHours.ToString().Split('.')[0].ToString();
+
+            if (elapsedSpan.Minutes.ToString().Split('.')[0].Length == 1)
+                TotalMinutes = "0" + elapsedSpan.Minutes.ToString().Split('.')[0].ToString();
+            else
+                TotalMinutes = elapsedSpan.Minutes.ToString().Split('.')[0].ToString();
         }
 
         [HttpPatch]
@@ -103,7 +188,6 @@ namespace TimeAPI.API.Controllroers
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<EntityMeeting>(socialViewModel);
                 modal.modified_date = _dateTime.ToString();
-
 
                 _unitOfWork.EntityMeetingParticipantsRepository.Remove(modal.id);
 
@@ -163,8 +247,7 @@ namespace TimeAPI.API.Controllroers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.EntityMeetingRepository.All();
-
+                var result = await _unitOfWork.EntityMeetingRepository.All().ConfigureAwait(false);
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -185,9 +268,7 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.EntityMeetingRepository.Find(Utils.ID);
-
-
+                var result = await _unitOfWork.EntityMeetingRepository.Find(Utils.ID).ConfigureAwait(false);
                 var config = new AutoMapper.MapperConfiguration(m => m.CreateMap<EntityMeeting, EntityMeetingViewModel>());
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<EntityMeetingViewModel>(result);
@@ -216,8 +297,7 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.EntityMeetingRepository.EntityMeetingByOrgID(Utils.ID);
-
+                var result = await _unitOfWork.EntityMeetingRepository.EntityMeetingByOrgID(Utils.ID).ConfigureAwait(false);
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -240,7 +320,7 @@ namespace TimeAPI.API.Controllroers
 
                 List<EntityMeetingViewModel> entityMeetingViewModelList = new List<EntityMeetingViewModel>();
 
-                var result = _unitOfWork.EntityMeetingRepository.EntityMeetingByEntityID(Utils.ID);
+                var result = await _unitOfWork.EntityMeetingRepository.EntityMeetingByEntityID(Utils.ID).ConfigureAwait(false);
 
                 foreach (var item in result)
                 {
@@ -260,15 +340,8 @@ namespace TimeAPI.API.Controllroers
                         participant_id = _unitOfWork.EntityMeetingParticipantsRepository.EntityMeetingParticipantsByMeetingID(id)
                                                                                        .Select(x => x.entity_or_emp_id)
                                                                                        .ToList()
-                        //created_date = item.created_date,
-                        //createdby = item.createdby,
-                        //modified_date = item.modified_date,
-                        //modifiedby = item.modifiedby,
-                        //is_deleted = item.is_deleted,
-
                     };
                     entityMeetingViewModelList.Add(entityMeetingViewModel);
-
                 }
 
                 return await Task.FromResult<object>(entityMeetingViewModelList).ConfigureAwait(false);
@@ -374,7 +447,7 @@ namespace TimeAPI.API.Controllroers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.EntityNotesRepository.All();
+                var result = await _unitOfWork.EntityNotesRepository.All().ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -396,7 +469,7 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.EntityNotesRepository.Find(Utils.ID);
+                var result = await _unitOfWork.EntityNotesRepository.Find(Utils.ID).ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -418,7 +491,7 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.EntityNotesRepository.EntityNotesByOrgID(Utils.ID);
+                var result = await _unitOfWork.EntityNotesRepository.EntityNotesByOrgID(Utils.ID).ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -440,7 +513,7 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.EntityNotesRepository.EntityNotesByEntityID(Utils.ID);
+                var result = await _unitOfWork.EntityNotesRepository.EntityNotesByEntityID(Utils.ID).ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -474,7 +547,61 @@ namespace TimeAPI.API.Controllroers
                 modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
+                var _status_id = (await _unitOfWork.StatusRepository.GetStatusByOrgID("default").ConfigureAwait(false))
+                     .Where(s => s.status_name.Equals("Completed"))
+                     .Select(s => s.id)
+                     .FirstOrDefault();
+
+                var _TotalMinutes = (Convert.ToDateTime(modal.end_time) - Convert.ToDateTime(modal.start_time)).Ticks;
+                TimeSpan elapsedSpan = new TimeSpan(_TotalMinutes);
+
+                string TotalHours;
+                string TotalMinutes;
+                ConvertHoursAndMinutes(elapsedSpan, out TotalHours, out TotalMinutes);
+
+                var modalTasks = new Domain.Entities.Tasks()
+                {
+                    id = Guid.NewGuid().ToString(),
+                    empid = socialViewModel.emp_id,
+                    project_id = modal.entity_id,
+                    task_name = modal.subject,
+                    status_id = _status_id,
+                    assigned_empid = socialViewModel.emp_id,
+                    is_local_activity = false,
+                    modifiedby = modal.createdby,
+                    created_date = _dateTime.ToString(),
+                    is_deleted = false
+                };
+
+                string _groupid = string.Empty;
+                var RecentTimesheet = await _unitOfWork.EntityMeetingRepository.GetRecentTimesheetByEmpID(socialViewModel.emp_id, _dateTime.ToString())
+                                                                               .ConfigureAwait(false);
+
+                if (RecentTimesheet == null)
+                {
+                    return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Please do checkin first for add logs." }).ConfigureAwait(false);
+                }
+                _groupid = RecentTimesheet;
+
+                TimesheetActivity timesheetActivity = new TimesheetActivity()
+                {
+                    id = Guid.NewGuid().ToString(),
+                    groupid = _groupid,
+                    project_id = modal.entity_id,
+                    task_id = modalTasks.id,
+                    task_name = modal.call_purpose,
+                    remarks = modal.call_desc,
+                    ondate = _dateTime.ToString(),
+                    start_time = modal.start_time,
+                    end_time = modal.end_time,
+                    total_hrs = string.Format(@"{0}:{1}", TotalHours, TotalMinutes),
+                    is_billable = false,
+                };
+
                 _unitOfWork.EntityCallRepository.Add(modal);
+                _unitOfWork.TaskRepository.Add(modalTasks);
+                _unitOfWork.TimesheetActivityRepository.Add(timesheetActivity);
+
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Meeting saved successfully." }).ConfigureAwait(false);
@@ -545,7 +672,7 @@ namespace TimeAPI.API.Controllroers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.EntityCallRepository.All();
+                var result = await _unitOfWork.EntityCallRepository.All().ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -567,9 +694,7 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.EntityCallRepository.Find(Utils.ID);
-
- 
+                var result = await _unitOfWork.EntityCallRepository.Find(Utils.ID).ConfigureAwait(false);
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -578,7 +703,6 @@ namespace TimeAPI.API.Controllroers
             }
         }
 
-    
         [HttpPost]
         [Route("FetchEntityCallEntityID")]
         public async Task<object> FetchEntityCallEntityID([FromBody] Utils Utils, CancellationToken cancellationToken)
@@ -591,8 +715,7 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.EntityCallRepository.EntityCallByEntityID(Utils.ID);
-
+                var result = await _unitOfWork.EntityCallRepository.EntityCallByEntityID(Utils.ID).ConfigureAwait(false);
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -749,27 +872,6 @@ namespace TimeAPI.API.Controllroers
 
         #endregion EntityHistoryLog
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         [HttpPost]
         [Route("GetAllOpenActivitiesEntityID")]
         public async Task<object> GetAllOpenActivitiesEntityID([FromBody] Utils Utils, CancellationToken cancellationToken)
@@ -782,8 +884,7 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-
-                var result = _unitOfWork.EntityMeetingRepository.GetAllOpenActivitiesEntityID(Utils.ID);
+                var result = await _unitOfWork.EntityMeetingRepository.GetAllOpenActivitiesEntityID(Utils.ID).ConfigureAwait(false);
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -804,8 +905,28 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
+                var result = await _unitOfWork.EntityMeetingRepository.GetAllCloseActivitiesEntityID(Utils.ID).ConfigureAwait(false);
+                return await Task.FromResult<object>(result).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
 
-                var result = _unitOfWork.EntityMeetingRepository.GetAllCloseActivitiesEntityID(Utils.ID);
+        [HttpPost]
+        [Route("GetLocalActivitieEntityID")]
+        public async Task<object> GetLocalActivitieEntityID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                var result = await _unitOfWork.EntityMeetingRepository.GetLocalActivitieEntityID(Utils.ID).ConfigureAwait(false);
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)

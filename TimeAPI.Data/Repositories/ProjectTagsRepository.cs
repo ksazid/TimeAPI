@@ -45,8 +45,7 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
-
-        
+                          
         public async Task<IEnumerable<ProjectTags>> All()
         {
             return await QueryAsync<ProjectTags>(
@@ -75,7 +74,6 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
-
 
         public void Update(ProjectTags entity)
         {

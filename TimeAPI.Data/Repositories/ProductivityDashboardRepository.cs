@@ -69,15 +69,6 @@ namespace TimeAPI.Data.Repositories
             string avgCheckin = string.Empty;
 
 
-            //var avgCheckin = new DateTime((long)(employeeProductivities
-            //                                     .Select(d => DateTime.Parse(d.check_in).Ticks)
-            //                                     .Average())).ToString(@"hh:mm tt");
-            //avgCheckout = new DateTime((long)employeeProductivities.Where(d => !d.check_out.Contains("-"))
-            //                                                               .Select(d => DateTime.Parse(d.check_out).Ticks)
-            //          .Average()).ToString(@"hh:mm tt");
-
-
-
             employeeProductivities.AddRange(await EmployeeProductivity(EmpID, StartDate, EndDate).ConfigureAwait(false));
 
             if (employeeProductivities.Count > 0)
@@ -471,67 +462,19 @@ namespace TimeAPI.Data.Repositories
         {
             double? temp = 0D, temp1 = 0D, tempx = 0D;
             DateTime avgCheckin = DateTime.Now, avgCheckout = DateTime.Now;
-            TimeSpan TotalDeskTimeHrs = TimeSpan.Zero;
-            TimeSpan TotalDeskTimeHrs1 = TimeSpan.Zero;
+            TimeSpan TotalDeskTimeHrs = TimeSpan.Zero, TotalDeskTimeHrs1 = TimeSpan.Zero;
 
             RootEmployeeProductivityRatio rootEmployeeProductivityRatio = new RootEmployeeProductivityRatio();
             List<Weekdays> weekdays = new List<Weekdays>();
             List<EmployeeProductivityTime> employeeProductivityTimes = new List<EmployeeProductivityTime>();
-            employeeProductivityTimes.AddRange(await EmployeeProductivityTime(EmpID, StartDate, EndDate));
+            List<EmployeeIdleTime> employeeIdleTime = new List<EmployeeIdleTime>();
 
             var data = (await FirstCheckInLastCheckout(EmpID, StartDate, EndDate).ConfigureAwait(false)).ToList();
             var employee = await EmployeeDetailByEmpID(EmpID).ConfigureAwait(false);
             weekdays.AddRange(await WorkingHoursFindByOrgID(employee.org_id).ConfigureAwait(false));
 
             if (data != null)
-            {
-                for (int d = 0; d < data.Count; d++)
-                {
-                    //CHECKIN
-                    temp += (double)Convert.ToDateTime(data[d].checkin).Ticks / (double)data.Count;
-
-                    //CHECKOUT
-                    if (!data[d].checkout.Contains("-"))
-                        temp1 += (double)Convert.ToDateTime(data[d].checkout).Ticks / (double)data.Count;
-                    else
-                    {
-                        var CheckOut = weekdays.Where(x => x.day_name == Convert.ToDateTime(data[d].ondate).DayOfWeek.ToString()).FirstOrDefault();
-                        if (CheckOut != null)
-                        {
-                            data[d].checkout = CheckOut.to_time;
-                            temp1 += (double)Convert.ToDateTime(data[d].checkout).Ticks / (double)data.Count;
-                        }
-                        else
-                        {
-                            data[d].checkout = "7:00 PM";
-                            temp1 += (double)Convert.ToDateTime(data[d].checkout).Ticks / (double)data.Count;
-                        }
-                    }
-
-                    if (data[d].desk_time != null)
-                    {
-                        string[] Time = data[d].desk_time.ToString().Split(':');
-                        TimeSpan _time_spend = new TimeSpan(0, Convert.ToInt32(Time[0]), Convert.ToInt32(Time[1]), 0);
-                        tempx += _time_spend.TotalMinutes / (double)data.Count;
-                    }
-                    else
-                    {
-                        DateTime timespan = DateTime.Parse(data[d].checkin);  //gives us a DateTime object
-                        DateTime timespan2 = DateTime.Parse(data[d].checkout);
-
-                        TimeSpan _time = timespan.TimeOfDay;  //returns a TimeSpan from the Time portion
-                        TimeSpan _time2 = timespan2.TimeOfDay;
-                        TimeSpan interval = (_time2 - _time);
-
-                        if (interval.CompareTo(TimeSpan.Zero) < 0)
-                            interval = new TimeSpan(Math.Abs(interval.Ticks));
-
-                        string[] Time = interval.ToString().Split(':');
-                        TimeSpan _time_spend = new TimeSpan(0, Convert.ToInt32(Time[0]), Convert.ToInt32(Time[1]), 0);
-                        tempx += _time_spend.TotalMinutes / (double)data.Count;
-                    }
-                }
-            }
+                AverageCheckinAndCheckout(ref temp, ref temp1, ref tempx, weekdays, data);
 
             if (temp != null && temp1 != null && tempx != null)
             {
@@ -539,79 +482,38 @@ namespace TimeAPI.Data.Repositories
                 avgCheckout = new DateTime((long)temp1);
                 TimeSpan _time_spendx = new TimeSpan(0, 0, (int)tempx, 0);
 
-                employeeProductivityTimes = employeeProductivityTimes.Where(x => Convert.ToDateTime(x.start_time) > Convert.ToDateTime(employeeProductivityTimes[0].checkin)).ToList();
-
-                if (employeeProductivityTimes.Count > 0)
-                {
-                    employeeProductivityTimes[0].checkin = avgCheckin.ToString(@"hh:mm tt");
-                    employeeProductivityTimes[0].checkout = avgCheckout.ToString(@"hh:mm tt");
-                    employeeProductivityTimes[0].desk_time = string.Format("{0:00}:{1:00}", (int)_time_spendx.TotalHours, _time_spendx.Minutes);
-                }
+                employeeProductivityTimes = await EmployeeProductivityList(EmpID, StartDate, EndDate, avgCheckin, avgCheckout, _time_spendx).ConfigureAwait(false);
+                employeeIdleTime = await EmployeeIdleList(EmpID, StartDate, EndDate, avgCheckin, avgCheckout).ConfigureAwait(false);
             }
 
-            //if (employeeProductivityTimes.Count > 0)
-            //{
-            //    employeeProductivityTimes[0].checkin = data.checkin;
-            //    employeeProductivityTimes[0].checkout = data.checkout;
-            //    employeeProductivityTimes[0].desk_time = data.desk_time;
-            //}
-
-
-            List<EmployeeIdleTime> employeeIdleTime = new List<EmployeeIdleTime>();
-            employeeIdleTime.AddRange(await EmployeeProductivityIdleTime(EmpID, StartDate, EndDate).ConfigureAwait(false));
-
-            for (int i = 0; i < employeeProductivityTimes.Count; i++)
-            {
-                List<EmployeeProductivityTrackedTime> EmployeeProductivityTrackedTime = new List<EmployeeProductivityTrackedTime>();
-                List<EmployeeProductivityTrackedTime> EmployeeProductivityIdleTrackedTime = new List<EmployeeProductivityTrackedTime>();
-
-                EmployeeProductivityTrackedTime.AddRange(await EmployeeProductivityTimeGraphFrequencyByUsageID(employeeProductivityTimes[i].id).ConfigureAwait(false));
-                employeeProductivityTimes[i].employeeProductivityTrackedTimes = EmployeeProductivityTrackedTime;
-
-
-                EmployeeProductivityIdleTrackedTime.AddRange(await EmployeeProductivityIdleGraphFrequencyByUsageID(employeeProductivityTimes[i].id).ConfigureAwait(false));
-                employeeIdleTime[i].employeeProductivityTrackedTimes = EmployeeProductivityIdleTrackedTime;
-
-                TimeSpan timeSpan = TimeSpan.ParseExact(employeeProductivityTimes[i].start_time, "c", null);
-                TimeSpan timeSpan2 = TimeSpan.ParseExact(employeeProductivityTimes[i].end_time, "c", null);
-                TimeSpan interval = (timeSpan - timeSpan2);
-
-                if (interval.CompareTo(TimeSpan.Zero) < 0)
-                    interval = new TimeSpan(Math.Abs(interval.Ticks));
-
-                TimeSpan TotalWorkedHrs = TimeSpan.Zero;
-                if (timeSpan != null && timeSpan2 != null)
-                {
-                    for (int x = 0; x < EmployeeProductivityTrackedTime.Count; x++)
-                    {
-                        string[] Time = EmployeeProductivityTrackedTime[x].time_spend.ToString().Split(':');
-                        TimeSpan _time_spend = new TimeSpan(0, 0, Convert.ToInt32(Time[0]), Convert.ToInt32(Time[1]));
-                        TotalWorkedHrs += _time_spend;
-                    }
-
-                    var ticks = (TotalWorkedHrs.TotalSeconds * 100 / (interval.TotalSeconds));
-                    employeeProductivityTimes[i].productive_ratio = ticks.ToString();
-                }
-
-                TimeSpan IdleWorkedHrs = TimeSpan.Zero;
-                if (timeSpan != null && timeSpan2 != null)
-                {
-                    for (int x = 0; x < EmployeeProductivityIdleTrackedTime.Count; x++)
-                    {
-                        string[] Time = EmployeeProductivityIdleTrackedTime[x].time_spend.ToString().Split(':');
-                        TimeSpan _time_spend = new TimeSpan(0, 0, Convert.ToInt32(Time[0]), Convert.ToInt32(Time[1]));
-                        IdleWorkedHrs += _time_spend;
-                    }
-
-                    var Idleticks = (IdleWorkedHrs.TotalSeconds * 100 / (interval.TotalSeconds));
-                    employeeIdleTime[i].productive_ratio = Idleticks.ToString();
-                }
-            }
+            await CalcProductivAndIdleTime(employeeProductivityTimes, employeeIdleTime).ConfigureAwait(false);
 
             rootEmployeeProductivityRatio.employeeProductivityTime = employeeProductivityTimes;
             rootEmployeeProductivityRatio.employeeIdleTime = employeeIdleTime;
 
             return rootEmployeeProductivityRatio;
+        }
+
+        public async Task<dynamic> EmployeeAppTrackedByEmpIDAndDate(string EmpID, string StartDate, string EndDate)
+        {
+            return await QueryAsync<dynamic>(
+                 sql: @" SELECT
+			            employee_app_tracked.app_category_name 
+			            ,CONVERT(varchar(5), DATEADD(MINUTE, SUM(DATEDIFF(MINUTE, 0, employee_app_tracked.time_spend)), 0), 114) as time_spend,
+			            employee_app_tracked.icon
+			            FROM employee_app_tracked
+			            WHERE
+				            FORMAT(CAST(created_date AS DATE), 'MM/dd/yyyy', 'EN-US') 
+				            BETWEEN FORMAT(CAST(@StartDate AS DATE), 'MM/dd/yyyy', 'EN-US') 
+				            AND FORMAT(CAST(@EndDate AS DATE), 'MM/dd/yyyy', 'EN-US')
+				            AND employee_app_tracked.app_name <> ' ' 
+				            AND employee_app_tracked.app_name <> 'Private Time' 
+				            AND employee_app_tracked.app_name <> 'unknown' 
+				            AND employee_app_tracked.app_name <> 'Idle' 
+				            AND emp_id = @EmpID
+				            GROUP BY employee_app_tracked.app_category_name, icon",
+                 param: new { EmpID, StartDate, EndDate }
+             );
         }
 
         public async Task<IEnumerable<EmployeeProductivityTrackedTime>> EmployeeProductivityTimeGraphFrequencyByUsageID(string UsageID)
@@ -659,6 +561,9 @@ namespace TimeAPI.Data.Repositories
                         );
         }
 
+        #region PrivateMethod
+
+       
         private async Task<IEnumerable<EmployeeProductivityTime>> EmployeeProductivityTime(string EmpID, string StartDate, string EndDate)
         {
             return await QueryAsync<EmployeeProductivityTime>(
@@ -686,7 +591,7 @@ namespace TimeAPI.Data.Repositories
                                         id 
                                     )
 	                                ORDER BY
-                                    FORMAT(CAST(ondate AS datetime2), N'dd-MMM-yyyy HH:mm:ss', 'EN-US') ASC",
+                                    FORMAT(CAST(employee_app_usage.start_time AS datetime2), N'HH:mm:ss', 'EN-US')",
                         param: new { EmpID, StartDate, EndDate }
                         );
         }
@@ -718,31 +623,9 @@ namespace TimeAPI.Data.Repositories
                                         id 
                                     )
 	                                ORDER BY
-                                    FORMAT(CAST(ondate AS datetime2), N'dd-MMM-yyyy HH:mm:ss', 'EN-US') ASC",
-                            param: new { EmpID, StartDate, EndDate }
+                                    FORMAT(CAST(employee_app_usage.start_time AS datetime2), N'HH:mm:ss', 'EN-US')",
+                        param: new { EmpID, StartDate, EndDate }
                          );
-        }
-
-        public async Task<dynamic> EmployeeAppTrackedByEmpIDAndDate(string EmpID, string StartDate, string EndDate)
-        {
-            return await QueryAsync<dynamic>(
-                 sql: @" SELECT
-			            employee_app_tracked.app_category_name 
-			            ,CONVERT(varchar(5), DATEADD(MINUTE, SUM(DATEDIFF(MINUTE, 0, employee_app_tracked.time_spend)), 0), 114) as time_spend,
-			            employee_app_tracked.icon
-			            FROM employee_app_tracked
-			            WHERE
-				            FORMAT(CAST(created_date AS DATE), 'MM/dd/yyyy', 'EN-US') 
-				            BETWEEN FORMAT(CAST(@StartDate AS DATE), 'MM/dd/yyyy', 'EN-US') 
-				            AND FORMAT(CAST(@EndDate AS DATE), 'MM/dd/yyyy', 'EN-US')
-				            AND employee_app_tracked.app_name <> ' ' 
-				            AND employee_app_tracked.app_name <> 'Private Time' 
-				            AND employee_app_tracked.app_name <> 'unknown' 
-				            AND employee_app_tracked.app_name <> 'Idle' 
-				            AND emp_id = @EmpID
-				            GROUP BY employee_app_tracked.app_category_name, icon",
-                 param: new { EmpID, StartDate, EndDate }
-             );
         }
 
         private async Task<IEnumerable<EmployeeFirstCheckInLastCheckout>> FirstCheckInLastCheckout(string EmpID, string StartDate, string EndDate)
@@ -814,7 +697,142 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
+
+        private async Task CalcProductivAndIdleTime(List<EmployeeProductivityTime> employeeProductivityTimes, List<EmployeeIdleTime> employeeIdleTime)
+        {
+            for (int i = 0; i < employeeProductivityTimes.Count; i++)
+            {
+                List<EmployeeProductivityTrackedTime> EmployeeProductivityTrackedTime = new List<EmployeeProductivityTrackedTime>();
+                List<EmployeeProductivityTrackedTime> EmployeeProductivityIdleTrackedTime = new List<EmployeeProductivityTrackedTime>();
+
+                EmployeeProductivityTrackedTime.AddRange(await EmployeeProductivityTimeGraphFrequencyByUsageID(employeeProductivityTimes[i].id).ConfigureAwait(false));
+                employeeProductivityTimes[i].employeeProductivityTrackedTimes = EmployeeProductivityTrackedTime;
+
+
+                EmployeeProductivityIdleTrackedTime.AddRange(await EmployeeProductivityIdleGraphFrequencyByUsageID(employeeProductivityTimes[i].id).ConfigureAwait(false));
+                employeeIdleTime[i].employeeProductivityTrackedTimes = EmployeeProductivityIdleTrackedTime;
+
+                TimeSpan timeSpan = TimeSpan.ParseExact(employeeProductivityTimes[i].start_time, "c", null);
+                TimeSpan timeSpan2 = TimeSpan.ParseExact(employeeProductivityTimes[i].end_time, "c", null);
+                TimeSpan interval = (timeSpan - timeSpan2);
+
+                if (interval.CompareTo(TimeSpan.Zero) < 0)
+                    interval = new TimeSpan(Math.Abs(interval.Ticks));
+
+                TimeSpan TotalWorkedHrs = TimeSpan.Zero;
+                if (timeSpan != null && timeSpan2 != null)
+                {
+                    for (int x = 0; x < EmployeeProductivityTrackedTime.Count; x++)
+                    {
+                        string[] Time = EmployeeProductivityTrackedTime[x].time_spend.ToString().Split(':');
+                        TimeSpan _time_spend = new TimeSpan(0, 0, Convert.ToInt32(Time[0]), Convert.ToInt32(Time[1]));
+                        TotalWorkedHrs += _time_spend;
+                    }
+
+                    var ticks = (TotalWorkedHrs.TotalSeconds * 100 / (interval.TotalSeconds));
+                    employeeProductivityTimes[i].productive_ratio = ticks.ToString();
+                }
+
+                TimeSpan IdleWorkedHrs = TimeSpan.Zero;
+                if (timeSpan != null && timeSpan2 != null)
+                {
+                    for (int x = 0; x < EmployeeProductivityIdleTrackedTime.Count; x++)
+                    {
+                        string[] Time = EmployeeProductivityIdleTrackedTime[x].time_spend.ToString().Split(':');
+                        TimeSpan _time_spend = new TimeSpan(0, 0, Convert.ToInt32(Time[0]), Convert.ToInt32(Time[1]));
+                        IdleWorkedHrs += _time_spend;
+                    }
+
+                    var Idleticks = (IdleWorkedHrs.TotalSeconds * 100 / (interval.TotalSeconds));
+                    employeeIdleTime[i].productive_ratio = Idleticks.ToString();
+                }
+            }
+        }
+
+        private async Task<List<EmployeeIdleTime>> EmployeeIdleList(string EmpID, string StartDate, string EndDate, DateTime avgCheckin, DateTime avgCheckout)
+        {
+            List<EmployeeIdleTime> employeeIdleTimes = new List<EmployeeIdleTime>();
+            employeeIdleTimes.AddRange((await EmployeeProductivityIdleTime(EmpID, StartDate, EndDate).ConfigureAwait(false))
+                                                    .Where(x =>
+                                                    Convert.ToDateTime(Convert.ToDateTime(x.start_time).ToString(@"HH:mm")) >= Convert.ToDateTime(avgCheckin.ToString(@"HH:mm")) &&
+                                                    Convert.ToDateTime(Convert.ToDateTime(x.start_time).ToString(@"HH:mm")) <= Convert.ToDateTime(avgCheckout.ToString(@"HH:mm"))
+                                                    ).ToList());
+            return employeeIdleTimes;
+        }
+
+        private async Task<List<EmployeeProductivityTime>> EmployeeProductivityList(string EmpID, string StartDate, string EndDate, DateTime avgCheckin, DateTime avgCheckout, TimeSpan _time_spendx)
+        {
+            List<EmployeeProductivityTime> employeeProductivityTimes = new List<EmployeeProductivityTime>();
+            employeeProductivityTimes.AddRange((await EmployeeProductivityTime(EmpID, StartDate, EndDate).ConfigureAwait(false))
+                                                .Where(x =>
+                                                    Convert.ToDateTime(Convert.ToDateTime(x.start_time).ToString(@"HH:mm")) >= Convert.ToDateTime(avgCheckin.ToString(@"HH:mm")) &&
+                                                    Convert.ToDateTime(Convert.ToDateTime(x.start_time).ToString(@"HH:mm")) <= Convert.ToDateTime(avgCheckout.ToString(@"HH:mm"))
+                                                ).ToList());
+
+            if (employeeProductivityTimes.Count > 0)
+            {
+                employeeProductivityTimes[0].checkin = avgCheckin.ToString(@"hh:mm tt");
+                employeeProductivityTimes[0].checkout = avgCheckout.ToString(@"hh:mm tt");
+                employeeProductivityTimes[0].desk_time = string.Format("{0:00}:{1:00}", (int)_time_spendx.TotalHours, _time_spendx.Minutes);
+            }
+
+            return employeeProductivityTimes;
+        }
+
+        private static void AverageCheckinAndCheckout(ref double? temp, ref double? temp1, ref double? tempx, List<Weekdays> weekdays, List<EmployeeFirstCheckInLastCheckout> data)
+        {
+            for (int d = 0; d < data.Count; d++)
+            {
+                //CHECKIN
+                temp += (double)Convert.ToDateTime(data[d].checkin).Ticks / (double)data.Count;
+
+                //CHECKOUT
+                if (!data[d].checkout.Contains("-"))
+                    temp1 += (double)Convert.ToDateTime(data[d].checkout).Ticks / (double)data.Count;
+                else
+                {
+                    var CheckOut = weekdays.Where(x => x.day_name == Convert.ToDateTime(data[d].ondate).DayOfWeek.ToString()).FirstOrDefault();
+                    if (CheckOut != null)
+                    {
+                        data[d].checkout = CheckOut.to_time;
+                        temp1 += (double)Convert.ToDateTime(data[d].checkout).Ticks / (double)data.Count;
+                    }
+                    else
+                    {
+                        data[d].checkout = "7:00 PM";
+                        temp1 += (double)Convert.ToDateTime(data[d].checkout).Ticks / (double)data.Count;
+                    }
+                }
+
+                if (data[d].desk_time != null)
+                {
+                    string[] Time = data[d].desk_time.ToString().Split(':');
+                    TimeSpan _time_spend = new TimeSpan(0, Convert.ToInt32(Time[0]), Convert.ToInt32(Time[1]), 0);
+                    tempx += _time_spend.TotalMinutes / (double)data.Count;
+                }
+                else
+                {
+                    DateTime timespan = DateTime.Parse(data[d].checkin);  //gives us a DateTime object
+                    DateTime timespan2 = DateTime.Parse(data[d].checkout);
+
+                    TimeSpan _time = timespan.TimeOfDay;  //returns a TimeSpan from the Time portion
+                    TimeSpan _time2 = timespan2.TimeOfDay;
+                    TimeSpan interval = (_time2 - _time);
+
+                    if (interval.CompareTo(TimeSpan.Zero) < 0)
+                        interval = new TimeSpan(Math.Abs(interval.Ticks));
+
+                    string[] Time = interval.ToString().Split(':');
+                    TimeSpan _time_spend = new TimeSpan(0, Convert.ToInt32(Time[0]), Convert.ToInt32(Time[1]), 0);
+                    tempx += _time_spend.TotalMinutes / (double)data.Count;
+                }
+            }
+        }
+
+        #endregion PrivateMethod
     }
+
+    #region LocalClass
 
     public class RootEmployeeProductivityRatio
     {
@@ -875,4 +893,6 @@ namespace TimeAPI.Data.Repositories
         public string time_spend_activity { get; set; }
         public string productivity_ratio { get; set; }
     }
+
+    #endregion LocalClass
 }

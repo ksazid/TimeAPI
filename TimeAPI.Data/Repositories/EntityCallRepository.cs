@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -22,24 +23,24 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public EntityCall Find(string key)
+        public async Task< EntityCall> Find(string key)
         {
-            return QuerySingleOrDefault<EntityCall>(
+            return await QuerySingleOrDefaultAsync<EntityCall>(
                 sql: "SELECT * FROM dbo.entity_call WHERE id = @key and is_deleted = 0",
                 param: new { key }
             );
         }
 
-        public IEnumerable<EntityCall> All()
+        public async Task<IEnumerable<EntityCall>> All()
         {
-            return Query<EntityCall>(
+            return await QueryAsync<EntityCall>(
                 sql: "SELECT * FROM dbo.entity_call where is_deleted = 0"
             );
         }
 
-        public dynamic EntityCallByEntityID(string key)
+        public async Task<dynamic> EntityCallByEntityID(string key)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                 sql: @"SELECT * FROM dbo.entity_call
                         WHERE is_deleted = 0 
                         AND entity_id =  @key",

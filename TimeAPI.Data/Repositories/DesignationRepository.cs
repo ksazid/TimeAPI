@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -21,9 +22,9 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public Designation Find(string key)
+        public async Task< Designation> Find(string key)
         {
-            return QuerySingleOrDefault<Designation>(
+            return await QuerySingleOrDefaultAsync<Designation>(
                 sql: @"SELECT * FROM dbo.designation WITH (NOLOCK)
                         WHERE is_deleted = 0 and id = @key",
                 param: new { key }
@@ -57,27 +58,27 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<Designation> All()
+        public async Task<IEnumerable<Designation>> All()
         {
-            return Query<Designation>(
+            return await QueryAsync<Designation>(
                 sql: @"SELECT * FROM [dbo].[designation] WITH (NOLOCK)
                             WHERE is_deleted = 0
                             ORDER BY designation.designation_name ASC"
             );
         }
 
-        public Designation FindByDesignationName(string dep_name)
+        public async Task<Designation> FindByDesignationName(string dep_name)
         {
-            return QuerySingleOrDefault<Designation>(
+            return await QuerySingleOrDefaultAsync<Designation>(
                 sql: @"SELECT * FROM [dbo].[designation] WITH (NOLOCK)
                         WHERE designation_name = @designation_name and is_deleted = 0",
                 param: new { dep_name }
             );
         }
 
-        public Designation FindByDesignationAlias(string alias)
+        public async Task<Designation> FindByDesignationAlias(string alias)
         {
-            return QuerySingleOrDefault<Designation>(
+            return await QuerySingleOrDefaultAsync<Designation>(
                 sql: @"SELECT * FROM [dbo].[designation] WITH (NOLOCK)
                                 WHERE alias = @alias and is_deleted = 0
                                 ORDER BY designation.designation_name ASC",
@@ -85,9 +86,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<Designation> FindDesignationByDeptID(string dep_id)
+        public async Task<IEnumerable<Designation>> FindDesignationByDeptID(string dep_id)
         {
-            return Query<Designation>(
+            return await QueryAsync<Designation>(
                 sql: @"SELECT * FROM [dbo].[designation] WITH (NOLOCK)
                             WHERE dep_id = @dep_id and is_deleted = 0
                             ORDER BY designation.designation_name ASC",
@@ -95,9 +96,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public dynamic FetchGridDataByDesignationByDeptOrgID(string key)
+        public async Task<dynamic> FetchGridDataByDesignationByDeptOrgID(string key)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                    sql: @"SELECT
                             ROW_NUMBER() OVER (ORDER BY department.dep_name) AS rowno,
 	                        designation.id,
@@ -112,9 +113,9 @@ namespace TimeAPI.Data.Repositories
                );
         }
 
-        public dynamic GetAllDesignationByOrgID(string key)
+        public async Task<dynamic> GetAllDesignationByOrgID(string key)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                    sql: @"SELECT
 	                        designation.id,
                             department.dep_name,

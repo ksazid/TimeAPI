@@ -237,7 +237,7 @@ namespace TimeAPI.Data.Repositories
                 avgCheckout = new DateTime((long)temp1);
                 TimeSpan _time_spendx = new TimeSpan(0, 0, (int)tempx, 0);
 
-                employeeProductivityTimes = employeeProductivityTimes.Where(x => Convert.ToDateTime(x.start_time) > Convert.ToDateTime(employeeProductivityTimes[0].checkin)).ToList();
+                employeeProductivityTimes = employeeProductivityTimes.Where(x => Convert.ToDateTime(x.start_time) > Convert.ToDateTime(avgCheckin.ToString(@"hh:mm tt"))).ToList();
 
                 if (employeeProductivityTimes.Count > 0)
                 {
@@ -246,6 +246,9 @@ namespace TimeAPI.Data.Repositories
                     employeeProductivityTimes[0].desk_time = string.Format("{0:00}:{1:00}", (int)_time_spendx.TotalHours, _time_spendx.Minutes);
                 }
             }
+
+            //employeeProductivityTimes = employeeProductivityTimes.Where(x => Convert.ToDateTime(x.start_time) > Convert.ToDateTime(employeeProductivityTimes[0].checkin)).ToList();
+
 
             for (int i = 0; i < employeeProductivityTimes.Count; i++)
             {

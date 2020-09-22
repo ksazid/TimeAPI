@@ -20,10 +20,10 @@ namespace TimeAPI.Data.Repositories
                     param: entity
                 );
         }
-
+                                                         
         public ProjectType Find(string key)
         {
-            return QuerySingleOrDefault<ProjectType>(
+            return QuerySingleOrDefault<ProjectType>(   
                 sql: "SELECT * FROM dbo.project_type WHERE is_deleted = 0 and id = @key",
                 param: new { key }
             );

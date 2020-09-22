@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -22,9 +23,9 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public EmployeeAppUsage Find(string key)
+        public async Task<EmployeeAppUsage> Find(string key)
         {
-            return QuerySingleOrDefault<EmployeeAppUsage>(
+            return await QuerySingleOrDefaultAsync<EmployeeAppUsage>(
                 sql: "SELECT * FROM dbo.employee_app_usage WHERE id = @key and  is_deleted = 0",
                 param: new { key }
             );
@@ -58,16 +59,16 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<EmployeeAppUsage> All()
+        public async Task<IEnumerable<EmployeeAppUsage>> All()
         {
-            return Query<EmployeeAppUsage>(
+            return await QueryAsync<EmployeeAppUsage>(
                 sql: "SELECT * FROM dbo.employee_app_usage where is_deleted = 0"
             );
         }
 
-        public EmployeeAppUsage FindEmployeeAppUsageEmpID(string key)
+        public async Task<EmployeeAppUsage> FindEmployeeAppUsageEmpID(string key)
         {
-            return QuerySingleOrDefault<EmployeeAppUsage>(
+            return await QuerySingleOrDefaultAsync<EmployeeAppUsage>(
                 sql: "SELECT * FROM dbo.employee_app_usage WHERE emp_id = @key and  is_deleted = 0",
                 param: new { key }
             );

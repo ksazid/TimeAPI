@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -24,32 +25,32 @@ namespace TimeAPI.Data.Repositories
                     );
         }
 
-        public Employee Find(string key)
+        public async Task<Employee> Find(string key)
         {
-            return QuerySingleOrDefault<Employee>(
+            return await QuerySingleOrDefaultAsync<Employee>(
                 sql: "SELECT * FROM [dbo].[employee] WHERE id = @key and is_deleted = 0",
                 param: new { key }
             );
         }
 
-        public Employee FindByEmpUserID(string key)
+        public async Task<Employee> FindByEmpUserID(string key)
         {
-            return QuerySingleOrDefault<Employee>(
+            return await QuerySingleOrDefaultAsync<Employee>(
                 sql: "SELECT * FROM [dbo].[employee] WHERE user_id = @key and is_deleted = 0",
                 param: new { key }
             );
         }
 
-        public IEnumerable<Employee> All()
+        public async Task<IEnumerable<Employee>> All()
         {
-            return Query<Employee>(
+            return await QueryAsync<Employee>(
                 sql: "SELECT * FROM [dbo].[employee] where is_deleted = 0"
             );
         }
 
         public void Remove(string key)
         {
-            Execute(
+             Execute(
                 sql: @"UPDATE dbo.employee
                    SET
                        modified_date = GETDATE(), is_deleted = 1
@@ -58,9 +59,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public void RemovePermanent(string key)
+        public async Task RemovePermanent(string key)
         {
-            Execute(
+           await ExecuteAsync(
                 sql: @"DELETE  
                         dbo.employee 
                     WHERE id = @key",
@@ -70,7 +71,7 @@ namespace TimeAPI.Data.Repositories
 
         public void Update(Employee entity)
         {
-            Execute(
+             Execute(
                 sql: @"UPDATE dbo.employee
                    SET
                        deptid = @deptid, full_name = @full_name, first_name = @first_name, last_name = @last_name, alias = @alias,
@@ -83,9 +84,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public void SetEmpPasswordResetByUserID(string key)
+        public async Task SetEmpPasswordResetByUserID(string key)
         {
-            Execute(
+             await ExecuteAsync(
                 sql: @"UPDATE dbo.employee
                    SET
                       is_password_reset = 1
@@ -94,41 +95,41 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public Employee FindByEmpName(string full_name)
+        public async Task<Employee> FindByEmpName(string full_name)
         {
-            return QuerySingleOrDefault<Employee>(
+            return await QuerySingleOrDefaultAsync<Employee>(
                 sql: "SELECT * FROM [dbo].[employee] WHERE full_name = @full_name and is_deleted = 0",
                 param: new { full_name }
             );
         }
 
-        public IEnumerable<Employee> FindByOrgIDCode(string OrgID)
+        public async Task<IEnumerable<Employee>> FindByOrgIDCode(string OrgID)
         {
-            return Query<Employee>(
+            return await QueryAsync<Employee>(
                 sql: "SELECT * FROM [dbo].[employee] WHERE org_id = @OrgID and is_deleted = 0",
                 param: new { OrgID }
             );
         }
 
-        public Employee FindByEmpCode(string emp_code)
+        public async Task<Employee> FindByEmpCode(string emp_code)
         {
-            return QuerySingleOrDefault<Employee>(
+            return await QuerySingleOrDefaultAsync<Employee>(
                 sql: "SELECT * FROM [dbo].[employee] WHERE emp_code = @emp_code and is_deleted = 0",
                 param: new { emp_code }
             );
         }
 
-        public IEnumerable<Employee> FindByRoleName(string role)
+        public async Task<IEnumerable<Employee>> FindByRoleName(string role)
         {
-            return Query<Employee>(
+            return await QueryAsync<Employee>(
                 sql: "SELECT * FROM [dbo].[employee] WHERE role_id = @role and is_deleted = 0",
                 param: new { role }
             );
         }
 
-        public dynamic FetchGridDataEmployeeByOrgID(string key)
+        public async Task<dynamic> FetchGridDataEmployeeByOrgID(string key)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                    sql: @"SELECT
                             ROW_NUMBER() OVER (ORDER BY employee.full_name) AS rowno,
 	                        employee.id,
@@ -156,9 +157,9 @@ namespace TimeAPI.Data.Repositories
                );
         }
 
-        public dynamic FindEmployeeListByDesignationID(string DesignationID)
+        public async Task<dynamic> FindEmployeeListByDesignationID(string DesignationID)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                 sql: @"SELECT  employee.id, employee.full_name FROM dbo.employee
                             INNER JOIN designation ON employee.designation_id = designation.id
                         WHERE  employee.is_deleted = 0
@@ -169,9 +170,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public dynamic FindEmployeeListByDepartmentID(string DepartmentID)
+        public async Task<dynamic> FindEmployeeListByDepartmentID(string DepartmentID)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                 sql: @"SELECT employee.id, employee.full_name FROM dbo.employee
                         INNER JOIN department ON employee.deptid = department.id
                         WHERE  employee.is_deleted = 0
@@ -182,9 +183,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public dynamic FindEmpDepartDesignByEmpID(string key)
+        public async Task<dynamic> FindEmpDepartDesignByEmpID(string key)
         {
-            return QuerySingleOrDefault<dynamic>(
+            return await QuerySingleOrDefaultAsync<dynamic>(
                    sql: @"	SELECT
 	                        employee.id,
 	                        employee.full_name,
@@ -206,9 +207,9 @@ namespace TimeAPI.Data.Repositories
                );
         }
 
-        public dynamic GetAllOutsourcedEmpByOrgID(string OrgID)
+        public async Task<dynamic> GetAllOutsourcedEmpByOrgID(string OrgID)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                 sql: @"select employee.id, employee.full_name from employee
                         INNER JOIN employee_type on employee.emp_type_id = employee_type.id
                         WHERE UPPER(employee_type.employee_type_name) = 'OUTSOURCED'
@@ -218,9 +219,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public dynamic GetAllFreelancerEmpByOrgID(string OrgID)
+        public async Task<dynamic> GetAllFreelancerEmpByOrgID(string OrgID)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                 sql: @"select employee.id, employee.full_name from employee
                         INNER JOIN employee_type on employee.emp_type_id = employee_type.id
                         WHERE UPPER(employee_type.employee_type_name) = 'FREELANCER'
@@ -230,9 +231,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public dynamic FindEmpDepartDesignByTeamID(string key)
+        public async Task<dynamic> FindEmpDepartDesignByTeamID(string key)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                    sql: @" SELECT
 	                        employee.id,
 	                        employee.full_name,
@@ -255,9 +256,9 @@ namespace TimeAPI.Data.Repositories
                );
         }
 
-        public void SetEmployeeInactiveByEmpID(string key)
+        public async Task SetEmployeeInactiveByEmpID(string key)
         {
-            Execute(
+             await ExecuteAsync(
                 sql: @"UPDATE dbo.employee
                    SET
                     is_inactive = 1
@@ -266,9 +267,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public void SetDelegateeAsAdminByEmpID(string key)
+        public async Task SetDelegateeAsAdminByEmpID(string key)
         {
-            Execute(
+             await ExecuteAsync(
                 sql: @"UPDATE dbo.employee
                    SET
                    is_admin = 1,
@@ -278,9 +279,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public void SetDelegateeAsSuperAdminByEmpID(string key)
+        public async Task SetDelegateeAsSuperAdminByEmpID(string key)
         {
-            Execute(
+             await ExecuteAsync(
                 sql: @"UPDATE dbo.employee
                    SET
                    is_superadmin = 1,
@@ -290,9 +291,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public void RemoveSuperAdminRightByEmpID(string key)
+        public async Task RemoveSuperAdminRightByEmpID(string key)
         {
-            Execute(
+             await ExecuteAsync(
                 sql: @"UPDATE dbo.employee
                    SET
                    is_superadmin = 0,
@@ -302,9 +303,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public void RemoveAdminRightByEmpID(string key)
+        public async Task RemoveAdminRightByEmpID(string key)
         {
-            Execute(
+             await ExecuteAsync(
                 sql: @"UPDATE dbo.employee
                    SET
                    is_admin = 0,
@@ -314,31 +315,27 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public int RemoveEmployeeIfZeroActivity(string key)
+        public async Task<int> RemoveEmployeeIfZeroActivity(string key)
         {
-            return QuerySingleOrDefault<int>(
+            return await QuerySingleOrDefaultAsync<int>(
               sql: @"SELECT				
-
                    COUNT(dbo.timesheet_activity.id) as CoutActivity
                 FROM
                     dbo.timesheet_activity  with(nolock)
                     INNER JOIN project on project.id = [timesheet_activity].project_id
                     INNER JOIN project_activity on project_activity.id =[timesheet_activity].milestone_id
                     LEFT JOIN task on dbo.timesheet_activity.task_id = task.id
-
                     INNER JOIN timesheet on dbo.timesheet_activity.groupid = timesheet.groupid
-
                     INNER JOIN timesheet_x_project_category on timesheet_x_project_category.groupid = dbo.timesheet_activity.groupid
-
                     AND dbo.timesheet_activity.is_deleted = 0
                     AND timesheet.empid = @key",
               param: new { key }
           );
         }
 
-        public dynamic GetOrganizationScreenshotDetails(string key)
+        public async Task<dynamic> GetOrganizationScreenshotDetails(string key)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                    sql: @" 	SELECT
 				                employee.id as empid,
 				                employee.org_id,
@@ -364,6 +361,10 @@ namespace TimeAPI.Data.Repositories
                       param: new { key }
                );
         }
-        
+
+        //Task IEmployeeRepository.RemoveSuperAdminRightByEmpID(string key)
+        //{
+        //    throw new System.NotImplementedException();
+        //}
     }
 }

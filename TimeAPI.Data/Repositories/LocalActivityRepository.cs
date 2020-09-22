@@ -10,6 +10,7 @@ namespace TimeAPI.Data.Repositories
         public LocalActivityRepository(IDbTransaction transaction)
            : base(transaction)
         { }
+
         public void Add(LocalActivity entity)
         {
             entity.id = ExecuteScalar<string>(

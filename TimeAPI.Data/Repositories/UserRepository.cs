@@ -250,7 +250,8 @@ namespace TimeAPI.Data.Repositories
 
                 TimesheetDataModelList.AddRange(await GetTimesheetDataModel(item));
 
-                TimesheetDataModelList.Select(async d => d.viewLogDataModels = (await GetTimesheetActivityByGroupAndProjectID(d.groupid, "", d.ondate)).ToList())
+                TimesheetDataModelList.Select(async d => d.viewLogDataModels = 
+                                            (await GetTimesheetActivityByGroupAndProjectID(d.groupid, "", d.ondate)).ToList())
                                             .ToList();
 
                 MembersList.AddRange(TimesheetDataModelList.Select(x => x.emp_name));

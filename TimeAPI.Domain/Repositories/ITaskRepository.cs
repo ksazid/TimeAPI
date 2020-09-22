@@ -16,6 +16,6 @@ namespace TimeAPI.Domain.Repositories
 
         Task<RootEmployeeTask> GetAllTaskByEmpID(string empid, string date);
 
-        Task<RootEmployeeTask> GetAllTaskByOrgAndEmpID(string key, string EmpID);
+        Task<RootEmployeeTask> GetAllTaskByOrgAndEmpID(string key, string EmpID, string date);
     }
 }

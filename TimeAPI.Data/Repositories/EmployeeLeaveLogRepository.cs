@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -22,17 +23,17 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public EmployeeLeaveLog Find(string key)
+        public async Task<EmployeeLeaveLog> Find(string key)
         {
-            return QuerySingleOrDefault<EmployeeLeaveLog>(
+            return await QuerySingleOrDefaultAsync<EmployeeLeaveLog>(
                 sql: "SELECT * FROM dbo.employee_leave_log WHERE id = @key and is_deleted = 0",
                 param: new { key }
             );
         }
 
-        public dynamic FetchEmployeeLeaveLogHistoryEmpID(string key)
+        public async Task<dynamic> FetchEmployeeLeaveLogHistoryEmpID(string key)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                 sql: @"SELECT 
                         leave_status.leave_status_name, employee_leave_log.* from employee_leave_log 
                         INNER JOIN employee_leave on employee_leave_log.emp_leave_id = employee_leave.id
@@ -43,9 +44,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<EmployeeLeaveLog> All()
+        public async Task<IEnumerable<EmployeeLeaveLog>> All()
         {
-            return Query<EmployeeLeaveLog>(
+            return await QueryAsync<EmployeeLeaveLog>(
                 sql: "SELECT * FROM dbo.employee_leave_log where is_deleted = 0"
             );
         }
@@ -82,9 +83,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public void UpdateApprovedByID(EmployeeLeaveLog entity)
+        public async Task UpdateApprovedByID(EmployeeLeaveLog entity)
         {
-            Execute(
+            await ExecuteAsync(
                 sql: @"UPDATE dbo.employee_leave_log
                            SET 
                             is_approved = @is_approved, 

@@ -35,6 +35,12 @@ namespace TimeAPI.API.Models
         public string ID { get; set; }
     }
 
+    public class UtilsEntityAndCstID
+    {
+        public string EntityID { get; set; }
+        public string CstID { get; set; }
+    }
+
     public class UtilsGroupIDAndDate
     {
         public string ID { get; set; }
@@ -175,6 +181,13 @@ namespace TimeAPI.API.Models
         public string StartDate { get; set; }
         public string EndDate { get; set; }
     }
+
+    public class UtilsIDAndDate
+    {
+        public string ID { get; set; }
+        public string Date { get; set; }
+    }
+
     public class UtilsDateAndOrgID
     {
         public string OrgID { get; set; }

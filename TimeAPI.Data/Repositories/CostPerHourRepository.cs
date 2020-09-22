@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -21,25 +22,25 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public CostPerHour Find(string key)
+        public async Task<CostPerHour> Find(string key)
         {
-            return QuerySingleOrDefault<CostPerHour>(
+            return await QuerySingleOrDefaultAsync<CostPerHour>(
                 sql: "SELECT * FROM dbo.cost_per_hour WHERE id = @key and is_deleted = 0",
                 param: new { key }
             );
         }
 
-        public IEnumerable<CostPerHour> FetchCostPerHourOrgID(string key)
+        public async Task<IEnumerable<CostPerHour>> FetchCostPerHourOrgID(string key)
         {
-            return Query<CostPerHour>(
+            return await QueryAsync<CostPerHour>(
                 sql: "SELECT * FROM dbo.cost_per_hour WHERE org_id = @key and is_deleted = 0",
                 param: new { key }
             );
         }
 
-        public IEnumerable<CostPerHour> All()
+        public async Task<IEnumerable<CostPerHour>> All()
         {
-            return Query<CostPerHour>(
+            return await QueryAsync<CostPerHour>(
                 sql: "SELECT * FROM dbo.cost_per_hour where is_deleted = 0"
             );
         }

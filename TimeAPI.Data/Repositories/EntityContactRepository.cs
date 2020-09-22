@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
@@ -24,7 +25,7 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public async Task< EntityContact> Find(string key)
+        public async Task<EntityContact> Find(string key)
         {
             return await QuerySingleOrDefaultAsync<EntityContact>(
                 sql: "SELECT * FROM entity_contact WHERE is_deleted = 0 and id = @key",
@@ -47,7 +48,26 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
-        
+
+        public async Task<IEnumerable<EntityContact>> GetAllEntityContactByEntityIDAndCstID(string EntityID, string CstID)
+        {
+            List<EntityContact> _EntityContact = new List<EntityContact>();
+            var entityContacts1 = await QueryAsync<EntityContact>(
+                sql: "SELECT * FROM [dbo].[entity_contact] where is_deleted = 0 AND entity_id = @EntityID AND is_primary = 1",
+                param: new { EntityID }
+            );
+
+            var entityContacts2 = await QueryAsync<EntityContact>(
+             sql: "SELECT * FROM [dbo].[entity_contact] where is_deleted = 0 AND entity_id = @CstID",
+             param: new { CstID }
+            );
+
+            _EntityContact.AddRange(entityContacts1);
+            _EntityContact.AddRange(entityContacts2);
+
+            return _EntityContact;
+        }
+
         public void Remove(string key)
         {
             Execute(
@@ -89,8 +109,8 @@ namespace TimeAPI.Data.Repositories
 
         public async Task UpdateByEntityID(EntityContact entity)
         {
-           await ExecuteAsync(
-                sql: @"UPDATE entity_contact
+            await ExecuteAsync(
+                 sql: @"UPDATE entity_contact
                    SET
                     name = @name,
                     first_name = @first_name, 
@@ -110,8 +130,8 @@ namespace TimeAPI.Data.Repositories
                     modified_date = @modified_date,
                     modifiedby = @modifiedby
                     WHERE entity_id = @entity_id",
-                param: entity
-            );
+                 param: entity
+             );
         }
 
         public async Task<dynamic> FindByEntityContactOrgID(string key)

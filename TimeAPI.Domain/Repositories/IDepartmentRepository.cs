@@ -1,20 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Model;
 
 namespace TimeAPI.Domain.Repositories
 {
-    public interface IDepartmentRepository : IRepository<Department, string>
+    public interface IDepartmentRepository : IRepositoryAsync<Department, string>
     {
-        Department FindByDepartmentName(string dep_name);
-        Department FindByDepartmentAlias(string alias);
-        IEnumerable<Department> FindDepartmentByOrgID(string OrgID);
-        dynamic FindAllDepLeadByOrgID(string OrgID);
-        dynamic FindAllDepMembersByDepID(string DepID);
-        dynamic FindDepLeadByDepID(string DepID);
-        dynamic FetchGridDataByDepOrgID(string OrgID);
+        Task<Department> FindByDepartmentName(string dep_name);
+        Task<Department> FindByDepartmentAlias(string alias);
+        Task<IEnumerable<Department>> FindDepartmentByOrgID(string OrgID);
+        Task<dynamic> FindAllDepLeadByOrgID(string OrgID);
+        Task<dynamic> FindAllDepMembersByDepID(string DepID);
+        Task<dynamic> FindDepLeadByDepID(string DepID);
+        Task<dynamic> FetchGridDataByDepOrgID(string OrgID);
 
     }
 }

@@ -77,8 +77,6 @@ namespace TimeAPI.Data.Repositories
              );
         }
 
-
-
         public void Update(LeadDeal entity)
         {
             Execute(

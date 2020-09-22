@@ -84,7 +84,6 @@ namespace TimeAPI.Data
         private IUnitDescriptionRepository _unitDescriptionRepository;
         private ITypeOfUnitRepository _typeOfUnitRepository;
 
-
         private IProjectTagsRepository _projectTagsRepository;
         private IProjectUnitRepository _projectUnitRepository;
         private IProjectDesignTypeRepository _projectDesignTypeRepository;
@@ -125,9 +124,7 @@ namespace TimeAPI.Data
         private ILocalActivityRepository _localActivityRepository;
         private IEntityCallRepository _entityCallRepository;
         private IEntityHistoryLogRepository _entityHistoryLogRepository;
-
-
-
+        private IWorkforceRepository _workforceRepository;
 
 
         #region systemadmin
@@ -652,6 +649,7 @@ namespace TimeAPI.Data
                     ?? (_superadminOrganizationRepository = new SuperadminOrganizationRepository(_transaction));
             }
         }
+
         public IAdminDashboardRepository AdminDashboardRepository
         {
             get
@@ -1129,6 +1127,17 @@ namespace TimeAPI.Data
             }
         }
 
+        public IWorkforceRepository WorkforceRepository
+        {
+            get
+            {
+                return _workforceRepository
+                    ?? (_workforceRepository = new WorkforceRepository(_transaction));
+            }
+        }
+
+        
+
         public bool Commit()
         {
             bool isSuccess = false;
@@ -1259,6 +1268,18 @@ namespace TimeAPI.Data
             _leadStageRepository = null;
             _leadContractRoleRepository = null;
             _prefixRepository = null;
+            _quotationRepository = null;
+            _paymentModeRepository = null;
+            _paymentRepository = null;
+            _warrantyRepository = null;
+            _exclusionRepository = null;
+            _entityMeetingRepository = null;
+            _entityNotesRepository = null;
+            _entityMeetingParticipantsRepository = null;
+            _localActivityRepository = null;
+            _entityCallRepository = null;
+            _entityHistoryLogRepository = null;
+
         }
 
         private void dispose(bool disposing)

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -21,9 +22,9 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public Department Find(string key)
+        public async Task<Department> Find(string key)
         {
-            return QuerySingleOrDefault<Department>(
+            return await QuerySingleOrDefaultAsync<Department>(
                 sql: "SELECT * FROM dbo.department WHERE is_deleted = 0 and id = @key ORDER BY department.dep_name ASC",
                 param: new { key }
             );
@@ -58,16 +59,16 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<Department> All()
+        public async Task<IEnumerable<Department>> All()
         {
-            return Query<Department>(
+            return await QueryAsync<Department>(
                 sql: "SELECT * FROM [dbo].[department] WITH (NOLOCK) where is_deleted = 0  ORDER BY department.dep_name ASC"
             );
         }
 
-        public Department FindByDepartmentName(string dep_name)
+        public async Task<Department> FindByDepartmentName(string dep_name)
         {
-            return QuerySingleOrDefault<Department>(
+            return await QuerySingleOrDefaultAsync<Department>(
                 sql: @"SELECT * FROM [dbo].[department] WITH (NOLOCK)
                         WHERE dep_name = @dep_name and is_deleted = 0
                         ORDER BY department.dep_name ASC",
@@ -75,9 +76,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public Department FindByDepartmentAlias(string alias)
+        public async Task<Department> FindByDepartmentAlias(string alias)
         {
-            return QuerySingleOrDefault<Department>(
+            return await QuerySingleOrDefaultAsync<Department>(
                 sql: @"SELECT * FROM [dbo].[department] WITH (NOLOCK)
                         WHERE alias = @alias and is_deleted = 0
                         ORDER BY department.dep_name ASC",
@@ -85,9 +86,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public IEnumerable<Department> FindDepartmentByOrgID(string org_id)
+        public async Task<IEnumerable<Department>> FindDepartmentByOrgID(string org_id)
         {
-            return Query<Department>(
+            return await QueryAsync<Department>(
                 sql: @"SELECT * FROM [dbo].[department] WITH (NOLOCK)
                        WHERE org_id = @org_id and is_deleted = 0
                        ORDER BY department.dep_name ASC",
@@ -95,9 +96,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public dynamic FindAllDepLeadByOrgID(string org_id)
+        public async Task<dynamic> FindAllDepLeadByOrgID(string org_id)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                 sql: @"SELECT
 	                    employee.full_name,
 	                    employee.workemail,
@@ -112,9 +113,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public dynamic FindDepLeadByDepID(string DepID)
+        public async Task<dynamic> FindDepLeadByDepID(string DepID)
         {
-            return QuerySingleOrDefault<dynamic>(
+            return await QuerySingleOrDefaultAsync<dynamic>(
                 sql: @"SELECT
                             designation.id as department_id,
                             department.dep_name,
@@ -131,9 +132,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public dynamic FetchGridDataByDepOrgID(string key)
+        public async Task<dynamic> FetchGridDataByDepOrgID(string key)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                    sql: @"SELECT
                                 ROW_NUMBER() OVER (ORDER BY department.id) AS rowno,
                                 department.id as department_id,
@@ -150,9 +151,9 @@ namespace TimeAPI.Data.Repositories
                );
         }
 
-        public dynamic FindAllDepMembersByDepID(string DepID)
+        public async Task<dynamic> FindAllDepMembersByDepID(string DepID)
         {
-            return Query<dynamic>(
+            return await QueryAsync<dynamic>(
                 sql: @"SELECT
                             department.id as department_id,
                             department.dep_name,

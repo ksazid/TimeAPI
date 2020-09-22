@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.Domain.Repositories
 {
-    public interface IEmployeeAppUsageRepository : IRepository<EmployeeAppUsage, string>
+    public interface IEmployeeAppUsageRepository : IRepositoryAsync<EmployeeAppUsage, string>
     {
-        public EmployeeAppUsage FindEmployeeAppUsageEmpID(string key);
+        Task<EmployeeAppUsage> FindEmployeeAppUsageEmpID(string key);
     }
 }

@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.Domain.Repositories
 {
-    public interface IDesignationRepositiory : IRepository<Designation, string>
+    public interface IDesignationRepositiory : IRepositoryAsync<Designation, string>
     {
-        Designation FindByDesignationName(string dep_name);
-        Designation FindByDesignationAlias(string alias);
-        IEnumerable<Designation> FindDesignationByDeptID(string DeptID);
-        dynamic FetchGridDataByDesignationByDeptOrgID(string OrgID);
-        dynamic GetAllDesignationByOrgID(string OrgID);
+        Task<Designation> FindByDesignationName(string dep_name);
+        Task<Designation> FindByDesignationAlias(string alias);
+        Task<IEnumerable<Designation>> FindDesignationByDeptID(string DeptID);
+        Task<dynamic> FetchGridDataByDesignationByDeptOrgID(string OrgID);
+        Task<dynamic> GetAllDesignationByOrgID(string OrgID);
     }
 }

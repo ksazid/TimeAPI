@@ -244,7 +244,7 @@ namespace TimeAPI.API.Controllers
             if (string.IsNullOrWhiteSpace(UserID.OrgID))
                 throw new ArgumentNullException(nameof(UserID.OrgID));
 
-            var Result = await _unitOfWork.TaskRepository.GetAllTaskByOrgAndEmpID(UserID.OrgID, UserID.EmpID).ConfigureAwait(false);
+            var Result = await _unitOfWork.TaskRepository.GetAllTaskByOrgAndEmpID(UserID.OrgID, UserID.EmpID, _dateTime.ToString()).ConfigureAwait(false);
             return await Task.FromResult<object>(Result).ConfigureAwait(false);
         }
 

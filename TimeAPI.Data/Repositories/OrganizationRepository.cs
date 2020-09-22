@@ -189,8 +189,6 @@ namespace TimeAPI.Data.Repositories
             return result;
         }
 
-
-
         public IEnumerable<OrganizationBranchViewModel> FindByAllBranchByParengOrgID(string ParengOrgID)
         {
             var Rest = Query<OrganizationBranchViewModel>(

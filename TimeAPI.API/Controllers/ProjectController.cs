@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Nancy.Extensions;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -577,7 +578,7 @@ namespace TimeAPI.API.Controllroers
             {
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
-              
+
                 List<ProjectSubTaskEntityViewModel> projectActivityTasks = new List<ProjectSubTaskEntityViewModel>();
 
                 projectActivityTasks = (await _unitOfWork.ProjectActivityTaskRepository.GetAllSubTaskByTaskID(Utils.ID).ConfigureAwait(false)).ToList();
@@ -739,14 +740,14 @@ namespace TimeAPI.API.Controllroers
                 var mapper = config.CreateMapper();
                 var modal = mapper.Map<EntityContact>(projectViewModel);
 
-                modal.id = Guid.NewGuid().ToString();
+                string entity_cont_id = modal.id = Guid.NewGuid().ToString();
                 modal.created_date = _dateTime.ToString();
                 modal.is_deleted = false;
 
                 _unitOfWork.EntityContactRepository.Add(modal);
                 _unitOfWork.Commit();
 
-                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Entity Location saved successfully." }).ConfigureAwait(false);
+                return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = entity_cont_id, Desc = "Entity Location saved successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -798,6 +799,56 @@ namespace TimeAPI.API.Controllroers
                 return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
             }
         }
+
+        [HttpPost]
+        [Route("FindEntityContactByEntityID")]
+        public async Task<object> FindEntityContactByEntityID([FromBody] Utils Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.ID));
+
+                var results = await _unitOfWork.EntityContactRepository.FindByEntityListID(Utils.ID).ConfigureAwait(false);
+
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(results, Formatting.Indented)).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+
+        [HttpPost]
+        [Route("GetAllEntityContactByEntityIDAndCstID")]
+        public async Task<object> GetAllEntityContactByEntityIDAndCstID([FromBody] UtilsEntityAndCstID Utils, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (cancellationToken != null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                if (Utils == null)
+                    throw new ArgumentNullException(nameof(Utils.EntityID));
+
+                var results = (await _unitOfWork.EntityContactRepository.GetAllEntityContactByEntityIDAndCstID(Utils.EntityID, Utils.CstID)
+                                                                        .ConfigureAwait(false)).DistinctBy(x => new { x.name, x.email });
+
+                return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(results, Formatting.Indented)).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = ex.Message, Desc = ex.Message });
+            }
+        }
+
+
+
+
 
         [HttpGet]
         [Route("GetAllEntityContact")]
@@ -1572,23 +1623,87 @@ namespace TimeAPI.API.Controllroers
                 if (TaskViewModel == null)
                     throw new ArgumentNullException(nameof(TaskViewModel));
 
-                await _unitOfWork.TaskTeamMembersRepository.RemoveByTaskID(TaskViewModel.id).ConfigureAwait(false);
+                bool? checkIfAssigned = null;
 
-                if (TaskViewModel.empid != null)
+                var task = await _unitOfWork.TaskRepository.Find(TaskViewModel.id).ConfigureAwait(false);
+                if (task != null)
                 {
-                    var TaskTeamMembers = new TaskTeamMember()
+                    int count = 0;
+                    var sub_task = (await _unitOfWork.SubTaskRepository.FindSubTaskByTaskID(task.id).ConfigureAwait(false)).ToList();
+                    for (int i = 0; i < sub_task.Count; i++)
                     {
-                        id = Guid.NewGuid().ToString(),
-                        task_id = TaskViewModel.id,
-                        empid = TaskViewModel.empid,
-                        createdby = TaskViewModel.createdby,
-                        created_date = _dateTime.ToString(),
-                        is_deleted = false
-                    };
-                    _unitOfWork.TaskTeamMembersRepository.Add(TaskTeamMembers);
+                        //await _unitOfWork.TaskTeamMembersRepository.RemoveByTaskID(sub_task[i].id).ConfigureAwait(false);
+                        var value = await _unitOfWork.TaskTeamMembersRepository.FindByTaskID(sub_task[i].id).ConfigureAwait(false);
+                        if (!value.Any())
+                        {
+                            if (TaskViewModel.empid != null)
+                            {
+                                var TaskTeamMembers = new TaskTeamMember()
+                                {
+                                    id = Guid.NewGuid().ToString(),
+                                    task_id = sub_task[i].id,
+                                    empid = TaskViewModel.empid,
+                                    createdby = TaskViewModel.createdby,
+                                    created_date = _dateTime.ToString(),
+                                    is_deleted = false
+                                };
+
+                                var Subtask = new SubTasks()
+                                {
+                                    id = sub_task[i].id,
+                                    lead_id = TaskViewModel.empid,
+                                    modifiedby = TaskViewModel.createdby,
+                                    modified_date = _dateTime.ToString()
+                                };
+                                await _unitOfWork.SubTaskRepository.UpdateSubTaskLeadBySubTaskID(Subtask).ConfigureAwait(false);
+                                _unitOfWork.TaskTeamMembersRepository.Add(TaskTeamMembers);
+                                checkIfAssigned = true;
+                            }
+                        }
+                        else
+                        {
+                            count++;
+                            if (count == sub_task.Count)
+                            {
+                                checkIfAssigned = false;
+                            }
+
+                        }
+                    }
+                }
+                else
+                {
+                    await _unitOfWork.TaskTeamMembersRepository.RemoveByTaskID(TaskViewModel.id).ConfigureAwait(false);
+                    if (TaskViewModel.empid != null)
+                    {
+                        var TaskTeamMembers = new TaskTeamMember()
+                        {
+                            id = Guid.NewGuid().ToString(),
+                            task_id = TaskViewModel.id,
+                            empid = TaskViewModel.empid,
+                            createdby = TaskViewModel.createdby,
+                            created_date = _dateTime.ToString(),
+                            is_deleted = false
+                        };
+                        var Subtask = new SubTasks()
+                        {
+                            id = TaskViewModel.id,
+                            lead_id = TaskViewModel.empid,
+                            modifiedby = TaskViewModel.createdby,
+                            modified_date = _dateTime.ToString()
+                        };
+                        await _unitOfWork.SubTaskRepository.UpdateSubTaskLeadBySubTaskID(Subtask).ConfigureAwait(false);
+                        _unitOfWork.TaskTeamMembersRepository.Add(TaskTeamMembers);
+                    }
+                    checkIfAssigned = true;
+                }
+                _unitOfWork.Commit();
+
+                if (Convert.ToBoolean(checkIfAssigned) == false)
+                {
+                    return await System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Alert", Desc = "All subtask are already assigned. Please assign manually." }).ConfigureAwait(false);
                 }
 
-                _unitOfWork.Commit();
                 return await System.Threading.Tasks.Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Task updated successfully." }).ConfigureAwait(false);
             }
             catch (Exception ex)

@@ -90,12 +90,19 @@ namespace TimeAPI.Data.Repositories
             return await QueryAsync<dynamic>(
                    sql: @"SELECT
                             dbo.task.id,
+							project_activity.activity_name,
                             dbo.task.task_name,
-                            dbo.task.task_desc,
+                            dbo.task.due_date,
+							dbo.task.task_desc,
+							priority.priority_name,
+							status.status_name,
 			                dbo.task.assigned_empid,
 			                dbo.task.status_id
                         FROM dbo.task WITH(NOLOCK)
                         INNER JOIN  dbo.project_activity_x_task on task.id = dbo.project_activity_x_task.task_id
+                        INNER JOIN  dbo.project_activity  on project_activity_x_task.activity_id = dbo.project_activity.id
+                        LEFT JOIN priority on task.priority_id = priority.id
+						LEFT JOIN status on task.status_id = status.id
                         WHERE dbo.project_activity_x_task.activity_id = @key
                         AND dbo.task.is_deleted = 0
                         ORDER BY dbo.task.task_name DESC",

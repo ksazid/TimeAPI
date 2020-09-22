@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.Domain.Repositories
 {
-    public interface IEntityNotesRepository : IRepository<EntityNotes, string>
+    public interface IEntityNotesRepository : IRepositoryAsync<EntityNotes, string>
     {
-        IEnumerable<EntityNotes> EntityNotesByOrgID(string OrgID);
-        IEnumerable<EntityNotes> EntityNotesByEntityID(string EntityID);
+        Task<IEnumerable<EntityNotes>> EntityNotesByOrgID(string OrgID);
+        Task<IEnumerable<EntityNotes>> EntityNotesByEntityID(string EntityID);
     }
 }

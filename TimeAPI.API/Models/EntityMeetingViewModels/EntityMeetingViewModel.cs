@@ -10,6 +10,7 @@ namespace TimeAPI.API.Models.EntityMeetingViewModels
     {
         public string id { get; set; }
         public string org_id { get; set; }
+        public string emp_id { get; set; }
         public string entity_id { get; set; }
         public string meeting_name { get; set; }
         public string location { get; set; }

@@ -10,6 +10,7 @@ namespace TimeAPI.API.Models.EntityCallViewModels
     {
         public string id { get; set; }
         public string entity_id { get; set; }
+        public string emp_id { get; set; }
         public string contact_id { get; set; }
         public string subject { get; set; }
         public string call_purpose { get; set; }

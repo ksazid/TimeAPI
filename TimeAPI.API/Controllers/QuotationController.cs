@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using TimeAPI.API.Models;
@@ -183,8 +184,9 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 var result = await _unitOfWork.QuotationRepository.FindByQuotationID(Utils.ID).ConfigureAwait(false);
-
+                result.EntityContact = (await _unitOfWork.EntityContactRepository.FindByEntityListID(result.id).ConfigureAwait(false)).ToList();
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
+
             }
             catch (Exception ex)
             {

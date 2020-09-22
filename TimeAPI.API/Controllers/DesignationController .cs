@@ -128,7 +128,7 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.DesignationRepositiory.All();
+                var result = await _unitOfWork.DesignationRepositiory.All().ConfigureAwait(false);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
@@ -151,7 +151,7 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.DesignationRepositiory.Find(Utils.ID);
+                var result = await _unitOfWork.DesignationRepositiory.Find(Utils.ID).ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -173,7 +173,7 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.FullName));
 
-                var result = _unitOfWork.DesignationRepositiory.FindByDesignationName(Utils.FullName);
+                var result = await _unitOfWork.DesignationRepositiory.FindByDesignationName(Utils.FullName).ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -195,7 +195,7 @@ namespace TimeAPI.API.Controllers
                 if (UtilsAlias == null)
                     throw new ArgumentNullException(nameof(UtilsAlias.Alias));
 
-                var result = _unitOfWork.DesignationRepositiory.FindByDesignationAlias(UtilsAlias.Alias);
+                var result = await _unitOfWork.DesignationRepositiory.FindByDesignationAlias(UtilsAlias.Alias).ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -217,7 +217,7 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.DesignationRepositiory.FindDesignationByDeptID(Utils.ID);
+                var result = await _unitOfWork.DesignationRepositiory.FindDesignationByDeptID(Utils.ID).ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -240,7 +240,7 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(UtilsOrgID.OrgID));
 
                 oDataTable _oDataTable = new oDataTable();
-                var results = _unitOfWork.DesignationRepositiory.FetchGridDataByDesignationByDeptOrgID(UtilsOrgID.OrgID);
+                var results = await _unitOfWork.DesignationRepositiory.FetchGridDataByDesignationByDeptOrgID(UtilsOrgID.OrgID).ConfigureAwait(false);
                 var xResult = _oDataTable.ToDataTable(results);
 
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
@@ -264,7 +264,7 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(UtilsOrgID.OrgID));
 
                 oDataTable _oDataTable = new oDataTable();
-                var results = _unitOfWork.DesignationRepositiory.GetAllDesignationByOrgID(UtilsOrgID.OrgID);
+                var results = await _unitOfWork.DesignationRepositiory.GetAllDesignationByOrgID(UtilsOrgID.OrgID).ConfigureAwait(false);
                 var xResult = _oDataTable.ToDataTable(results);
 
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);

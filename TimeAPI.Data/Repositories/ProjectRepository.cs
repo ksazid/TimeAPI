@@ -59,9 +59,7 @@ namespace TimeAPI.Data.Repositories
                 param: new { key, date }
             );
         }
-
-      
-
+                         
         public async Task<Project> FindCustomProjectPrefixByOrgIDAndPrefix(string key, string project_prefix)
         {
             return await QuerySingleOrDefaultAsync<Project>(
@@ -119,9 +117,10 @@ namespace TimeAPI.Data.Repositories
 
         public async Task<IEnumerable<dynamic>> FetchAllProjectByOrgID(string key)
         {
-            //AND entity_contact.is_primary = 1
+            //               AND dbo.entity_contact.is_primary = 1
+            //AND dbo.entity_contact.is_deleted = 0
             return await QueryAsync<dynamic>(
-                   sql: @"SELECT
+                   sql: @"	SELECT
                             project_type.id as project_type_id,
                             project_type.type_name as project_type_name,
                             project.id as project_id,
@@ -147,14 +146,14 @@ namespace TimeAPI.Data.Repositories
                         FROM project  WITH(NOLOCK)
                         LEFT JOIN dbo.customer_x_project  ON project.id = dbo.customer_x_project.project_id
 	                    LEFT JOIN dbo.customer ON dbo.customer_x_project.cst_id = dbo.customer.id
-	                    LEFT JOIN dbo.entity_contact on dbo.customer.id = dbo.entity_contact.entity_id
+	                    LEFT JOIN dbo.entity_contact on dbo.project.id = dbo.entity_contact.entity_id
 	                    LEFT JOIN dbo.employee e_tl ON project.user_id = e_tl.id
                         LEFT JOIN project_status  ON project.project_status_id = project_status.id
                         LEFT JOIN project_type  ON project.project_type_id = project_type.id
-                        WHERE
-	                    project.org_id= @key
+                        WHERE project.org_id= @key
+    
 	                    AND project.is_deleted = 0
-	                    ORDER BY project.project_name ASC",
+	                    ORDER BY FORMAT(CAST( dbo.project.created_date AS DATETIME2), N'MM/dd/yyyy hh:mm tt') DESC",
                       param: new { key }
                );
         }

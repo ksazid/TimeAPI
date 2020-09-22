@@ -582,7 +582,7 @@ namespace TimeAPI.API.Controllroers
                 if (statusingViewModel == null)
                     throw new ArgumentNullException(nameof(statusingViewModel));
 
-                var CustomerCostProject = _unitOfWork.CustomerProjectRepository.Find(statusingViewModel.project_id);
+                var CustomerCostProject = await _unitOfWork.CustomerProjectRepository.Find(statusingViewModel.project_id).ConfigureAwait(false);
 
                 if (CustomerCostProject == null)
                 {
@@ -650,8 +650,9 @@ namespace TimeAPI.API.Controllroers
                 modalCostProject = mapperCostProject.Map<CostProjectResponseViewModel>(CostProject);
 
                 typeOfDesign1 = (await _unitOfWork.ProjectDesignTypeRepository.GetProjectDesignTypeByProjectID(_project_id).ConfigureAwait(false))
-                                                                        .Select(x => x.design_type_id).ToList();
+                                                                              .Select(x => x.design_type_id).ToList();
                 entityContact1 = (await _unitOfWork.EntityContactRepository.FindByEntityListID(_project_id).ConfigureAwait(false)).ToList();
+
                 ProjectUnit = (await _unitOfWork.ProjectUnitRepository.FindByProjectID(_project_id).ConfigureAwait(false)).ToList();
                 var Customer = await _unitOfWork.CustomerProjectRepository.FindByProjectID(_project_id).ConfigureAwait(false);
 
@@ -1702,6 +1703,48 @@ namespace TimeAPI.API.Controllroers
                         _unitOfWork.EntityLocationRepository.Add(entityLocation);
                     }
 
+                    var ProjectContact = (await _unitOfWork.EntityContactRepository.FindByEntityListID(projectViewModel.id).ConfigureAwait(false)).ToList();
+
+                    if (ProjectContact != null)
+                    {
+                        for (int i = 0; i < ProjectContact.Count; i++)
+                        {
+                            var entityContact = new EntityContact()
+                            {
+                                id = Guid.NewGuid().ToString(),
+                                entity_id = modal.id,
+                                name = ProjectContact[i].name,
+                                position = ProjectContact[i].position,
+                                phone = ProjectContact[i].phone,
+                                mobile = ProjectContact[i].mobile,
+                                email = ProjectContact[i].email,
+                                city = ProjectContact[i].city,
+                                country = ProjectContact[i].country,
+                                createdby = modal.createdby,
+                                created_date = _dateTime.ToString(),
+                                is_deleted = false,
+                                is_primary = ProjectContact[i].is_primary
+                            };
+                            _unitOfWork.EntityContactRepository.Add(entityContact);
+                        }
+                    }
+
+                   var cst_x_project =  await _unitOfWork.CustomerProjectRepository.FindByProjectID(projectViewModel.id).ConfigureAwait(false);
+
+                    if (cst_x_project != null)
+                    {
+                        var customerCostProject = new CustomerProject()
+                        {
+                            id = Guid.NewGuid().ToString(),
+                            cst_id = cst_x_project.cst_id,
+                            project_id = modal.id,
+                            createdby = modal.createdby,
+                            created_date = _dateTime.ToString(),
+                            is_deleted = false
+                        };
+                        _unitOfWork.CustomerProjectRepository.Add(customerCostProject);
+                    }
+
                     var CostProjectMilestone = await _unitOfWork.CostProjectMilestoneRepository.GetCostProjectMilestoneByProjectID(projectViewModel.id).ConfigureAwait(false);
 
                     foreach (var item in CostProjectMilestone)
@@ -2686,7 +2729,7 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var results = _unitOfWork.CostPerHourRepository.FetchCostPerHourOrgID(Utils.ID);
+                var results = await _unitOfWork.CostPerHourRepository.FetchCostPerHourOrgID(Utils.ID).ConfigureAwait(false);
 
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(results, Formatting.Indented)).ConfigureAwait(false);
             }
@@ -2708,7 +2751,7 @@ namespace TimeAPI.API.Controllroers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var results = _unitOfWork.CostPerHourRepository.Find(Utils.ID);
+                var results = await _unitOfWork.CostPerHourRepository.Find(Utils.ID).ConfigureAwait(false);
                 return await Task.FromResult<object>(results).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -2726,7 +2769,7 @@ namespace TimeAPI.API.Controllroers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.CostPerHourRepository.All();
+                var result = await _unitOfWork.CostPerHourRepository.All().ConfigureAwait(false);
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)

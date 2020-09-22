@@ -90,7 +90,19 @@ namespace TimeAPI.Data.Repositories
         public async Task<IEnumerable<dynamic>> FindCustomerByOrgID(string key)
         {
             return await QueryAsync<dynamic>(
-                sql: "SELECT  ROW_NUMBER() OVER (ORDER BY dbo.customer.cst_name) AS rowno, * FROM dbo.customer where is_deleted = 0 AND org_id = @key",
+                sql: @"SELECT dbo.entity_contact.is_primary,
+                        dbo.entity_contact.name as primary_name,
+                        dbo.entity_contact.email as primary_email,
+                        dbo.entity_contact.phone as primary_phone,
+                        dbo.industry_type.industry_type_name,
+                        dbo.customer.*
+                        FROM dbo.customer
+                    LEFT JOIN  dbo.entity_contact on  dbo.customer.id = dbo.entity_contact.entity_id
+                    LEFT JOIN  dbo.industry_type on  dbo.customer.industry_id = dbo.industry_type.id
+                    WHERE
+                        dbo.customer.is_deleted = 0
+                        AND dbo.entity_contact.is_deleted = 0
+                        AND dbo.customer.org_id = @key",
                  param: new { key }
             );
         }

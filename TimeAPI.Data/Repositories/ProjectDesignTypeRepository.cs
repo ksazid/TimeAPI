@@ -46,17 +46,13 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-
         public async Task<IEnumerable<ProjectDesignType>> GetProjectDesignTypeByProjectID(string key)
         {
             return await QueryAsync<ProjectDesignType>(
                 sql: "SELECT * FROM dbo.project_design_type WHERE project_id = @key and is_deleted = 0",
                 param: new { key }
             );
-        }
-        
-
-
+        }              
 
         public async Task<IEnumerable<ProjectDesignType>> All()
         {
@@ -86,6 +82,7 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
+
         public async Task RemoveByProjectID(string key)
         {
            await ExecuteAsync(
@@ -96,10 +93,6 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
-
-        
-
-
 
         public void Update(ProjectDesignType entity)
         {

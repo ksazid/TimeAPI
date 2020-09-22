@@ -31,7 +31,14 @@ namespace TimeAPI.Data.Repositories
                 param: new { key }
             );
         }
-
+        public async Task<IEnumerable<SubTasks>> FindSubTaskByTaskID(string key)
+        {
+            return await QueryAsync<SubTasks>(
+                sql: @"SELECT  * from dbo.sub_task where task_id = @key",
+                param: new { key }
+            );
+        }
+       
         public void Remove(string key)
         {
             Execute(
@@ -87,5 +94,20 @@ namespace TimeAPI.Data.Repositories
                  param: entity
              );
         }
+
+        public async Task UpdateSubTaskLeadBySubTaskID(SubTasks entity)
+        {
+            await ExecuteAsync(
+                 sql: @"UPDATE dbo.sub_task
+                   SET
+                    lead_id = @lead_id,
+                    modified_date = @modified_date,
+                    modifiedby = @modifiedby
+                    WHERE id =  @id",
+                 param: entity
+             );
+        }
+
+        
     }
 }

@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 
 namespace TimeAPI.Domain.Repositories
 {
-    public interface IEntityCallRepository : IRepository<EntityCall, string>
+    public interface IEntityCallRepository : IRepositoryAsync<EntityCall, string>
     {
-        dynamic EntityCallByEntityID(string EntityID);
+        Task<dynamic> EntityCallByEntityID(string EntityID);
     }
 }

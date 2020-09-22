@@ -149,7 +149,7 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                _unitOfWork.EmployeeRepository.SetEmployeeInactiveByEmpID(Utils.ID);
+                await _unitOfWork.EmployeeRepository.SetEmployeeInactiveByEmpID(Utils.ID).ConfigureAwait(false);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee set to inactive." }).ConfigureAwait(false);
@@ -172,16 +172,16 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                int Result = _unitOfWork.EmployeeRepository.RemoveEmployeeIfZeroActivity(Utils.ID);
+                int Result = await _unitOfWork.EmployeeRepository.RemoveEmployeeIfZeroActivity(Utils.ID).ConfigureAwait(false);
 
                 if (Result > 0)
                 {
                     return await Task.FromResult<object>(new SuccessViewModel { Status = "201", Code = "Error", Desc = "Employee has being attended more than one project activity. Are you sure to remove all past history of the employee." }).ConfigureAwait(false);
                 }
 
-                var result = _unitOfWork.EmployeeRepository.Find(Utils.ID);
+                var result = await _unitOfWork.EmployeeRepository.Find(Utils.ID).ConfigureAwait(false);
 
-                _unitOfWork.EmployeeRepository.RemovePermanent(Utils.ID);
+                await _unitOfWork.EmployeeRepository.RemovePermanent(Utils.ID).ConfigureAwait(false);
                 _unitOfWork.UserRepository.Remove(result.user_id);
                 _unitOfWork.Commit();
 
@@ -205,9 +205,8 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.EmployeeRepository.Find(Utils.ID);
-
-                _unitOfWork.EmployeeRepository.RemovePermanent(Utils.ID);
+                var result = await _unitOfWork.EmployeeRepository.Find(Utils.ID).ConfigureAwait(false);
+                await _unitOfWork.EmployeeRepository.RemovePermanent(Utils.ID).ConfigureAwait(false);
                 _unitOfWork.UserRepository.Remove(result.user_id);
                 _unitOfWork.Commit();
 
@@ -228,7 +227,7 @@ namespace TimeAPI.API.Controllers
                 if (cancellationToken != null)
                     cancellationToken.ThrowIfCancellationRequested();
 
-                var result = _unitOfWork.EmployeeRepository.All();
+                var result = await _unitOfWork.EmployeeRepository.All().ConfigureAwait(false);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
@@ -251,7 +250,7 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.EmployeeRepository.Find(Utils.ID);
+                var result = await _unitOfWork.EmployeeRepository.Find(Utils.ID).ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -273,7 +272,7 @@ namespace TimeAPI.API.Controllers
                 if (UtilsName == null)
                     throw new ArgumentNullException(nameof(UtilsName));
 
-                var result = _unitOfWork.EmployeeRepository.FindByEmpName(UtilsName.FullName);
+                var result = await _unitOfWork.EmployeeRepository.FindByEmpName(UtilsName.FullName).ConfigureAwait(false);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
@@ -295,8 +294,7 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.EmployeeRepository.FindByOrgIDCode(Utils.ID);
-
+                var result = await _unitOfWork.EmployeeRepository.FindByOrgIDCode(Utils.ID).ConfigureAwait(false);
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -317,8 +315,7 @@ namespace TimeAPI.API.Controllers
                 if (_EmpCode == null)
                     throw new ArgumentNullException(nameof(_EmpCode.Code));
 
-                var result = _unitOfWork.EmployeeRepository.FindByEmpCode(_EmpCode.Code);
-
+                var result = await _unitOfWork.EmployeeRepository.FindByEmpCode(_EmpCode.Code).ConfigureAwait(false);
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -339,8 +336,7 @@ namespace TimeAPI.API.Controllers
                 if (UtilsRole == null)
                     throw new ArgumentNullException(nameof(UtilsRole.Role));
 
-                var result = _unitOfWork.EmployeeRepository.FindByRoleName(UtilsRole.Role);
-
+                var result = await _unitOfWork.EmployeeRepository.FindByRoleName(UtilsRole.Role).ConfigureAwait(false);
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -362,7 +358,7 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(UtilsOrgID.OrgID));
 
                 oDataTable _oDataTable = new oDataTable();
-                var results = _unitOfWork.EmployeeRepository.FetchGridDataEmployeeByOrgID(UtilsOrgID.OrgID);
+                var results = await _unitOfWork.EmployeeRepository.FetchGridDataEmployeeByOrgID(UtilsOrgID.OrgID).ConfigureAwait(false);
                 var xResult = _oDataTable.ToDataTable(results);
                 _unitOfWork.Commit();
 
@@ -387,7 +383,7 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(utils.ID));
 
                 oDataTable _oDataTable = new oDataTable();
-                var results = _unitOfWork.EmployeeRepository.FindEmployeeListByDesignationID(utils.ID);
+                var results = await _unitOfWork.EmployeeRepository.FindEmployeeListByDesignationID(utils.ID).ConfigureAwait(false);
                 var xResult = _oDataTable.ToDataTable(results);
 
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(results, Formatting.Indented)).ConfigureAwait(false);
@@ -411,7 +407,7 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(utils.ID));
 
                 oDataTable _oDataTable = new oDataTable();
-                var results = _unitOfWork.EmployeeRepository.FindEmployeeListByDepartmentID(utils.ID);
+                var results = await _unitOfWork.EmployeeRepository.FindEmployeeListByDepartmentID(utils.ID).ConfigureAwait(false);
                 var xResult = _oDataTable.ToDataTable(results);
 
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(results, Formatting.Indented)).ConfigureAwait(false);
@@ -435,8 +431,7 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 oDataTable _oDataTable = new oDataTable();
-                var results = _unitOfWork.EmployeeRepository.FindEmpDepartDesignByEmpID(Utils.ID);
-
+                var results = await _unitOfWork.EmployeeRepository.FindEmpDepartDesignByEmpID(Utils.ID).ConfigureAwait(false);
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(results, Formatting.Indented)).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -458,7 +453,7 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(UtilsOrgID.OrgID));
 
                 oDataTable _oDataTable = new oDataTable();
-                var results = _unitOfWork.EmployeeRepository.GetAllOutsourcedEmpByOrgID(UtilsOrgID.OrgID);
+                var results = await _unitOfWork.EmployeeRepository.GetAllOutsourcedEmpByOrgID(UtilsOrgID.OrgID).ConfigureAwait(false);
                 var xResult = _oDataTable.ToDataTable(results);
 
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(xResult, Formatting.Indented)).ConfigureAwait(false);
@@ -482,7 +477,7 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(UtilsOrgID.OrgID));
 
                 oDataTable _oDataTable = new oDataTable();
-                var results = _unitOfWork.EmployeeRepository.GetAllFreelancerEmpByOrgID(UtilsOrgID.OrgID);
+                var results = await _unitOfWork.EmployeeRepository.GetAllFreelancerEmpByOrgID(UtilsOrgID.OrgID).ConfigureAwait(false);
                 var xResult = _oDataTable.ToDataTable(results);
                 _unitOfWork.Commit();
 
@@ -507,7 +502,7 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 oDataTable _oDataTable = new oDataTable();
-                var results = _unitOfWork.EmployeeRepository.FindEmpDepartDesignByTeamID(Utils.ID);
+                var results = await _unitOfWork.EmployeeRepository.FindEmpDepartDesignByTeamID(Utils.ID).ConfigureAwait(false);
                 var xResult = _oDataTable.ToDataTable(results);
 
                 return await System.Threading.Tasks.Task.FromResult<object>(JsonConvert.SerializeObject(results, Formatting.Indented)).ConfigureAwait(false);
@@ -530,8 +525,7 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.EmployeeRepository.GetOrganizationScreenshotDetails(Utils.ID);
-
+                var result = await _unitOfWork.EmployeeRepository.GetOrganizationScreenshotDetails(Utils.ID).ConfigureAwait(false);
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -672,8 +666,8 @@ namespace TimeAPI.API.Controllers
                 modal.created_date = _dateTime.ToString();
 
                 var LeaveName = _unitOfWork.LeaveSetupRepository.Find(modal.leave_setup_id).leave_name;
-                var FromName = _unitOfWork.EmployeeRepository.Find(modal.emp_id).full_name;
-                var ToName = _unitOfWork.EmployeeRepository.Find(modal.approver_emp_id).full_name;
+                var FromName = (await _unitOfWork.EmployeeRepository.Find(modal.emp_id).ConfigureAwait(false)).full_name;
+                var ToName = (await _unitOfWork.EmployeeRepository.Find(modal.approver_emp_id).ConfigureAwait(false)).full_name;
 
                 var EmployeeLeaveLog = new EmployeeLeaveLog
                 {
@@ -766,8 +760,7 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.EmployeeLeaveRepository.FetchEmployeeLeaveID(Utils.ID);
-
+                var result = await _unitOfWork.EmployeeLeaveRepository.FetchEmployeeLeaveID(Utils.ID).ConfigureAwait(false);
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -789,7 +782,7 @@ namespace TimeAPI.API.Controllers
                     throw new ArgumentNullException(nameof(Utils.ID));
 
                 oDataTable _oDataTable = new oDataTable();
-                var result = _unitOfWork.EmployeeLeaveRepository.FetchEmployeeLeaveOrgID(Utils.ID);
+                var result = await _unitOfWork.EmployeeLeaveRepository.FetchEmployeeLeaveOrgID(Utils.ID).ConfigureAwait(false);
                 //var xResult = _oDataTable.ToDataTable(result);
 
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
@@ -812,7 +805,7 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.EmployeeLeaveRepository.FetchEmployeeLeaveEmpID(Utils.ID);
+                var result = await _unitOfWork.EmployeeLeaveRepository.FetchEmployeeLeaveEmpID(Utils.ID).ConfigureAwait(false);
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -839,8 +832,8 @@ namespace TimeAPI.API.Controllers
                 modal.modified_date = _dateTime.ToString();
 
                 var LeaveName = _unitOfWork.LeaveSetupRepository.Find(modal.leave_setup_id).leave_name;
-                var ToName = _unitOfWork.EmployeeRepository.Find(modal.emp_id).full_name;
-                var FromName = _unitOfWork.EmployeeRepository.Find(modal.approver_emp_id).full_name;
+                var ToName = (await _unitOfWork.EmployeeRepository.Find(modal.emp_id).ConfigureAwait(false)).full_name;
+                var FromName = (await _unitOfWork.EmployeeRepository.Find(modal.approver_emp_id).ConfigureAwait(false)).full_name;
 
                 var EmployeeLeaveLog = new EmployeeLeaveLog
                 {
@@ -859,7 +852,7 @@ namespace TimeAPI.API.Controllers
                 };
 
                 _unitOfWork.EmployeeLeaveLogRepository.Add(EmployeeLeaveLog);
-                _unitOfWork.EmployeeLeaveRepository.UpdateApprovedByID(modal);
+                await _unitOfWork.EmployeeLeaveRepository.UpdateApprovedByID(modal).ConfigureAwait(false);
                 _unitOfWork.Commit();
 
                 return await Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Employee Leave updated successfully." }).ConfigureAwait(false);
@@ -882,7 +875,7 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.EmployeeLeaveRepository.FetchEmployeeLeaveHistoryEmpID(Utils.ID);
+                var result = await _unitOfWork.EmployeeLeaveRepository.FetchEmployeeLeaveHistoryEmpID(Utils.ID).ConfigureAwait(false);
                 var json = JsonConvert.SerializeObject(result);
                 DataTable dataTable = (DataTable)JsonConvert.DeserializeObject(json, (typeof(DataTable)));
 
@@ -890,9 +883,9 @@ namespace TimeAPI.API.Controllers
 
                 for (int i = 0; i < dataTable.Rows.Count; i++)
                 {
-                    var LeaveDays = _unitOfWork.EmployeeLeaveRepository.GetDaysOfMonth
+                    var LeaveDays = await _unitOfWork.EmployeeLeaveRepository.GetDaysOfMonth
                                                                         (dataTable.Rows[i]["leave_start_date"].ToString(),
-                                                                        dataTable.Rows[i]["leave_end_date"].ToString());
+                                                                        dataTable.Rows[i]["leave_end_date"].ToString()).ConfigureAwait(false);
 
                     var json2 = JsonConvert.SerializeObject(LeaveDays);
                     DataTable dataTable2 = (DataTable)JsonConvert.DeserializeObject(json2, (typeof(DataTable)));
@@ -957,7 +950,7 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.EmployeeLeaveRepository.FetchEmployeeLeaveHistoryOrgID(Utils.ID);
+                var result = await _unitOfWork.EmployeeLeaveRepository.FetchEmployeeLeaveHistoryOrgID(Utils.ID).ConfigureAwait(false);
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -978,7 +971,7 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.EmployeeLeaveRepository.FetchEmployeeLeaveHistoryApproverID(Utils.ID);
+                var result = await _unitOfWork.EmployeeLeaveRepository.FetchEmployeeLeaveHistoryApproverID(Utils.ID).ConfigureAwait(false);
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -999,7 +992,7 @@ namespace TimeAPI.API.Controllers
                 if (Utils == null)
                     throw new ArgumentNullException(nameof(Utils.ID));
 
-                var result = _unitOfWork.EmployeeLeaveLogRepository.FetchEmployeeLeaveLogHistoryEmpID(Utils.ID);
+                var result = await _unitOfWork.EmployeeLeaveLogRepository.FetchEmployeeLeaveLogHistoryEmpID(Utils.ID).ConfigureAwait(false);
                 return await Task.FromResult<object>(result).ConfigureAwait(false);
             }
             catch (Exception ex)

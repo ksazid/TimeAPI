@@ -24,7 +24,7 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public async Task< Quotation> Find(string key)
+        public async Task<Quotation> Find(string key)
         {
             return await QuerySingleOrDefaultAsync<Quotation>(
                 sql: "SELECT * FROM dbo.project_quotation WHERE id = @key and is_deleted = 0",
@@ -32,9 +32,9 @@ namespace TimeAPI.Data.Repositories
             );
         }
 
-        public async Task<dynamic> FindByQuotationID(string key)
+        public async Task<Quotation> FindByQuotationID(string key)
         {
-            return await QuerySingleOrDefaultAsync<dynamic>(
+            return await QuerySingleOrDefaultAsync<Quotation>(
                 sql: @"SELECT
                         CASE
                             WHEN dbo.customer.is_company = 1 THEN dbo.customer.company_name
@@ -101,6 +101,7 @@ namespace TimeAPI.Data.Repositories
 						and customer.is_deleted = 0 
 						and project_quotation.is_deleted = 0
 						and entity_contact.is_primary =1 
+						and entity_contact.is_deleted =0 
 						and cost_project.org_id = @key",
                 param: new { key }
             );

@@ -13,6 +13,7 @@ namespace TimeAPI.Domain.Repositories
         Task<EntityContact> FindByEntityID(string EntityID);
         Task<IEnumerable<EntityContact>> FindByEntityListID(string EntityID);
         Task<dynamic> FindByEntityContactOrgID(string OrgID);
+        Task<IEnumerable<EntityContact>> GetAllEntityContactByEntityIDAndCstID(string EntityID, string CstID);
 
     }
 }

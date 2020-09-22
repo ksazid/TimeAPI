@@ -6,6 +6,7 @@ namespace TimeAPI.Domain
 {
     public interface IUnitOfWork : IDisposable
     {
+        #region interface
         IRoleRepository RoleRepository { get; }
         IRoleClaimRepository RoleClaimRepository { get; }
         IUserRepository UserRepository { get; }
@@ -112,8 +113,9 @@ namespace TimeAPI.Domain
         ILocalActivityRepository LocalActivityRepository { get; }
         IEntityCallRepository EntityCallRepository { get; }
         IEntityHistoryLogRepository EntityHistoryLogRepository { get; }
-      
+        IWorkforceRepository WorkforceRepository { get; }
 
+        #endregion interface
 
         #region systemadmin
         IPlanRepository PlanRepository { get; }

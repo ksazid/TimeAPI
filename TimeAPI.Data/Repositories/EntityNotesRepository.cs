@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using TimeAPI.Domain.Entities;
 using TimeAPI.Domain.Repositories;
 
@@ -21,32 +22,32 @@ namespace TimeAPI.Data.Repositories
                 );
         }
 
-        public EntityNotes Find(string key)
+        public async Task< EntityNotes> Find(string key)
         {
-            return QuerySingleOrDefault<EntityNotes>(
+            return await QuerySingleOrDefaultAsync<EntityNotes>(
                 sql: "SELECT * FROM dbo.entity_notes WHERE id = @key and is_deleted = 0",
                 param: new { key }
             );
         }
 
-        public IEnumerable<EntityNotes> All()
+        public async Task< IEnumerable<EntityNotes>> All()
         {
-            return Query<EntityNotes>(
+            return await QueryAsync<EntityNotes>(
                 sql: "SELECT * FROM dbo.entity_notes where is_deleted = 0"
             );
         }
 
-        public IEnumerable<EntityNotes> EntityNotesByOrgID(string key)
+        public async Task<IEnumerable<EntityNotes>> EntityNotesByOrgID(string key)
         {
-            return Query<EntityNotes>(
+            return await QueryAsync<EntityNotes>(
                 sql: "SELECT * FROM dbo.entity_notes where is_deleted = 0 and org_id = @key",
                 param: new { key }
             );
         }
 
-        public IEnumerable<EntityNotes> EntityNotesByEntityID(string key)
+        public async Task<IEnumerable<EntityNotes>> EntityNotesByEntityID(string key)
         {
-            return Query<EntityNotes>(
+            return await QueryAsync<EntityNotes>(
                 sql: "SELECT * FROM dbo.entity_notes where is_deleted = 0 and entity_id = @key",
                 param: new { key }
             );

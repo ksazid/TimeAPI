@@ -115,7 +115,7 @@ namespace TimeAPI.API.Controllroers
 
                 foreach (var item in teamViewModel.teammember_empids)
                 {
-                    var Employee = _unitOfWork.EmployeeRepository.Find(item);
+                    var Employee = await _unitOfWork.EmployeeRepository.Find(item).ConfigureAwait(false);
 
                     if (Employee != null)
                     {

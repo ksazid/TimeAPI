@@ -133,44 +133,45 @@ namespace TimeAPI.Data.Repositories
             //AND entity_contact.is_primary = 1
             return await QueryAsync<dynamic>(
                    sql: @"SELECT
-	                        project_type.id as project_type_id,
-                            project_type.type_name as project_type_name,
-                            entity_contact.name,
-							entity_contact.phone,
-							entity_contact.email,
-                            cost_project.id as project_id,
-                            cost_project.project_name,
-	                        CASE
-                            WHEN FORMAT(CAST( dbo.cost_project.modified_date AS DATETIME2), N'dd/MM/yyyy') IS NULL
-	                        THEN FORMAT(CAST( dbo.cost_project.created_date AS DATETIME2), N'dd/MM/yyyy')
-                            ELSE FORMAT(CAST( dbo.cost_project.created_date AS DATETIME2), N'dd/MM/yyyy') 
-                            END AS ondate,
-	                        dbo.customer.cst_name,
-                            cost_project.project_prefix,
-                            cost_project.no_of_floors, 
-                            cost_project.plot_size, 
-                            cost_project.buildup_area, 
-                            cost_project.discount_amount, 
-                            cost_project.profit_margin_amount, 
-                            cost_project.net_total_amount, 
-                            e_tl.full_name as project_owner,
-                            e_tl.workemail,
-                            project_status.project_status_name ,
-	                        cost_project.start_date,
-                            cost_project.end_date,
-                            cost_project.completed_date
-                        FROM dbo.cost_project WITH (NOLOCK)
-                        LEFT JOIN dbo.employee e_tl ON dbo.cost_project.user_id = e_tl.id
-                        LEFT JOIN dbo.project_status ON dbo.cost_project.project_status_id = dbo.project_status.id
-                        LEFT JOIN dbo.project_type ON dbo.cost_project.project_type_id = dbo.project_type.id
-                        LEFT JOIN dbo.customer_x_project ON dbo.cost_project.id = dbo.customer_x_project.project_id
-						LEFT JOIN dbo.customer ON dbo.customer_x_project.cst_id = dbo.customer.id
-                        LEFT JOIN dbo.entity_contact on dbo.customer.id = dbo.entity_contact.entity_id
-                        WHERE
-						dbo.cost_project.org_id = @key
-	                     
-                        AND dbo.cost_project.is_deleted = 0 and cost_project.is_quotation != 1
-                        ORDER BY dbo.cost_project.project_name ASC",
+	                            project_type.id as project_type_id,
+                                project_type.type_name as project_type_name,
+                                entity_contact.name,
+		                        entity_contact.phone,
+		                        entity_contact.email,
+                                cost_project.id as project_id,
+                                cost_project.project_name,
+	                            CASE
+                                WHEN FORMAT(CAST( dbo.cost_project.modified_date AS DATETIME2), N'dd/MM/yyyy') IS NULL
+	                            THEN FORMAT(CAST( dbo.cost_project.created_date AS DATETIME2), N'dd/MM/yyyy')
+                                ELSE FORMAT(CAST( dbo.cost_project.created_date AS DATETIME2), N'dd/MM/yyyy') 
+                                END AS ondate,
+	                            dbo.customer.cst_name,
+                                cost_project.project_prefix,
+                                cost_project.no_of_floors, 
+                                cost_project.plot_size, 
+                                cost_project.buildup_area, 
+                                cost_project.discount_amount, 
+                                cost_project.profit_margin_amount, 
+                                cost_project.net_total_amount, 
+                                e_tl.full_name as project_owner,
+                                e_tl.workemail,
+                                project_status.project_status_name ,
+	                            cost_project.start_date,
+                                cost_project.end_date,
+                                cost_project.completed_date
+                            FROM dbo.cost_project WITH (NOLOCK)
+                            LEFT JOIN dbo.employee e_tl ON dbo.cost_project.user_id = e_tl.id
+                            LEFT JOIN dbo.project_status ON dbo.cost_project.project_status_id = dbo.project_status.id
+                            LEFT JOIN dbo.project_type ON dbo.cost_project.project_type_id = dbo.project_type.id
+                            LEFT JOIN dbo.customer_x_project ON dbo.cost_project.id = dbo.customer_x_project.project_id
+	                        LEFT JOIN dbo.customer ON dbo.customer_x_project.cst_id = dbo.customer.id
+                            LEFT JOIN dbo.entity_contact on dbo.cost_project.id = dbo.entity_contact.entity_id
+                            WHERE dbo.cost_project.org_id = @key
+	                        AND entity_contact.is_primary = 1
+                            AND dbo.cost_project.is_deleted = 0 
+	                        AND cost_project.is_quotation != 1
+	                        AND entity_contact.is_deleted  = 0
+                            ORDER BY FORMAT(CAST(dbo.cost_project.created_date AS DATETIME2), N'MM/dd/yyyy hh:mm tt') DESC",
                       param: new { key }
                );
         }

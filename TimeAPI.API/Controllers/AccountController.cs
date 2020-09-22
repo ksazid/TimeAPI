@@ -170,7 +170,7 @@ namespace TimeAPI.API.Controllers
                 {
                     _unitOfWork.Commit();
 
-                    if (_unitOfWork.EmployeeRepository.FindByEmpUserID(userId).is_password_reset == false)
+                    if ((await _unitOfWork.EmployeeRepository.FindByEmpUserID(userId).ConfigureAwait(false)).is_password_reset == false)
                     {
                         await UserPasswordResetCode(user).ConfigureAwait(true);
                         return Task.FromResult<object>(new SuccessViewModel { Status = "200", Code = "Success", Desc = "Congrats! User Verified. Please setup password for login." });
